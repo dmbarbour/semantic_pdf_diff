@@ -16,7 +16,7 @@ from semantic_pdf_diff.progress import NoProgress
 from semantic_pdf_diff.provenance import triage_interpreter
 from semantic_pdf_diff.figures import CAPTION, find_figures, targets
 from semantic_pdf_diff.situate import figure_map, grounding, quality, situate, values_in
-from semantic_pdf_diff.binding import InterpreterMismatch, bind
+from semantic_pdf_diff.binding import bind
 from semantic_pdf_diff.store import Store
 import stubs
 from stubs import situating_answer
@@ -411,18 +411,16 @@ class Storage(unittest.TestCase):
             self.assertEqual(self.situating_calls(client), 0)
             self.assertEqual(json.loads((root / 'out/evidence.json').read_text())['situation'], {})
 
-    def test_changed_triage_interpreter_needs_a_reset_that_keeps_evidence(self):
+    def test_a_changed_triage_interpreter_situates_again_and_keeps_evidence(self):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
             self.run_cli(root, a, b)
             with Store(root / 'out') as store:
                 evidence_before = store.db.execute('SELECT COUNT(*) FROM task').fetchone()[0]
                 changed = triage_interpreter(Settings()).model_copy(update={'prompt_hash': 'different'})
-                with self.assertRaises(InterpreterMismatch):
-                    bind(store, changed)
-                preview = bind(store, changed, reset=True, dry_run=True)
+                preview = bind(store, changed, dry_run=True)
                 self.assertEqual(preview['situated_content'], 2)
-                bind(store, changed, reset=True)
+                bind(store, changed)
                 self.assertEqual(store.db.execute('SELECT COUNT(*) FROM situation').fetchone()[0], 0)
                 self.assertEqual(store.db.execute('SELECT COUNT(*) FROM task').fetchone()[0], evidence_before)
                 self.assertTrue(all(s.about == '' for (c,) in store.db.execute('SELECT DISTINCT content FROM section')

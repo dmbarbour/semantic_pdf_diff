@@ -20,7 +20,7 @@ from .readings import reconcile
 from .report import SPLIT, report_topics, traced, write_report
 from .scan import ARCHIVES, Limits, read_origin
 from .situate import quality, situate
-from .binding import bind
+from .binding import bind, redone
 from .store import Store, StoreError
 
 def limits(settings):
@@ -60,11 +60,11 @@ def attempt(run_it, *args, **kwargs):
 
 @dataclass
 class RunOptions:
-    """What a run takes besides its settings: how to compare, whether to reset a store bound to other settings, and
-    where answers come from and costs go."""
+    """What a run takes besides its settings: how to compare, whether to start a store over, and where answers come
+    from and costs go."""
     mode: str = "proposals"           # proposals or revisions
-    reset: bool = False               # clear derived data a changed interpreter affects, then run
-    dry_run: bool = False             # with reset: report what would be cleared, change nothing
+    reset: bool = False               # start the store over: everything read is read again (binding.bind)
+    dry_run: bool = False             # report what the run would clear to read again, change nothing
     fixture: Path | None = None       # replay fixture (.sqlite, or a .zip to replay)
     fixture_mode: str | None = None   # fixtures.MODES; None: the fixture's default (fixtures.default_mode)
     responder: str | None = None      # whose recorded answers (default: the model's name)
@@ -152,9 +152,9 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
     interpreter = extraction_interpreter(settings)
     triage = triage_interpreter(settings) if settings.situate else None
     if options.dry_run:
-        would = {'extract': bind(store, interpreter, reset=True, dry_run=True)}
+        would = {'extract': bind(store, interpreter, reset=options.reset, dry_run=True)}
         if triage:
-            would['triage'] = bind(store, triage, reset=True, dry_run=True)
+            would['triage'] = bind(store, triage, reset=options.reset, dry_run=True)
         print(json.dumps({'would_clear': would}, indent=2))
         return 0
     prepare(options, settings, store, names, (interpreter, triage), force_rescan)
@@ -170,19 +170,15 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
             client.close()
 
 def prepare(options, settings, store, names, roles, force_rescan):
-    """The store bound to the run's interpreters (each checked before either clears anything, so a rejected run
-    changes nothing), readings merged as the settings say, the sources scanned."""
+    """The store bound to the run's interpreters (what changed settings affect cleared, to be read again; everything,
+    with --reset), readings merged as the settings say, the sources scanned."""
     check_fixture(options)
     for role in filter(None, roles):
-        if not options.reset:
-            bind(store, role, dry_run=True)
-    for role in filter(None, roles):
         cleared = bind(store, role, reset=options.reset)
-        if cleared.get("automatic"):
-            log.info(f"Changed settings that only post-process answers ({'; '.join(cleared['automatic'])}): what they "
-                     f"affect is recomputed from cached answers")
+        if options.reset and cleared:
+            log.info(f"Started over ({role.role}): {json.dumps(cleared)}")
         elif cleared:
-            log.info(f"Reset cleared ({role.role}): {json.dumps(cleared)}")
+            log.info(redone(role.role, cleared))
     if store.set_reconcile(settings.reconciles()):
         log.info("Readings merging changed: situating results will be redone")
     if settings.rescan == 'auto' or force_rescan:

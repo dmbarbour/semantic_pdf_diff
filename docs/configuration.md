@@ -51,12 +51,12 @@ For Python callers, use `Settings.from_env(...)` to get the user's settings and 
 Settings are in `config.example.json`; all omitted settings have defaults in `settings.py` and `levers.py`.
 
 - **Levers** are the settings that shape how documents are read (context lines, tiling, quote matching and so on). Each is a mixin in `levers.py` that declares its settings, the stores' bindings it is part of, and the regions a change clears. A settings file may name its levers in order (`"levers": [...]`); without, the default order. `benchmarks/round0.json` and `benchmarks/champion.json` name theirs. A lever left out asks exactly what it asks switched off; a lever's place orders its lines among others' (context lines, for one).
-- **A store binds every setting that shapes its results,** resolved, and the levers' order. A store made before 2026-10-02 bound only levers changed from the defaults of its day, so it asks for `--reset` once; recorded answers replay.
+- **A store binds every setting that shapes its results,** resolved, and the levers' order. A store made before 2026-10-02 bound only levers changed from the defaults of its day, so its first run since reads again what they shape; recorded answers replay.
 
 
 ### Every setting
 
-Generated from the settings' declarations (`levers.settings_table`); `tests/test_settings.py` checks it's current. *Class:* endpoint settings never change what's asked; shaping ones change queries' content; selecting ones, which queries are made; post ones, only what's done with answers. *Bound by:* the stores' bindings it is part of (a change asks for `--reset`). *Regions:* the extraction regions a change clears.
+Generated from the settings' declarations (`levers.settings_table`); `tests/test_settings.py` checks it's current. *Class:* endpoint settings never change what's asked; shaping ones change queries' content; selecting ones, which queries are made; post ones, only what's done with answers. *Bound by:* the stores' bindings it is part of (a change reads again what it affects). *Regions:* the extraction regions a change clears.
 
 <!-- settings table: generated, do not edit -->
 | Setting | Default | Class | Lever | Bound by | Regions |
@@ -175,9 +175,9 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 - Every request is sent at temperature 0, for reproducible answers; it isn't a setting. `seed` is sent when set.
 - Set `max_token_field` to `max_completion_tokens` if your server requires it.
 - `claims_per_request` (default 20) caps the claims asked for in one extraction request. A small cap on a dense page makes the model report "partial", and each partial answer is split and asked again, one round at a time. With a large-context model, raise it together with `output_tokens` (allow about 150 tokens per claim), e.g. 20 claims with 4000 output tokens.
-- `section_depth` (default 2) sets how many outline levels become sections; `section_pages` (default 20) sets the page-range size for PDFs without an outline. Both affect prompts, so changing them needs `--reset` on an existing store.
+- `section_depth` (default 2) sets how many outline levels become sections; `section_pages` (default 20) sets the page-range size for PDFs without an outline. Both affect prompts, so changing them reads an existing store's documents again.
 - `--no-vision` is a deliberately incomplete text-only run, recorded as such.
-- `situate` (default `true`; `--no-situate` on the command line) runs the situating stage: one request per labelled figure and per section after extraction. Its model, prompts and output settings are bound to the store as the `triage` role; changing them needs `--reset`, which clears only situating results.
+- `situate` (default `true`; `--no-situate` on the command line) runs the situating stage: one request per labelled figure and per section after extraction. Its model, prompts and output settings are bound to the store as the `triage` role; changing them situates again, clearing only situating results.
 
 ## Context budget
 
@@ -191,7 +191,7 @@ Defaults are model-neutral and target a 32,768-token context, with a generous 1,
 - **`rate_limits`**: time-of-day rules, the first matching one applies (local time), each with `tokens_per_minute` and/or `requests_per_minute`, optionally `days` (`"mon-fri"`, `"sat,sun"`) and `hours` (`"08:00-18:00"`, or overnight like `"22:00-06:00"`). Token use is estimated before each request and corrected from the server's reported usage. `config set --user rate_limits '[...]'` takes the same JSON list.
 - **Progress:** a `tqdm` bar per stage on a terminal; otherwise a heartbeat line every `heartbeat_seconds` (30) with tasks done, tokens per minute and time remaining. `-q` shows warnings only, `-v` each task, `-vv` each model request; `--log-file` writes a detailed log.
 
-None of these affect output, so changing them never needs `--reset`.
+None of these affect output, so changing them never reads anything again.
 
 ## Calls, caching and exit codes
 
@@ -203,7 +203,7 @@ A comparison's `--store` folder is an evidence store: `store.sqlite` (sources, f
 - **Sources:** each comparison object is a source declared in the store with a name, metadata and roots (files, folders, zip archives). `compare` declares a path given in place of a name as a `shortcut` source, named after its final component. Roots are rescanned on every run; set `rescan` to `"manual"` to rescan only on `source update`. Unchanged files (same size and modification time) aren't reread. Content no source references any more is orphaned; `gc` removes it.
 - **Archives and hidden files:** zip archives are read in memory, including nested ones. Files and folders whose names start with `.`, and OS clutter (`__MACOSX`, `Thumbs.db`), are skipped and listed. Safety limits are generous and configurable: `max_zip_depth` (8), `max_source_bytes` (50 GB), and a compression-ratio check (`zip_ratio_limit` 1000 for members over `zip_ratio_min_bytes`, 100 MB). Unsafe member paths are rejected and encrypted members skipped; all are listed in the report.
 - **One writer:** a second process writing to the same store gets a "store is in use" error.
-- **Binding:** the store records its extraction interpreter (model, prompts, output-affecting settings, library versions). A run with a different one is refused. The refusal lists each difference and what it affects, what going ahead would clear, and at most how many requests would be asked again. A change that can't cost a model call isn't refused: a setting that only post-processes answers (`quote_match`) is applied, and what it affects is recomputed from cached answers. Neither is a reader's change: the content it reads is read again ([decision 0016](decisions/0016-content-reread-when-its-reader-changes.md)). `--reset` clears only the affected derived data (for example, a changed tile size clears only image-based evidence) and all comparisons; `--reset --dry-run` shows what would be cleared. Timeouts, retries, call limits, credentials and the endpoint URL don't count. Keep model identifiers versioned when deployed weights change; the store can't detect a silent weight swap.
+- **Binding:** the store records its extraction interpreter (model, prompts, output-affecting settings, library versions). A run with a different one clears only the derived data the differences affect (for example, a changed tile size clears only image-based evidence) and reads it again, its unchanged queries answered from the cache. The log says each difference and what it affects, what is read again, and at most how many requests are asked again. Until 2026-10-20 such a run was refused (the owner: "Redo instead of refusing, yes."). A setting that only post-processes answers (`quote_match`) is recomputed from cached answers. A reader's change reads again the content it reads ([decision 0016](decisions/0016-content-reread-when-its-reader-changes.md)). Saved comparisons are kept. `--reset` starts the store over: everything read is read again and its saved comparisons cleared (sources, settings and cached answers stay). `--dry-run` shows what a run would clear. Timeouts, retries, call limits, credentials and the endpoint URL don't count. Keep model identifiers versioned when deployed weights change; the store can't detect a silent weight swap.
 - **Maintenance:** `show VIEW` prints `sources`, `source_files`, `evidence_occurrences`, `coverage_by_source`, `orphaned_content` or `comparisons` (the same names are SQL views in `store.sqlite`). `report` regenerates a report from a saved comparison (`--comparison ID`, default latest). `gc` deletes orphaned content with its evidence, tasks, sections, cached extraction responses and crops; `--dry-run` previews, and `--orphaned-sources` also removes sources whose linked manifest file is gone.
 - **Schema changes** during development aren't migrated: an older store refuses to open; use a new folder.
 

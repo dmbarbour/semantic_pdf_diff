@@ -1,12 +1,12 @@
 """A store's binding to its interpreters (decision 0004): what differs from the interpreter a run brings, whether going
-ahead can cost a model call, what it would clear and ask again, and the refusal that says so. Policy over the store's
-operations (Store.interpreter, save_interpreter, clear_extraction, clear_situating, logged_queries): split from
-store.py (code review 2026-10-08, C5).
+ahead can cost a model call, and what it clears to read again, and asks again at most. A changed interpreter redoes
+what it affects, never refused since 2026-10-20 (the owner: "Redo instead of refusing, yes."); a reset starts the store
+over. Policy over the store's operations (Store.interpreter, save_interpreter, clear_extraction, clear_situating,
+logged_queries): split from store.py (code review 2026-10-08, C5).
 """
 from .levers import ALL_REGIONS, REGISTRY, declared, setting_regions
 from .schema import Interpreter
 from .settings import Settings
-from .store import StoreError
 
 # Extraction regions that a changed extraction setting affects (levers.Declared regions); anything not listed
 # (model, prompts, library versions, sampling and output options) affects them all.
@@ -57,29 +57,22 @@ def describe(key, old, new):
                                                                                           "may change every request")
     return f"{name}: {shown} ({effect})"
 
-class InterpreterMismatch(StoreError):
-    """A run refused: the store was made with another interpreter. The message says what differs, what going ahead
-    (--reset) would clear, and at most how many requests would be asked again."""
-    def __init__(self, role, differences, regions, cleared=None, estimate=None):
-        self.role, self.differences, self.regions = role, differences, regions
-        what = {"extract": "extraction settings", "triage": "situating settings"}.get(role, f"{role} interpreter")
-        lines = [f"This store was made with other {what}:"] + [f"  - {describe(k, a, b)}" for k, (a, b) in
-                                                               differences.items()]
-        if role == "triage":
-            effect = "situating results (figures' and sections' \"about\" statements)"
-        else:
-            effect = (f"{', '.join(sorted(regions))} extraction" +
-                      (f": {cleared['tasks']:,} tasks and {cleared['evidence']:,} claim sightings" if cleared else "") +
-                      "; situating" + (f"; {cleared['comparisons']} saved comparisons" if cleared else "; comparisons"))
-        lines.append(f"Going ahead clears what they affect ({effect}) and reads it again.")
-        if estimate and estimate["requests"]:
-            lines.append(f"Requests whose queries didn't change replay free from the store's cache; at most "
-                         f"{estimate['requests']:,} would be asked again (about {estimate['text_bytes'] // 4:,} tokens "
-                         f"of text and {estimate['images']:,} images), if every one changed.")
-        else:
-            lines.append("Requests whose queries didn't change replay free from the store's cache.")
-        lines.append("To go ahead, rerun with --reset (--reset --dry-run shows what it clears), or use a new store.")
-        super().__init__("\n".join(lines))
+def redone(role, counts):
+    """The log's line for a rebinding (bind's summary): what changed, and what's read again or recomputed."""
+    changed = "; ".join(counts["changed"])
+    if counts.get("free"):
+        return f"Changed settings that only post-process answers ({changed}): what they affect is recomputed from " \
+               "cached answers"
+    if role == "triage":
+        what = f"situating done again ({counts['situated_content']:,} items)"
+    else:
+        what = (f"{', '.join(counts['regions'])} extraction read again ({counts['tasks']:,} tasks, "
+                f"{counts['evidence']:,} claim sightings), then situating")
+    estimate = counts.get("estimate") or {}
+    asked = (f", at most {estimate['requests']:,} asked again (about {estimate['text_bytes'] // 4:,} tokens of text "
+             f"and {estimate['images']:,} images)" if estimate.get("requests") else "")
+    return (f"Changed {'situating' if role == 'triage' else 'extraction'} settings ({changed}): {what}. Queries that "
+            f"didn't change are answered from the cache{asked}")
 
 
 def interpreter_differences(old, new):
@@ -113,7 +106,11 @@ def affected_regions(differences):
     return regions
 
 def bind(store, interpreter: Interpreter, reset=False, dry_run=False):
-    """Bind a store to an interpreter. Returns a summary of what was (or would be) cleared."""
+    """Bind a store to an interpreter. What a changed one affects is cleared, to be read again (its unchanged queries
+    answered from the cache); with reset, everything the role derived, to start the store over. Returns what was (or
+    would be) cleared, as the store counts it, with "changed" (each difference, described: describe), "free" when no
+    difference can cost a model call, and "estimate" (at most what reading again asks: rerun_estimate). Saved
+    comparisons, self-contained records of earlier runs, are kept but by a reset (code review 2026-10-08, C24)."""
     new = interpreter.model_dump()
     old = store.interpreter(interpreter.role)
     if old is None:
@@ -122,28 +119,25 @@ def bind(store, interpreter: Interpreter, reset=False, dry_run=False):
         return {}
     differences = {k: (a, b) for k, (a, b) in interpreter_differences(old, new).items()
                    if not _asks_alike(k, a, b, old, new)}
-    if not differences:
+    if not differences and not reset:
         if old != new and not dry_run:
             store.save_interpreter(interpreter.role, new)  # only levers off that the store didn't know
         return {}
-    automatic = free(differences, old, new) and not reset  # can't cost a model call: applied without asking
+    costless = bool(differences) and free(differences, old, new) and not reset
+    regions = ALL_REGIONS if reset else affected_regions(differences)
+    estimate = None if costless else rerun_estimate(store, interpreter.role,
+                                                    None if interpreter.role == "triage" or reset else regions)
     if interpreter.role == "triage":
-        if not (reset or automatic):
-            raise InterpreterMismatch("triage", differences, {"situating"},
-                                      estimate=rerun_estimate(store, "triage", None))
         counts = store.clear_situating(dry_run=dry_run, rebind=None if dry_run else new)
     else:
-        regions = affected_regions(differences)
-        if not (reset or automatic):
-            raise InterpreterMismatch(interpreter.role, differences, regions,
-                                      store.clear_extraction(regions, dry_run=True),
-                                      rerun_estimate(store, interpreter.role, regions))
-        # a rebind nobody was asked about keeps the saved comparisons, self-contained records of earlier runs
-        # (code review 2026-10-08, C24: deleted silently); a reset clears them, as it says (decision 0004)
         counts = store.clear_extraction(regions, dry_run=dry_run, rebind=None if dry_run else new,
-                                        keep_comparisons=automatic)
-    if automatic:
-        counts["automatic"] = [describe(k, a, b) for k, (a, b) in differences.items()]
+                                        keep_comparisons=not reset)
+    if differences:
+        counts["changed"] = [describe(k, a, b) for k, (a, b) in differences.items()]
+    if costless:
+        counts["free"] = True
+    elif estimate:
+        counts["estimate"] = estimate
     return counts
 
 def rerun_estimate(store, role, regions):

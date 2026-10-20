@@ -3,14 +3,12 @@
 One process writes to a store at a time. Evidence and coverage are written per
 task in their own transactions; a rerun resumes by replaying cached model
 responses. The store is bound to its extraction interpreter: a run with a
-different one is rejected unless the affected derived data is reset, with what going ahead would
-clear and ask again. A change that can't cost a model call (a setting that only post-processes
-answers) is applied without asking: what it affects is recomputed from cached answers. Answers
-are cached outside the store, in the user's answers cache (settings.cache_path; until 2026-10-20 in
-each store's response_cache), so a reset never clears them: they're keyed by the query that
-reached the model (and the model), so unchanged queries replay and changed ones are asked afresh
-(decision 0004; the owner, 2026-10-04, choosing this middle way: "I lean towards 3 with a friendly
-refusal.")
+different one clears the derived data it affects and reads it again (refused until 2026-10-20; the
+owner: "Redo instead of refusing, yes."). A change that can't cost a model call (a setting that only
+post-processes answers) is recomputed from cached answers. Answers are cached outside the store, in
+the user's answers cache (settings.cache_path; until 2026-10-20 in each store's response_cache), so
+a reset never clears them: they're keyed by the query that reached the model (and the model), so
+unchanged queries replay and changed ones are asked afresh (decision 0004).
 The binding's policy is binding.py's, over this store's operations (code review 2026-10-08, C5).
 
 Each content item records the version of the reader that extracted it ("docx/1"; jobs.READERS),

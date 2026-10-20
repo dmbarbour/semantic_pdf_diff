@@ -1,6 +1,11 @@
-# 0004. A store is bound to its interpreters, with a selective reset
+# 0004. A store is bound to its interpreters, and redoes what a change affects
 
-- **Status:** Accepted (2026-09-23); amended 2026-10-04 (changes that can't cost a model call, and the refusal's content)
+- **Status:** Accepted (2026-09-23); amended 2026-10-04 (changes that can't cost a model call, and the refusal's content) and 2026-10-20 (redo instead of refusing; `--reset` starts over)
+- **Amended 2026-10-20** ([configuration in the store](../plans/configuration-in-the-store-2026-10-20.md), milestone 4). The owner: "Redo instead of refusing, yes." With answers cached per user (milestone 3), reading again costs time, and money only for queries that changed.
+  - A run with a different interpreter is no longer refused. It clears what the differences affect, as the selective reset below did, and reads it again. The log says what the refusal said: each difference and its effect, what is read again, at most how many requests are asked again.
+  - Saved comparisons are kept by such a run (code review 2026-10-08, C24).
+  - `--reset` starts the store over: every region and situating read again, saved comparisons cleared. Sources, settings and cached answers stay. `--dry-run` shows what a run, with or without it, would clear.
+  - The bullets below on refusing and on `--reset` describe 2026-09-23 to 2026-10-20.
 - **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [concepts](../plans/sources-and-evidence-store-2026-09-23.md#concepts) (interpreter, binding, `--reset`), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23); [content-addressed queries: progress](../plans/content-addressed-queries-2026-09-28.md#progress), milestones 2 and 5 (cached answers kept through resets); [architecture clean-up: progress](../plans/architecture-cleanup-2026-10-02.md#progress), milestone 3 (every resolved setting bound); [code review 2026-10-01](../reviews/code-review-2026-10-01.md), item 4
 
 ## Context

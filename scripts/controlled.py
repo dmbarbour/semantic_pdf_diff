@@ -103,9 +103,6 @@ def main(argv=None):
     packing = sub.add_parser("pack", help="export the answers the standard runs replay into replay.zip (offline)")
     for each in (running, refreshing, packing):
         each.add_argument("--jobs", type=int, default=1, help="runs at once, in processes sharing the fixture")
-    running.add_argument("--reset", action="store_true",
-                         help="a store bound to other settings clears what changed and reads it again (refresh "
-                              "always does)")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
@@ -133,10 +130,10 @@ def main(argv=None):
         if args.variant:
             name, config, only = variant(args.variant)
             return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows,
-                       jobs=args.jobs, reset=args.reset, fixture=WORKING, runs=VARIANTS / name,
+                       jobs=args.jobs, fixture=WORKING, runs=VARIANTS / name,
                        pair_runs=VARIANT_PAIRS / name, config=config, only=only)
         return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows,
-                   jobs=args.jobs, reset=args.reset)
+                   jobs=args.jobs)
     if args.command == "pack":
         return pack(args.jobs)
     if args.command == "refresh":
@@ -149,7 +146,7 @@ def variant(path):
     """(name, settings file, document patterns) of a variant defined in a JSON file: {"settings": an overlay on the
     corpus's settings, "only": shell patterns of the documents' file names (default: every document; a pair by its
     earlier document), "name": its folder's (default: the file's stem)}. Its resolved settings and its definition are
-    written beside its runs, so a later run of the same name with other settings is refused by the stores (or reset)."""
+    written beside its runs; a later run of the same name with other settings reads again what they change."""
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     unknown = set(data) - {"settings", "only", "name", "note"}
     if unknown:
@@ -163,14 +160,14 @@ def variant(path):
     return name, folder / "settings.json", tuple(data.get("only") or ())
 
 def refresh(max_cost, jobs=1):
-    """Every step after a change, in order, stores reset where settings moved: the standard and row-by-row runs
+    """Every step after a change, in order, stores reading again what changed: the standard and row-by-row runs
     recorded, replay.zip exported, both replayed from it, scored, context measured. Exit status 1 when a run failed
     or a step did, 3 when a recording reached its cap (rerun to resume); incomplete coverage (2) isn't a failure."""
-    steps = [("record", lambda: run(False, None, max_cost, False, jobs=jobs, reset=True)),
-             ("record rows", lambda: run(False, None, max_cost, False, rows=True, jobs=jobs, reset=True)),
+    steps = [("record", lambda: run(False, None, max_cost, False, jobs=jobs)),
+             ("record rows", lambda: run(False, None, max_cost, False, rows=True, jobs=jobs)),
              ("pack", lambda: pack(jobs)),
-             ("replay", lambda: run(True, None, 0, False, jobs=jobs, reset=True)),
-             ("replay rows", lambda: run(True, None, 0, False, rows=True, jobs=jobs, reset=True)),
+             ("replay", lambda: run(True, None, 0, False, jobs=jobs)),
+             ("replay rows", lambda: run(True, None, 0, False, rows=True, jobs=jobs)),
              ("score", score), ("context", context)]
     for name, step in steps:
         code = step()
@@ -207,12 +204,12 @@ def pack(jobs=1):
     return 0
 
 def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=RUNS, pair_runs=PAIR_RUNS, rows=False,
-        export=None, jobs=1, reset=False, config=None, only=()):
+        export=None, jobs=1, config=None, only=()):
     """Every document read alone, then every revision pair compared: recorded into the working fixture, or replayed
     (from replay.zip, or `fixture`) into fresh or existing stores under runs and pair_runs; with `export`, every
     answer served or recorded also copied into that fixture. jobs: runs at once, in processes sharing the fixture
-    (the documents first, then the pairs, which replay their extraction). reset: a store bound to other settings
-    clears what changed and reads it again, instead of refusing. The cost cap is checked as each run starts, so runs
+    (the documents first, then the pairs, which replay their extraction). A store bound to other settings
+    reads again what changed. The cost cap is checked as each run starts, so runs
     started together may overshoot it together. config: a settings file other than the corpus's (a variant's); only:
     shell patterns of the documents' file names to read (a pair by its earlier document's)."""
     import fnmatch
@@ -255,7 +252,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         overrides = {"table_rules": None}
     before = ledger.spent(LEDGER, round="controlled")
     _BATCH.update(replay=replay, responder=responder, fixture=fixture, export=export, config=config or settings_file(),
-                  overrides=overrides, max_cost=max_cost, before=before, reset=reset)
+                  overrides=overrides, max_cost=max_cost, before=before)
     worst, capped = 0, 0
     for mode in ("proposals", "revisions"):
         for name, code in _each([job for job in batch if job[4] == mode], jobs):
@@ -284,7 +281,7 @@ def _one(job):
     from semantic_pdf_diff import ledger, pipeline
     a, b, folder, name, mode = job
     c = _BATCH
-    options = pipeline.RunOptions(mode=mode, fixture=c["fixture"], export=c["export"], reset=c["reset"],
+    options = pipeline.RunOptions(mode=mode, fixture=c["fixture"], export=c["export"],
                                   fixture_mode="replay" if c["replay"] else "record-new", responder=c["responder"])
     if c["replay"]:  # the model named as recorded, whatever the environment says (its name is in the stores' binding)
         settings = pipeline.settings_from(c["config"], situate=False, base_url=pipeline.NO_MODEL, model=c["responder"],

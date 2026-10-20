@@ -181,10 +181,12 @@ def add_run_options(parser):
     add_budget_options(budget)
     store = parser.add_argument_group('the store')
     store.add_argument('--reset', action='store_true',
-                       help='A store remembers the model and settings it was read with, and refuses a run with '
-                            'others, saying what differs: --reset clears what they change, then runs')
+                       help='Start the store over: everything read is read again, its answers from the cache where '
+                            'queries are unchanged (sources and settings stay). Without it, a run with other '
+                            'settings reads again what they change')
     store.add_argument('--dry-run', action='store_true',
-                       help='With --reset: say what would be cleared, and change nothing')
+                       help='Say what the run would clear to read again (with --reset: everything), and change '
+                            'nothing')
     output = parser.add_argument_group('output')
     add_log_options(output)
     add_report_options(output)
@@ -405,8 +407,8 @@ Print the settings a run would use, as JSON: the defaults, then the user's (`con
 (--store; `config set`), then --config's. The endpoint is OPENAI_BASE_URL's; the API key (OPENAI_API_KEY) is never
 printed. `pdf-semantic-diff config show` lists the settings with what each does.
 
-Settings that shape what's asked (extraction, levers) are bound to a store: a run with others is refused, saying
-what differs, unless --reset is given.
+Settings that shape what's asked (extraction, levers) are bound to a store: a run with others reads again what they
+change, the queries that didn't change answered from the cache.
 """
 
 def default_store():

@@ -100,7 +100,7 @@ class Extraction_(unittest.TestCase):
                 store.record_task(row, found)
             self.assertEqual([e.model_dump() for e in store.evidence(cid)], [e.model_dump() for e in evidence])
             bind(store, extraction_interpreter(Settings(tile_points=300)))
-            bind(store, extraction_interpreter(Settings(tile_points=200)), reset=True)  # clears visual sightings only
+            bind(store, extraction_interpreter(Settings(tile_points=200)))  # clears visual sightings only
             (kept,) = store.evidence(cid)
             self.assertEqual(kept.id, evidence[0].id)
             self.assertEqual({o.locator.region for o in kept.occurrences}, {'text'})

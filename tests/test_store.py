@@ -15,7 +15,7 @@ from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.schema import Extraction, PdfLocator, Evidence
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.provenance import content_id, extraction_interpreter
-from semantic_pdf_diff.binding import InterpreterMismatch, bind
+from semantic_pdf_diff.binding import bind, redone
 from semantic_pdf_diff.store import Store, StoreError, StoreInUse
 from stubs import chat_answer, prompt_of, request_body, serving, situating_answer, source_data, text_pdf
 
@@ -145,10 +145,9 @@ class Binding(unittest.TestCase):
             self.assertEqual(store.interpreter('extract'), json.loads(json.dumps(
                 extraction_interpreter(Settings()).model_dump())))  # rebound, as it is now
             store.save_interpreter('extract', before)
-            with self.assertRaises(InterpreterMismatch) as caught:  # on, it asks something new
-                bind(store, extraction_interpreter(Settings(column_conditions=True)))
-            self.assertIn('settings.column_conditions', caught.exception.differences)
-            self.assertIn('settings.levers', caught.exception.differences)
+            changed = bind(store, extraction_interpreter(Settings(column_conditions=True)))['changed']  # on: new asks
+            self.assertTrue(any(c.startswith('column_conditions: None -> True') for c in changed), changed)
+            self.assertIn('levers: +column_conditions (the levers in use)', changed)
 
     def test_a_post_processing_lever_built_on_since_rebinds_by_itself(self):
         # a store made before sheet_records existed, the lever now on: it only post-processes answers
@@ -158,46 +157,53 @@ class Binding(unittest.TestCase):
             before['settings']['levers'].remove('sheet_records')
             store.save_interpreter('extract', before)
             cleared = bind(store, extraction_interpreter(Settings(sheet_records=True)))
-            self.assertTrue(cleared.get('automatic'))
+            self.assertTrue(cleared.get('free'))
             self.assertEqual(bind(store, extraction_interpreter(Settings(sheet_records=True))), {})
             for lever in ('column_conditions', 'sheet_records'):  # and with another lever built, off, since
                 before['settings'].pop(lever, None)
                 if lever in before['settings']['levers']:
                     before['settings']['levers'].remove(lever)
             store.save_interpreter('extract', before)
-            self.assertTrue(bind(store, extraction_interpreter(Settings(sheet_records=True))).get('automatic'))
+            self.assertTrue(bind(store, extraction_interpreter(Settings(sheet_records=True))).get('free'))
 
-    def test_changed_interpreter_is_rejected_with_explanation(self):
+    def test_a_changed_interpreter_redoes_what_it_affects(self):
+        # the owner, 2026-10-20: "Redo instead of refusing, yes." (a run with other settings was refused until then)
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
-            with self.assertRaises(InterpreterMismatch) as caught:
-                bind(store, extraction_interpreter(Settings(tile_points=500)))
-            self.assertIn('settings.tile_points', caught.exception.differences)
-            self.assertIn('--reset', str(caught.exception))
-            self.assertEqual(self.count(store, 'evidence'), 3)
+            cleared = bind(store, extraction_interpreter(Settings(tile_points=500)))
+            self.assertEqual([c.split(':')[0] for c in cleared['changed']], ['tile_points'])
+            self.assertEqual({r for (r,) in store.db.execute('SELECT region FROM evidence')}, {'text'})
+            self.assertEqual(store.interpreter('extract')['settings']['tile_points'], 500)  # bound to the new ones
+            line = redone('extract', cleared)
+            self.assertRegex(line, r"^Changed extraction settings \(tile_points: \d+ -> 500 \(changes which requests "
+                                   r"are made\)\): .*tile.* extraction read again \(2 tasks, 2 claim sightings\)")
+            self.assertEqual(bind(store, extraction_interpreter(Settings(tile_points=500))), {})
+            bind(store, extraction_interpreter(Settings(tile_points=500, model='other-model')))  # another model: all
+            self.assertEqual(self.count(store, 'evidence'), 0)
 
     def test_dry_run_changes_nothing(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
-            preview = bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True, dry_run=True)
+            preview = bind(store, extraction_interpreter(Settings(tile_points=500)), dry_run=True)
             self.assertEqual((preview['tasks'], preview['evidence']), (2, 2))
+            everything = bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True, dry_run=True)
+            self.assertEqual((everything['tasks'], everything['evidence']), (3, 3))
             self.assertEqual(self.count(store, 'evidence'), 3)
-            with self.assertRaises(InterpreterMismatch):
-                bind(store, extraction_interpreter(Settings(tile_points=500)))
+            self.assertNotEqual(store.interpreter('extract')['settings']['tile_points'], 500)
 
-    def test_reset_is_selective(self):
+    def test_a_reset_starts_over(self):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
-            bind(store, extraction_interpreter(Settings(tile_points=500)), reset=True)
-            regions = {r for (r,) in store.db.execute('SELECT region FROM evidence')}
-            self.assertEqual(regions, {'text'})
-            self.assertEqual(bind(store, extraction_interpreter(Settings(tile_points=500))), {})
-            bind(store, extraction_interpreter(Settings(tile_points=500, model='other-model')), reset=True)
-            self.assertEqual(self.count(store, 'evidence'), 0)
+            store.save_comparison('2026-10-08T00:00:00', {'note': 'cleared'})
+            cleared = bind(store, extraction_interpreter(Settings()), reset=True)  # nothing changed: all the same
+            self.assertNotIn('changed', cleared)
+            self.assertEqual((self.count(store, 'evidence'), self.count(store, 'comparison')), (0, 0))
 
-    def test_saved_comparisons_outlive_a_free_rebind_not_a_reset(self):
+    def test_saved_comparisons_outlive_a_rebind_not_a_reset(self):
         # code review 2026-10-08, C24: a rebind nobody was asked about deleted them silently
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             store.save_comparison('2026-10-08T00:00:00', {'note': 'kept'})
             cleared = bind(store, extraction_interpreter(Settings(quote_match='exact')))  # post-processing only
-            self.assertTrue(cleared.get('automatic'))
+            self.assertTrue(cleared.get('free'))
+            self.assertNotIn('comparisons', cleared)
+            cleared = bind(store, extraction_interpreter(Settings(quote_match='exact', tile_points=500)))  # asks anew
             self.assertNotIn('comparisons', cleared)
             self.assertEqual(self.count(store, 'comparison'), 1)
             cleared = bind(store, extraction_interpreter(Settings(quote_match='exact', tile_points=500)), reset=True)
@@ -393,32 +399,34 @@ class ResumeAndReuse(unittest.TestCase):
             self.assertFalse(any(r['status'] == 'failed' for r in report['coverage']))
             self.assertEqual(report['paused'], '')  # resumed: nothing cut
 
-    def test_changed_settings_need_reset(self):
+    def test_changed_settings_redo_what_they_change_and_a_reset_starts_over(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
             self.run_cli(a, b, root / 'out', url)
-            code, log = self.run_cli(a, b, root / 'out', url, '--model', 'another-model')
-            self.assertEqual(code, 1)
-            self.assertIn('--reset', log)
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 cli.main(['compare', str(a), str(b), '--store', str(root / 'out'), '--model', 'another-model',
-                          '--reset', '--dry-run'])
+                          '--dry-run'])
             self.assertGreater(json.loads(out.getvalue())['would_clear']['extract']['evidence'], 0)
-            code, _ = self.run_cli(a, b, root / 'out', url, '--model', 'another-model', '--reset')
-            self.assertEqual(code, 2)  # --no-vision is deliberately incomplete
+            code, log = self.run_cli(a, b, root / 'out', url, '--model', 'another-model')
+            self.assertEqual(code, 2)  # not refused (--no-vision is deliberately incomplete)
+            self.assertIn("model: 'gemma-4' -> 'another-model' (another model: every request is asked again)", log)
+            asked = state['requests']
+            code, log = self.run_cli(a, b, root / 'out', url, '--model', 'another-model', '--reset')
+            self.assertEqual(code, 2)
+            self.assertIn('Started over (extract)', log)
+            self.assertEqual(state['requests'], asked)  # read again, every answer from the cache
 
-    def test_a_refusal_says_what_differs_what_going_ahead_clears_and_asks(self):
+    def test_a_redo_says_what_differs_what_it_reads_again_and_asks(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
             root = Path(d); a, b = self.pdfs(root)
             self.run_cli(a, b, root / 'out', url)
             config = root / 'more-claims.json'
             config.write_text(json.dumps({'claims_per_request': 25}))
             code, log = self.run_cli(a, b, root / 'out', url, '--config', str(config))
-            self.assertEqual(code, 1)
+            self.assertEqual(code, 2)
             self.assertIn("claims_per_request: 20 -> 25 (shapes what's asked)", log)
-            self.assertIn('Going ahead clears what they affect', log)
-            self.assertRegex(log, r'at most [\d,]+ would be asked again \(about [\d,]+ tokens')
-            self.assertIn('rerun with --reset', log)
+            self.assertIn('extraction read again (', log)
+            self.assertRegex(log, r'answered from the cache, at most [\d,]+ asked again \(about [\d,]+ tokens')
 
     def test_a_post_processing_change_is_applied_without_asking_and_costs_nothing(self):
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
