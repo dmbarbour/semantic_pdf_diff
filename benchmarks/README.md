@@ -16,7 +16,7 @@ Nobody is ground truth here. Each rater (people, model judges, exact keys, mecha
 | `real-pairs/` | yes (not `fixture.sqlite` or `replay.zip`) | Real revision pairs (`scripts/real_pairs.py`): the settings and the raters' results; the recorded answers stay local, as the samples do. Plan: [comparing revisions](../docs/plans/revision-comparison-2026-10-02.md) |
 | `champion.json`, `round0.json` | yes | The defaults since the improvement rounds, and the settings before them (tests pin both) |
 | `rounds/<name>/` | no | Improvement rounds (`scripts/run_round.py`): their specs, pairs, verdicts and decisions. Five batches that tests judge again offline are in `tests/fixtures/rounds/` |
-| `batches/<name>/` | no | Review batches (`pdf-semantic-diff review sample`) and their labels |
+| `batches/<name>/` | no | Review batches (`semantic-pdf-diff review sample`) and their labels |
 | `spotchecks/<name>/` | no | Spot checks: a person judges the same pairs as the panel (`scripts/spotcheck.py`) |
 | `pagetest/` | no | Page tests (`scripts/page_test.py`); the findings are in [page tests](../docs/research/page-tests-2026-10-01.md) |
 | `runs/` | no | Stores replayed or recorded by the scripts above |
@@ -55,7 +55,7 @@ For each page:
 2. Type your name at the top. Work through the items, one per screen: pick a verdict, tick any flags that apply, say how clear the item was and how confident you are, and optionally leave a note. Click any image to zoom. `←` and `→` move between items.
 3. Progress is saved in the browser as you go, so you can stop and come back (same browser, same file).
 4. When done (or at any point), click **Download labels**. That saves `questions-<batch>-<name>.json` or `labels-<batch>-<name>.json`, usually to your Downloads folder. Then either:
-   - run `pdf-semantic-diff review import benchmarks/batches/<name> <file>` (it tells the two kinds apart), or
+   - run `semantic-pdf-diff review import benchmarks/batches/<name> <file>` (it tells the two kinds apart), or
    - tell Claude where the file is, or click **Copy labels** and paste the text into the conversation.
 
 Batches are kept small (about 15–20 items, 10–20 minutes) so a session fits comfortably; more batches can follow.
@@ -106,9 +106,9 @@ Before a round spends money judging answers, it looks at the queries themselves.
 - **Outside rounds,** for a lever being built:
 
 ```bash
-pdf-semantic-diff queries dump benchmarks/runs/<round>/<variant> --out /tmp/stems --lever stem_context --sample 40
-pdf-semantic-diff queries dump benchmarks/runs/<round>/<variant> --against benchmarks/runs/<round>/baseline --out /tmp/diff
-pdf-semantic-diff queries check /tmp/diff --model google/gemini-3.1-pro --max-cost 0.5
+semantic-pdf-diff queries dump benchmarks/runs/<round>/<variant> --out /tmp/stems --lever stem_context --sample 40
+semantic-pdf-diff queries dump benchmarks/runs/<round>/<variant> --against benchmarks/runs/<round>/baseline --out /tmp/diff
+semantic-pdf-diff queries check /tmp/diff --model google/gemini-3.1-pro --max-cost 0.5
 ```
 
 ## Panels of people (and sensitive documents)
@@ -127,21 +127,21 @@ For sensitive documents, everything stays local. Use `review judge` only with mo
 
 ```bash
 # Replay recorded answers into stores to sample from (offline; no model calls)
-pdf-semantic-diff compare samples/slices/A.pdf samples/slices/B.pdf --store benchmarks/runs/<responder>/<run> \
+semantic-pdf-diff compare samples/slices/A.pdf samples/slices/B.pdf --store benchmarks/runs/<responder>/<run> \
     --fixture tests/fixtures/replay-slices.zip --responder <responder> --config <recording settings>
 
 # Sample a batch (claims round-robin over kinds; abouts; pairs round-robin over relations)
-pdf-semantic-diff review sample benchmarks/batches/s02 --store <label>=benchmarks/runs/... --claims 4 --abouts 1 --pairs 1
+semantic-pdf-diff review sample benchmarks/batches/s02 --store <label>=benchmarks/runs/... --claims 4 --abouts 1 --pairs 1
     # items show exactly what each model was asked, from the stores' query logs
-pdf-semantic-diff review judge benchmarks/batches/s02 --model <m> --stage questions   # the panel judges questions blind
-pdf-semantic-diff review question-agreement benchmarks/batches/s02
+semantic-pdf-diff review judge benchmarks/batches/s02 --model <m> --stage questions   # the panel judges questions blind
+semantic-pdf-diff review question-agreement benchmarks/batches/s02
 
 # Labels from people, a panel of models, and the results
-pdf-semantic-diff review import benchmarks/batches/s02 labels.json
-pdf-semantic-diff review judge benchmarks/batches/s02 --model google/gemini-3.1-pro --limit 2   # check cost first
-pdf-semantic-diff review consensus benchmarks/batches/s02 [--gate]   # reliability and consensus, no referee
-pdf-semantic-diff review agreement benchmarks/batches/s02
-pdf-semantic-diff review scores benchmarks/batches/s02
+semantic-pdf-diff review import benchmarks/batches/s02 labels.json
+semantic-pdf-diff review judge benchmarks/batches/s02 --model google/gemini-3.1-pro --limit 2   # check cost first
+semantic-pdf-diff review consensus benchmarks/batches/s02 [--gate]   # reliability and consensus, no referee
+semantic-pdf-diff review agreement benchmarks/batches/s02
+semantic-pdf-diff review scores benchmarks/batches/s02
 ```
 
 ## Why the taxonomy looks like this

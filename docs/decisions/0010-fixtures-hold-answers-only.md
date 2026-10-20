@@ -26,6 +26,6 @@ Under semantic keys ([0007](0007-semantic-request-keys.md)), fixtures stored eac
 
 - The committed fixture stays small: 1.7 MB for 4,190 queries.
 - Replay needs the sample documents, since queries are rebuilt from them.
-- To see what was asked, replay the runs into a store, then dump its queries (`pdf-semantic-diff queries dump`, with the lab installed). The fixture alone can't show it.
+- To see what was asked, replay the runs into a store, then dump its queries (`semantic-pdf-diff queries dump`, with the lab installed). The fixture alone can't show it.
 - Rerunning an evaluation pays only for answers its folder fixture lacks. Packing is reproducible, so a replay leaves the zip's bytes alone.
 - Verdict files keep their own layout, so rounds can be re-decided offline without any fixture.

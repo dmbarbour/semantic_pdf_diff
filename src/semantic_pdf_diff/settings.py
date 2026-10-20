@@ -77,7 +77,7 @@ class SettingsBase(Strict):
 
     @classmethod
     def from_env(cls, only=None, **overrides):
-        """The user's settings (`pdf-semantic-diff config set --user`: user_settings), $OPENAI_BASE_URL, then explicit
+        """The user's settings (`semantic-pdf-diff config set --user`: user_settings), $OPENAI_BASE_URL, then explicit
         overrides (a store's own settings, a --config file, a run's flags, a caller's). `only`: the fields read from
         the user's settings and the environment (default all).
 
@@ -115,16 +115,16 @@ def user_settings():
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except ValueError as e:
-        raise ValueError(f"{path}: not JSON ({e}); `pdf-semantic-diff config export --user` shows the format") from e
+        raise ValueError(f"{path}: not JSON ({e}); `semantic-pdf-diff config export --user` shows the format") from e
     if not isinstance(data, dict) or not isinstance(data.get("settings"), dict):
         raise ValueError(f'{path}: expected {{"format": 1, "settings": {{...}}}}')
     return dict(data["settings"])
 
 def cache_path():
-    """The answers cache: $PDF_DIFF_CACHE/answers.sqlite, else under $XDG_CACHE_HOME/semantic-pdf-diff, else
+    """The answers cache: $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else under $XDG_CACHE_HOME/semantic-pdf-diff, else
     ~/.cache/semantic-pdf-diff. Every answer the user's runs were given, in the fixture format, shared by every store
     (the owner, 2026-10-08: "The per-user default is tempting. Let's go with that instead.")."""
-    folder = os.environ.get("PDF_DIFF_CACHE") or os.path.join(
+    folder = variable("CACHE") or os.path.join(
         os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache"), "semantic-pdf-diff")
     return Path(folder) / "answers.sqlite"
 
@@ -135,7 +135,18 @@ def save_user_settings(values):
     path.write_text(json.dumps({"format": 1, "settings": values}, indent=1, sort_keys=True, ensure_ascii=False) + "\n",
                     encoding="utf-8")
 
+PREFIX = "SEMANTIC_PDF_DIFF_"  # the environment's variables, as the command (semantic-pdf-diff) is named
 _warned = set()
+
+def variable(name):
+    """$SEMANTIC_PDF_DIFF_<name> (STORE, CACHE), stripped. Its name until 2026-10-20, PDF_DIFF_<name>, isn't read: one
+    name for the command, the package and the variables (the owner, 2026-10-20: "I'm fine with any one name, but three
+    is a bit awkward"). Set alone, it's ignored with a warning, once a process."""
+    old = "PDF_DIFF_" + name
+    if (os.environ.get(old) or "").strip() and not (os.environ.get(PREFIX + name) or "").strip() and old not in _warned:
+        _warned.add(old)
+        logging.getLogger("semantic_pdf_diff").warning("%s is no longer read: it's now %s%s", old, PREFIX, name)
+    return (os.environ.get(PREFIX + name) or "").strip()
 
 def retired(target):
     """Warn, once a process, of each environment variable that named a setting before the user's settings did."""
@@ -144,7 +155,7 @@ def retired(target):
         if field != "base_url" and (os.environ.get(name) or "").strip() and name not in _warned:
             _warned.add(name)
             logging.getLogger("semantic_pdf_diff").warning(
-                "%s is no longer read: `pdf-semantic-diff config set --user %s VALUE` keeps it for every run "
+                "%s is no longer read: `semantic-pdf-diff config set --user %s VALUE` keeps it for every run "
                 "(docs/configuration.md)", name, field)
 
 @lru_cache(maxsize=None)

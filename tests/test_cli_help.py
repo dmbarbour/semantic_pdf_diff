@@ -70,7 +70,7 @@ class Help(unittest.TestCase):
             err = io.StringIO()
             with contextlib.redirect_stderr(err):
                 self.assertEqual(cli.main([str(a), str(a)]), 1)
-            self.assertIn(f"pdf-semantic-diff compare {a} {a}", err.getvalue())
+            self.assertIn(f"semantic-pdf-diff compare {a} {a}", err.getvalue())
 
     def test_help_command_is_the_commands_own_help(self):
         self.assertEqual(run(["help", "source", "add"]), run(["source", "add", "--help"]))

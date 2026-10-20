@@ -1,8 +1,8 @@
-"""The lab's commands, added to `pdf-semantic-diff` through the "semantic_pdf_diff.commands" entry points
+"""The lab's commands, added to `semantic-pdf-diff` through the "semantic_pdf_diff.commands" entry points
 (code review 2026-10-01, A2; architecture clean-up, milestone 8): review panels, and query dumps and checks.
 
-    pdf-semantic-diff review sample|import|judge|consensus|agreement|scores|page ...
-    pdf-semantic-diff queries dump|check|flagged ...
+    semantic-pdf-diff review sample|import|judge|consensus|agreement|scores|page ...
+    semantic-pdf-diff queries dump|check|flagged ...
 """
 import json
 from pathlib import Path
@@ -15,7 +15,7 @@ from semantic_pdf_diff.progress import Progress, log
 from . import queries, review
 
 def queries_command(argv):
-    parser = Parser(prog='pdf-semantic-diff queries',
+    parser = Parser(prog='semantic-pdf-diff queries',
         description='Queries as the model saw them: dump a sample from runs, and have strong models check them.')
     sub = parser.add_subparsers(dest='command', required=True)
     dump = sub.add_parser('dump', help="Sample queries from a folder of runs (their stores' query logs) into a page")
@@ -62,7 +62,7 @@ def queries_command(argv):
     return 0
 
 def review_command(argv):
-    parser = Parser(prog='pdf-semantic-diff review',
+    parser = Parser(prog='semantic-pdf-diff review',
         description='Review batches: sample results, label them (people and a panel of models), measure agreement.')
     sub = parser.add_subparsers(dest='command', required=True)
     sample = sub.add_parser('sample', help='Sample claims, about statements and claim pairs from stores into a batch')

@@ -255,7 +255,7 @@ class TheUsersCache(unittest.TestCase):
         from stubs import per_user_cache
         key = ('extract', 'text', 'sha256:x.pdf', 'text:0', 'input-hash', None)
         with model_server() as (url, state), tempfile.TemporaryDirectory() as d, \
-                patch.dict(os.environ, {'PDF_DIFF_CACHE': str(Path(d) / 'cache')}), \
+                patch.dict(os.environ, {'SEMANTIC_PDF_DIFF_CACHE': str(Path(d) / 'cache')}), \
                 patch('semantic_pdf_diff.pipeline.answers_cache', per_user_cache):
             for name in ('first', 'second'):
                 with Store(Path(d) / name) as store:

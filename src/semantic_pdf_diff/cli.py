@@ -1,11 +1,11 @@
 """Command line: compare two sources, and manage declared sources in a store.
 
-    pdf-semantic-diff compare A B [--store DIR]         # files, folders, zips or declared sources' names
-    pdf-semantic-diff source add|list|show|update|remove|export|import ...
-    pdf-semantic-diff show|gc|report --store DIR ...
-    pdf-semantic-diff settings [--config FILE] [--changed]
-    pdf-semantic-diff fixtures summary|pack|prune|merge ...
-    pdf-semantic-diff review|queries ...                # with the lab installed (semantic-pdf-diff[lab])
+    semantic-pdf-diff compare A B [--store DIR]         # files, folders, zips or declared sources' names
+    semantic-pdf-diff source add|list|show|update|remove|export|import ...
+    semantic-pdf-diff show|gc|report --store DIR ...
+    semantic-pdf-diff settings [--config FILE] [--changed]
+    semantic-pdf-diff fixtures summary|pack|prune|merge ...
+    semantic-pdf-diff review|queries ...                # with the lab installed (semantic-pdf-diff[lab])
 """
 import argparse
 import csv
@@ -47,7 +47,7 @@ def command(argv, client):
         print(overview_parser().format_help())
         return 0 if argv else 1
     if argv[0] == '--version':
-        print(f'pdf-semantic-diff {__version__}')
+        print(f'semantic-pdf-diff {__version__}')
         return 0
     if argv[0] == 'help':  # "help source add" is "source add --help"
         argv = [*argv[1:], '--help']
@@ -68,11 +68,11 @@ def command(argv, client):
     lab = lab_commands().get(argv[0])
     if lab:
         return lab(argv[1:])
-    hint = f": to compare files, pdf-semantic-diff compare {' '.join(argv[:2])}" if Path(argv[0]).exists() else ""
-    print(f"pdf-semantic-diff: no command {argv[0]!r}{hint} (pdf-semantic-diff --help lists them)", file=sys.stderr)
+    hint = f": to compare files, semantic-pdf-diff compare {' '.join(argv[:2])}" if Path(argv[0]).exists() else ""
+    print(f"semantic-pdf-diff: no command {argv[0]!r}{hint} (semantic-pdf-diff --help lists them)", file=sys.stderr)
     return 1
 
-# What `pdf-semantic-diff --help` says: someone installing the tool on another machine has only this, not the docs
+# What `semantic-pdf-diff --help` says: someone installing the tool on another machine has only this, not the docs
 # (the owner, 2026-10-14: "it doesn't even mention the `source add` options").
 COMMANDS_HELP = """\
 Evidence-first comparison of engineering documents: competing proposals, or revisions of one design. A vision
@@ -80,7 +80,7 @@ model behind an OpenAI-compatible endpoint reads claims from text, tables, chart
 paired, and differences are reported with the page and region each claim came from. Nothing is ranked, and a claim
 with no counterpart isn't taken as proof of absence.
 
-Commands (pdf-semantic-diff COMMAND --help for each, or pdf-semantic-diff help COMMAND):
+Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help COMMAND):
   compare     compare two sources: files, folders or zip archives, or sources declared in a store
   source      declare sources in a store and manage them: add, list, show, update, remove, export, import
   show        print a view of a store: its sources, files, evidence, coverage or comparisons
@@ -95,22 +95,22 @@ START_HELP = """\
 Before a first run, name the endpoint and the model (a .env file isn't read):
   export OPENAI_API_KEY=...                            the provider's key
   export OPENAI_BASE_URL=https://provider.example/v1   default: {base_url}
-  pdf-semantic-diff config set --user model provider/vision-model     default: {model}
-A store keeps its own settings: `pdf-semantic-diff config show` lists them, `config set NAME VALUE` sets one
+  semantic-pdf-diff config set --user model provider/vision-model     default: {model}
+A store keeps its own settings: `semantic-pdf-diff config show` lists them, `config set NAME VALUE` sets one
 (`config help NAME` says what it does). A run's flags, or a --config JSON file, override them for that run.
 
 Examples:
-  pdf-semantic-diff compare team-a.pdf team-b.pdf --store result           two proposals; open result/report.html
-  pdf-semantic-diff compare old.pdf new.pdf --mode revisions --store diff  a revision: the earlier one first
-  pdf-semantic-diff compare team-a/ team-b.zip --max-cost 2                stop asking once $2 is reported spent
-  pdf-semantic-diff source add team-a --store work --path team-a/ --meta organization="Team A"
-  pdf-semantic-diff source add team-b --store work --path team-b.zip
-  pdf-semantic-diff compare team-a team-b --store work                     declared sources, by name
+  semantic-pdf-diff compare team-a.pdf team-b.pdf --store result           two proposals; open result/report.html
+  semantic-pdf-diff compare old.pdf new.pdf --mode revisions --store diff  a revision: the earlier one first
+  semantic-pdf-diff compare team-a/ team-b.zip --max-cost 2                stop asking once $2 is reported spent
+  semantic-pdf-diff source add team-a --store work --path team-a/ --meta organization="Team A"
+  semantic-pdf-diff source add team-b --store work --path team-b.zip
+  semantic-pdf-diff compare team-a team-b --store work                     declared sources, by name
 
 A comparison's --store folder (diff-output unless named) holds what was read, and receives report.html (one file
 to keep or send, its crops inside as --report-budget allows), report.json and evidence.json. A comparison into it
 again reuses what was read, and resumes one interrupted. The model's answers are cached for every store
-($PDF_DIFF_CACHE, else ~/.cache/semantic-pdf-diff): what was asked once isn't paid for again.
+($SEMANTIC_PDF_DIFF_CACHE, else ~/.cache/semantic-pdf-diff): what was asked once isn't paid for again.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
 (a mistyped command or option too); 5 a check of `config test` failed.
@@ -147,7 +147,7 @@ def add_run_options(parser):
                               'source is the earlier revision of one design and the second the later; differences '
                               'are named as changes (a value or its conditions changed, renamed, restated, moved)')
     reading.add_argument('--config', type=Path,
-                         help='A settings JSON file, e.g. {"concurrency": 6}; `pdf-semantic-diff settings` lists '
+                         help='A settings JSON file, e.g. {"concurrency": 6}; `semantic-pdf-diff settings` lists '
                               'every setting. The environment gives defaults, the file overrides them, and these '
                               'flags override both')
     reading.add_argument('--no-vision', action='store_true',
@@ -192,9 +192,9 @@ def add_run_options(parser):
     add_report_options(output)
     recorded = parser.add_argument_group('recorded answers (testing, and runs without the model)')
     recorded.add_argument('--fixture', type=Path,
-                          help="Answers fixture, instead of the answers cache ($PDF_DIFF_CACHE): answers recorded in "
-                               'it are replayed, not asked again. A .sqlite file also records new answers (created if '
-                               'missing); a .zip is replayed only')
+                          help="Answers fixture, instead of the answers cache ($SEMANTIC_PDF_DIFF_CACHE): answers "
+                               'recorded in it are replayed, not asked again. A .sqlite file also records new answers '
+                               '(created if missing); a .zip is replayed only')
     recorded.add_argument('--fixture-mode', choices=fixtures.MODES,
                           help='replay: fail requests with no recorded answer (tests, CI); replay-or-record (a '
                                ".sqlite file's default): ask the model and record, recorded failures asked again; "
@@ -253,10 +253,10 @@ def load_settings(args, layer=None):
 
 
 def overview_parser():
-    """What `pdf-semantic-diff --help` prints: the commands, how to start, examples (each command parses its own)."""
+    """What `semantic-pdf-diff --help` prints: the commands, how to start, examples (each command parses its own)."""
     commands = COMMANDS_HELP + "".join(f"  {name:<11} the lab's (semantic-pdf-diff[lab])\n"
                                        for name in sorted(lab_commands()))
-    parser = Parser(prog='pdf-semantic-diff', usage='%(prog)s COMMAND [options]')
+    parser = Parser(prog='semantic-pdf-diff', usage='%(prog)s COMMAND [options]')
     help_text(parser, START_HELP.format(base_url=default('base_url'), model=default('model')), commands)
     parser.add_argument('--version', action='version', version=f'%(prog)s {__version__}',
                         help="show the program's version and exit")
@@ -267,21 +267,21 @@ def overview_parser():
 
 COMPARE_HELP = """\
 Compare two sources. Each is a file, folder or zip archive, or the name of a source declared in the store
-(`pdf-semantic-diff source add`); a declared name is taken before a path. Sources are rescanned first, so files
+(`semantic-pdf-diff source add`); a declared name is taken before a path. Sources are rescanned first, so files
 edited, added or removed since are picked up.
 """
 
 COMPARE_EXAMPLES = """\
 Examples:
-  pdf-semantic-diff compare team-a.pdf team-b.pdf --store result
-  pdf-semantic-diff compare old.pdf new.pdf --mode revisions --store diff --max-cost 2
-  pdf-semantic-diff compare team-a team-b --store work  sources declared in work
-  pdf-semantic-diff compare rev-b rev-c --store work --mode revisions --report reports/b-to-c
-  pdf-semantic-diff compare --store work --manifest team-a.source.json team-b
+  semantic-pdf-diff compare team-a.pdf team-b.pdf --store result
+  semantic-pdf-diff compare old.pdf new.pdf --mode revisions --store diff --max-cost 2
+  semantic-pdf-diff compare team-a team-b --store work  sources declared in work
+  semantic-pdf-diff compare rev-b rev-c --store work --mode revisions --report reports/b-to-c
+  semantic-pdf-diff compare --store work --manifest team-a.source.json team-b
 """
 
 def compare_parser():
-    parser = help_text(Parser(prog='pdf-semantic-diff compare',
+    parser = help_text(Parser(prog='semantic-pdf-diff compare',
                                                usage='%(prog)s SOURCE SOURCE [--store DIR] [options]'),
                        COMPARE_EXAMPLES, COMPARE_HELP)
     parser.add_argument('sources', nargs='*', metavar='SOURCE',
@@ -339,7 +339,7 @@ def link_manifest(store, path):
     return source.name
 
 def fixtures_parser():
-    parser = Parser(prog='pdf-semantic-diff fixtures',
+    parser = Parser(prog='semantic-pdf-diff fixtures',
                                      description='Replay fixtures of recorded answers.')
     commands = parser.add_subparsers(dest='command', required=True, metavar='COMMAND')
     def sub_parser(name, help):
@@ -405,44 +405,45 @@ def fixtures_command(argv):
 SETTINGS_HELP = """\
 Print the settings a run would use, as JSON: the defaults, then the user's (`config set --user`), then a store's
 (--store; `config set`), then --config's. The endpoint is OPENAI_BASE_URL's; the API key (OPENAI_API_KEY) is never
-printed. `pdf-semantic-diff config show` lists the settings with what each does.
+printed. `semantic-pdf-diff config show` lists the settings with what each does.
 
 Settings that shape what's asked (extraction, levers) are bound to a store: a run with others reads again what they
 change, the queries that didn't change answered from the cache.
 """
 
 def default_store():
-    """The store a command works on without --store: $PDF_DIFF_STORE, else ./diff-output."""
-    return Path(os.environ.get('PDF_DIFF_STORE') or 'diff-output')
+    """The store a command works on without --store: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output."""
+    from .settings import variable
+    return Path(variable('STORE') or 'diff-output')
 
 CONFIG_HELP = """\
 A store keeps its own settings: set once, they apply to every run in it (a run's flags override them for that
 run only). The user's settings (--user) lie under every store's: the endpoint's model and context, concurrency, a
 reranker. Names are the settings' own (max_cost, report_budget, rerank_threshold).
 
-  pdf-semantic-diff config show                     the settings most runs set, by group
-  pdf-semantic-diff config show comparing           a group's: endpoint, budget, sources, reading, comparing,
+  semantic-pdf-diff config show                     the settings most runs set, by group
+  semantic-pdf-diff config show comparing           a group's: endpoint, budget, sources, reading, comparing,
                                                     report, levers
-  pdf-semantic-diff config show --all               every setting
-  pdf-semantic-diff config find table holder        settings whose name or help holds the words
-  pdf-semantic-diff config help rerank_threshold    everything about one setting
-  pdf-semantic-diff config set max_cost 2           kept in the store; a new store is made for it
-  pdf-semantic-diff config unset max_cost           back to the default
-  pdf-semantic-diff config export settings.json     the store's own settings, as JSON (to the screen without a file)
-  pdf-semantic-diff config import settings.json     every setting in the file, or none if any is wrong (null unsets)
-  pdf-semantic-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
-  pdf-semantic-diff config test                     the endpoint, the key and each model checked, for a few cents
+  semantic-pdf-diff config show --all               every setting
+  semantic-pdf-diff config find table holder        settings whose name or help holds the words
+  semantic-pdf-diff config help rerank_threshold    everything about one setting
+  semantic-pdf-diff config set max_cost 2           kept in the store; a new store is made for it
+  semantic-pdf-diff config unset max_cost           back to the default
+  semantic-pdf-diff config export settings.json     the store's own settings, as JSON (to the screen without a file)
+  semantic-pdf-diff config import settings.json     every setting in the file, or none if any is wrong (null unsets)
+  semantic-pdf-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
+  semantic-pdf-diff config test                     the endpoint, the key and each model checked, for a few cents
                                                     (exit 5 when a check fails)
-  pdf-semantic-diff config models gemma             the endpoint's models holding the words, those in use marked
+  semantic-pdf-diff config models gemma             the endpoint's models holding the words, those in use marked
 """
 
 def config_parser():
-    parser = Parser(prog='pdf-semantic-diff config', usage='%(prog)s ACTION [options]')
+    parser = Parser(prog='semantic-pdf-diff config', usage='%(prog)s ACTION [options]')
     help_text(parser, CONFIG_HELP, "The user's and a store's settings: show, find, help, set, unset, export and "
                                   "import; the endpoint checked (test) and its models listed (models).")
     where = Parser(add_help=False)
     where.add_argument('--store', type=Path, default=None,
-                       help='The store (default: $PDF_DIFF_STORE, else ./diff-output)')
+                       help='The store (default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
     where.add_argument('--user', action='store_true',
                        help="the user's settings, shared by every store (set, unset, export, import), not the store's")
     actions = parser.add_subparsers(dest='action', metavar='ACTION')
@@ -471,7 +472,7 @@ def config_parser():
     return parser
 
 def config_command(argv):
-    """`pdf-semantic-diff config` (configuration.py): a store's own settings shown, explained, set and moved."""
+    """`semantic-pdf-diff config` (configuration.py): a store's own settings shown, explained, set and moved."""
     parser = config_parser()
     args = parser.parse_args(argv or ['show'])
     from .settings import save_user_settings, user_path, user_settings
@@ -560,13 +561,13 @@ def environment():
     value = lambda name, unset: os.environ.get(name) or f"not set: {unset}"  # noqa: E731
     return [('OPENAI_BASE_URL', value('OPENAI_BASE_URL', default('base_url'))),
             ('OPENAI_API_KEY', 'set' if os.environ.get('OPENAI_API_KEY') else 'not set'),
-            ('PDF_DIFF_STORE', value('PDF_DIFF_STORE', './diff-output, without --store')),
-            ('PDF_DIFF_CACHE', value('PDF_DIFF_CACHE', f'answers cached in {cache_path()}'))]
+            ('SEMANTIC_PDF_DIFF_STORE', value('SEMANTIC_PDF_DIFF_STORE', './diff-output, without --store')),
+            ('SEMANTIC_PDF_DIFF_CACHE', value('SEMANTIC_PDF_DIFF_CACHE', f'answers cached in {cache_path()}'))]
 # Every other setting is the user's or a store's (`config set [--user]`): PDF_DIFF_<NAME> and OPENAI_MODEL are no longer
-# read, and warn when set (settings.retired).
+# read, and warn when set (settings.retired), as PDF_DIFF_STORE and PDF_DIFF_CACHE do (settings.variable).
 
 def settings_parser():
-    parser = help_text(Parser(prog='pdf-semantic-diff settings'), description=SETTINGS_HELP)
+    parser = help_text(Parser(prog='semantic-pdf-diff settings'), description=SETTINGS_HELP)
     parser.add_argument('--config', type=Path, help='A settings JSON file, applied over the environment')
     parser.add_argument('--store', type=Path, help='A store whose own settings (`config set`) apply, under --config')
     parser.add_argument('--changed', action='store_true',
@@ -603,22 +604,22 @@ def parse_meta(pairs):
 
 SOURCE_HELP = """\
 A source is a named set of files: one proposal, or one revision of a design. It's declared once in a store, with
-provenance metadata, and compared by name (`pdf-semantic-diff compare`). Its roots are files, folders (read with
+provenance metadata, and compared by name (`semantic-pdf-diff compare`). Its roots are files, folders (read with
 their subfolders) and zip archives, rescanned on every comparison.
 """
 
 SOURCE_EXAMPLES = """\
 Examples:
-  pdf-semantic-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A"
-  pdf-semantic-diff source add team-b --store work --path team-b.zip --meta revision=C
-  pdf-semantic-diff source list --store work
-  pdf-semantic-diff source show team-a --store work  its files, and those skipped and why
-  pdf-semantic-diff compare team-a team-b --store work
-  pdf-semantic-diff source export team-a --store work --output team-a.source.json --with-hashes
+  semantic-pdf-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A"
+  semantic-pdf-diff source add team-b --store work --path team-b.zip --meta revision=C
+  semantic-pdf-diff source list --store work
+  semantic-pdf-diff source show team-a --store work  its files, and those skipped and why
+  semantic-pdf-diff compare team-a team-b --store work
+  semantic-pdf-diff source export team-a --store work --output team-a.source.json --with-hashes
 """
 
 def source_parser():
-    parser = help_text(Parser(prog='pdf-semantic-diff source'), SOURCE_EXAMPLES,
+    parser = help_text(Parser(prog='semantic-pdf-diff source'), SOURCE_EXAMPLES,
                        'Declare sources in a store, and manage them.\n\n' + SOURCE_HELP)
     commands = parser.add_subparsers(dest='command', required=True, metavar='COMMAND')
     def command(name, help, description=None):
@@ -706,7 +707,7 @@ def source_command(argv):
     return 0
 
 def store_parser(command):
-    parser = Parser(prog=f'pdf-semantic-diff {command}')
+    parser = Parser(prog=f'semantic-pdf-diff {command}')
     parser.add_argument('--store', type=Path, required=True, help='The store folder')
     add_log_options(parser)
     if command == 'show':

@@ -186,5 +186,5 @@ def feedback(account, shown=20):
 def summary(account, store):
     """One line on what the budget left out, for a run's or a report's last words."""
     return (f"{len(account.cut)} of {len(account.wanted)} crops left out for the report's {sized(account.budget)} "
-            f"budget: `pdf-semantic-diff report --store {store} --dry-run` lists them, and --report-budget sets "
+            f"budget: `semantic-pdf-diff report --store {store} --dry-run` lists them, and --report-budget sets "
             "another")

@@ -1,4 +1,4 @@
-"""A store's own settings and what `pdf-semantic-diff config` does with them (docs/plans/configuration-in-the-store-
+"""A store's own settings and what `semantic-pdf-diff config` does with them (docs/plans/configuration-in-the-store-
 2026-10-20.md): values given as text parsed by their setting's type and checked; settings listed by group with what
 each does (settinghelp.py), found by words, explained one by one; a layer exported and imported as JSON, in
 cameo_ingest's format. The owner, 2026-10-08: "Other configuration items should be adjusted in the store via the CLI,
@@ -153,7 +153,7 @@ def help_lines(name, layers):
     if h.more:
         lines.append(f"  {h.more}")
     if h.example:
-        lines.append(f"  example: pdf-semantic-diff config set {name} {shlex.quote(h.example)}")
+        lines.append(f"  example: semantic-pdf-diff config set {name} {shlex.quote(h.example)}")
     lines.append(f"  group: {h.group}" + (f"; lever: {lever}" if lever else ""))
     lines.append(f"  changing it redoes: {redoes(name)}")
     return lines

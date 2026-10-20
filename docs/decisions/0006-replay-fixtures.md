@@ -14,8 +14,8 @@ Integration tests against a real model are slow, cost money and vary from run to
   - `replay-or-record`: asks for whatever is missing, recorded failures included.
   - `record-new`: asks only what was never asked. It replays the model's failures as failures, and asks transient ones (timeouts, server errors) again.
 - **Committed zipped:** `tests/fixtures/replay-slices.zip`. A `.zip` is replay-only, served from a temporary copy. Recording goes into a working `.sqlite`, which is git-ignored.
-- **Reproducible packing** (`pdf-semantic-diff fixtures pack`): rows in key order, fixed timestamps, last-use times and sessions left out. Unchanged answers give identical bytes, so git history changes only when answers do.
-- **`pdf-semantic-diff fixtures summary`** says what a fixture holds (answers per responder, role and outcome; tokens; PyMuPDF version), since a binary diff doesn't.
+- **Reproducible packing** (`semantic-pdf-diff fixtures pack`): rows in key order, fixed timestamps, last-use times and sessions left out. Unchanged answers give identical bytes, so git history changes only when answers do.
+- **`semantic-pdf-diff fixtures summary`** says what a fixture holds (answers per responder, role and outcome; tokens; PyMuPDF version), since a binary diff doesn't.
 - **Slices, not whole documents:** recordings use deterministic page slices of the public sample corpus (`scripts/slices.json`, `scripts/make_slices.py`). They're cheaper to record and faster to replay.
 - **PyMuPDF pinned:** slices are pinned by SHA-256 and by the PyMuPDF version that cut them. Fixtures record their PyMuPDF version, and replay tests skip under another, since text and renderings may differ.
 - **No migrations:** a fixture with another schema version is refused (`fixtures.FixtureError`).

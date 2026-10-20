@@ -12,7 +12,7 @@ People label in short sessions and sometimes on documents that can't leave a san
 - **A review page is a local, self-contained HTML file:**
   - it works offline, so it works inside the sandbox on real documents
   - one item per screen, progress saved in the browser
-  - labels downloaded as a file and imported with `pdf-semantic-diff review import`
+  - labels downloaded as a file and imported with `semantic-pdf-diff review import`
 - **Batches are small:** about 15–20 items, 10–20 minutes a session.
 - **Two pages per batch, in order:**
   - `questions.html` first, blind: is what the model was asked answerable?
@@ -22,5 +22,5 @@ People label in short sessions and sometimes on documents that can't leave a san
 
 ## Consequences
 
-- Sampling, review, import and agreement are lab commands (`pdf-semantic-diff review sample | import | agreement`), installed with `semantic-pdf-diff[lab]` ([0014](0014-lab-as-its-own-distribution.md)).
+- Sampling, review, import and agreement are lab commands (`semantic-pdf-diff review sample | import | agreement`), installed with `semantic-pdf-diff[lab]` ([0014](0014-lab-as-its-own-distribution.md)).
 - Labels and batches are local working data ([0015](0015-repository-contents.md)). What a batch showed goes into a review document.

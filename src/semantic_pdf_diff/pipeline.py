@@ -99,7 +99,7 @@ class RunOptions:
 
 def compare_paths(a, b, out, settings, options=None, client=None):
     """Compare two sources given as paths (files, folders or zips), each a shortcut source in the store at `out`,
-    as `pdf-semantic-diff compare A B --store DIR` does. Returns its exit code (0, 2 incomplete, 3 paused for
+    as `semantic-pdf-diff compare A B --store DIR` does. Returns its exit code (0, 2 incomplete, 3 paused for
     budget)."""
     options = options or RunOptions()
     check_fixture(options)  # before the sources are declared in the store
@@ -304,7 +304,7 @@ def restated(settings, earlier, later, records, left, right):
 def answers_cache(store):
     """The answers cache a run reads and records into: the user's (settings.cache_path), whatever the store. The
     tests keep one in each store instead (tests/stubs.py), as stores once kept their own. Owner-only, as a store is:
-    its answers quote the documents (a folder named by $PDF_DIFF_CACHE is left as it is)."""
+    its answers quote the documents (a folder named by $SEMANTIC_PDF_DIFF_CACHE is left as it is)."""
     from .settings import cache_path
     path = cache_path()
     if not path.parent.exists():

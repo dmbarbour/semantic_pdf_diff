@@ -1,4 +1,4 @@
-"""`pdf-semantic-diff config test` and `config models` (docs/plans/configuration-in-the-store-2026-10-20.md,
+"""`semantic-pdf-diff config test` and `config models` (docs/plans/configuration-in-the-store-2026-10-20.md,
 milestone 5, as cameo_ingest's): the endpoint, the key and each model the settings name checked for a few cents, and
 the endpoint's models listed.
 
@@ -111,7 +111,7 @@ def run(settings, rng=None):
     checks.append(_timed("json", answer))
 
     def image():
-        with tempfile.TemporaryDirectory(prefix="pdf-diff-check-") as folder:
+        with tempfile.TemporaryDirectory(prefix="semantic-pdf-diff-check-") as folder:
             path, code = card(folder, rng)
             got = client.ask('The image shows one code: letters, a dash and digits. Return only the JSON object '
                              '{"code": "..."} with the code exactly as written.', Code, images=(path,))

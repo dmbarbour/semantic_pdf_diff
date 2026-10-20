@@ -5,7 +5,7 @@ saving responses and handling results (which may queue refinement requests) happ
 on the calling thread, which owns the PDF document and the store connection.
 
 A cached or replayed answer is handled at once, so a replay sees answers in the order they
-were asked, while a live run sees them as they arrive. With PDF_DIFF_ANSWER_ORDER set to a
+were asked, while a live run sees them as they arrive. With SEMANTIC_PDF_DIFF_ANSWER_ORDER set to a
 seed (tests only), cached and replayed answers (and replayed failures) are held and handled in
 an order drawn from it instead, as a live run's might be: what a run writes must not depend on that order (the
 determinism review, 2026-10-12).
@@ -16,7 +16,7 @@ import random
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from .failures import ModelFailure
 
-ANSWER_ORDER = "PDF_DIFF_ANSWER_ORDER"
+ANSWER_ORDER = "SEMANTIC_PDF_DIFF_ANSWER_ORDER"
 
 class Dispatcher:
     def __init__(self, client, workers=None):

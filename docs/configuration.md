@@ -6,7 +6,7 @@ When no environment variable or override is supplied, the default endpoint is `h
 
 ## Precedence and environment variables
 
-Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > built-in defaults**. The user's settings (`config set --user`, kept in `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `pdf-semantic-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `pdf-semantic-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
+Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > built-in defaults**. The user's settings (`config set --user`, kept in `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `semantic-pdf-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `semantic-pdf-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
 
 Four environment variables, as the owner listed them ([the plan](plans/configuration-in-the-store-2026-10-20.md)):
 
@@ -14,23 +14,23 @@ Four environment variables, as the owner listed them ([the plan](plans/configura
 | --- | --- |
 | `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere) |
 | `OPENAI_BASE_URL` | Chat Completions API base URL, including `/v1` when required |
-| `PDF_DIFF_STORE` | The store a command works on without `--store` (unset: `./diff-output`) |
-| `PDF_DIFF_CACHE` | The answers cache's folder: every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
+| `SEMANTIC_PDF_DIFF_STORE` | The store a command works on without `--store` (unset: `./diff-output`) |
+| `SEMANTIC_PDF_DIFF_CACHE` | The answers cache's folder: every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
 
 Two more variables aren't settings:
 
 | Variable | What it is |
 | --- | --- |
-| `PDF_DIFF_ANSWER_ORDER` | Tests only: a seed; cached and replayed answers are handled in an order drawn from it, as a live run's might arrive, rather than as they were asked. What a run writes must not change (`dispatch.py`) |
+| `SEMANTIC_PDF_DIFF_ANSWER_ORDER` | Tests only: a seed; cached and replayed answers are handled in an order drawn from it, as a live run's might arrive, rather than as they were asked. What a run writes must not change (`dispatch.py`) |
 | `SOURCE_DATE_EPOCH` | The time reports and review batches say they were made, in seconds since 1970 (UTC). The reproducible-builds convention; with it, replays form byte-identical reports |
 
-`OPENAI_MODEL` and `PDF_DIFF_<NAME>` (one for every setting until 2026-10-20) are no longer read. A run that finds one set says, once, which `config set --user` keeps it instead: `OPENAI_MODEL` is `config set --user model NAME`, `PDF_DIFF_CONCURRENCY` is `config set --user concurrency 32`. Export the two endpoint variables through your shell or process manager; `.env` files are not loaded automatically.
+`OPENAI_MODEL` and `PDF_DIFF_<NAME>` (one for every setting until 2026-10-20) are no longer read. A run that finds one set says, once, which `config set --user` keeps it instead: `OPENAI_MODEL` is `config set --user model NAME`, `PDF_DIFF_CONCURRENCY` is `config set --user concurrency 32`. `PDF_DIFF_STORE` and `PDF_DIFF_CACHE` are now `SEMANTIC_PDF_DIFF_STORE` and `SEMANTIC_PDF_DIFF_CACHE`, named as the command is; the old names are ignored, with a warning. Export the two endpoint variables through your shell or process manager; `.env` files are not loaded automatically.
 
-`pdf-semantic-diff settings [--config FILE] [--store DIR]` prints every setting as a run would resolve them, the API key never; `--changed` prints only those differing from the defaults.
+`semantic-pdf-diff settings [--config FILE] [--store DIR]` prints every setting as a run would resolve them, the API key never; `--changed` prints only those differing from the defaults.
 
-## The user's and a store's settings: `pdf-semantic-diff config`
+## The user's and a store's settings: `semantic-pdf-diff config`
 
-A store keeps its own settings, set once for every run in it; the user's are shared by every store ([the plan](plans/configuration-in-the-store-2026-10-20.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$PDF_DIFF_STORE`, else `./diff-output`). `set`, `unset`, `export` and `import` take `--user` for the user's settings instead of the store's.
+A store keeps its own settings, set once for every run in it; the user's are shared by every store ([the plan](plans/configuration-in-the-store-2026-10-20.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$SEMANTIC_PDF_DIFF_STORE`, else `./diff-output`). `set`, `unset`, `export` and `import` take `--user` for the user's settings instead of the store's.
 
 | Command | What it does |
 | --- | --- |
@@ -199,9 +199,9 @@ None of these affect output, so changing them never reads anything again.
 
 A typical page needs multiple calls, so large PDFs can require hundreds or thousands. `Retry-After` on 429/503 responses is honoured (capped at 60 s). `--max-calls` caps the requests sent in one invocation, counted as each is asked; retries don't count. A run a cap cuts (`--max-calls`, `--max-cost`, the provider's balance) says so in its report (`paused`): which work the cap cut followed the order answers came in, so the report isn't reproducible until the run is resumed.
 
-A comparison's `--store` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, the queries asked, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from. So is the answers cache (`$PDF_DIFF_CACHE`), owner-only too: its answers quote the documents, and removing a store leaves them there.
+A comparison's `--store` folder is an evidence store: `store.sqlite` (sources, files, content, evidence, coverage, the queries asked, comparisons) plus `assets/` for rendered crops. Stores are created with owner-only permissions and are as sensitive as the documents they were built from. So is the answers cache (`$SEMANTIC_PDF_DIFF_CACHE`), owner-only too: its answers quote the documents, and removing a store leaves them there.
 
-- **Reuse and resume:** content already extracted is loaded from the store. Evidence and coverage are written task by task. Model answers are cached in the user's answers cache (`$PDF_DIFF_CACHE/answers.sqlite`, a fixture's format, shared by every store) by the query that reached the model (its text, images and generation settings) and the model, so an interrupted run resumes by replaying cached answers, and another store asking the same is answered from it. The model's failures are asked again. Tasks that failed (e.g. hitting `--max-calls`) are retried on the next run. `--fixture` replaces the cache for a run (tests and the lab). Stores cached their own answers until 2026-10-20; those are moved into the cache as they're asked for.
+- **Reuse and resume:** content already extracted is loaded from the store. Evidence and coverage are written task by task. Model answers are cached in the user's answers cache (`$SEMANTIC_PDF_DIFF_CACHE/answers.sqlite`, a fixture's format, shared by every store) by the query that reached the model (its text, images and generation settings) and the model, so an interrupted run resumes by replaying cached answers, and another store asking the same is answered from it. The model's failures are asked again. Tasks that failed (e.g. hitting `--max-calls`) are retried on the next run. `--fixture` replaces the cache for a run (tests and the lab). Stores cached their own answers until 2026-10-20; those are moved into the cache as they're asked for.
 - **Sources:** each comparison object is a source declared in the store with a name, metadata and roots (files, folders, zip archives). `compare` declares a path given in place of a name as a `shortcut` source, named after its final component. Roots are rescanned on every run; set `rescan` to `"manual"` to rescan only on `source update`. Unchanged files (same size and modification time) aren't reread. Content no source references any more is orphaned; `gc` removes it.
 - **Archives and hidden files:** zip archives are read in memory, including nested ones. Files and folders whose names start with `.`, and OS clutter (`__MACOSX`, `Thumbs.db`), are skipped and listed. Safety limits are generous and configurable: `max_zip_depth` (8), `max_source_bytes` (50 GB), and a compression-ratio check (`zip_ratio_limit` 1000 for members over `zip_ratio_min_bytes`, 100 MB). Unsafe member paths are rejected and encrypted members skipped; all are listed in the report.
 - **One writer:** a second process writing to the same store gets a "store is in use" error.

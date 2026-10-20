@@ -61,7 +61,7 @@ def check(path, mode):
         raise FixtureError(f"{path}: no such fixture (replay only reads one; name it without --fixture-mode replay "
                            "to create it and record into it)")
     if mode != "replay" and path.suffix == ".zip":
-        raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (pdf-semantic-diff fixtures pack)")
+        raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (semantic-pdf-diff fixtures pack)")
 OUTCOMES = ("ok", "invalid", "transient")
 
 SCHEMA = """
@@ -411,7 +411,7 @@ def open(path, mode="read"):  # noqa: A001 (fixtures.open, as the module's reade
         raise ValueError(f"mode {mode!r} is not read, replay or record")
     if path.suffix == ".zip":
         if mode == "record":
-            raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (pdf-semantic-diff fixtures pack)")
+            raise FixtureError(f"{path}: record into a .sqlite fixture, then pack it (semantic-pdf-diff fixtures pack)")
         temp = tempfile.TemporaryDirectory(prefix="fixture-")
         # read-only in either mode: a replay's marks would go to the copy, removed on close (code review
         # 2026-10-08, C3)

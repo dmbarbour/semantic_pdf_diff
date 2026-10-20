@@ -2,7 +2,7 @@
 
 ## Tests and demo
 
-The product is `src/semantic_pdf_diff`. The lab, how it's measured and improved (rounds, judges, review panels, spot checks, controlled documents, eye and page tests), is its own distribution in `lab/` (`semantic_pdf_diff_lab`), installed beside it. It adds its commands to `pdf-semantic-diff` through entry points. `tests/test_boundaries.py` keeps the product from importing it.
+The product is `src/semantic_pdf_diff`. The lab, how it's measured and improved (rounds, judges, review panels, spot checks, controlled documents, eye and page tests), is its own distribution in `lab/` (`semantic_pdf_diff_lab`), installed beside it. It adds its commands to `semantic-pdf-diff` through entry points. `tests/test_boundaries.py` keeps the product from importing it.
 
 ```bash
 pip install -e '.[dev]' -e lab
@@ -47,7 +47,7 @@ python scripts/fetch_samples.py --all --make-zips
 The 3GPP files are kept as downloaded zips, since zips are meant to be read as folders. Sources and terms are in `scripts/samples.json`. For example:
 
 ```bash
-pdf-semantic-diff compare samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \
+semantic-pdf-diff compare samples/wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf \
   samples/wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf --store wind-diff
 ```
 
@@ -57,7 +57,7 @@ Recorded model answers let the real pipeline run offline. A query is named by th
 
 - **The committed fixture:** `tests/fixtures/replay-slices.zip`, answers from `google/gemma-4-31B-it` (DeepInfra) for the development runs in `scripts/slices.json`.
 - **Slices:** page ranges cut from the public samples, byte-identical for the PyMuPDF version pinned in `slices.json`. `make_slices.py` says so when bytes differ.
-- **What a fixture holds:** `pdf-semantic-diff fixtures summary FILE` lists answers per responder, role and outcome, tokens, and the PyMuPDF version it was recorded with.
+- **What a fixture holds:** `semantic-pdf-diff fixtures summary FILE` lists answers per responder, role and outcome, tokens, and the PyMuPDF version it was recorded with.
 
 ```bash
 python scripts/fetch_samples.py --set wind-reference-turbines --set solar-decathlon-2013 --set nasa-flagship-concepts
@@ -86,7 +86,7 @@ python scripts/record_runs.py --replay --fixture tests/fixtures/replay-slices.zi
 - **The controlled corpus:** `scripts/controlled.py pack` exports `replay.zip` from its archive the same way. After a change, `controlled.py refresh --jobs 6 --max-cost 2` does every step in order (the standard and row-by-row runs recorded, the export, both replays, scoring, the context measures), with stores bound to other settings reading again what changed. It exits 1 only when a run or a step fails, 3 at the cap.
 - **Runs at once:** `--jobs N` (`controlled.py run`, `pack` and `refresh`; `record_runs.py`) spreads the runs over N processes sharing the archive, the documents before the pairs that replay their extraction. The cost cap is checked as each run starts, so runs started together may overshoot it together. On 2026-10-17, six processes exported the corpus in 1.5 minutes (5 alone), eight the slices in 45 seconds (2 minutes alone).
 - **The same runs export the same zip,** whatever else the archive holds: the answers they're served, their queries' descriptions and the recipes they noted. Packing is reproducible, so the zip's bytes change only when the runs' answers do.
-- **Merging:** `pdf-semantic-diff fixtures merge ARCHIVE SOURCE...` copies in the answers an archive lacks (an arm's copy, a colleague's recording), keeping the archive's own. `--prefer` lets the sources' answers win instead, for a committed zip merged into its archive: an archive holding a variant's later answer to a query would otherwise replay it in place of the committed one.
+- **Merging:** `semantic-pdf-diff fixtures merge ARCHIVE SOURCE...` copies in the answers an archive lacks (an arm's copy, a colleague's recording), keeping the archive's own. `--prefer` lets the sources' answers win instead, for a committed zip merged into its archive: an archive holding a variant's later answer to a query would otherwise replay it in place of the committed one.
 - **Pruning** (`fixtures prune ARCHIVE --unused-since TIME`) still drops answers no run used since a time, with its guards, but nothing needs it.
 
 ## Proving a refactor changes nothing

@@ -13,7 +13,7 @@ The owner, 2026-10-12: "We definitely need to fix things so race conditions aren
 
 - **What a run writes depends only on:** its inputs, its settings, and each answer's content or absence. That covers evidence.json, report.json and report.html, coverage, the store as later stages read it, and every lab metric.
 - **It must not depend on:** the order answers arrive in, thread scheduling, the wall clock, or PYTHONHASHSEED.
-- **Tested by shuffling:** with `PDF_DIFF_ANSWER_ORDER` (tests only), the dispatcher holds cached and replayed answers, failures too, and releases them in a seeded order. A whole run replayed under several seeds must write the same evidence and report.
+- **Tested by shuffling:** with `SEMANTIC_PDF_DIFF_ANSWER_ORDER` (tests only), the dispatcher holds cached and replayed answers, failures too, and releases them in a seeded order. A whole run replayed under several seeds must write the same evidence and report.
 - **Answers are never shared or edited:**
   - A query's outcome, answer or failure, is kept for the run, so a duplicate gets the same outcome whenever it's asked.
   - Each waiter gets its own copy.

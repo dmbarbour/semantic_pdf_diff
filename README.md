@@ -29,29 +29,29 @@ source .venv/bin/activate
 pip install -e .
 export OPENAI_API_KEY='your-serving-provider-key'
 export OPENAI_BASE_URL='https://your-provider.example/v1'
-pdf-semantic-diff config set --user model your-vision-model-id
-pdf-semantic-diff config test        # the endpoint, the key and the model checked, for a fraction of a cent
-pdf-semantic-diff compare team-a.pdf team-b.pdf --store result
+semantic-pdf-diff config set --user model your-vision-model-id
+semantic-pdf-diff config test        # the endpoint, the key and the model checked, for a fraction of a cent
+semantic-pdf-diff compare team-a.pdf team-b.pdf --store result
 ```
 
-The model, like the endpoint's other settings (context, concurrency, timeout), is the user's: kept once for every store. A store keeps its own settings: `pdf-semantic-diff config show --store result` lists them by group, `config set NAME VALUE` sets one for every run in the store, and `config help NAME` says what it does and what changing it redoes. `pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff COMMAND --help` (or `pdf-semantic-diff help COMMAND`) gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
+The model, like the endpoint's other settings (context, concurrency, timeout), is the user's: kept once for every store. A store keeps its own settings: `semantic-pdf-diff config show --store result` lists them by group, `config set NAME VALUE` sets one for every run in the store, and `config help NAME` says what it does and what changing it redoes. `semantic-pdf-diff --help` lists every command, the environment it needs and examples; `semantic-pdf-diff COMMAND --help` (or `semantic-pdf-diff help COMMAND`) gives a command's options, and `semantic-pdf-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
 
-Open `result/report.html`: it's one file, which can be moved or sent on its own. Its crops are embedded in order of value (the findings to check, and claims read from charts, diagrams and tables, first) until the file reaches `--report-budget` (20 MB by default); `pdf-semantic-diff report --store result --dry-run` says what a budget leaves out. For comparisons too large for one file, `--split` writes a file per pair of files and an index, in a folder to zip and send. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
+Open `result/report.html`: it's one file, which can be moved or sent on its own. Its crops are embedded in order of value (the findings to check, and claims read from charts, diagrams and tables, first) until the file reaches `--report-budget` (20 MB by default); `semantic-pdf-diff report --store result --dry-run` says what a budget leaves out. For comparisons too large for one file, `--split` writes a file per pair of files and an index, in a folder to zip and send. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 
 Either source can also be a folder or a zip archive. For revisions, supply the old version first:
 
 ```bash
-pdf-semantic-diff compare old.pdf new.pdf --mode revisions --store revision-diff
-pdf-semantic-diff compare team-a/ team-b.zip --store team-diff
+semantic-pdf-diff compare old.pdf new.pdf --mode revisions --store revision-diff
+semantic-pdf-diff compare team-a/ team-b.zip --store team-diff
 ```
 
 For repeated work, declare **sources** in a store, each with a name, provenance metadata and one or more roots, and compare them by name (`compare` takes names and paths alike, a declared name first). Sources are rescanned on every run, so edited, added or deleted files are picked up:
 
 ```bash
-pdf-semantic-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A" --meta revision=C
-pdf-semantic-diff source add team-b --store work --path team-b.zip
-pdf-semantic-diff compare --store work team-a team-b
-pdf-semantic-diff source export team-a --store work --output team-a.source.json --with-hashes
+semantic-pdf-diff source add team-a --store work --path team-a/ --path addendum.pdf --meta organization="Team A" --meta revision=C
+semantic-pdf-diff source add team-b --store work --path team-b.zip
+semantic-pdf-diff compare --store work team-a team-b
+semantic-pdf-diff source export team-a --store work --output team-a.source.json --with-hashes
 ```
 
 Model requests run in parallel (`concurrency`, default 4, adapting down when the server throttles) within optional time-of-day rate limits, e.g. in a `--config` file:
@@ -66,16 +66,16 @@ Runs show progress bars on a terminal and heartbeat lines otherwise; `-q`, `-v`,
 Inspect and maintain a store with `show` (views as Markdown, CSV or JSON Lines), `report` (regenerate a report without model calls) and `gc` (delete content no source references any more):
 
 ```bash
-pdf-semantic-diff show evidence_occurrences --store work --format csv
-pdf-semantic-diff report --store work --out reports/latest
-pdf-semantic-diff gc --store work --dry-run
+semantic-pdf-diff show evidence_occurrences --store work --format csv
+semantic-pdf-diff report --store work --out reports/latest
+semantic-pdf-diff gc --store work --dry-run
 ```
 
 A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Files of the types listed under Status are read; others are listed as skipped (`source show` says which, and why).
 
-Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error, a mistyped command or option included; `5` a check of `pdf-semantic-diff config test` failed.
+Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `1` fatal input or configuration error, a mistyped command or option included; `5` a check of `semantic-pdf-diff config test` failed.
 
-The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence, and an interrupted run resumes where it stopped. Model answers are cached for every store (`$PDF_DIFF_CACHE`, else `~/.cache/semantic-pdf-diff`), so what was asked once isn't paid for again. A store is bound to the model and extraction settings it was built with. A run with different ones reads again what they change, saying what differs and at most how much is asked again (preview with `--dry-run`); unchanged queries are answered from the cache. `--reset` starts a store over.
+The `--store` folder (`diff-output` unless named) is an evidence **store** (`store.sqlite` plus rendered crops): rerunning into it reuses extracted evidence, and an interrupted run resumes where it stopped. Model answers are cached for every store (`$SEMANTIC_PDF_DIFF_CACHE`, else `~/.cache/semantic-pdf-diff`), so what was asked once isn't paid for again. A store is bound to the model and extraction settings it was built with. A run with different ones reads again what they change, saying what differs and at most how much is asked again (preview with `--dry-run`); unchanged queries are answered from the cache. `--reset` starts a store over.
 
 ## Documentation
 

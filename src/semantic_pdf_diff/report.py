@@ -636,7 +636,7 @@ def crops_left_out_html(account):
             f"crops fill the size budget ({crops.sized(account.budget)}) in order of value: claims in different "
             "or uncertain findings, then complementary ones and claims possibly added or removed, then the rest; "
             "within each, claims read from a chart, diagram or table, or whose quote isn't in the page's text, first. "
-            "<code>pdf-semantic-diff report --report-budget SIZE</code> writes it again with another budget, and "
+            "<code>semantic-pdf-diff report --report-budget SIZE</code> writes it again with another budget, and "
             "<code>--dry-run</code> says what that would leave out.</p><table><thead><tr><th>Shown in</th>"
             f"<th>Crop</th><th>Size</th></tr></thead><tbody>{rows}</tbody></table></details>")
 

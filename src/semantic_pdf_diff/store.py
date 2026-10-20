@@ -397,7 +397,7 @@ class Store:
         return claims
 
     def own_settings(self):
-        """The store's own settings, as `pdf-semantic-diff config` set them (configuration.py): {name: value}."""
+        """The store's own settings, as `semantic-pdf-diff config` set them (configuration.py): {name: value}."""
         row = self.db.execute("SELECT value FROM meta WHERE key='settings'").fetchone()
         return json.loads(row[0]) if row else {}
 

@@ -41,14 +41,28 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertLogs('semantic_pdf_diff', 'WARNING') as logged:
             s=Settings.from_env()
         self.assertEqual((s.concurrency, s.model), (Settings().concurrency, Settings().model))
-        self.assertIn('PDF_DIFF_CONCURRENCY is no longer read: `pdf-semantic-diff config set --user concurrency VALUE`',
+        self.assertIn('PDF_DIFF_CONCURRENCY is no longer read: `semantic-pdf-diff config set --user concurrency VALUE`',
                       '\n'.join(logged.output))
+
+    def test_the_variables_old_names_are_ignored_with_a_warning_naming_the_new(self):
+        # the owner, 2026-10-20: "I'm fine with any one name, but three is a bit awkward"
+        from semantic_pdf_diff import settings as module
+        from semantic_pdf_diff.cli import default_store
+        module._warned.discard('PDF_DIFF_STORE')
+        with patch.dict(os.environ, {'PDF_DIFF_STORE': '/old'}), \
+                self.assertLogs('semantic_pdf_diff', 'WARNING') as logged:
+            os.environ.pop('SEMANTIC_PDF_DIFF_STORE', None)
+            self.assertEqual(default_store(), Path('diff-output'))
+            os.environ['SEMANTIC_PDF_DIFF_STORE'] = '/new'
+            self.assertEqual(default_store(), Path('/new'))
+        self.assertEqual(logged.output, ['WARNING:semantic_pdf_diff:PDF_DIFF_STORE is no longer read: it\'s now '
+                                         'SEMANTIC_PDF_DIFF_STORE'])
 
     def test_the_answers_cache_is_the_users(self):
         from semantic_pdf_diff.settings import cache_path
-        with patch.dict(os.environ, {'PDF_DIFF_CACHE': '/c', 'XDG_CACHE_HOME': '/x', 'HOME': '/h'}):
+        with patch.dict(os.environ, {'SEMANTIC_PDF_DIFF_CACHE': '/c', 'XDG_CACHE_HOME': '/x', 'HOME': '/h'}):
             self.assertEqual(cache_path(), Path('/c/answers.sqlite'))
-            del os.environ['PDF_DIFF_CACHE']
+            del os.environ['SEMANTIC_PDF_DIFF_CACHE']
             self.assertEqual(cache_path(), Path('/x/semantic-pdf-diff/answers.sqlite'))
             del os.environ['XDG_CACHE_HOME']
             self.assertEqual(cache_path(), Path('/h/.cache/semantic-pdf-diff/answers.sqlite'))
