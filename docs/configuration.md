@@ -168,7 +168,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `record_changes` | `true` | post | record_changes | compare | - |
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `topic_names` | `true` | selecting | topic_names | compare | - |
-| `search_names` | `false` | selecting | search_names | compare | - |
+| `search_names` | `true` | selecting | search_names | compare | - |
 | `embed_model` | `null` | selecting | embed | compare | - |
 | `embed_url` | `null` | endpoint | embed | - | - |
 | `embed_dimensions` | `256` | selecting | embed | compare | - |

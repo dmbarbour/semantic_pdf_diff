@@ -13,7 +13,8 @@ from pathlib import Path
 import pymupdf
 from semantic_pdf_diff import cli
 import stubs
-from stubs import chat_answer, prompt_of, request_body, serving, situating_answer, slow, source_data, topics_answer
+from stubs import (chat_answer, names_answer, prompt_of, request_body, serving, situating_answer, slow, source_data,
+                   topics_answer)
 
 @contextlib.contextmanager
 def jittery_model():
@@ -57,6 +58,8 @@ def jittery_model():
             answer = situating_answer(prompt)
         elif topics_answer(prompt):
             answer = topics_answer(prompt)
+        elif names_answer(prompt):
+            answer = names_answer(prompt)
         elif len(parts) > 1:  # an image: a claim derived from its pixels
             answer = {'claims': [{'entity': 'drawing', 'attribute': 'label', 'value': digest[:4], 'kind': 'diagram',
                                   'quote': digest[:4], 'confidence': .8}],
@@ -73,7 +76,7 @@ def jittery_model():
                 if prompt.startswith('You wrote the rules below') else 'table-structure'
                 if prompt.startswith('These are the lines of one table') else 'compare' if 'Compare exactly' in prompt
                 or 'Explain a difference' in prompt else 'triage' if situating_answer(prompt) else 'topics'
-                if topics_answer(prompt) else 'extract')
+                if topics_answer(prompt) else 'names' if names_answer(prompt) else 'extract')
         seen = hashlib.sha256(json.dumps({k: v for k, v in body.items()
                                           if k not in ('model', 'stream', 'stream_options')},
                                          sort_keys=True).encode()).hexdigest()

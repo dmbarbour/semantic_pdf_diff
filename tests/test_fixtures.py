@@ -223,7 +223,8 @@ class RecordAndReplay(unittest.TestCase):
         self.assertIn(f'{missing} request(s) have no answer', log)
         unreached = [r for r in report['coverage'] if r['status'] == 'not_reached']
         self.assertGreaterEqual(len(unreached), 2)
-        self.assertEqual(missing, len(unreached))  # one request each: none refined
+        # one request each, none refined; and the other names' (search_names), asked of fewer claims than recorded
+        self.assertEqual(missing, len(unreached) + 1)
         self.assertTrue(all('No recorded answer' in r['issues'][0] for r in unreached))
         self.assertFalse([r for r in report['coverage'] if r['status'] == 'failed'])
 
@@ -377,7 +378,7 @@ class RecordAndReplay(unittest.TestCase):
         with sqlite3.connect(self.fixture) as db:
             self.assertEqual(sum(a['answers'] for a in summary['answers']),
                              db.execute('SELECT COUNT(*) FROM response').fetchone()[0])
-        self.assertEqual({a['role'] for a in summary['answers']}, {'extract', 'triage', 'compare'})
+        self.assertEqual({a['role'] for a in summary['answers']}, {'extract', 'triage', 'compare', 'names'})
         self.assertEqual(len(summary['contents']), 2)  # the documents recorded from, for the replay test
         _, replayed, _ = self.run_cli('zip', UNREACHABLE, '--fixture', str(first))  # a .zip named alone: replayed
         self.assertEqual(self.outcome(replayed), self.outcome(live))

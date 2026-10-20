@@ -100,5 +100,6 @@
   "text_spans": "section",
   "repeated_text": "keep",
   "lone_rows": false,
-  "topic_names": false
+  "topic_names": false,
+  "search_names": false
 }

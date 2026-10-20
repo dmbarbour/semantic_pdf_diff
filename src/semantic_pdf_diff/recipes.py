@@ -11,7 +11,8 @@ the role's extras (code review 2026-10-08, C14: these were read by position in s
 RECIPES = {"extract": ("region", "content", "task", "text", "crop", "heading"),
            "triage": ("kind", "content", "id", "inputs"),
            "compare": ("mode", "settings", "a", "b"),
-           "topics": ("mode", "settings")}
+           "topics": ("mode", "settings"),
+           "names": ("mode", "settings", "part")}
 
 class Recipe(tuple):
     """A recipe, its shared slots read by name. Equal to, and stored as, the plain tuple."""

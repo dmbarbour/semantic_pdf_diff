@@ -1123,8 +1123,9 @@ class SearchNames(Lever):
     # the documents' other names for one thing ("rated output", "nominal power"), grouped by the model after the
     # comparison, in a request (a topic's, for a large one): a search for one name finds the others' claims too
     # (synonyms.py; docs/plans/search-2026-10-20.md, milestone 4; the owner, 2026-10-20: "Please proceed with that and
-    # the model-supported search ideas"). Off until measured.
-    search_names: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # the model-supported search ideas"). A default since 2026-10-20, measured (the owner: "Go ahead and make it a
+    # default.")
+    search_names: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def names_synonyms(self):
         return self.search_names

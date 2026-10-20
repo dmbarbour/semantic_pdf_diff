@@ -101,6 +101,12 @@ def topics_answer(prompt):
     count = sum(1 for line in first.splitlines() if re.match(r'  \d+\. ', line))
     return {'way': 1, 'names': [f'Topic {i}' for i in range(1, count + 1)]}
 
+def names_answer(prompt):
+    """The documents' other names for one thing (synonyms.py): none; else None."""
+    if not prompt.startswith('Find the names two engineering documents give the same thing'):
+        return None
+    return {'items': [], 'properties': []}
+
 def stock_answer(prompt, schema):
     """The answer a fake gives a query its test doesn't answer itself, or None: comparisons equivalent, situating
     from the prompt (situating_answer), a table's rules query each row read by itself, a two-column block a table."""
@@ -111,6 +117,8 @@ def stock_answer(prompt, schema):
         return schema.model_validate(situating_answer(prompt))
     if topics_answer(prompt):
         return schema.model_validate(topics_answer(prompt))
+    if names_answer(prompt):
+        return schema.model_validate(names_answer(prompt))
     if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
         return schema(reading='rows')
     if schema.__name__ == 'Check':  # a block of two columns: a table, as these tests read it (B5)

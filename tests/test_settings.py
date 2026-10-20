@@ -65,7 +65,7 @@ NOT_EXERCISED = {
                     '(tests/test_rerank.py)'),
     **dict.fromkeys(('embed_model', 'embed_url', 'embed_dimensions'),
                     "an embedding model's endpoint, which the stub model doesn't serve (tests/test_embed.py)"),
-    'search_names': "asks the model after the comparison, for the report's search, which the stub doesn't answer "
+    'search_names': "asks the model after the comparison, for the report's search; the stub answers no other names "
                     '(tests/test_search.py)',
     'topic_names': "needs claims of both sides splitting into two topics or more; the stub's documents make "
                    'one (tests/test_topics.py)',
@@ -194,7 +194,8 @@ class SettingsKeepToTheirClass(unittest.TestCase):
             self.assertNotEqual(getattr(defaults, name), Settings(**{name: value}).__getattribute__(name), name)
 
     def test_each_setting_keeps_to_its_class(self):
-        self.assertEqual({role for role, _ in self.base[False, ()]}, {'extract', 'table-rules', 'triage', 'compare'})
+        self.assertEqual({role for role, _ in self.base[False, ()]},
+                         {'extract', 'table-rules', 'triage', 'compare', 'names'})
         extraction = lambda queries: {q for q in queries if q[0] in ('extract', 'table-rules', 'table-review')}
         for name, value in TOGGLES.items():
             kind, sheet = SETTING_CLASSES[name], name in ON_SHEETS

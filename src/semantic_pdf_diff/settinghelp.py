@@ -112,8 +112,8 @@ HELP = {
                              "3 is 0.03. Measured at 2, 5 and 10: no related finding lost.", "5", basic=True),
     "search_names": Help("comparing", "the model groups the names the documents give one thing, so a search for one "
                          "finds the others' claims too", "In a request after the comparison (a topic's, for a large "
-                         "one): \"rated output\" finds \"nominal power\". Off until measured "
-                         "(docs/plans/search-2026-10-20.md)."),
+                         "one): \"rated output\" finds \"nominal power\". About $0.004 a comparison of 1,400 to "
+                         "3,100 claims; measured in docs/plans/search-2026-10-20.md.", basic=True),
     "embed_model": Help("comparing", "an embedding model the claims are embedded with after the comparison, for a "
                         "search by meaning (none: not embedded)",
                         "near:ID finds the claims most like a claim in meaning, and like:ID blends meaning in (the "
