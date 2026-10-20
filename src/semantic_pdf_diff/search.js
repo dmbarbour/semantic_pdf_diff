@@ -1,6 +1,7 @@
 // The report's search (report.js shows what it finds; docs/plans/portable-reports-2026-10-19.md, milestone 6): every
 // word of a query found in the cards' fields, the most relevant first, by an index of the cards' words built in the
-// page. A card is read by its markup, as report.py's Cards.card writes it: its heading (file, section), its
+// page; by meaning too, where the report holds the claims' vectors (near:ID; like:ID blends them in). A card is read
+// by its markup, as report.py's Cards.card writes it: its heading (file, section), its
 // statement (entity — attribute, value and unit, conditions, frame and basis, quote) and its context lines. A
 // finding's own text (why, its rationale) is a document beside its two cards'.
 const Search = (() => {
@@ -17,6 +18,10 @@ const Search = (() => {
     + 'with').split(' '));
   const K1 = 1.2, B = 0.75;
   const LIKE_SHARE = 0.3;  // like:ID keeps the claims scoring at least this share of the claim's own score
+  // by meaning (milestone 5; the embed lever's vectors), as measured: a claim near another at this cosine or more
+  // (about 90% of judged counterparts, 5% of other claims), a typed query's (meaning:, the command line's) at this
+  // share of the best; a cosine of 1 scores as much as this
+  const NEAR_LEAST = 0.7, MEANING_SHARE = 0.65, MEANING_WEIGHT = 10;
 
   // words as searched: case and accents folded, numbers whole and plain ("1,000" is 1000, "15.00" is 15), letters
   // and digits apart ("75kW" is "75 kW")
@@ -197,6 +202,32 @@ const Search = (() => {
       return spelled[t];
     };
 
+    // the claims' vectors (the embed lever), read when first asked for: [signed bytes, their length]
+    const vectors = new Map();
+    const vectorOf = (id) => {
+      if (!R.vectors || !Object.prototype.hasOwnProperty.call(R.vectors.of, id)) return null;
+      if (!vectors.has(id)) {
+        const bytes = atob(R.vectors.vectors[R.vectors.of[id]]), v = new Int8Array(bytes.length);
+        let sum = 0;
+        for (let i = 0; i < bytes.length; i++) {
+          v[i] = (bytes.charCodeAt(i) << 24) >> 24;
+          sum += v[i] * v[i];
+        }
+        vectors.set(id, [v, Math.sqrt(sum)]);
+      }
+      return vectors.get(id);
+    };
+    const cosines = ([v, length]) => {  // {doc: cosine} of every claim with a vector (search.py's embed.cosine)
+      const out = new Map();
+      for (const id of Object.keys(R.vectors ? R.vectors.of : {})) {
+        const [w, other] = vectorOf(id);
+        let dot = 0;
+        for (let i = 0; i < w.length; i++) dot += v[i] * w[i];
+        out.set(cardDoc.get(id), dot / (length * other || 1));
+      }
+      return out;
+    };
+
     // what a query's groups find: a function giving the items (findings or claims) found among some, {item: score}
     const find = (groups) => {
       step();
@@ -210,16 +241,39 @@ const Search = (() => {
       };
       const scored = groups.map((group) => {
         const out = new Map();
+        const add = (doc, s) => out.set(doc, (out.get(doc) || 0) + s);
         for (const term of group.terms) {
+          if (term.near !== undefined) {  // near:ID: the claims near it in meaning; not it
+            const mine = vectorOf(term.near), self = cardDoc.get(term.near);
+            for (const [doc, c] of mine ? cosines(mine) : []) {
+              if (doc !== self && c >= NEAR_LEAST) add(doc, MEANING_WEIGHT * c);
+            }
+            continue;
+          }
+          if (term.meaning !== undefined) continue;  // a typed query's meaning: the command line's (search.py)
           if (term.like === undefined) {
             scores(term, out);
             continue;
           }
           // like:ID: the claims sharing enough of what makes it what it is, as it scores against itself; not it
-          const alike = new Map(), self = cardDoc.get(term.like);
+          const alike = new Map(), self = cardDoc.get(term.like), kept = new Map();
           for (const one of about(term.like)) scores(one, alike);
           const least = LIKE_SHARE * (alike.get(self) || 0);
-          for (const [doc, s] of alike) if (doc !== self && s >= least) out.set(doc, (out.get(doc) || 0) + s);
+          for (const [doc, s] of alike) if (doc !== self && s >= least) kept.set(doc, s);
+          const mine = vectorOf(term.like);
+          if (!mine) {
+            for (const [doc, s] of kept) add(doc, s);
+            continue;
+          }
+          // with the claims' vectors, words and meaning blended (measured better than either): the words' share of
+          // the best, and the cosine, for the claims either keeps
+          const cos = cosines(mine), chosen = new Set(kept.keys());
+          let best = 0;
+          for (const s of kept.values()) best = Math.max(best, s);
+          for (const [doc, c] of cos) if (doc !== self && c >= NEAR_LEAST) chosen.add(doc);
+          for (const doc of chosen) {
+            add(doc, MEANING_WEIGHT * ((kept.get(doc) || 0) / (best || 1) + (cos.get(doc) || 0)));
+          }
         }
         return out;
       });
@@ -250,7 +304,8 @@ const Search = (() => {
         .replace(/\.+$/, '');
       return (R.units && (R.units[spelled] || R.folded[spelled.toLowerCase()])) || null;
     };
-    return {step, find, unitOf, about: (id) => (step(), about(id).map((t) => word(t.terms[0]))),
+    return {step, find, unitOf, embedded: () => Boolean(R.vectors && R.vectors.vectors.length),
+            about: (id) => (step(), about(id).map((t) => word(t.terms[0]))),
             named: (id) => (step(), names.get(id) || ['', ''])};  // a card's entity and attribute
   };
 
@@ -301,6 +356,8 @@ const Search = (() => {
         }
         term = compared(value[1], value[2], value[3], unitText, unitOf);
       } else if (key === 'like') term = {like: raw};
+      else if (key === 'near') term = {near: raw};
+      else if (key === 'meaning') term = {meaning: raw};
       else if (key === 'page') {
         const range = /^(\d+)(?:-(\d+))?$/.exec(raw);
         if (range) term = {pages: [Number(range[1]), Number(range[2] || range[1])]};
@@ -333,7 +390,7 @@ const Search = (() => {
   // pages); none for like:
   const otherNames = (groups, synonyms) => {
     const out = [];
-    if (!synonyms || groups.some((g) => g.terms.some((t) => t.like !== undefined))) return out;
+    if (!synonyms || groups.some((g) => g.terms.some((t) => t.like !== undefined || t.near !== undefined))) return out;
     const kept = groups.filter((g) => g.not || !g.terms.some((t) => t.words));
     for (const [kind, field] of [['items', ENTITY], ['properties', ATTRIBUTE]]) {
       for (const group of synonyms[kind] || []) {

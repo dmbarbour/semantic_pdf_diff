@@ -423,7 +423,10 @@ store's latest comparison (--comparison picks another, for one store).
                        file (a file's name is searched only so); page:12 or page:10-20
   >50kW  value:10-20mm values compared across units (0.075 MW is over 50 kW); <=, >=, <; value:75kW for
                        that value; without a unit, numbers as written
-  like:ID              the claims sharing enough of what a claim is about, most alike first
+  like:ID              the claims sharing enough of what a claim is about, most alike first; near it in meaning
+                       too where the claims were embedded (embed_model)
+  near:ID              the claims near a claim in meaning;  meaning:"rated output"  what's typed, by meaning (it
+                       asks the embedding model the claims were embedded with, once: the answers cache keeps it)
 The most relevant first. After the claims found come their counterparts (the claims the comparison paired with
 them; --alone leaves them out), and where a counterpart names what was searched otherwise, its name is offered.
 Where the model was asked the documents' other names for one thing (search_names), a search for one name finds the
@@ -471,6 +474,37 @@ def claim_json(claim):
             'attribute': e['attribute'], 'value': e['value'], 'unit': e['unit'], 'conditions': e['conditions'],
             'quote': e['quote'], 'fared': claim['status']}
 
+def meant(terms, model, dimensions, folder):
+    """Each meaning: term's text embedded by the model the claims were, through the store's answers cache (a search
+    asked again is free): its vector set on the term. ValueError when the model can't be asked."""
+    from . import embed
+    from .dispatch import Dispatcher
+    from .llm import Client
+    from .pipeline import cache_of, open_cache
+    from .store import Store
+    with Store.open(folder) as store:
+        own = store.own_settings()
+        cache = open_cache(cache_of(store, bind=False))
+    settings = settings_from(layer={**{k: v for k, v in own.items() if k not in configuration.RUN_OPTIONS},
+                                    'embed_model': model, 'embed_dimensions': dimensions})
+    client = Client(settings, None, cache=cache)
+    failed = []
+    try:
+        with Dispatcher(client) as dispatch:
+            for term in terms:
+                def done(value, error, term=term):
+                    if error is not None:
+                        failed.append(f"{term['meaning']!r}: {error}")
+                        return
+                    v = embed.unpacked(value.vectors[0])
+                    term['vector'] = (v, sum(x * x for x in v) ** 0.5)
+                dispatch.submit_request(embed.request(settings, [term['meaning']], None, query=True), done)
+            dispatch.drain()
+    finally:
+        client.close()
+    if failed:
+        raise ValueError(f"meaning: {model} couldn't be asked: {'; '.join(failed)}")
+
 def search_command(argv):
     from . import search as finder
     from .store import Store, StoreError
@@ -486,7 +520,7 @@ def search_command(argv):
     stores = args.store or [default_store()]
     if args.comparison and len(stores) > 1:
         parser.error('--comparison picks one store\'s comparison: name one store')
-    index, claims, findings = finder.Index(), [], []
+    index, claims, findings, embedded = finder.Index(), [], [], set()
     for n, folder in enumerate(stores):
         try:
             with Store.open(folder) as store:
@@ -494,15 +528,25 @@ def search_command(argv):
         except StoreError as e:
             print(f'{folder}: {e}', file=sys.stderr)
             return 1
+        if (data.get('vectors') or {}).get('vectors'):
+            embedded.add((data['vectors']['model'], data['vectors']['dimensions']))
         found_claims, found_findings = finder.report_items(data, index, f'{n}:' if len(stores) > 1 else '')
         for x in found_claims + found_findings:
             x['store'] = folder
         claims += found_claims
         findings += found_findings
-    for group in groups:  # like:ID names a claim by its id, in whichever store holds it
+    for group in groups:  # like:ID and near:ID name a claim by its id, in whichever store holds it
         for term in group['terms']:
-            if 'like' in term and term['like'] not in index.card_doc:
-                term['like'] = next((k for k in index.card_doc if k.endswith(':' + term['like'])), term['like'])
+            for key in ('like', 'near'):
+                if key in term and term[key] not in index.card_doc:
+                    term[key] = next((k for k in index.card_doc if k.endswith(':' + term[key])), term[key])
+    asked = [term for group in groups for term in group['terms'] if 'meaning' in term]
+    if asked:  # what's typed, embedded as the claims were
+        if len(embedded) != 1:
+            parser.error('meaning: needs the claims embedded, every store\'s by one model (embed_model, then '
+                         'compare again)' if not embedded else f"meaning: the stores' claims were embedded by "
+                         f"{len(embedded)} models: search them apart")
+        meant(asked, *next(iter(embedded)), stores[0])
     view = 'findings' if args.findings else 'claims'
     hits, names, others = finder.search(index, groups, claims, findings, view, paired=not args.alone)
     if view == 'claims' and args.side:

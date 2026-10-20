@@ -1129,6 +1129,20 @@ class SearchNames(Lever):
     def names_synonyms(self):
         return self.search_names
 
+class Embed(Lever):
+    lever_name, stage, off = "embed", "comparison", {"embed_model": None, "embed_url": None, "embed_dimensions": 256}
+    # the claims embedded after the comparison, each distinct sentence once, for a search by meaning: near:ID (the
+    # claims most like a claim), and meaning:"..." from the command line (embed.py; docs/plans/search-2026-10-20.md,
+    # milestone 5). On only where an embedding model is named, as the reranker
+    embed_model: Annotated[str | None, _selecting(roles=COMPARE)] = None  # e.g. Qwen/Qwen3-Embedding-0.6B
+    # where it's asked ({model} filled in); none: the chat endpoint's /embeddings
+    embed_url: Annotated[str | None, Declared("endpoint")] = None
+    # each vector's size, asked of the model (one trained to be cut answers any) and kept in the report
+    embed_dimensions: Annotated[int, _selecting(roles=COMPARE)] = Field(default=256, ge=32, le=4096)
+
+    def embeds(self):
+        return bool(self.embed_model)
+
 class Rerank(Lever):
     lever_name, stage, off = "rerank", "comparison", {"rerank_model": None, "rerank_api": "deepinfra",
                                                        "rerank_url": None, "rerank_threshold": 3}
@@ -1194,7 +1208,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
-                 NameTopics, SearchNames, Rerank)
+                 NameTopics, SearchNames, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1380,6 +1394,12 @@ class Platform(Composable):
     def reranks(self, mode):
         """Whether a comparison's candidate pairs are reranked before the judge (rerank.py): the platform's, never;
         the rerank lever's, in proposals mode with a reranker named."""
+        return False
+
+    @chosen
+    def embeds(self):
+        """Whether the claims are embedded after the comparison, for a search by meaning (embed.py): the platform's,
+        never; the embed lever's, with an embedding model named."""
         return False
 
     @chosen

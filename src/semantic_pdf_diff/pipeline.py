@@ -288,6 +288,11 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key))
     if settings.names_synonyms():  # the documents' other names for one thing, for the search (synonyms.py)
         data['synonyms'] = other_names(data, client, options.mode, provenance.text_hash(comparing.model_dump_json()))
+    if settings.embeds():  # the claims' vectors, for a search by meaning (embed.py)
+        from . import embed
+        with Dispatcher(client) as dispatch:
+            data['vectors'] = embed.embedded(data['evidence'], dispatch, settings,
+                                             provenance.text_hash(comparing.model_dump_json()))
     store.save_comparison(data['created_at'], data)
     account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
                            split=options.split)

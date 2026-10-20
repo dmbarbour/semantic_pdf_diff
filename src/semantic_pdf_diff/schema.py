@@ -487,6 +487,11 @@ class OtherNames(DropsUnknown):
     items: list[list[Annotated[str, Field(max_length=300)]]] = Field(default_factory=list)
     properties: list[list[Annotated[str, Field(max_length=300)]]] = Field(default_factory=list)
 
+class Vectors(DropsUnknown):
+    """Texts' vectors as an embedding model answered them, each kept small: unit length, its components signed bytes in
+    base64 (the embed lever; embed.py)."""
+    vectors: list[str] = Field(default_factory=list)
+
 REPORT_SCHEMA = 2  # report.json and evidence.json (and the comparisons a store saves)
 
 class CoverageRow(Strict):

@@ -453,6 +453,20 @@ class InABrowser(unittest.TestCase):
         counts = re.findall(r'<button data-topic="(-?\d+)"[^>]*>[^<]*<small>(\d+)</small>', dom)
         self.assertEqual(sorted(int(n) for t, n in counts if t != "-1"), [12, 12, 12])
 
+TOY_WORDS = ("pump", "valve", "heater", "motor", "drive", "power", "output", "rated", "feed", "water", "flow", "speed")
+
+def toy_vector(text):
+    """A toy embedding (the embed lever's tests): how often each of a few words is in the text, and a constant."""
+    words = text.lower().replace(",", " ").replace(".", " ").split()
+    return [float(sum(w.startswith(t) for w in words)) for t in TOY_WORDS] + [0.0] * 19 + [0.5]
+
+def toy_vectors(evidence):
+    """A report's vectors, as the embed lever keeps them, by the toy embedding."""
+    from semantic_pdf_diff.embed import packed, sentence_of
+    sentences = sorted({sentence_of(e) for e in evidence})
+    return {"model": "toy", "dimensions": 32, "vectors": [packed(toy_vector(s)) for s in sentences],
+            "of": {e["id"]: sentences.index(sentence_of(e)) for e in evidence}, "requests": 1, "failed": 0}
+
 def search_report():
     """Claims to search (milestone 6): pumps named in either order, a pump only quoted, numbers written two ways;
     values in another unit, a range and a bound (the search plan's milestone 3)."""
@@ -487,6 +501,8 @@ def search_report():
     data["sections"] = [{"content": a[0].content, "id": "s1", "heading_path": ["Plant", "Feed system"]}]
     # the model's other names (the search plan's milestone 4: the search_names lever): A's motor is B's drive
     data["synonyms"] = {"items": [["drive", "pump motor"]], "properties": []}
+    # the claims' vectors (milestone 5: the embed lever), by a toy embedding
+    data["vectors"] = toy_vectors(data["evidence"])
     return data
 
 class SearchMarkup(unittest.TestCase):
@@ -567,7 +583,8 @@ class SearchInABrowser(unittest.TestCase):
                                          ">70kW", ">70 kW", "value:75kW", "value:0.075MW", "power <20kW",
                                          "value:55L/s", "<40dBA", "value:>40dBA", ">1000", ">1mw", ">1e9 N•m2",
                                          "value:2.5GN.m2", "drive")]
-        cases += [("findings", "pump"), ("claims", "drive", True), ("claims", "output", True)]
+        cases += [("claims", "near:A-pump"), ("claims", "near:A-heater"), ("claims", 'meaning:"pumps"'),
+                  ("findings", "pump"), ("claims", "drive", True), ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
             page = Path(d) / "report.html"
@@ -663,6 +680,14 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(renamed["count"], "2 of 13 claims (1 by other names): 1 in A; 1 in B")
         self.assertIn('"pump motor"', renamed["also"])
         self.assertEqual(self.ids("drive"), ["B-drive"])  # without them
+
+    def test_claims_near_a_claim_in_meaning(self):
+        # the search plan, milestone 5: the toy embedding puts the pumps together, and the heaters
+        self.assertEqual(self.ids("near:A-pump")[0], "B-pump")
+        self.assertNotIn("A-pump", self.ids("near:A-pump"))
+        self.assertEqual(self.ids("near:A-heater"), ["B-heater"])
+        self.assertTrue(self.got('meaning:"pumps"')["count"].endswith("meaning: is searched from the command line "
+                                                                       "(semantic-pdf-diff search)"))
 
     def test_claims_like_a_claim_are_the_other_sources_most_alike_first(self):
         like = self.results[("claims", "like:A-pump")]

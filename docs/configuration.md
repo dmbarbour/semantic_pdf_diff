@@ -63,6 +63,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 <!-- settings table: generated, do not edit -->
 | Setting | Default | Class | Lever | Bound by | Regions |
 |---|---|---|---|---|---|
+| `embed_url` | `null` | endpoint | embed | - | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |
 | `model` | `"gemma-4"` | endpoint |  | extract, triage, compare | all |
 | `base_url` | `"http://localhost:8000/v1"` | endpoint |  | - | - |
@@ -168,6 +169,9 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `topic_names` | `true` | selecting | topic_names | compare | - |
 | `search_names` | `false` | selecting | search_names | compare | - |
+| `embed_model` | `null` | selecting | embed | compare | - |
+| `embed_url` | `null` | endpoint | embed | - | - |
+| `embed_dimensions` | `256` | selecting | embed | compare | - |
 | `rerank_model` | `null` | selecting | rerank | compare | - |
 | `rerank_api` | `"deepinfra"` | selecting | rerank | compare | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |

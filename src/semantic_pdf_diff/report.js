@@ -212,6 +212,9 @@
     }
     const strange = Search.unknown(groups);
     if (strange.length) count += ` · units the search doesn't know: ${strange.join(', ')}`;
+    const asked = (key) => groups.some((g) => g.terms.some((t) => t[key] !== undefined));
+    if (asked('meaning')) count += ' · meaning: is searched from the command line (semantic-pdf-diff search)';
+    if (asked('near') && !index.embedded()) count += ' · near: needs the claims embedded (embed_model)';
     $('count').textContent = count;
     if (found && view === 'findings') {
       const named = chosen.filter((f) => renamed.has(f)).length;

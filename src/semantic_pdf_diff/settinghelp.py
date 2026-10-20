@@ -110,6 +110,17 @@ HELP = {
                          "finds the others' claims too", "In a request after the comparison (a topic's, for a large "
                          "one): \"rated output\" finds \"nominal power\". Off until measured "
                          "(docs/plans/search-2026-10-20.md)."),
+    "embed_model": Help("comparing", "an embedding model the claims are embedded with after the comparison, for a "
+                        "search by meaning (none: not embedded)",
+                        "near:ID finds the claims most like a claim in meaning, and like:ID blends meaning in (the "
+                        "page and the command line); meaning:\"...\" from the command line. Each distinct claim "
+                        "sentence once, 64 to a request, on the chat endpoint's /embeddings unless embed_url says "
+                        "otherwise. Measured best: Qwen3-Embedding-8B at 256 dimensions.", "Qwen/Qwen3-Embedding-8B"),
+    "embed_url": Help("endpoint", "where the embedding model is asked ({model} filled in); none: the chat endpoint's "
+                      "/embeddings"),
+    "embed_dimensions": Help("comparing", "each claim's vector's size, asked of the embedding model and kept in the "
+                             "report", "A model trained to be cut (Qwen3-Embedding) answers any; a byte a dimension "
+                             "a claim in the report.", "256"),
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),
     # --- report

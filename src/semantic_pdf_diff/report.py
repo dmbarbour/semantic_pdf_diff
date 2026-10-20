@@ -116,7 +116,9 @@ SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul
                '<code>page:12</code> or <code>page:10-20</code>.</li>'
                '<li><code>like:</code> and a claim\'s id, as each card\'s <i>Claims like this</i> searches: the claims '
                'sharing enough of the words of what it\'s about (its entity, attribute, conditions, and its value\'s '
-               'words), most alike first.</li>'
+               'words), most alike first; where the claims were embedded (<code>embed_model</code>), near it in '
+               'meaning too. <code>near:</code> and an id: by meaning alone. <code>meaning:"…"</code>, what\'s typed '
+               'by meaning, is the command line\'s.</li>'
                '<li>In the claims view, the claims the findings pair with those found come after them, as their '
                'counterparts. Where a counterpart names what was searched otherwise (<i>nominal power</i> for '
                '<i>rated output</i>), its name is offered as a search. Where the model was asked the documents\' '
@@ -397,6 +399,17 @@ def report_page(data, stored, budget, note=''):
         chosen.pop()
     return page, account
 
+def page_vectors(vectors, cards):
+    """The claims' vectors a page's search reads (the embed lever's): {"dimensions", "vectors", "of": {card: index}},
+    only those of its cards; none without them."""
+    if not vectors or not vectors.get('vectors'):
+        return None
+    kept, of = {}, {}
+    for card in cards:
+        if card in vectors['of']:
+            of[card] = kept.setdefault(vectors['of'][card], len(kept))
+    return {"dimensions": vectors['dimensions'], "vectors": [vectors['vectors'][i] for i in kept], "of": of}
+
 def ordered(findings):
     """Findings in the order a report shows them: explained differences first, value changes leading (KINDS' order);
     the rest as found."""
@@ -537,7 +550,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     values = {eid: v for eid in card.html if (v := claim_value(card.evidence[eid])) is not None}
     parts = {"page": page, "findings": findings, "claims": claims, "cards": card.html, "said": list(card.said),
              "values": values, "units": units, "folded": folded, "kinds": kinds,
-             "synonyms": {k: data.get('synonyms', {}).get(k, []) for k in ('items', 'properties')}}
+             "synonyms": {k: data.get('synonyms', {}).get(k, []) for k in ('items', 'properties')},
+             "vectors": page_vectors(data.get('vectors'), card.html)}
     packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
     images = embed_json({"type": mime, "data": [c.data for c in chosen]})

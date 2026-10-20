@@ -22,6 +22,10 @@ ABOUT = {ENTITY, ATTRIBUTE, CONDITIONS, VALUE}
 STOP = frozenset("a an and are as at be by for from in into is it its of on or per than that the this to with".split())
 K1, B = 1.2, 0.75
 LIKE_SHARE = 0.3  # like:ID keeps the claims scoring at least this share of the claim's own score
+# by meaning (milestone 5; the embed lever's vectors), as measured: a claim near another at this cosine or more (about
+# 90% of judged counterparts, 5% of other claims), a typed query's (meaning:) at this share of the best; a cosine of 1
+# scores as much as this (the page's)
+NEAR_LEAST, MEANING_SHARE, MEANING_WEIGHT = 0.7, 0.65, 10
 
 # words as searched: case and accents folded, numbers whole and plain ("1,000" is 1000, "15.00" is 15), letters
 # and digits apart ("75kW" is "75 kW"); digits are ASCII's, as JavaScript's \d
@@ -75,7 +79,7 @@ class Index:
     def __init__(self):
         self.vocab, self.postings, self.docs = {}, [], []
         self.pages, self.card_doc, self.names, self.values = {}, {}, {}, {}
-        self.synonyms = {}
+        self.synonyms, self.vectors = {}, {}  # the vectors: {card: (signed bytes, their length)}
         self._sorted = None
 
     def _add(self, fields):
@@ -209,6 +213,12 @@ class Index:
     def about_words(self, key):
         return [self.spelled[term["terms"][0]] for term in self.about(key)]
 
+    def cosines(self, vector):
+        """{doc: cosine} of every claim with a vector, to a vector (bytes, length): embed.cosine's, as the page's."""
+        v, length = vector
+        return {self.card_doc[key]: sum(a * b for a, b in zip(v, w)) / (length * other or 1)
+                for key, (w, other) in self.vectors.items()}
+
     def find(self, groups):
         """What a query's groups find: a function giving the items (findings or claims) found among some,
         {item's index: score} in the items' order."""
@@ -226,7 +236,23 @@ class Index:
         scored = []
         for group in groups:
             out = {}
+
+            def add(doc, s, out=out):
+                out[doc] = out.get(doc, 0) + s
             for term in group["terms"]:
+                if "near" in term:  # near:ID: the claims near it in meaning; not it
+                    mine, own = self.vectors.get(term["near"]), self.card_doc.get(term["near"])
+                    for doc, c in (self.cosines(mine) if mine else {}).items():
+                        if doc != own and c >= NEAR_LEAST:
+                            add(doc, MEANING_WEIGHT * c)
+                    continue
+                if "meaning" in term:  # a typed query, embedded by the command line: the claims nearest it
+                    cos = self.cosines(term["vector"]) if term.get("vector") else {}
+                    best = max(cos.values(), default=0)
+                    for doc, c in cos.items():
+                        if c >= MEANING_SHARE * best:
+                            add(doc, MEANING_WEIGHT * c)
+                    continue
                 if "like" not in term:
                     scores(term, out)
                     continue
@@ -234,9 +260,18 @@ class Index:
                 for one in self.about(term["like"]):
                     scores(one, alike)
                 least = LIKE_SHARE * alike.get(own, 0)
-                for doc, s in alike.items():
-                    if doc != own and s >= least:
-                        out[doc] = out.get(doc, 0) + s
+                kept = {doc: s for doc, s in alike.items() if doc != own and s >= least}
+                mine = self.vectors.get(term["like"])
+                if not mine:
+                    for doc, s in kept.items():
+                        add(doc, s)
+                    continue
+                # with the claims' vectors, words and meaning blended (measured better than either)
+                cos = self.cosines(mine)
+                best = max(kept.values(), default=0)
+                chosen = set(kept) | {doc for doc, c in cos.items() if doc != own and c >= NEAR_LEAST}
+                for doc in chosen:
+                    add(doc, MEANING_WEIGHT * (kept.get(doc, 0) / (best or 1) + cos.get(doc, 0)))
             scored.append(out)
 
         def among(items):
@@ -325,8 +360,8 @@ def parse(text):
                 unit_text = following[4]
                 i += 1
             term = compared(value.group(1), value.group(2), value.group(3), unit_text)
-        elif key == "like":
-            term = {"like": raw}
+        elif key in ("like", "near", "meaning"):
+            term = {key: raw}
         elif key == "page":
             pages = re.fullmatch(r"([0-9]+)(?:-([0-9]+))?", raw)
             if pages:
@@ -381,7 +416,7 @@ def other_names(groups, synonyms):
     written (not "diameter" in "rotor diameter"), with the query's exclusions and its terms that aren't words (values,
     pages); none for like:."""
     out = []
-    if not synonyms or any("like" in t for g in groups for t in g["terms"]):
+    if not synonyms or any("like" in t or "near" in t for g in groups for t in g["terms"]):
         return out
     kept = [g for g in groups if g["not"] or not any("words" in t for t in g["terms"])]
     for kind, field in (("items", ENTITY), ("properties", ATTRIBUTE)):
@@ -441,6 +476,11 @@ def report_items(data, index, prefix=""):
     claims = claim_records(data, card, file_index(file_pairs(data)), {}, sides)
     for kind in ("items", "properties"):  # the model's other names (the search_names lever), every report's
         index.synonyms.setdefault(kind, []).extend(data.get("synonyms", {}).get(kind, []))
+    vectors = data.get("vectors") or {}
+    for claim, i in (vectors.get("of") or {}).items():  # the claims' vectors (the embed lever)
+        from .embed import unpacked
+        v = unpacked(vectors["vectors"][i])
+        index.vectors[prefix + claim] = (v, math.sqrt(sum(x * x for x in v)))
     index.add(card.html, list(card.said), findings, prefix, {k: claim_value(card.evidence[k]) for k in card.html})
     for claim in claims:  # what the command prints of it
         e = card.evidence[claim["card"]]
