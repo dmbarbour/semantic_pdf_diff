@@ -153,6 +153,19 @@ class OneFile(unittest.TestCase):
         self.assertIn("500 of 1500 candidate pairs weren't judged: a comparison judges at most 1000, best first "
                       "(<code>--max-pairs</code>", unpacked((self.root / "out" / "report.html").read_text()))
 
+    def test_run_metadata_leaves_out_what_the_page_shows_elsewhere(self):
+        a, b = ev("A-1"), ev("B-1")
+        data = report([a, b], [finding(a, b, "different")])
+        data.update(groupings=[{"kind": "matched", "earlier": ["pump"], "later": ["pump"], "earlier_claims": [a.id],
+                                "later_claims": [b.id], "evidence": {}, "outcome": {}}], settings={"top_k": 4})
+        write_report(data, self.root / "out")
+        shown = unpacked((self.root / "out" / "report.html").read_text())
+        metadata = shown.split("Run metadata and limitations", 1)[1].split("<pre>", 1)[1].split("</pre>", 1)[0]
+        self.assertIn("&quot;top_k&quot;: 4", metadata)
+        self.assertNotIn("groupings", metadata)
+        self.assertIn("How the revisions were grouped", shown)  # shown in its own place
+        self.assertIn("PDF bbox [0.0, 0.0, 100.0, 100.0]", shown)
+
     def test_budgets_on_the_command_line(self):
         import argparse
         from semantic_pdf_diff.cli import report_size

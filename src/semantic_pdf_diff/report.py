@@ -62,7 +62,7 @@ PLACES = {"text": lambda loc: f"lines {loc['lines'][0]}–{loc['lines'][1]}",
 def place(loc):
     """Where a claim is within its page, as its format names it (a PDF's: its box)."""
     named = PLACES.get(loc.get('format'))
-    return named(loc) if named else f"PDF bbox {list(loc['bbox'])}"
+    return named(loc) if named else f"PDF bbox {[round(x, 1) for x in loc['bbox']]}"
 
 STYLE = '''
 :root{font-family:system-ui,sans-serif}body{max-width:1200px;margin:32px auto;padding:0 24px}
@@ -219,11 +219,16 @@ def header_html(data, listed=True):
              'of exhaustive coverage. Unmatched claims do not establish additions or deletions.</p>')
     page += ('<p>Revision mode treats the first source as the earlier version and the second as the later one. '
              'Proposal mode treats both symmetrically; neither is ranked.</p>')
-    page += ('<details><summary>Run metadata and limitations</summary><pre>'
-             + esc(json.dumps({k:v for k,v in data.items() if k not in ('evidence','coverage','findings','unmatched')},
-                              indent=2))
+    page += ('<details><summary>Run metadata and limitations</summary><p>Every detail is in <code>report.json</code>; '
+             'what the page shows elsewhere (groupings, sections, situating, files) is left out here.</p><pre>'
+             + esc(json.dumps({k: v for k, v in data.items() if k not in SHOWN_ELSEWHERE}, indent=2))
              + '</pre></details></header>')
     return page
+
+# A report document's parts the page shows in their own places, left out of its run metadata (each file's grows with
+# the files compared: the revisions' groupings were 208 KB of TS 38.300's 1.4 MB, gzipped).
+SHOWN_ELSEWHERE = ('evidence', 'coverage', 'findings', 'unmatched', 'shared', 'groupings', 'sections', 'situation',
+                   'records', 'record_changes', 'files', 'file_difference', 'scan_issues')
 
 RECORD_KINDS = {"note": "Note", "legend": "Legend", "list": "List lead-in", "table": "Table"}
 
