@@ -2,6 +2,7 @@ import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -55,6 +56,30 @@ class Maintenance(unittest.TestCase):
         comparisons = self.show('comparisons')
         self.assertEqual([(c['first'], c['second'], c['findings']) for c in comparisons], [('team-a', 'team-b', 1)])
         self.assertEqual(self.show('orphaned_content'), [])
+
+    def test_every_command_takes_the_store_from_the_environment(self):
+        # the owner, 2026-10-20: "SEMANTIC_PDF_DIFF_STORE is nit respected by all commands, some still require
+        # '--store'."
+        from unittest.mock import patch
+        self.assertEqual(self.cli('config', 'set', 'max_cost', '2', '--store', self.store)[0], 0)
+        with patch.dict(os.environ, {'SEMANTIC_PDF_DIFF_STORE': str(self.store)}):
+            code, out, _ = self.cli('source', 'list')
+            self.assertEqual(code, 0)
+            self.assertIn('team-a\tdeclared\t1 files', out)
+            code, out, _ = self.cli('show', 'comparisons', '--format', 'jsonl')
+            self.assertEqual((code, len(out.splitlines())), (0, 1))
+            code, out, _ = self.cli('report', '--dry-run')
+            self.assertEqual(code, 0)
+            self.assertEqual(self.cli('gc', '--dry-run')[0], 0)
+            code, out, _ = self.cli('settings')
+            self.assertEqual(json.loads(out)['max_cost'], 2)
+            code, out, _ = self.cli('search', 'pump')
+            self.assertTrue(out.startswith('2 claims found'))
+            self.assertEqual(self.cli('cache', 'remove', '--dry-run')[0], 0)  # the store's queries
+            code, _, err = self.cli('source', 'add', 'team-c', '--path', self.root / 'team-a')
+            self.assertEqual(code, 0, err)
+        with Store.open(self.store) as store:
+            self.assertEqual([s.name for s in store.sources()], ['team-a', 'team-b', 'team-c'])
 
     def test_gc_collects_only_orphaned_content(self):
         with Store(self.store) as store:

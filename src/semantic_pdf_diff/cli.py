@@ -115,10 +115,11 @@ Examples:
   semantic-pdf-diff source add team-b --store work --path team-b.zip
   semantic-pdf-diff compare team-a team-b --store work                     declared sources, by name
 
-A comparison's --store folder (diff-output unless named) holds what was read, and receives report.html (one file
-to keep or send, its crops inside as --report-budget allows), report.json and evidence.json. A comparison into it
-again reuses what was read, and resumes one interrupted. The model's answers are cached for every store
-($SEMANTIC_PDF_DIFF_CACHE, else ~/.cache/semantic-pdf-diff): what was asked once isn't paid for again.
+A comparison's --store folder ($SEMANTIC_PDF_DIFF_STORE unless named, else diff-output) holds what was read, and
+receives report.html (one file to keep or send, its crops inside as --report-budget allows), report.json and
+evidence.json. A comparison into it again reuses what was read, and resumes one interrupted. Every command takes
+--store, with the same default. The model's answers are cached ($SEMANTIC_PDF_DIFF_CACHE, else
+~/.cache/semantic-pdf-diff; a store keeps the cache its first run used): what was asked once isn't paid for again.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
 (a mistyped command or option too); 5 a check of `config test` failed.
@@ -296,8 +297,9 @@ def compare_parser():
                         help='Two sources (a file, folder or zip, or a declared source\'s name): proposal A then B, '
                              'or the earlier revision then the later')
     parser.add_argument('--store', type=Path, default=default_store(),
-                        help='The store folder, created if missing (default: diff-output). It keeps what was read, '
-                             'for the next comparison, and receives the reports unless --report names another')
+                        help='The store folder, created if missing (default: $SEMANTIC_PDF_DIFF_STORE, else '
+                             './diff-output). It keeps what was read, for the next comparison, and receives the '
+                             'reports unless --report names another')
     parser.add_argument('--report', type=Path, help='Report folder (default: the store folder)')
     parser.add_argument('--manifest', action='append', type=Path, default=[],
                         help='A manifest file (source export) as a source, linked live: re-imported when it changes')
@@ -615,9 +617,11 @@ def search_command(argv):
 
 CACHE_HELP = """\
 The answers cache keeps every answer the model gave a run, by the query asked, so what was asked once isn't paid
-for again. It's $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else the user's (under $XDG_CACHE_HOME or ~/.cache);
---cache names another. A project whose documents mustn't mix with others' keeps a cache of its own: point
-SEMANTIC_PDF_DIFF_CACHE at it before its runs.
+for again. It's $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else the user's (under $XDG_CACHE_HOME or ~/.cache). A
+store keeps the cache its first run used (answers_cache), so each action works on the cache the stores it names use
+(--store; prune's --keep), else on $SEMANTIC_PDF_DIFF_STORE's (else ./diff-output's); --cache names another. A
+project whose documents mustn't mix with others' keeps a cache of its own: point SEMANTIC_PDF_DIFF_CACHE at it
+before its first run, or `config set answers_cache` after.
 
 A store logs every query its runs asked, however each was answered, so naming a project's stores (--store) picks
 out its answers: to copy them from another cache into this one, or to remove them from this one. Removed answers
@@ -627,6 +631,7 @@ Examples:
   semantic-pdf-diff cache show
   semantic-pdf-diff cache copy ~/.cache/semantic-pdf-diff --store project/store --dry-run
   semantic-pdf-diff cache remove --store old-store --keep current-store
+  semantic-pdf-diff cache remove --store project/store --cache ~/.cache/semantic-pdf-diff   from another cache
   semantic-pdf-diff cache prune --keep store-a --keep store-b
   semantic-pdf-diff cache prune --unused-since 2026-09-01
 """
@@ -637,11 +642,13 @@ def cache_parser():
                                   'cache, removed, or kept alone.')
     which = Parser(add_help=False)
     which.add_argument('--cache', type=Path, help='the answers cache: a folder holding answers.sqlite, or the file '
-                                                  '(default: the current one, as `config show` lists it)')
+                                                  "(default: the one the stores' runs use)")
     dry = Parser(add_help=False)
     dry.add_argument('--dry-run', action='store_true', help='say what would be copied or removed, change nothing')
     actions = parser.add_subparsers(dest='action', metavar='ACTION', required=True)
-    actions.add_parser('show', parents=[which], help='where it is, its size, its answers by model and role')
+    show = actions.add_parser('show', parents=[which], help='where it is, its size, its answers by model and role')
+    show.add_argument('--store', type=Path, action='append', default=[],
+                      help='the cache this store uses (default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
     copy = actions.add_parser('copy', parents=[which, dry],
                               help='copy in the answers another cache or fixture holds and this one lacks')
     copy.add_argument('source', type=Path, help="the other cache's folder, or a fixture (.sqlite or .zip)")
@@ -649,7 +656,8 @@ def cache_parser():
                       help='only the answers to the queries this store asked (repeat for several)')
     remove = actions.add_parser('remove', parents=[which, dry],
                                 help='remove the answers to the queries these stores asked')
-    remove.add_argument('--store', type=Path, action='append', required=True, help='a store (repeat for several)')
+    remove.add_argument('--store', type=Path, action='append', default=[],
+                        help='a store (repeat for several; default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
     remove.add_argument('--keep', type=Path, action='append', default=[],
                         help="but not those this store asked too (repeat for several)")
     prune = actions.add_parser('prune', parents=[which, dry],
@@ -671,12 +679,41 @@ def stores_queries(folders):
             queries |= store.query_hashes()
     return queries
 
+def cache_in_use(folders):
+    """The answers cache the stores' runs use (pipeline.cache_of), else, with none named, the default store's (one made
+    already), else the cache in effect: ValueError where the stores keep their answers apart."""
+    from .pipeline import cache_of
+    from .settings import cache_path
+    if not folders:
+        if not (default_store() / 'store.sqlite').exists():
+            return cache_path()
+        folders = [default_store()]
+    caches = {}
+    for folder in folders:
+        with Store.open(folder) as store:
+            try:
+                path = cache_of(store, bind=False)
+            except ValueError as e:  # $SEMANTIC_PDF_DIFF_CACHE names another: which one is meant isn't guessed
+                raise ValueError(f"{e}; or name the cache with --cache") from None
+        caches.setdefault(path.resolve(), (path, []))[1].append(str(folder))
+    if len(caches) > 1:
+        raise ValueError("the stores keep their answers in different caches ("
+                         + "; ".join(f"{', '.join(named)}: {path}" for path, named in caches.values())
+                         + "): name one with --cache")
+    return next(iter(caches.values()))[0]
+
 def cache_command(argv):
     from .pipeline import open_cache
-    from .settings import cache_file, cache_path
+    from .settings import cache_file
     from .store import StoreError
     args = cache_parser().parse_args(argv)
-    path = cache_file(args.cache) if args.cache else cache_path()
+    stores = args.keep if args.action == 'prune' else args.store or (
+        [default_store()] if args.action == 'remove' else [])
+    try:
+        path = cache_file(args.cache) if args.cache else cache_in_use(stores)
+    except (StoreError, ValueError) as e:
+        print(e, file=sys.stderr)
+        return 1
     if args.action == 'show':
         if not path.exists():
             print(f'{path}: no answers cached yet')
@@ -701,7 +738,6 @@ def cache_command(argv):
                   + (f'; {failed} failures' if failed else '') + ')')
         return 0
     try:
-        stores = args.store if args.action != 'prune' else args.keep
         queries = stores_queries(stores) if stores else None
         kept = stores_queries(args.keep) if args.action == 'remove' and args.keep else None
     except StoreError as e:
@@ -749,9 +785,10 @@ def cache_command(argv):
     return 0
 
 SETTINGS_HELP = """\
-Print the settings a run would use, as JSON: the defaults, then the user's (`config set --user`), then a store's
-(--store; `config set`), then --config's. The endpoint is OPENAI_BASE_URL's; the API key (OPENAI_API_KEY) is never
-printed. `semantic-pdf-diff config show` lists the settings with what each does.
+Print the settings a run would use, as JSON: the defaults, then the user's (`config set --user`), then the store's
+(`config set`; --store, else $SEMANTIC_PDF_DIFF_STORE's, else ./diff-output's), then --config's. The endpoint is
+OPENAI_BASE_URL's; the API key (OPENAI_API_KEY) is never printed. `semantic-pdf-diff config show` lists the
+settings with what each does.
 
 Settings that shape what's asked (extraction, levers) are bound to a store: a run with others reads again what they
 change, the queries that didn't change answered from the cache.
@@ -928,7 +965,8 @@ def environment():
 def settings_parser():
     parser = help_text(Parser(prog='semantic-pdf-diff settings'), description=SETTINGS_HELP)
     parser.add_argument('--config', type=Path, help='A settings JSON file, applied over the environment')
-    parser.add_argument('--store', type=Path, help='A store whose own settings (`config set`) apply, under --config')
+    parser.add_argument('--store', type=Path, help='The store whose own settings (`config set`) apply, under --config '
+                                                   '(default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
     parser.add_argument('--changed', action='store_true',
                         help='Only the settings that differ from the defaults (a starting --config file)')
     return parser
@@ -937,7 +975,7 @@ def settings_command(argv):
     from .llm import redact_url
     from .settings import Settings
     args = settings_parser().parse_args(argv)
-    own = Store.settings_of(args.store) if args.store else {}
+    own = Store.settings_of(args.store or default_store())
     settings = settings_from(args.config, layer={k: v for k, v in own.items() if k not in configuration.RUN_OPTIONS})
     from .levers import declared
     dumped = settings.model_dump(mode='json')
@@ -983,7 +1021,9 @@ def source_parser():
     commands = parser.add_subparsers(dest='command', required=True, metavar='COMMAND')
     def command(name, help, description=None):
         sub = help_text(commands.add_parser(name, help=help, description=description or help), SOURCE_EXAMPLES)
-        sub.add_argument('--store', type=Path, required=True, help='The store folder (created if missing)')
+        sub.add_argument('--store', type=Path, default=default_store(),
+                         help='The store folder, created if missing (default: $SEMANTIC_PDF_DIFF_STORE, else '
+                              './diff-output)')
         sub.add_argument('--config', type=Path, help='Settings JSON (only its archive limits apply here)')
         add_log_options(sub)
         return sub
@@ -1067,7 +1107,8 @@ def source_command(argv):
 
 def store_parser(command):
     parser = Parser(prog=f'semantic-pdf-diff {command}')
-    parser.add_argument('--store', type=Path, required=True, help='The store folder')
+    parser.add_argument('--store', type=Path, default=default_store(),
+                        help='The store folder (default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
     add_log_options(parser)
     if command == 'show':
         parser.description = 'Print a view of the store.'

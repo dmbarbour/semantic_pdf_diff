@@ -206,6 +206,29 @@ class Bound(unittest.TestCase):
         code, out, _ = run("config", "help", "answers_cache", "--store", self.folder)
         self.assertIn("Later runs use it whatever the environment says", out)
 
+    def test_each_action_works_on_the_cache_the_stores_runs_use(self):
+        project = cache_answering(self.root / "project" / "answers" / "answers.sqlite", {"q1": ["m1"], "q2": ["m1"]})
+        store_asking(self.folder, "q1")
+        with Store(self.folder) as store:
+            store.save_own_settings({"answers_cache": "../answers"})
+        code, _, err = run("cache", "show", "--store", self.folder)  # the tests' SEMANTIC_PDF_DIFF_CACHE names another
+        self.assertEqual(code, 1)
+        self.assertIn("or name the cache with --cache", err)
+        with patch.dict(os.environ, {"SEMANTIC_PDF_DIFF_STORE": str(self.folder), "XDG_CACHE_HOME": str(self.root)}):
+            os.environ.pop("SEMANTIC_PDF_DIFF_CACHE")  # (and never the developer's own cache)
+            code, out, _ = run("cache", "show", "--store", self.folder)
+            self.assertIn(f"{project}: 2 answers to 2 queries", out)
+            code, out, _ = run("cache", "show")  # the store in effect's
+            self.assertIn(f"{project}: 2 answers", out)
+            code, out, _ = run("cache", "remove")
+            self.assertIn(f"1 answers removed from {project}", out)
+            self.assertEqual(held(project)[0], [("q2", "m1")])
+            other = store_asking(self.root / "other" / "store", "q2")  # bound to no cache: the one in effect
+            code, _, err = run("cache", "remove", "--store", self.folder, "--store", other)
+        self.assertEqual(code, 1)
+        self.assertIn("different caches", err)
+        self.assertIn("--cache", err)
+
     def test_a_run_with_another_cache_is_refused_before_the_store_changes(self):
         with Store(self.folder) as store:
             store.save_own_settings({"answers_cache": "../answers"})
