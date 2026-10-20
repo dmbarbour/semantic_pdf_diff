@@ -86,16 +86,16 @@ Commands (pdf-semantic-diff COMMAND --help for each, or pdf-semantic-diff help C
   show        print a view of a store: its sources, files, evidence, coverage or comparisons
   report      write a store's report again, without model calls
   gc          delete content no declared source uses any more
-  config      a store's settings: show, find, help, set, unset, export, import
+  config      the user's and a store's settings: show, find, help, set, unset, export, import
   settings    print the settings a run would use, as JSON
   fixtures    recorded model answers, replayed instead of asked (testing)
 """
 
 START_HELP = """\
-Before a first run, name the model and its endpoint (a .env file isn't read):
+Before a first run, name the endpoint and the model (a .env file isn't read):
   export OPENAI_API_KEY=...                            the provider's key
   export OPENAI_BASE_URL=https://provider.example/v1   default: {base_url}
-  export OPENAI_MODEL=provider/vision-model            default: {model}
+  pdf-semantic-diff config set --user model provider/vision-model     default: {model}
 A store keeps its own settings: `pdf-semantic-diff config show` lists them, `config set NAME VALUE` sets one
 (`config help NAME` says what it does). A run's flags, or a --config JSON file, override them for that run.
 
@@ -167,8 +167,8 @@ def add_run_options(parser):
                          help=f'The most candidate pairs the model judges, best first; the report says how many were '
                               f'left unjudged (default: {default("max_pairs")})')
     model = parser.add_argument_group('the model')
-    model.add_argument('--model', help=f'The model identifier the provider uses (default: $OPENAI_MODEL, else '
-                                       f'{default("model")})')
+    model.add_argument('--model', help=f'The model identifier the provider uses (default: the model setting, '
+                                       f'`config set [--user] model NAME`, else {default("model")})')
     model.add_argument('--base-url', help=f'The provider\'s OpenAI-compatible API, with /v1 where it needs it '
                                           f'(default: $OPENAI_BASE_URL, else {default("base_url")})')
     model.add_argument('--context-tokens', type=int,
@@ -295,7 +295,9 @@ def compare_parser():
 def compare_command(argv, client=None):
     args = compare_parser().parse_args(argv)
     start_logging(args)
-    layer = Store.settings_of(args.store)  # the store's own settings (`config set`), under --config and flags
+    from .settings import user_settings
+    # the user's settings, then the store's own (`config set [--user]`), under --config and the flags
+    layer = {**user_settings(), **Store.settings_of(args.store)}
     settings = load_settings(args, layer)
     options = RunOptions.from_args(args, layer)
     check_fixture(options)  # before the store is changed
@@ -397,9 +399,9 @@ def fixtures_command(argv):
 # --- settings ------------------------------------------------------------------------
 
 SETTINGS_HELP = """\
-Print the settings a run would use, as JSON: the defaults, then the environment's, then --config's. Any of them can
-go in a --config file ({"concurrency": 6}), or the environment as PDF_DIFF_<NAME> (PDF_DIFF_CONCURRENCY=6); the
-model and endpoint as OPENAI_MODEL and OPENAI_BASE_URL. The API key (OPENAI_API_KEY) is never printed.
+Print the settings a run would use, as JSON: the defaults, then the user's (`config set --user`), then a store's
+(--store; `config set`), then --config's. The endpoint is OPENAI_BASE_URL's; the API key (OPENAI_API_KEY) is never
+printed. `pdf-semantic-diff config show` lists the settings with what each does.
 
 Settings that shape what's asked (extraction, levers) are bound to a store: a run with others is refused, saying
 what differs, unless --reset is given.
@@ -411,7 +413,8 @@ def default_store():
 
 CONFIG_HELP = """\
 A store keeps its own settings: set once, they apply to every run in it (a run's flags override them for that
-run only). Names are the settings' own (max_cost, report_budget, rerank_threshold).
+run only). The user's settings (--user) lie under every store's: the endpoint's model and context, concurrency, a
+reranker. Names are the settings' own (max_cost, report_budget, rerank_threshold).
 
   pdf-semantic-diff config show                     the settings most runs set, by group
   pdf-semantic-diff config show comparing           a group's: endpoint, budget, sources, reading, comparing,
@@ -423,14 +426,18 @@ run only). Names are the settings' own (max_cost, report_budget, rerank_threshol
   pdf-semantic-diff config unset max_cost           back to the default
   pdf-semantic-diff config export settings.json     the store's own settings, as JSON (to the screen without a file)
   pdf-semantic-diff config import settings.json     every setting in the file, or none if any is wrong (null unsets)
+  pdf-semantic-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
 """
 
 def config_parser():
     parser = Parser(prog='pdf-semantic-diff config', usage='%(prog)s ACTION [options]')
-    help_text(parser, CONFIG_HELP, "A store's settings: show, find, help, set, unset, export and import.")
+    help_text(parser, CONFIG_HELP, "The user's and a store's settings: show, find, help, set, unset, export and "
+                                  "import.")
     where = Parser(add_help=False)
     where.add_argument('--store', type=Path, default=None,
                        help='The store (default: $PDF_DIFF_STORE, else ./diff-output)')
+    where.add_argument('--user', action='store_true',
+                       help="the user's settings, shared by every store (set, unset, export, import), not the store's")
     actions = parser.add_subparsers(dest='action', metavar='ACTION')
     show = actions.add_parser('show', parents=[where], help='the settings and their values, by group')
     show.add_argument('group', nargs='?', help=f"one group: {', '.join(configuration.GROUPS)}")
@@ -440,12 +447,12 @@ def config_parser():
     find.add_argument('words', nargs='+')
     explain = actions.add_parser('help', parents=[where], help='everything about one setting')
     explain.add_argument('name')
-    put = actions.add_parser('set', parents=[where], help='set a setting in the store')
+    put = actions.add_parser('set', parents=[where], help="set a setting in the store (the user's with --user)")
     put.add_argument('name')
     put.add_argument('value')
     drop = actions.add_parser('unset', parents=[where], help='a setting back to its default')
     drop.add_argument('name')
-    out = actions.add_parser('export', parents=[where], help="the store's own settings as JSON")
+    out = actions.add_parser('export', parents=[where], help="the store's own settings as JSON (--user: the user's)")
     out.add_argument('file', nargs='?', type=Path)
     take = actions.add_parser('import', parents=[where], help='settings from a JSON file (- for standard input)')
     take.add_argument('file')
@@ -455,23 +462,26 @@ def config_command(argv):
     """`pdf-semantic-diff config` (configuration.py): a store's own settings shown, explained, set and moved."""
     parser = config_parser()
     args = parser.parse_args(argv or ['show'])
+    from .settings import save_user_settings, user_path, user_settings
     store = args.store or default_store()
-    own = Store.settings_of(store)
-    layers = [('store', own)]
+    user, own = user_settings(), Store.settings_of(store)
+    layers = [('user', user), ('store', own)]
+    if args.user:  # the layer set, unset, exported or imported
+        own = user
     if args.action == 'show' and args.json:
         values = {name: value for name, (value, _) in configuration.resolved(layers).items()}
         print(json.dumps(values, indent=2, ensure_ascii=False))
         return 0
     if args.action in ('show', 'find'):
         made = (store / 'store.sqlite').exists()
-        print(f"settings of {store}" + ("" if made else " (no store yet: the defaults)"))
+        print(f"settings of {store}" + ("" if made else " (no store yet)") + f", over the user's ({user_path()})")
         lines = configuration.show_lines(layers, group=getattr(args, 'group', None),
                                          everything=getattr(args, 'all', False),
                                          find=' '.join(args.words) if args.action == 'find' else None)
         print('\n'.join(lines))
         if args.action == 'show':
             print("more: config show GROUP, config show --all, config find WORDS, config help NAME")
-            print('environment variables (not the store\'s):')
+            print('environment variables (neither the user\'s nor the store\'s):')
             for name, value in environment():
                 print(f"  {name:<16} {value}")
         return 0
@@ -484,7 +494,7 @@ def config_command(argv):
             sys.stdout.write(text)
         else:
             args.file.write_text(text, encoding='utf-8')
-            print(f"wrote the settings of {store} to {args.file}")
+            print(f"wrote the settings of {'the user' if args.user else store} to {args.file}")
         return 0
     if args.action == 'import':
         text = sys.stdin.read() if args.file == '-' else Path(args.file).read_text(encoding='utf-8')
@@ -499,9 +509,13 @@ def config_command(argv):
             raise configuration.unknown(args.name)
         changes = {args.name: value}
         values = configuration.applied(own, changes)
-    with Store(store) as kept:
-        kept.save_own_settings(values)
-    now = configuration.resolved([('store', values)])
+    if args.user:
+        save_user_settings(values)
+        now = configuration.resolved([('user', values), ('store', Store.settings_of(store))])
+    else:
+        with Store(store) as kept:
+            kept.save_own_settings(values)
+        now = configuration.resolved([('user', user), ('store', values)])
     for name in changes:
         if name == 'levers':
             print(f"levers = {', '.join(values.get('levers') or ['the default order'])}")
@@ -509,7 +523,9 @@ def config_command(argv):
         value, layer = now[name]
         moved = configuration.shown(name, value) != configuration.shown(
             name, configuration.resolved(layers)[name][0])
-        print(f"{name} = {configuration.shown(name, value)}" + (" (the default)" if layer == 'default' else '')
+        print(f"{name} = {configuration.shown(name, value)}" + (" (the default)" if layer == 'default' else
+                                                                ' (the store\'s)' if args.user and layer == 'store'
+                                                                else '')
               + (f"; the next run redoes: {configuration.redoes(name)}" if moved else ''))
     return 0
 
@@ -519,6 +535,8 @@ def environment():
     return [('OPENAI_BASE_URL', value('OPENAI_BASE_URL', default('base_url'))),
             ('OPENAI_API_KEY', 'set' if os.environ.get('OPENAI_API_KEY') else 'not set'),
             ('PDF_DIFF_STORE', value('PDF_DIFF_STORE', './diff-output, without --store'))]
+# Every other setting is the user's or a store's (`config set [--user]`): PDF_DIFF_<NAME> and OPENAI_MODEL are no longer
+# read, and warn when set (settings.retired).
 
 def settings_parser():
     parser = help_text(Parser(prog='pdf-semantic-diff settings'), description=SETTINGS_HELP)
@@ -702,7 +720,8 @@ def store_command(command, argv):
             print(json.dumps(store.gc(dry_run=args.dry_run, orphaned_sources=args.orphaned_sources), indent=2))
         else:
             out = args.out or args.store
-            own = store.own_settings()  # the store's report settings, unless a flag says otherwise
+            from .settings import user_settings
+            own = {**user_settings(), **store.own_settings()}  # the report's settings, unless a flag says otherwise
             budget = args.report_budget if args.report_budget is not None else own.get('report_budget',
                                                                                        crops.DEFAULT_BUDGET)
             split = args.split if args.split is not None else own.get('split', False)

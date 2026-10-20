@@ -6,36 +6,35 @@ When no environment variable or override is supplied, the default endpoint is `h
 
 ## Precedence and environment variables
 
-Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > environment variables > built-in defaults**. A store keeps its own settings, set with `pdf-semantic-diff config` (below); a run's flags and a `--config` file override them for that run only. You can normally run just `pdf-semantic-diff compare a.pdf b.pdf` after setting your environment. A config file only overrides fields it contains; the example config intentionally omits model and endpoint so it works with your environment.
+Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > built-in defaults**. The user's settings (`config set --user`, kept in `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `pdf-semantic-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `pdf-semantic-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
 
-| Environment variable | Setting |
+Four environment variables, as the owner listed them ([the plan](plans/configuration-in-the-store-2026-10-20.md)):
+
+| Environment variable | What it is |
 | --- | --- |
-| `OPENAI_API_KEY` | API authentication (never included in settings/reports) |
+| `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere) |
 | `OPENAI_BASE_URL` | Chat Completions API base URL, including `/v1` when required |
-| `OPENAI_MODEL` | Your provider's vision model identifier |
-| `PDF_DIFF_CONTEXT_TOKENS` | Context budget |
-| `PDF_DIFF_OUTPUT_TOKENS` | Output reserve |
-| `PDF_DIFF_IMAGE_TOKENS` | Per-image budget estimate |
-| `PDF_DIFF_MAX_CALLS` | Request limit (retries not counted) |
-| `PDF_DIFF_TIMEOUT` | HTTP timeout in seconds |
-| `PDF_DIFF_TOP_K` | Retrieval candidates per direction |
-| `PDF_DIFF_VISION` | Enable visual extraction (`true` or `false`) |
-| `PDF_DIFF_VERIFY_VISUALS` | Reinspect source images in comparisons |
-| `PDF_DIFF_ALIASES` | JSON object mapping domain aliases to canonical names |
-| `PDF_DIFF_ANSWER_ORDER` | Tests only: a seed; cached and replayed answers are handled in an order drawn from it, as a live run's might arrive, rather than as they were asked. What a run writes must not change (`dispatch.py`) |
-| `SOURCE_DATE_EPOCH` | Not a setting: the time reports and review batches say they were made, in seconds since 1970 (UTC). The reproducible-builds convention; with it, replays form byte-identical reports |
+| `PDF_DIFF_STORE` | The store a command works on without `--store` (unset: `./diff-output`) |
+| `PDF_DIFF_CACHE` | The answers cache (planned, milestone 3) |
 
-Every other field in `Settings` follows `PDF_DIFF_<UPPERCASE_FIELD_NAME>` (for example `PDF_DIFF_TEXT_BYTES`, `PDF_DIFF_RETRIES`, `PDF_DIFF_RESPONSE_FORMAT`). Model and base URL use only the `OPENAI_*` names above. `OPENAI_MODEL` and the `PDF_DIFF_*` names are application conventions. Empty or whitespace-only setting variables are treated as unset; invalid active values fail validation. Explicit overrides take precedence even over invalid environment values. Export variables through your shell or process manager; `.env` files are not loaded automatically.
+Two more variables aren't settings:
+
+| Variable | What it is |
+| --- | --- |
+| `PDF_DIFF_ANSWER_ORDER` | Tests only: a seed; cached and replayed answers are handled in an order drawn from it, as a live run's might arrive, rather than as they were asked. What a run writes must not change (`dispatch.py`) |
+| `SOURCE_DATE_EPOCH` | The time reports and review batches say they were made, in seconds since 1970 (UTC). The reproducible-builds convention; with it, replays form byte-identical reports |
+
+`OPENAI_MODEL` and `PDF_DIFF_<NAME>` (one for every setting until 2026-10-20) are no longer read. A run that finds one set says, once, which `config set --user` keeps it instead: `OPENAI_MODEL` is `config set --user model NAME`, `PDF_DIFF_CONCURRENCY` is `config set --user concurrency 32`. Export the two endpoint variables through your shell or process manager; `.env` files are not loaded automatically.
 
 `pdf-semantic-diff settings [--config FILE] [--store DIR]` prints every setting as a run would resolve them, the API key never; `--changed` prints only those differing from the defaults.
 
-## A store's own settings: `pdf-semantic-diff config`
+## The user's and a store's settings: `pdf-semantic-diff config`
 
-A store keeps its own settings, set once for every run in it ([the plan](plans/configuration-in-the-store-2026-10-20.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$PDF_DIFF_STORE`, else `./diff-output`).
+A store keeps its own settings, set once for every run in it; the user's are shared by every store ([the plan](plans/configuration-in-the-store-2026-10-20.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$PDF_DIFF_STORE`, else `./diff-output`). `set`, `unset`, `export` and `import` take `--user` for the user's settings instead of the store's.
 
 | Command | What it does |
 | --- | --- |
-| `config show [GROUP] [--all] [--json]` | The settings most runs set, by group, each with its value, `(store)` where the store sets it, and what it does; a group's (endpoint, budget, sources, reading, comparing, report, levers); every one; or every value as JSON. Then the environment variables |
+| `config show [GROUP] [--all] [--json]` | The settings most runs set, by group, each with its value, `(user)` or `(store)` where one sets it, and what it does; a group's (endpoint, budget, sources, reading, comparing, report, levers); every one; or every value as JSON. Then the environment variables |
 | `config find WORDS` | Settings whose name or help holds the words |
 | `config help NAME` | One setting: what it does, its value and default, an example, its group and lever, and what changing it redoes |
 | `config set NAME VALUE` | Kept in the store (a new store is made for it), and says what the next run redoes. Values as text: `on`/`off`, numbers, sizes (`40MB`), `none`, JSON for lists and objects |
@@ -45,7 +44,7 @@ A store keeps its own settings, set once for every run in it ([the plan](plans/c
 
 Besides the settings below, a store keeps three run options the same way: `mode` (proposals or revisions), and the report's `report_budget` and `split`.
 
-For Python callers, use `Settings.from_env(...)` to get the same environment defaults with explicit keyword overrides. Plain `Settings(...)` remains deterministic and does not consult the environment. Output paths and comparison mode remain CLI options.
+For Python callers, use `Settings.from_env(...)` to get the user's settings and the endpoint's variable with explicit keyword overrides (a store's settings among them). Plain `Settings(...)` remains deterministic and consults neither. Output paths and comparison mode remain CLI options.
 
 ## Settings
 
@@ -189,7 +188,7 @@ Defaults are model-neutral and target a 32,768-token context, with a generous 1,
 ## Throughput and progress
 
 - **`concurrency`** (default 4): the most model requests in flight. An adaptive gate halves it when the server returns 429/503 or latency jumps, and grows it back by one after a run of successes. Results don't depend on it: concurrent and sequential runs produce identical evidence and findings.
-- **`rate_limits`**: time-of-day rules, the first matching one applies (local time), each with `tokens_per_minute` and/or `requests_per_minute`, optionally `days` (`"mon-fri"`, `"sat,sun"`) and `hours` (`"08:00-18:00"`, or overnight like `"22:00-06:00"`). Token use is estimated before each request and corrected from the server's reported usage. As an environment variable, `PDF_DIFF_RATE_LIMITS` takes the same JSON list.
+- **`rate_limits`**: time-of-day rules, the first matching one applies (local time), each with `tokens_per_minute` and/or `requests_per_minute`, optionally `days` (`"mon-fri"`, `"sat,sun"`) and `hours` (`"08:00-18:00"`, or overnight like `"22:00-06:00"`). Token use is estimated before each request and corrected from the server's reported usage. `config set --user rate_limits '[...]'` takes the same JSON list.
 - **Progress:** a `tqdm` bar per stage on a terminal; otherwise a heartbeat line every `heartbeat_seconds` (30) with tasks done, tokens per minute and time remaining. `-q` shows warnings only, `-v` each task, `-vv` each model request; `--log-file` writes a detailed log.
 
 None of these affect output, so changing them never needs `--reset`.

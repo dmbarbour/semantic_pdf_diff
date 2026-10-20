@@ -1,6 +1,7 @@
 """The command line's help: everything a newcomer on another machine has without the docs (the owner, 2026-10-14:
 "I don't feel the `pdf-semantic-diff --help` is providing the details I need to actually use it")."""
 import stubs  # noqa: F401 (a clean environment)
+from stubs import user_settings
 import argparse
 import contextlib
 import io
@@ -57,7 +58,7 @@ class Help(unittest.TestCase):
         self.assertEqual(code, 0)
         for name in COMMANDS:
             self.assertRegex(text, rf"\n  {name} +\S", name)
-        for needed in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_MODEL", "source add", "Exit codes"):
+        for needed in ("OPENAI_API_KEY", "OPENAI_BASE_URL", "config set --user model", "source add", "Exit codes"):
             self.assertIn(needed, text)
         self.assertEqual(run([]), (1, text))  # no arguments: the same, as an error
         self.assertEqual(run(["--version"])[0], 0)
@@ -91,9 +92,10 @@ class SettingsCommand(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             config = Path(d) / "settings.json"
             config.write_text(json.dumps({"concurrency": 6}))
-            env = {"OPENAI_MODEL": "provider/vision", "OPENAI_API_KEY": "sk-secret",
-                   "OPENAI_BASE_URL": "https://user:pass@provider.example/v1"}
-            code, text = run(["settings", "--config", str(config)], env)
+            env = {"OPENAI_API_KEY": "sk-secret", "OPENAI_BASE_URL": "https://user:pass@provider.example/v1"}
+            with user_settings({"model": "provider/vision"}):
+                code, text = run(["settings", "--config", str(config)], env)
+                _, changed = run(["settings", "--config", str(config), "--changed"])
             self.assertEqual(code, 0)
             shown = json.loads(text)
             self.assertEqual(list(shown)[:2], ["model", "base_url"])
@@ -101,7 +103,6 @@ class SettingsCommand(unittest.TestCase):
             self.assertIn("levers", shown)
             self.assertNotIn("sk-secret", text)
             self.assertNotIn("pass", shown["base_url"])
-            _, changed = run(["settings", "--config", str(config), "--changed"], {"OPENAI_MODEL": "provider/vision"})
             self.assertEqual(json.loads(changed), {"model": "provider/vision", "concurrency": 6})
 
 if __name__ == "__main__":

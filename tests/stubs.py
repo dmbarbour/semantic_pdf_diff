@@ -12,6 +12,26 @@ from pathlib import Path
 # module imports this module.
 for _name in [n for n in os.environ if n.startswith(("PDF_DIFF_", "OPENAI_"))]:
     del os.environ[_name]
+# Nor does a developer's own settings (`config set --user`, settings.user_path): every test reads an empty folder's.
+import atexit as _atexit  # noqa: E402
+import shutil as _shutil  # noqa: E402
+import tempfile as _tempfile  # noqa: E402
+_CONFIG = _tempfile.mkdtemp(prefix="pdf-diff-tests-config-")
+_atexit.register(_shutil.rmtree, _CONFIG, True)
+os.environ["XDG_CONFIG_HOME"] = _CONFIG
+from semantic_pdf_diff import settings as _settings  # noqa: E402
+# a test clearing the environment (patch.dict(..., clear=True)) still reads the empty folder's, not ~/.config's
+_settings.user_path = lambda: Path(os.environ.get("XDG_CONFIG_HOME") or _CONFIG) / "semantic-pdf-diff" / "settings.json"
+
+@contextlib.contextmanager
+def user_settings(values):
+    """The user's settings (`config set --user`) as given, for the block."""
+    from semantic_pdf_diff.settings import save_user_settings, user_path
+    save_user_settings(values)
+    try:
+        yield
+    finally:
+        user_path().unlink(missing_ok=True)
 
 # A quick run for iterating (QUICK=1 python -m unittest discover -s tests): the slowest tests skipped, about two thirds
 # of the time (docs/plans/quick-wins-2026-10-02.md). Every commit is still checked by the full suite.

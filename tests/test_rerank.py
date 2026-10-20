@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from stubs import chat_answer, prompt_of, request_body, serving, source_data
+from stubs import chat_answer, prompt_of, request_body, serving, source_data, user_settings
 from semantic_pdf_diff import cli, rerank
 from semantic_pdf_diff.settings import Settings
 
@@ -68,8 +68,8 @@ class Requests(unittest.TestCase):
                 Settings(rerank_threshold=wrong)
         parser = argparse.ArgumentParser()
         add_run_options(parser)
-        with patch.dict(os.environ, {"PDF_DIFF_RERANK_MODEL": "m", "PDF_DIFF_RERANK_THRESHOLD": "5"}, clear=True):
-            kept = load_settings(parser.parse_args([]))  # a persistent setting: the environment's
+        with patch.dict(os.environ, {}, clear=True), user_settings({"rerank_model": "m", "rerank_threshold": 5}):
+            kept = load_settings(parser.parse_args([]))  # a persistent setting: the user's (`config set --user`)
             flagged = load_settings(parser.parse_args(["--rerank-threshold", "2"]))  # a flag overrides it
         self.assertEqual((kept.rerank_model, kept.rerank_threshold, flagged.rerank_threshold), ("m", 5, 2))
         with self.assertRaises(SystemExit), contextlib.redirect_stderr(io.StringIO()):

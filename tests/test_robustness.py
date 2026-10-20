@@ -1,7 +1,6 @@
 import contextlib
 import io
 import json
-import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -17,7 +16,7 @@ from semantic_pdf_diff.segmentation import tiles
 from semantic_pdf_diff.cli import main
 from semantic_pdf_diff.context import Context
 import stubs
-from stubs import ROUND0, source_data
+from stubs import ROUND0, source_data, user_settings
 
 CID = 'sha256:' + 'a' * 64 + '.pdf'
 GOOD = {'entity':'primary pump','attribute':'rated power','value':'10','unit':'kW','conditions':'',
@@ -218,9 +217,8 @@ class ValidationTests(unittest.TestCase):
     def test_legacy_json_mode(self):
         self.assertEqual(Settings(json_mode=True).response_format, 'json_object')
         self.assertEqual(Settings(json_mode=True, response_format='json_schema').response_format, 'json_schema')
-        with patch.dict(os.environ, {'PDF_DIFF_JSON_MODE':'true'}, clear=True):
-            self.assertEqual(Settings.from_env().response_format, 'json_object')
-        with patch.dict(os.environ, {'PDF_DIFF_RESPONSE_FORMAT':'json_schema'}, clear=True):
+        self.assertEqual(Settings.from_env(json_mode=True).response_format, 'json_object')  # as a --config file's
+        with user_settings({'response_format':'json_schema'}):
             self.assertEqual(Settings.from_env(json_mode=False).response_format, 'none')
 
 class UnitTests(unittest.TestCase):

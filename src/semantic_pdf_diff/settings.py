@@ -2,9 +2,11 @@
 how they're loaded from the environment, a file and a caller. Split from models (code review 2026-10-08, C4).
 """
 import json
+import logging
 import os
 from functools import lru_cache
-from typing import Annotated, get_args, get_origin
+from pathlib import Path
+from typing import Annotated
 from pydantic import Field, model_validator
 from .levers import DEFAULT_LEVERS, EVERY_ROLE, Declared, compose, lever_marks, setting_classes
 from .schema import Strict
@@ -75,38 +77,67 @@ class SettingsBase(Strict):
 
     @classmethod
     def from_env(cls, only=None, **overrides):
-        """Load environment defaults, then explicit file/CLI/programmatic overrides.
+        """The user's settings (`pdf-semantic-diff config set --user`: user_settings), $OPENAI_BASE_URL, then explicit
+        overrides (a store's own settings, a --config file, a run's flags, a caller's). `only`: the fields read from
+        the user's settings and the environment (default all).
 
-        Keep plain Settings() deterministic for library callers and fixtures.
-        Empty environment values are treated as unset. `only`: the fields read from the environment (default all).
-        """
+        The environment is read for the endpoint alone (docs/plans/configuration-in-the-store-2026-10-20.md: the
+        owner's four variables); a PDF_DIFF_<NAME> or OPENAI_MODEL still set is ignored, with a warning naming the
+        setting that replaces it. Plain Settings() stays deterministic for library callers and fixtures."""
         levers = overrides.pop("levers", None)
+        user = user_settings()
+        if levers is None and "levers" in user and (only is None or "levers" in only):
+            levers = user["levers"]
         target = cls if levers is None else settings_class(tuple(levers))
-        values = {}
-        names = {"base_url": "OPENAI_BASE_URL", "model": "OPENAI_MODEL"}
-        # An explicit legacy json_mode must beat an environment response_format.
+        retired(target)
+        # An explicit legacy json_mode must beat the user's response_format.
         explicit = set(overrides) | ({"response_format"} if "json_mode" in overrides else set())
-        for field in [*target.model_fields, "json_mode"]:
-            if field in explicit or (only is not None and field not in only):
-                continue
-            name = names.get(field, "PDF_DIFF_" + field.upper())
-            raw = os.environ.get(name)
-            if raw is None or not raw.strip():
-                continue
-            if field in target.model_fields and get_origin(target.model_fields[field].annotation) in (list, dict):
-                try:
-                    values[field] = json.loads(raw)
-                except ValueError as exc:
-                    shape = {"aliases": "object mapping aliases to canonical names",
-                             "rate_limits": "list of rate-limit rules"}.get(field, "list of strings")
-                    raise ValueError(f"{name} must be a JSON {shape}") from exc
-            elif raw.strip().casefold() in ("none", "null") and field in target.model_fields \
-                    and type(None) in get_args(target.model_fields[field].annotation):
-                values[field] = None  # an optional setting switched off (code review 2026-10-08, C23: table_rules)
-            else:
-                values[field] = raw.strip()
+        values = {k: v for k, v in user.items()
+                  if k in target.model_fields and k not in explicit and (only is None or k in only)}
+        raw = os.environ.get("OPENAI_BASE_URL", "")
+        if raw.strip() and "base_url" not in overrides and (only is None or "base_url" in only):
+            values["base_url"] = raw.strip()
         values.update(overrides)
         return target(**values)
+
+def user_path():
+    """The user's settings (`config set --user`): $XDG_CONFIG_HOME/semantic-pdf-diff/settings.json, else under
+    ~/.config: what belongs to the user's endpoint and machine (the model and its context, concurrency, a reranker),
+    shared by every store."""
+    base = os.environ.get("XDG_CONFIG_HOME") or os.path.join(os.path.expanduser("~"), ".config")
+    return Path(base) / "semantic-pdf-diff" / "settings.json"
+
+def user_settings():
+    """The user's settings, {name: value}; none without the file."""
+    path = user_path()
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as e:
+        raise ValueError(f"{path}: not JSON ({e}); `pdf-semantic-diff config export --user` shows the format") from e
+    if not isinstance(data, dict) or not isinstance(data.get("settings"), dict):
+        raise ValueError(f'{path}: expected {{"format": 1, "settings": {{...}}}}')
+    return dict(data["settings"])
+
+def save_user_settings(values):
+    """The user's settings replaced (checked by the caller: configuration.applied)."""
+    path = user_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"format": 1, "settings": values}, indent=1, sort_keys=True, ensure_ascii=False) + "\n",
+                    encoding="utf-8")
+
+_warned = set()
+
+def retired(target):
+    """Warn, once a process, of each environment variable that named a setting before the user's settings did."""
+    for field in target.model_fields:
+        name = "OPENAI_MODEL" if field == "model" else "PDF_DIFF_" + field.upper()
+        if field != "base_url" and (os.environ.get(name) or "").strip() and name not in _warned:
+            _warned.add(name)
+            logging.getLogger("semantic_pdf_diff").warning(
+                "%s is no longer read: `pdf-semantic-diff config set --user %s VALUE` keeps it for every run "
+                "(docs/configuration.md)", name, field)
 
 @lru_cache(maxsize=None)
 def settings_class(levers=DEFAULT_LEVERS):

@@ -70,7 +70,7 @@ class Command(unittest.TestCase):
         self.assertEqual(Store.settings_of(self.store), {"max_pairs": 5000})
         _, shown, _ = run("config", "show", "--store", self.store)
         self.assertIn("max_pairs         5000 (store)", shown)
-        self.assertIn("environment variables (not the store's):", shown)
+        self.assertIn("environment variables (neither the user's nor the store's):", shown)
         _, comparing, _ = run("config", "show", "comparing", "--store", self.store)
         self.assertIn("min_score", comparing)  # not a basic one: shown in its group
         self.assertNotIn("max_cost", comparing)
@@ -83,6 +83,26 @@ class Command(unittest.TestCase):
         self.assertEqual((code, out), (0, "max_pairs = 1000 (the default); the next run redoes: the comparison "
                                           "judged again\n"))
         self.assertEqual(Store.settings_of(self.store), {})
+
+    def test_the_users_settings_lie_under_every_stores(self):
+        from semantic_pdf_diff.settings import user_path, user_settings
+        self.addCleanup(lambda: user_path().unlink(missing_ok=True))
+        code, out, _ = run("config", "set", "--user", "concurrency", "32", "--store", self.store)
+        self.assertEqual((code, out), (0, "concurrency = 32; the next run redoes: nothing (it changes how requests "
+                                          "travel, never what is asked)\n"))
+        self.assertFalse(self.store.exists())  # the user's: no store made
+        run("config", "set", "--user", "top_k", "6")
+        run("config", "set", "top_k", "8", "--store", self.store)
+        self.assertEqual(user_settings(), {"concurrency": 32, "top_k": 6})
+        _, shown, _ = run("config", "show", "--store", self.store)
+        self.assertIn("concurrency       32 (user)", shown)
+        self.assertIn("top_k             8 (store)", shown)
+        self.assertEqual(json.loads(run("config", "export", "--user")[1]),
+                         {"format": 1, "settings": {"concurrency": 32, "top_k": 6}})
+        code, out, _ = run("config", "unset", "--user", "top_k", "--store", self.store)
+        self.assertEqual(out, "top_k = 8 (the store's)\n")  # the store's still applies: nothing redone
+        run("config", "unset", "--user", "concurrency")
+        self.assertEqual(user_settings(), {})
 
     def test_a_wrong_setting_changes_nothing(self):
         run("config", "set", "max_cost", "2", "--store", self.store)
