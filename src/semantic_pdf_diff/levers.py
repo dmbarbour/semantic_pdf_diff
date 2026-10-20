@@ -1111,8 +1111,9 @@ class NameTopics(Lever):
     # the report's topics (topics.py) chosen among the candidate ways and named by the model, in a request a
     # comparison; without it, or when it fails, the most even way by its words (the owner, 2026-10-19: "let an LLM
     # model select heuristically between candidates based on what would better fit the human intuition, and name the
-    # divisions"; docs/plans/portable-reports-2026-10-19.md, milestone 3). Off until judged by eye
-    topic_names: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # divisions"; docs/plans/portable-reports-2026-10-19.md, milestone 3). A default since 2026-10-20 (the owner: "Yes,
+    # turn `topic_names` on by default.")
+    topic_names: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def names_topics(self):
         return self.topic_names

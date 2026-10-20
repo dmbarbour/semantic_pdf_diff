@@ -161,8 +161,10 @@ class Requests:
                 ident = ("extract", r["content"], r["task"])
             elif r["role"] == "triage":
                 ident = ("triage", r["content"], r["kind"], r["id"])
-            else:
+            elif r["role"] == "compare":
                 ident = ("compare", r["a"], r["b"])
+            else:  # a report's topics (topics.py): nothing a review batch samples
+                continue
             self.index[ident] = (r, q["prompt"], q["images"])
 
     def describe(self, item, source, folder):

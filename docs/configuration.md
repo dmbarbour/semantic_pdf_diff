@@ -148,7 +148,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `editorial` | `true` | post | editorial | compare | - |
 | `record_changes` | `true` | post | record_changes | compare | - |
 | `judge_context` | `false` | shaping | judge_context | compare | - |
-| `topic_names` | `false` | selecting | topic_names | compare | - |
+| `topic_names` | `true` | selecting | topic_names | compare | - |
 <!-- end of settings table -->
 
 - `response_format` is `none` by default because some compatible servers do not support it; `json_object` requests JSON mode and `json_schema` sends the response schema for guided decoding (vLLM, llama.cpp, and similar), which is strongly recommended for small models where supported. The 0.1 `json_mode: true` setting still maps to `json_object`.

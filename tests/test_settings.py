@@ -60,8 +60,8 @@ ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refin
              'tile_cut', 'band_width', 'least_half', 'skip_sheet_tables', 'sheet_records'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
-    'topic_names': "needs claims of both sides sharing words in two topics or more; the stub's documents give "
-                   'too few (tests/test_topics.py)',
+    'topic_names': "needs claims of both sides splitting into two topics or more; the stub's documents make "
+                   'one (tests/test_topics.py)',
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
     'decoration': 'changes which graphics count, so it shows only through bands, skip_text_only or tile_cut; these '
                   'documents hold no decoration (tests/test_tiling.py)',

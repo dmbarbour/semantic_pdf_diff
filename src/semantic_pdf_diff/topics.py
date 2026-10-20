@@ -19,6 +19,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
 from .failures import ModelFailure
+from .progress import log
 
 STOP = frozenset("""a an the of and or for to in on at by with from as is are be was were this that these those its it
 into per not no all any each other than then over under between within without about above below up down out off via vs
@@ -133,14 +134,14 @@ def measures(way, sides):
 
 def ways(claims, sides):
     """The candidate ways of splitting claims (dicts with entity and attribute), each side's claims together: by
-    subject, by subject coarser, by property."""
+    subject, by property, by subject coarser; those with two topics or more."""
     k = target(len(claims))
     subject = [words(f"{c['entity']} {c['attribute']}") for c in claims]
     found = [split(subject, sides, k, "by subject"), split([words(c['attribute']) for c in claims], sides, k,
                                                            "by property")]
     if k > 4:
         found.append(split(subject, sides, max(2, k // 2), "by subject, coarser"))
-    return [w for w in found if w.topics]
+    return [w for w in found if len(w.topics) >= 2]  # one topic splits nothing
 
 def best(found):
     """The way shown without the model: the most claims placed, evenly, both sides in its topics."""
@@ -200,7 +201,8 @@ def named(found, claims, ask):
     try:
         answer = ask(names_prompt(found, claims))
     except ModelFailure as e:  # a request that failed, timed out, was refused or answered unreadably: words stand
-        return {"failed": f"{type(e).__name__}: {e}"[:300]}
+        log.warning("The report's topics are named by their words: the request for names failed (%s)", e)
+        return {"failed": "no answer"}  # the same live and replayed: only answers decide what a run writes (0030)
     if not 1 <= answer.way <= len(found):
         return {"failed": f"way {answer.way} of {len(found)}"}
     way = found[answer.way - 1]

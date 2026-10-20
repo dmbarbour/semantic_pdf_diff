@@ -99,5 +99,6 @@
   "images_first": false,
   "text_spans": "section",
   "repeated_text": "keep",
-  "lone_rows": false
+  "lone_rows": false,
+  "topic_names": false
 }

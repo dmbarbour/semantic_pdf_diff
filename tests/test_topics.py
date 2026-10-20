@@ -92,8 +92,9 @@ class Named(unittest.TestCase):
         from semantic_pdf_diff.failures import ModelFailure
         def ask(prompt):
             raise ModelFailure("HTTP 504: Gateway Timeout")
-        self.assertEqual(topics.named(self.found, self.claims, ask),
-                         {"failed": "ModelFailure: HTTP 504: Gateway Timeout"})
+        with self.assertLogs("semantic_pdf_diff", "WARNING") as logged:
+            self.assertEqual(topics.named(self.found, self.claims, ask), {"failed": "no answer"})  # live as replayed
+        self.assertIn("HTTP 504: Gateway Timeout", logged.output[0])
 
     def test_a_report_shows_the_models_names_unless_its_topics_have_changed(self):
         import tempfile

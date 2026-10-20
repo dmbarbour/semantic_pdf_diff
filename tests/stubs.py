@@ -67,6 +67,14 @@ def source_data(prompt):
     """What an extraction request reads: its text after "SOURCE DATA:"."""
     return prompt.split('SOURCE DATA:\n', 1)[1]
 
+def topics_answer(prompt):
+    """A report's topics (topics.py): the first way, its topics named "Topic 1", "Topic 2"...; else None."""
+    if not prompt.startswith('Name the topics a reader browses'):
+        return None
+    first = prompt.split('WAY 1 ', 1)[1].split('\nWAY ', 1)[0]
+    count = sum(1 for line in first.splitlines() if re.match(r'  \d+\. ', line))
+    return {'way': 1, 'names': [f'Topic {i}' for i in range(1, count + 1)]}
+
 def stock_answer(prompt, schema):
     """The answer a fake gives a query its test doesn't answer itself, or None: comparisons equivalent, situating
     from the prompt (situating_answer), a table's rules query each row read by itself, a two-column block a table."""
@@ -75,6 +83,8 @@ def stock_answer(prompt, schema):
         return Judgment(relation='equivalent', rationale='fixture', confidence=.9, same_conditions=True)
     if situating_answer(prompt):
         return schema.model_validate(situating_answer(prompt))
+    if topics_answer(prompt):
+        return schema.model_validate(topics_answer(prompt))
     if schema.__name__ == 'Rules':  # a table's rules query: each row read by itself, as these tests read tables
         return schema(reading='rows')
     if schema.__name__ == 'Check':  # a block of two columns: a table, as these tests read it (B5)
