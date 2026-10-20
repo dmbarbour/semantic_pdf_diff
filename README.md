@@ -33,7 +33,7 @@ export OPENAI_MODEL='your-vision-model-id'
 pdf-semantic-diff compare team-a.pdf team-b.pdf --store result
 ```
 
-`pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff COMMAND --help` (or `pdf-semantic-diff help COMMAND`) gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
+A store keeps its own settings: `pdf-semantic-diff config show --store result` lists them by group, `config set NAME VALUE` sets one for every run in the store, and `config help NAME` says what it does and what changing it redoes. `pdf-semantic-diff --help` lists every command, the environment it needs and examples; `pdf-semantic-diff COMMAND --help` (or `pdf-semantic-diff help COMMAND`) gives a command's options, and `pdf-semantic-diff settings` prints every setting a run would use (with `--changed`, those differing from the defaults: a starting `--config` file).
 
 Open `result/report.html`: it's one file, which can be moved or sent on its own. Its crops are embedded in order of value (the findings to check, and claims read from charts, diagrams and tables, first) until the file reaches `--report-budget` (20 MB by default); `pdf-semantic-diff report --store result --dry-run` says what a budget leaves out. For comparisons too large for one file, `--split` writes a file per pair of files and an index, in a folder to zip and send. Machine-readable results are in `report.json`; the extracted evidence, its provenance and coverage are in `evidence.json`.
 

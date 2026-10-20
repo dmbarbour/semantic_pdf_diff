@@ -395,6 +395,28 @@ class Store:
             claims = merge_readings(claims)
         return claims
 
+    def own_settings(self):
+        """The store's own settings, as `pdf-semantic-diff config` set them (configuration.py): {name: value}."""
+        row = self.db.execute("SELECT value FROM meta WHERE key='settings'").fetchone()
+        return json.loads(row[0]) if row else {}
+
+    def save_own_settings(self, values):
+        """The store's own settings replaced (checked by the caller: configuration.applied)."""
+        with self._durable():
+            if values:
+                self.db.execute("INSERT OR REPLACE INTO meta VALUES ('settings', ?)",
+                                (json.dumps(values, sort_keys=True, ensure_ascii=False),))
+            else:
+                self.db.execute("DELETE FROM meta WHERE key='settings'")
+
+    @classmethod
+    def settings_of(cls, folder):
+        """A store's own settings, read without a writer's lock; none where there's no store yet."""
+        if not (Path(folder) / "store.sqlite").exists():
+            return {}
+        with cls.open(folder) as store:
+            return store.own_settings()
+
     def reconciles(self):
         row = self.db.execute("SELECT value FROM meta WHERE key='reconcile'").fetchone()
         return bool(row and row[0] == "1")

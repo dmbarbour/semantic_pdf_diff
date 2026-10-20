@@ -6,7 +6,7 @@ When no environment variable or override is supplied, the default endpoint is `h
 
 ## Precedence and environment variables
 
-Configuration precedence, highest first: **CLI flags > JSON config file > environment variables > built-in defaults**. You can normally run just `pdf-semantic-diff compare a.pdf b.pdf` after setting your environment. A config file only overrides fields it contains; the example config intentionally omits model and endpoint so it works with your environment.
+Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > environment variables > built-in defaults**. A store keeps its own settings, set with `pdf-semantic-diff config` (below); a run's flags and a `--config` file override them for that run only. You can normally run just `pdf-semantic-diff compare a.pdf b.pdf` after setting your environment. A config file only overrides fields it contains; the example config intentionally omits model and endpoint so it works with your environment.
 
 | Environment variable | Setting |
 | --- | --- |
@@ -27,7 +27,23 @@ Configuration precedence, highest first: **CLI flags > JSON config file > enviro
 
 Every other field in `Settings` follows `PDF_DIFF_<UPPERCASE_FIELD_NAME>` (for example `PDF_DIFF_TEXT_BYTES`, `PDF_DIFF_RETRIES`, `PDF_DIFF_RESPONSE_FORMAT`). Model and base URL use only the `OPENAI_*` names above. `OPENAI_MODEL` and the `PDF_DIFF_*` names are application conventions. Empty or whitespace-only setting variables are treated as unset; invalid active values fail validation. Explicit overrides take precedence even over invalid environment values. Export variables through your shell or process manager; `.env` files are not loaded automatically.
 
-`pdf-semantic-diff settings [--config FILE]` prints every setting as a run would resolve them, the API key never; `--changed` prints only those differing from the defaults.
+`pdf-semantic-diff settings [--config FILE] [--store DIR]` prints every setting as a run would resolve them, the API key never; `--changed` prints only those differing from the defaults.
+
+## A store's own settings: `pdf-semantic-diff config`
+
+A store keeps its own settings, set once for every run in it ([the plan](plans/configuration-in-the-store-2026-10-20.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$PDF_DIFF_STORE`, else `./diff-output`).
+
+| Command | What it does |
+| --- | --- |
+| `config show [GROUP] [--all] [--json]` | The settings most runs set, by group, each with its value, `(store)` where the store sets it, and what it does; a group's (endpoint, budget, sources, reading, comparing, report, levers); every one; or every value as JSON. Then the environment variables |
+| `config find WORDS` | Settings whose name or help holds the words |
+| `config help NAME` | One setting: what it does, its value and default, an example, its group and lever, and what changing it redoes |
+| `config set NAME VALUE` | Kept in the store (a new store is made for it), and says what the next run redoes. Values as text: `on`/`off`, numbers, sizes (`40MB`), `none`, JSON for lists and objects |
+| `config unset NAME` | Back to the default |
+| `config export [FILE]` | The store's own settings as `{"format": 1, "settings": {...}}` (cameo_ingest's format), to the screen without a file |
+| `config import FILE` | Every setting in the file, or none when any key or value is wrong; `null` unsets one |
+
+Besides the settings below, a store keeps three run options the same way: `mode` (proposals or revisions), and the report's `report_budget` and `split`.
 
 For Python callers, use `Settings.from_env(...)` to get the same environment defaults with explicit keyword overrides. Plain `Settings(...)` remains deterministic and does not consult the environment. Output paths and comparison mode remain CLI options.
 

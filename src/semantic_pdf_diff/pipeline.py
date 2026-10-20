@@ -40,13 +40,14 @@ def document_properties(name, data):
 
 NO_MODEL = "http://127.0.0.1:9/v1"  # an address nothing answers: for replays that must never reach a model
 
-def settings_from(config=None, **overrides):
-    """Settings as the CLI's --config gives them (the environment, then the file), then overrides."""
+def settings_from(config=None, layer=None, **overrides):
+    """Settings as the CLI gives them: the environment, then a store's own (layer: `config set`'s), then the --config
+    file, then overrides."""
     from .settings import Settings
     options = json.loads(Path(config).read_text()) if config else {}
     if not isinstance(options, dict):
         raise ValueError(f'{config}: settings file must contain a JSON object')
-    return Settings.from_env(**{**options, **overrides})
+    return Settings.from_env(**{**(layer or {}), **options, **overrides})
 
 def attempt(run_it, *args, **kwargs):
     """A run's exit code, an error reported as the CLI reports one (exit 1)."""
@@ -75,13 +76,17 @@ class RunOptions:
     split: bool = False               # a report file a pair of files, and an index (report.SPLIT)
 
     @classmethod
-    def from_args(cls, args):
+    def from_args(cls, args, layer=None):
+        """A run's options from its flags, over a store's own settings (layer) for the mode and the report's."""
+        layer = layer or {}
         get = lambda name, default=None: getattr(args, name, default)
-        return cls(mode=get("mode", "proposals"), reset=bool(get("reset", False)), dry_run=bool(get("dry_run", False)),
+        given = lambda name, default: get(name) if get(name) is not None else layer.get(name, default)
+        return cls(mode=given("mode", "proposals"), reset=bool(get("reset", False)),
+                   dry_run=bool(get("dry_run", False)),
                    fixture=get("fixture"), fixture_mode=get("fixture_mode"), responder=get("responder"),
                    fresh_regions=tuple(r for r in (get("fresh_regions", "") or "").split(",") if r),
                    ledger=get("ledger"), export=get("fixture_export"),
-                   report_budget=get("report_budget", crops.DEFAULT_BUDGET), split=bool(get("split", False)),
+                   report_budget=given("report_budget", crops.DEFAULT_BUDGET), split=bool(given("split", False)),
                    ledger_tags=dict(t.split("=", 1) for t in (get("ledger_tag", []) or []) if "=" in t))
 
     @property
