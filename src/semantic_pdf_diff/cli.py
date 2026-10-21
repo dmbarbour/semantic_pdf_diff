@@ -12,14 +12,16 @@
 import argparse
 import csv
 import json
+import logging
 import os
+import signal
 import sys
 from pathlib import Path
 from . import __version__, configuration, crops, fixtures, manifest
 from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, limits, require_model,
                        run, settings_from)
 from .schema import Source
-from .progress import log, setup_logging
+from .progress import abandon, log, setup_logging
 from .report import SPLIT, write_report
 from .store import Store, StoreError
 
@@ -39,9 +41,42 @@ class Parser(argparse.ArgumentParser):
         self.print_usage(sys.stderr)
         self.exit(1, f'{self.prog}: error: {message}\n')
 
+INTERRUPTED = 130  # 128 + SIGINT, as shells report a command Ctrl+C stopped
+
 def main(argv=None, client=None):
-    """The command line. client: a model client the comparing commands use (a caller's: tests)."""
-    return attempt(command, list(sys.argv[1:] if argv is None else argv), client)
+    """The command line. argv None: the process's own (the console script, python -m), which Ctrl+C ends at once
+    (interrupted); a caller's (tests, scripts) gets KeyboardInterrupt as Python raises it. client: a model client the
+    comparing commands use (a caller's: tests)."""
+    if argv is not None:
+        return attempt(command, list(argv), client)
+    signal.signal(signal.SIGINT, first_interrupt)
+    try:
+        return attempt(command, sys.argv[1:], client)
+    except KeyboardInterrupt:
+        interrupted(sys.argv[1:])
+
+def first_interrupt(signum, frame):
+    """Ctrl+C: KeyboardInterrupt, as Python's own handler raises it, and a second Ctrl+C ends the process where it is,
+    while the first is closing what's open (the answers are committed as they come, and SQLite's files survive a
+    process's end)."""
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    raise KeyboardInterrupt
+
+def interrupted(argv):
+    """Ctrl+C, once what was open is closed (the answers cache, the store): the bars erased, a line saying how to
+    resume a comparison, and the process ended at once, exit 130. The requests in flight aren't waited for, their
+    threads holding the exit for up to the timeout (600 s); they're asked again when the run resumes. Until 2026-10-21
+    a traceback was printed, the bars were drawn again below it, and the exit waited (the owner: "ctrl+c just leaves
+    a mess of exception info in the terminal. Please capture it and exit cleanly, with a short message about how to
+    resume.")."""
+    if not abandon() and sys.stderr.isatty():
+        sys.stderr.write("\n")  # past the terminal's "^C"
+    sys.stdout.flush()  # what was printed before it, before it (a pipe's buffer)
+    resumes = argv[:1] == ['compare']
+    log.warning("Interrupted" + (": rerun the same command to resume; finished work is kept." if resumes else "."))
+    logging.shutdown()
+    sys.stderr.flush()
+    os._exit(INTERRUPTED)
 
 def command(argv, client):
     """The command argv names, run: its exit code."""
@@ -124,7 +159,8 @@ evidence.json. A comparison into it again reuses what was read, and resumes one 
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
 (a mistyped command or option too); 3 paused for budget (run again to resume); 5 the endpoint failed: a check of
-`config test`, or 25 requests in a row (stop_after_failures), which pauses the run.
+`config test`, or 25 requests in a row (stop_after_failures), which pauses the run; 130 interrupted by Ctrl+C
+(run again to resume).
 """
 
 def help_text(parser, epilog=None, description=None):

@@ -113,6 +113,17 @@ def handling(cached):
     finally:
         _cached = outer
 
+def abandon():
+    """The bars erased and the standard streams given back, their stage left unfinished (Ctrl+C: cli.interrupted);
+    whether there were any."""
+    global _board
+    board, _board = _board, None
+    if board is None:
+        return False
+    board.erase()
+    board.detach()
+    return True
+
 class Item:
     """One thing a bar counts (a page): done once it's closed and none of its requests is waiting."""
     __slots__ = ("bar", "open", "closed", "done")
