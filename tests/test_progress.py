@@ -217,8 +217,9 @@ class OnATerminal(unittest.TestCase):
         pyte.Stream(screen).feed(raw)
         rows = [row.rstrip() for row in screen.display if row.strip()]
         self.assertFalse([r for r in rows if '█' in r or '░' in r or 'answered, ' in r and ' · ' in r], rows)
-        shown = [r for r in rows if not r.startswith(('Report:', 'Consider using'))]  # stdout's, not the log's
-        self.assertEqual(shown, logged)  # ...and the log reads as it was written, every line whole, once
+        shown = [r for r in rows if not r.startswith('Report:')]  # stdout's, not the log's
+        self.assertEqual(shown, logged)  # ...and the log reads as it was written, every line whole, once: PyMuPDF's
+        # notice recommending its layout package isn't printed (2026-10-21)
 
     @staticmethod
     def read(master, written):
