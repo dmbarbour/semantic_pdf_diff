@@ -61,7 +61,9 @@ HELP = {
                     "Between chunks when streaming: a slow answer isn't cut off whole, and still billed.", "300",
                     basic=True),
     "concurrency": Help("endpoint", "requests in flight at most (adaptive below it)",
-                        "A slow model needs many at once: 32 for gemma-4 at DeepInfra.", "32", basic=True),
+                        "A slow model needs many at once: 32 for gemma-4 at DeepInfra. A run's own: two runs at once "
+                        "send twice as many. The status shows those in flight, and those queued behind them.", "32",
+                        basic=True),
     "rate_limits": Help("endpoint", "throughput ceilings by day and hour",
                         "A JSON list of rules: days, hours, tokens_per_minute, requests_per_minute; the first that "
                         "matches applies.", '[{"hours": "08:00-18:00", "tokens_per_minute": 200000}]'),

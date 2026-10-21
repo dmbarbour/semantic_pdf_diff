@@ -81,7 +81,8 @@ class Bars(unittest.TestCase):
         self.assertEqual(term.rows(), [
             "extract  nrel-5mw.pdf ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  97/561 pages",
             "         team-b       █████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░   1/3   files",
-            "         4 answered, 1 waiting · 120k tokens/min · $0.42 · about 5 min left"])  # the slowest bar's rate
+            "         4 answered, 0 in flight, 1 queued",  # too long for one line at 80 columns: two
+            "         120k tokens/min · $0.42 · about 5 min left"])  # the slowest bar's rate
 
     def test_log_lines_print_above_the_bars(self):
         term = Terminal()
@@ -145,7 +146,7 @@ class Bars(unittest.TestCase):
         self.assertEqual(rows[2], '         0 tokens/min · about 1 s left')
 
     def test_a_status_too_long_for_a_line_takes_two_and_keeps_them(self):
-        term = Terminal()
+        term = Terminal(columns=100)
         client = type('C', (), {'usage': {'prompt_tokens': 0, 'completion_tokens': 0}, 'cost': 1.23})()
         stage = staged(term, client=client)
         stage.bar('a.pdf', 561, 'pages').tick(97)
@@ -156,7 +157,7 @@ class Bars(unittest.TestCase):
             with module.handling(answer < 11_000):
                 stage.finish()
         stage.board.redraw()
-        self.assertEqual(term.rows()[1:], ['         11,790 answered (11,000 from cache), 210 waiting',
+        self.assertEqual(term.rows()[1:], ['         11,790 answered (11,000 from cache), 0 in flight, 210 queued',
                                            '         0 tokens/min · $1.23 · about 1 s left'])
         stage.add(-11_000)  # shorter again: still two lines, so the bars don't jump about
         stage.board.redraw()
@@ -370,7 +371,7 @@ class FromCache(unittest.TestCase):
         ask('d')  # asked before: now in the cache
         dispatch.drain()
         self.assertEqual((stage.done, stage.cached, stage.failed), (6, 3, 1))
-        self.assertEqual(stage.requests(), '6 answered (3 from cache), 0 waiting, 1 failed')
+        self.assertEqual(stage.requests(), '6 answered (3 from cache), 0 in flight, 0 queued, 1 failed')
         with self.assertLogs('semantic_pdf_diff', level='INFO') as logs:
             stage.close()
         self.assertIn('extract: 6 requests answered (3 from cache), 1 failed in', logs.output[0])
@@ -390,6 +391,53 @@ class FromCache(unittest.TestCase):
         asked = said[0][0].split()[1]
         self.assertRegex(said[0][0], rf'^extract: {asked} requests answered in \d+s$')
         self.assertRegex(said[1][0], rf'^extract: {asked} requests answered \({asked} from cache\) in \d+s$')
+
+class InFlight(unittest.TestCase):
+    """The status's "in flight" is what the endpoint has open, never more than `concurrency`; "queued", what's asked
+    and not yet sent (the owner, 2026-10-21: "I regularly seem to have "7 waiting" when I configure concurrency at 2,
+    for example. My in-house setup has only a few servers for gemma-4, and I need to not be taking all of them")."""
+
+    def test_a_comparison_has_at_most_concurrency_open_at_the_endpoint(self):
+        import re
+        import threading
+        import time
+        from unittest.mock import patch
+        from stubs import chat_answer, prompt_of, request_body, serving, source_data, text_pdf
+        state, lock, shown = {'open': 0, 'most': 0}, threading.Lock(), []
+
+        def post(handler):
+            prompt = prompt_of(request_body(handler)['messages'][1]['content'])
+            with lock:
+                state['open'] += 1
+                state['most'] = max(state['most'], state['open'])
+            time.sleep(0.05)
+            with lock:
+                state['open'] -= 1
+            answer = {'claims': [], 'complete': True, 'issues': []}
+            if 'Compare exactly' in prompt:
+                answer = {'relation': 'equivalent', 'rationale': 'stub', 'confidence': .9, 'same_conditions': True}
+            elif 'SOURCE DATA:\n' in prompt and 'kW' in source_data(prompt):
+                value = source_data(prompt).split(' kW')[0].split()[-1]
+                answer['claims'] = [{'entity': 'pump', 'attribute': 'rated power', 'value': value, 'unit': 'kW',
+                                     'kind': 'text', 'quote': f'{value} kW', 'confidence': .9}]
+            chat_answer(handler, answer)
+        real = Progress.changed
+
+        def changed(self, now=False):
+            shown.append(self.requests())
+            return real(self, now)
+        with serving(post, threaded=True) as url, tempfile.TemporaryDirectory() as d, \
+                stubs.user_settings({'model': 'gemma-4', 'concurrency': 2}), patch.object(Progress, 'changed', changed):
+            root = Path(d)
+            for name, power in (('a.pdf', 10), ('b.pdf', 50)):
+                text_pdf(root / name, [f'Pump {k} rated power {power + k} kW' for k in range(12)])
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                cli.main(['compare', str(root / 'a.pdf'), str(root / 'b.pdf'), '--store', str(root / 'out'),
+                          '--base-url', url, '--no-situate'])
+        counts = [tuple(map(int, re.search(r'(\d+) in flight, (\d+) queued', line).groups())) for line in shown]
+        self.assertEqual(state['most'], 2)  # two at once, never more
+        self.assertEqual(max(flying for flying, _ in counts), 2)
+        self.assertGreater(max(queued for _, queued in counts), 0)  # what "waiting" counted besides
 
 class Heartbeats(unittest.TestCase):
     def setUp(self):
@@ -411,8 +459,8 @@ class Heartbeats(unittest.TestCase):
             stage.close()
         self.assertEqual(len(logs.output), 2)
         # At the heartbeat: 2 of 4 pages in 31 s, so 31 s left; 3,100 tokens in 31 s.
-        self.assertRegex(logs.output[0], r'extract: a\.pdf 2/4 pages; requests 2 answered, 2 waiting, 1 failed, '
-                                         r'(5,999|6,000) tokens/min, about 31 s left')
+        self.assertRegex(logs.output[0], r'extract: a\.pdf 2/4 pages; requests 2 answered, 0 in flight, 2 queued, '
+                                         r'1 failed, (5,999|6,000) tokens/min, about 31 s left')
         self.assertIn('extract: 2 requests answered, 1 failed in 31s', logs.output[1])
 
 class Verbosity(unittest.TestCase):

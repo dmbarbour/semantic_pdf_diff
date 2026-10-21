@@ -142,7 +142,7 @@ class Interrupted(unittest.TestCase):
             self.assertLess(took, 20)  # the requests held unanswered weren't waited for
             self.assertEqual(rows[-1], MESSAGE)
             self.assertFalse([r for r in rows if 'Traceback' in r or 'KeyboardInterrupt' in r], rows)
-            self.assertFalse([r for r in rows if '█' in r or '░' in r or ' waiting' in r], rows)  # no bars left
+            self.assertFalse([r for r in rows if '█' in r or '░' in r or ' queued' in r], rows)  # no bars left
             self.assertIn(MESSAGE, Path(str(store) + '.log').read_text())
             state['release'].set()
             before = state['requests']

@@ -360,9 +360,15 @@ class Progress:
         return out
 
     def requests(self):
-        """The requests answered (those from the cache among them), waiting and failed."""
+        """The requests answered (those from the cache among them), in flight, queued and failed. In flight: sent and
+        not yet answered, at most `concurrency` (the client's gate counts them). Queued: asked and not yet sent, the
+        dispatcher holding up to twice as many. Until 2026-10-21 both were "waiting", which read as more than
+        `concurrency` at the server (the owner: "I regularly seem to have "7 waiting" when I configure concurrency at
+        2")."""
         cached = f" ({self.cached:,} from cache)" if self.cached else ""
-        return (f"{self.done:,} answered{cached}, {self.total - self.done:,} waiting"
+        waiting = self.total - self.done
+        flying = min(waiting, getattr(getattr(self.client, "gate", None), "active", 0) or 0)
+        return (f"{self.done:,} answered{cached}, {flying:,} in flight, {waiting - flying:,} queued"
                 + (f", {self.failed:,} failed" if self.failed else ""))
 
     def status(self):
