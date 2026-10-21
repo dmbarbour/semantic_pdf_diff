@@ -1,6 +1,7 @@
 # Spot check sc01: the owner's comments, with evidence
 
 - **Date:** 2026-09-30, items 1–5 of 16 (the owner's survey is in progress).
+- **Status:** Closed (2026-10-21). The owner, 2026-10-03: "I won't get back to that spotcheck." Its lever ideas have rows in the [lever index](levers.md) (two of the table ones folded into [one table model](../plans/one-table-model-2026-09-30.md), done 2026-10-08); its situations are rows of the controlled corpus's catalogue ([samples and testing](../samples-and-testing.md#the-catalogue-of-situations)). Moved to the plans index's *Resumed query rounds* (Tentative): the rubric v7 candidate, and the proposal for evaluation (a unit's claims from the page's other readers shown beside its own).
 - **Batch:** `benchmarks/spotchecks/sc01`, round 0's output (r02 and r02h baselines) against the champion (r09b and r09h fragments).
 - **Evidence:** read from the batch's `pairs.json` (claims, and each table task's input) and from the runs' stores.
 

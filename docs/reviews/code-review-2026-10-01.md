@@ -1,6 +1,7 @@
 # Code review: architecture, separation of concerns, redundancy
 
 - **Date:** 2026-10-01
+- **Status:** Closed (2026-10-21). Its items were tracked in the [2026-10-08 review](code-review-2026-10-08.md)'s status table, closed 2026-10-10; items 14 and 15 are in the tentative row *Code health*. The relation vocabulary's held-out check (*Measurement validity*, below) moved to the tentative row *Testing and recording infrastructure* ([plans index](../plans/README.md#tentative)).
 - **Asked by:** the owner. "a general code review with attention to architecture, separation of concerns, and redundancy or refactoring opportunities. It's been a while since we did a full review."
 - **Scope:**
   - all of `src/` (13,069 lines, 34 modules), `scripts/` (1,621 lines) and `tests/` (5,761 lines)

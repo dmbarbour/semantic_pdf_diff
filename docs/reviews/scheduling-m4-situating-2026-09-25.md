@@ -1,6 +1,11 @@
 # Review: situating stage (scheduling milestone 4) and next steps
 
 - **Date:** 2026-09-25
+- **Status:** Closed (2026-10-21) with its plan; the decisions in [0039](../decisions/0039-runs-paced-by-throughput-and-situated-after-extraction.md). Open items moved:
+  - telling references to other documents apart (`calg_cd.pdf`'s building-code tables, *Evidence after the revision*) to the plans index's *Runtime quality spot checks* (Tentative), since it's what keeps the resolved-reference check a recall signal
+  - a one-sheet section reusing its sheet's "about" (*Possible saving, not taken*) to the [lever index](levers.md)'s ideas
+  - the human-review sample of "abouts" to *Reviewer feedback* (Tentative); judging "abouts" on real output, with situating's quality measures, and milestone 5 to [claim context](../plans/claim-context-2026-10-14.md)
+  - supporting-evidence webs were already *Evidence webs* (Tentative)
 - **Plan:** [scheduling-and-triage](../plans/scheduling-and-triage-2026-09-23.md), milestone 4
 - **Commits:** `34ac923` (figures, captions and citing prose), `0988581` (figure and section requests), and the quality checks and report section (this review's commit)
 - **Tests:** 135 passing on Python 3.10; 135 passing with 4 skipped on the minimum-version environment

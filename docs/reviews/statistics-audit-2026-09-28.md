@@ -1,6 +1,7 @@
 # Statistics and review audit
 
 - **Date:** 2026-09-28
+- **Status:** Closed (2026-10-21), with its plan. Findings 1, 4, 6, 8 and 10 were fixed (*What changed*), and 7 in part (a mean weighted by changed units, reported beside the sampled one). Proposal A was approved and built: criteria fixed in `round.json` before judging, promotion after a combination round and a held-out check ([0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)). Moved to the plans index's *Resumed query rounds* (Tentative): B (levers that act on part of a page), open; C (spot checks of close calls), not built; D (the measurements owed: stems as fixed, merged readings on drawings with the new units, sc01 re-judged with v6), which no longer wait on the owner's survey (the owner, 2026-10-03: "I won't get back to that spotcheck.") but on rounds resuming.
 - **Asked by:** the owner: "We should aim to improve known flaws in our statistics and review to find more of them." The spot check had just shown a junk "Within:" line (a table value taken for a numbered item) and claims about table rows the band's crop didn't show.
 - **Method:**
   - A read-only audit of the round statistics, judging and spot checks against rounds r06–r09h.

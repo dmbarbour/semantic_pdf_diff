@@ -1,6 +1,11 @@
 # Claim context: what a claim is about, how to read it, where it came from and who holds it
 
-- **Status:** Active (2026-10-14): written; milestones 1 to 3 built (positions a default; context measured, order revisited; context records kept, `records` and `editorial` defaults); Concepts rewritten (subject, scope, frame, provenance, stance); reviewed whole against the context model, with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 1–9 answered, claim identity to be considered further ([Claim identity](#claim-identity)).
+- **Status:** Active (2026-10-14; brought current 2026-10-21). Written 2026-10-14, Concepts rewritten (subject, scope, frame, provenance, stance), reviewed whole with measurement rewritten and milestones reordered ([Review](#review-2026-10-14)); design questions 1–9 answered, claim identity to be considered further ([Claim identity](#claim-identity)).
+  - **Milestones 1 to 3 built** (2026-10-14): positions a default; context measured, order revisited; context records, `records` and `editorial` defaults.
+  - **Milestone 4, scope and frame, mostly done** (2026-10-14 to 15): context held by reference counted; restated records reported once (`record_changes`), scope and frame apart in the reader (`split_conditions`) and a sheet's title block a record (`sheet_records`), all defaults; the judge shown records (`judge_context`) measured worse, off. Left: figures' and sections' "abouts" as records, and stated, none or unknown as a field.
+  - **Milestone 5, stance, mostly done** (2026-10-15 to 17): holders from tables and from reading, views' yes or no, hedges as uncertainty (`table_holders`, `carried_holders`, `view_attitudes`, `view_rows`, `hedges_apart`, `align_hedges`, `read_holders`, `hedge_rule`, all defaults); RAN1's findings pairing two companies 14 → 0. Left: its remaining lever ideas (the [lever index](../reviews/levers.md)), and readers asked for the basis (moved in, below).
+  - **Milestones 6 to 8 not begun.**
+  - **Moved in (2026-10-21), as those plans closed:** [from scheduling and triage](#moved-in-from-scheduling-and-triage-2026-10-21), the epistemic basis, skeptical prompting and situating's quality measures; [from comparing revisions](#moved-in-from-comparing-revisions-2026-10-21), identity at extraction and the entity register.
 - **The owner, 2026-10-14:** "Ideally, we'd avoid list positions as conditions of a claim, treating them as provenance instead (where a claim was made, how it was named). I feel there's a lot to improve in this domain of tracking the context of a claim. For A, we should consider what the model has access to as part of its query, and what a comparison of claims would have access to - was there enough information in the query to call it the non-conventional 'depth' instead of 'length'? If not, what sort of structure would provide the context for that info? Perhaps we should be examining how we'd approach different naming conventions for dimensions between papers, too."
 - **Then:** "Write the plan, then start with list positions as provenance. Turn it into a full plan unless it proves very short; I expect there's a lot you can think up for how to handle provenance and contexts with a little brainstorming."
 - **On the kinds of context (2026-10-14),** after I proposed subject, scope, frame, provenance and stance: "The names work; rewrite the plan's Concepts section. We can keep 'context' as the umbrella term. I expect we'll spend a fair bit of time on this, trying to improve capture of context per claim." Further words on stance and on context's size are quoted in Concepts.
@@ -29,9 +34,9 @@ A claim today is five words the reader chose (entity, attribute, value, unit, co
 
 - **In:** the context of a claim, every kind (subject, scope, frame, provenance, stance), through every stage: captured mechanically where the source's structure gives it, by the reader where only reading can; stored once and referenced; selected into the reader's and the judge's queries; applied by code or by the model; reported; and keyed, so each stage is measured. For drawings, what a value spans.
 - **Shared with other plans:**
-  - [Comparing revisions](revision-comparison-2026-10-02.md), design item 4 (identity at extraction, an entity register): the register names *things*; this plan records where a claim's subject came from (a heading, a row label, a title block) and how it was named. Its cheap partial steps (names by what a value measures, row labels and column headers kept) are built here or there, whichever comes first, not twice.
+  - **Identity at extraction, an entity register:** [comparing revisions](revision-comparison-2026-10-02.md)' design item 4, this plan's since that plan closed (2026-10-21; [moved in](#moved-in-from-comparing-revisions-2026-10-21)). The register names *things*; the rest of this plan records where a claim's subject came from (a heading, a row label, a title block) and how it was named.
   - *Subject, parties and provenance* (plans index): the parties around a project and the document's own provenance (title blocks, front matter, issue status), and claims about parties told from claims about the subject. That work stays there; the attribution chain on each claim (stance) is this plan's, and takes the document's link from it.
-  - [Scheduling and triage](scheduling-and-triage-2026-09-23.md), milestone 5 (epistemic status): asks readers for basis and uncertainty. Here those are the innermost link's attitude; the prompt work stays there. Its situating stage's figure and section "abouts" become context records here (milestone 3).
+  - [Scheduling and triage](scheduling-and-triage-2026-09-23.md), milestone 5 (epistemic status): asking readers for basis and uncertainty, the innermost link's attitude here. The prompt work is this plan's since that plan closed (2026-10-21; [moved in](#moved-in-from-scheduling-and-triage-2026-10-21)). Its situating stage's figure and section "abouts" become context records here (milestone 3).
   - [Units and normalization](units-and-normalization-2026-09-24.md): a document's declared units ("all dimensions in mm") are frame here, applied there.
   - *Evidence webs* (plans index): links between claims. A claim's context points at other claims (a lead-in, a note) but isn't a web.
 - **Out:** model-chosen names judged by a rater (the panel's business); a document's own revision marks (the revision comparison plan).
@@ -91,7 +96,7 @@ Stance is a form of provenance: the provenance of the proposition, where the res
   - Claims held by different parties are different claims for alignment.
   - The same proposition held by another party is reported as its attribution changed.
 - **Negation and dispute are attitudes, not values:** "Company A does not support option 2" is A's stance on option 2, not a value "not supported" on the item.
-- **Basis** (measured, calculated, simulated, projected, required, targeted, asserted) is the attitude of the innermost link. The [scheduling plan](scheduling-and-triage-2026-09-23.md)'s epistemic-status milestone asks readers for it; this record gives it its place.
+- **Basis** (measured, calculated, simulated, projected, required, targeted, asserted) is the attitude of the innermost link. The [scheduling plan](scheduling-and-triage-2026-09-23.md)'s epistemic-status milestone was to ask readers for it, and moved here (2026-10-21); this record gives it its place.
 - **Chains are usually short** (none to two reported links); the record allows any depth.
 - **Where a hedge lives, for now** (asked 2026-10-16: a hedge is its holder's link's strength, but the document's own claims have no link to carry it). *The owner:* "Regarding where a hedge should live, keeping it in `uncertainty` will do for now but it's probably the wrong long-term solution. At the moment, we're working on engineering proposals, not murder mysteries where tracking every he-said-she-said path becomes more critical. In any case, the document's certainty would ultimately derive from the claimants and the judgement of models in context of contradictions or a web of supporting claims. We're pretty far from detailing that."
   - So a hedge on the document's own claim goes in `uncertainty` (the source's, out of the claim's identity); a reported claim's hedge is its link's strength.
@@ -478,6 +483,30 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **Charts:** series, axis and operating point as context, not attribute words.
 - **Time and place in scope:** phase, year, level, zone, option or alternate ("base bid", "alternate 2"); options are names with identity, not positions.
 - **Repetition:** the same value stated in many places, its occurrences as context for confidence ([evidence webs](README.md)).
+
+## Moved in from scheduling and triage (2026-10-21)
+
+Its milestone 5, and a measure it held, moved here when [scheduling and triage](scheduling-and-triage-2026-09-23.md) closed. Each prompt change is a lever judged against null arms and the probes ([Rules against drift](#rules-against-drift)); their place among milestones 6 to 8 is set when the order is next revisited.
+
+- **Basis asked of readers:** measured, calculated, simulated, projected, required, targeted, asserted or unknown (`basis`, in the schema since v2, asked by no prompt yet), in every format, spreadsheet claims included (their basis from headers, notes or the surrounding document). Stated uncertainty is asked already: tolerances (`split_conditions`) and hedges (`hedge_rule`).
+- **The basis veto in comparison:** a measured value and a projected one aren't a contradiction. A basis mismatch makes a confident "different" or "equivalent" uncertain, as unmatched conditions do. Basis is already part of a claim's identity (`claim_id`).
+- **Skeptical prompting:** the reader asked to question its own reading of columns and labels, and to notice presentation that can mislead: truncated or log axes, missing error bars, selective ranges, projections presented as results, totals that don't add up, claims that don't fit together. Suspicions are recorded as issues on the claim or finding and shown, never dropping evidence.
+- **The schema's other unfilled fields,** `context`, `topic` and `role` ([Where the code mixes them today](#where-the-code-mixes-them-today)): defined, or retired.
+- **Situating's quality, measured** (moved into scheduling from the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan, 2026-10-04), before figures' and sections' "abouts" become subject and scope records (milestone 4's remainder):
+  - figure–reference links labelled on curated pages: link precision and recall, figure detection recall (reports' unresolved references a label-free proxy)
+  - "abouts" rated for usefulness and correctness (what a figure or section is about, without values) by panels of models ([Measurement](#measurement), layer 6)
+
+## Moved in from comparing revisions (2026-10-21)
+
+Its design item 4, identity at extraction (its milestone 5), moved here when [comparing revisions](revision-comparison-2026-10-02.md) closed; the alignment it serves is [decision 0038](../decisions/0038-revisions-aligned-then-differences-explained.md).
+
+- **Built here since:** names as printed, a table claim's row label and column header and a text claim's words before its value (`records`, milestone 3); identity's first proxy (`align_printed`, off).
+- **Left:**
+  - readers naming a row by its tag and a dimension by what it measures, not by position (the lever index's "names that carry identity"; as an `extract_rules` arm, measured no different, 2026-10-14)
+  - tags found by pattern near a value
+  - **a per-document entity register:** tags, row labels, captions, headings and defined abbreviations, with a model pass only for what's left, and claims pointing at its entries; it shares declared names with *Document glossaries* (plans index) and units with [units and normalization](units-and-normalization-2026-09-24.md)
+  - measured by claims named by position, per document, and by the revision pairs' precision
+- **Revisions need it least,** since alignment infers identity from the other revision; proposals need it most, two designs sharing no values.
 
 ## Review (2026-10-14)
 

@@ -1,6 +1,12 @@
 # Rate-aware scheduling, section triage and claim quality signals
 
-- **Status:** Active (2026-09-24)
+- **Status:** Completed (2026-10-21) in the closing pass the owner approved ("Please proceed with 1 and 2"); active from 2026-09-24. Built: milestones 0 to 4 (union provenance, [0005](../decisions/0005-union-provenance.md); time-of-day rate limits and adaptive concurrency; pages round-robin across compared sources and `not_reached`; per-section signals and repeated rows and text read once; situating). Decision: [0039](../decisions/0039-runs-paced-by-throughput-and-situated-after-extraction.md). Unfinished items moved:
+  - milestone 6, preliminary reports, with milestone 2's rest (sections ordered by triage's signals, the queue persisted), to the plans index's *Interactive views* (Tentative)
+  - milestone 7, claim quality signals, to *Runtime quality spot checks* (Tentative)
+  - milestone 8, reviewer feedback and `import-reviews`, with milestone 4's sample of "abouts" for review, to a new tentative row, *Reviewer feedback*
+  - milestone 5, epistemic status and skeptical prompting, and situating's quality measured (from the evaluation benchmarks plan) to [claim context](claim-context-2026-10-14.md); "about" embeddings aligning sections stay [retrieval recall](retrieval-recall-2026-09-23.md)'s (its section alignment)
+  - *Alternatives to evaluate later*, PDF tables of contents and reference lists as boilerplate, and the milestone 4 review's reused "about" to the [lever index](../reviews/levers.md)'s ideas; that review's external references to *Runtime quality spot checks* (its [Status](../reviews/scheduling-m4-situating-2026-09-25.md))
+  - **Superseded since:** `tqdm` (bars drawn by the product, [progress display](progress-display-2026-10-20.md)); `--plan`'s estimates ([0026](../decisions/0026-plan-estimates-dropped.md), *Dry runs*); a 262,144-token context configured to match (defaults fit 32k, [0012](../decisions/0012-temperature-zero-and-model-neutral-defaults.md); measured on first use, [endpoint first use](endpoint-first-use-2026-10-20.md))
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections as units of work)
 
 ## Context

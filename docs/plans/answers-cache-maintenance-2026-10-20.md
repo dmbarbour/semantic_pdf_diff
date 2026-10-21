@@ -1,6 +1,6 @@
 # Answers cache maintenance: copy a project's answers, remove them, prune
 
-- **Status:** Active (2026-10-20)
+- **Status:** Completed (2026-10-21). Milestones done 2026-10-20. Decision: [0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md), amended 2026-10-20 (a store bound to its cache) and 2026-10-21 (the `cache` command, and the cache each action works on). Nothing was left unfinished; its limits stay recorded here (milestone 2's *Still possible*) and in the configuration guide (copies made before, by backups or snapshots, aren't touched).
 - **The owner (2026-10-20):** "I'm just using project-local cache for sensitive things. Can't even let it mix without marking home cache CUI or higher. Some ability to prune or transfer answers would be convenient, though, e.g. fill this cache by taking answers from that one for a particular project."
 - **From:** the Tentative row raised when the answers cache became one per user ([decision 0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md)): removing a store leaves its answers in the cache, and they quote its documents.
 

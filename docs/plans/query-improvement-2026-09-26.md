@@ -1,6 +1,6 @@
 # Query improvement in rounds
 
-- **Status:** Active (2026-09-26); rounds paused since r09b (2026-09-28). The owner (2026-10-04): "We'll defer query rounds for just a bit longer." Open question 1 waits with them.
+- **Status:** Completed (2026-10-21), closed as a method: milestones 1, 2, 4 and 5 done (rounds r01 to r09, 2026-09-26 to 28; the report page and history), and 3 but for the panel's calibration; rounds paused since r09b (2026-09-28). The owner (2026-10-04): "We'll defer query rounds for just a bit longer." Decision in force: [0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md); the rounds' record is [docs/research/rounds.md](../research/rounds.md), the levers' the [lever index](../reviews/levers.md) (repeated readings, below, is a row there). Moved to the plans index's *Resumed query rounds* (Tentative): model-proposed variants (milestone 6), rubric v7, open question 1, automatic acceptance (still "to be confirmed"), levers that act on part of a page (B), spot checks of close calls (C), the measurements owed (D), and the levers not accepted or parked. The panel's calibration against the owner's labels (milestone 3) went with the sc01 survey (below).
   - **2026-10-03:**
     - Nothing waits on the sc01 survey any more. The owner: "I won't get back to that spotcheck." That covers re-judging sc01 with v6, agreement with the owner's sc01 verdicts, the measurements owed after the surveys, and the next round.
     - The rounds' working data left the repository (the owner); their record is [docs/research/rounds.md](../research/rounds.md).
@@ -296,5 +296,7 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Re-recording:** the replay test's fixture was re-recorded under the new defaults.
 
 ## Open questions
+
+Moved (2026-10-21) to the plans index's *Resumed query rounds*.
 
 1. **Model fixed per cycle?** Proposed: keep the responder (gemma-4-31B) fixed while improving queries, and compare models separately, so effects don't mix.

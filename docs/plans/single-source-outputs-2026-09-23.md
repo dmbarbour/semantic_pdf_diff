@@ -1,6 +1,7 @@
 # Single-source outputs: consistency check, RAG export, overviews
 
 - **Status:** Planned (consistency check and export); Tentative (model-written summaries)
+- **Since written (reviewed 2026-10-21):** the portable report's Claims view, topics and search (`search`, the command too) make a claims browser without the model, but only of a two-source comparison; the owner, 2026-10-20: "As a user of the report, it would be convenient to have an easily searchable database of claims even without the comparisons". Milestone 3 would be that report for one source. `export` is taken (`source export`, `config export`), so the RAG export needs another name. Comparing a source with itself compares nothing (shared evidence is never compared with itself), so `check` needs its own pass. Situating's "about" statements exist for PDFs only.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) for per-section export chunks and fact-sheet context
 
 ## Goal

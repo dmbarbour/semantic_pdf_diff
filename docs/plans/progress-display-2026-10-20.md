@@ -1,6 +1,6 @@
 # Progress in stacked bars of fixed size
 
-- **Status:** Active (2026-10-20)
+- **Status:** Completed (2026-10-21). Milestones done 2026-10-20 and 2026-10-21. Decision: [0035](../decisions/0035-progress-drawn-by-the-product.md). Moved to *Interactive views* (Tentative, in the [index](README.md)): moving the bars onto rich if that row brings Textual, and the topics' one request, counted in no bar and not in the status. *Dry runs* no longer waits on per-level totals. Open, for the owner: whether `concurrency` should cap several runs at once ([below](#open-question-2026-10-21)).
 - **The owner (2026-10-20):** "Progress bars: it's very awkward to have say 97/100 items followed by 98/115. I spend 90% of my time at 90% done, like a metaphor for software development. I'd prefer to have multiple stacked progress bars that are each stable size."
 - **On the status (2026-10-21):** "currently we have answered/waiting/failed and tokens/min as status, which is nice, but it would be convenient if we also mention how many were answered from cache, e.g. 1234 answered (1179 from cache) or similar."
 - **On Ctrl+C (2026-10-21):** "these processes can run a long time and resume cleanly. But, currently, ctrl+c just leaves a mess of exception info in the terminal. Please capture it and exit cleanly, with a short message about how to resume."
@@ -64,3 +64,7 @@
    - **What "waiting" counted:** every request asked and not yet answered. The dispatcher queues up to twice `concurrency` (at least 4) before the gate sends them, and a page asks its requests together, so "waiting" ran to about twice `concurrency` and one more. At the endpoint, `concurrency` was never passed: a stub counting the requests it had open saw at most 1, 2 and 4 at `concurrency` 1, 2 and 4, situating or not, while "waiting" reached 1, 5 and 9.
    - **Now** "in flight" is what the client's gate has sent and not had answered, never more than `concurrency`; "queued" is the rest.
    - `concurrency` is a run's own: two runs at once send twice as many (its help says so now).
+
+## Open question (2026-10-21)
+
+- **Several runs at once:** `concurrency` is a run's own (milestone 7), so two runs at once send twice as many, and its help says so. The owner (2026-10-21): "My in-house setup has only a few servers for gemma-4, and I need to not be taking all of them." Whether runs at once should share one cap is the owner's to decide; nothing is built for it.

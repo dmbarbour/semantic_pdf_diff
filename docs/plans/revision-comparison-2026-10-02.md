@@ -1,6 +1,12 @@
 # Comparing revisions: align items, then explain differences
 
-- **Status:** Active (2026-10-03): milestones 1 (research) and 2 (alignment, a first version) done; milestone 3 (real revision pairs) begun with three pairs (RAN1's feature-lead summaries added 2026-10-04). The owner, on the outline: "Looks good! Please do so." The owner answered the plan's four open questions the same day (decisions 6 to 9), and added two points (decisions 10 and 11).
+- **Status:** Completed (2026-10-21), split in the closing pass the owner approved ("Please proceed with 1 and 2"). Written 2026-10-02 (the owner, on the outline: "Looks good! Please do so."), its four open questions answered the same day (decisions 6 to 9) and two points added (decisions 10 and 11). Built: the research (milestone 1), alignment items-first (`align`, milestone 2), three real pairs (milestone 3, begun) and differences named by kind (`explain_differences`, milestone 4), both levers defaults. Decision: [0038](../decisions/0038-revisions-aligned-then-differences-explained.md). Unfinished items moved:
+  - more real series and a search for them, raters beyond the text diff, positional pairings, calibrated confidences and BM25F, and the split and merge confirmation ([Open questions](#open-questions): Claude's recommendation to defer it, no answer recorded, so still open) to the plans index's *Comparing revisions, further* (Tentative)
+  - identity at extraction and the entity register (design item 4, milestone 5) to [claim context](claim-context-2026-10-14.md)
+  - proposals mode (decision 9) and its openings to [criteria-first comparison](n-way-comparison-2026-09-23.md)
+  - systematic improvement (milestone 7: held-out sets as a rolling window, decisions 3 and 8) to *Lever search* (Tentative)
+  - the revision knobs not built (a section moved, units restated, fungible items, a table split in two, an item replaced wholesale, merges, near-ties) to the controlled documents' catalogue in [samples and testing](../samples-and-testing.md)
+  - RAN1's false change (two companies' views paired as one item) was claim context's to fix: with its holders (`table_holders`, milestone 5), findings pairing two companies' claims went 14 → 0
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
@@ -534,6 +540,8 @@ Claude's reading of where proposals mode begins to make sense:
   - Cost: $0.273 with TS 38.300's re-reading (its equations, the adapters plan).
 
 ## Open questions
+
+Open at the close (2026-10-21), moved to the plans index's *Comparing revisions, further*.
 
 - **Split and merge confirmation (design item 1's note: "a change to its schema decided in that milestone").** Claude's recommendation:
   - defer it until a pair produces candidates that need a model: the controlled split pair's candidate is right without one, and neither real pair produced a candidate

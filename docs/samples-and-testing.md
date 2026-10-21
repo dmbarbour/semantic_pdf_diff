@@ -109,6 +109,164 @@ python scripts/refactor_check.py --against main~2   # against another revision; 
 
 A changed output means a behaviour change. It goes in a fix of its own, with its test.
 
+## Controlled documents
+
+Documents for fictional projects, generated with every fact's form and place known, so a reader's claims and a comparison's findings are scored exactly against an answer key ([decision 0036](decisions/0036-controlled-documents-with-exact-keys.md)). A key is exact for its own documents only: one strong rater among others ([0018](decisions/0018-several-raters-none-ground-truth.md)). How each part was built and first measured is in the [controlled documents plan](plans/controlled-documents-2026-10-01.md) (closed 2026-10-21).
+
+```bash
+python scripts/controlled.py generate        # every document and key, byte for byte as committed
+python scripts/controlled.py run --replay    # read every document and compare every pair from replay.zip, offline
+python scripts/controlled.py score           # results.json (extraction) and comparisons.json (revision pairs)
+python scripts/controlled.py context         # context.json: claims' context against the keys
+```
+
+- **Where:** `benchmarks/controlled/docs` (PDFs and their `.key.json`), with the same documents as Markdown (`docs-md`), Word (`docs-docx`), slide decks (`docs-pptx`) and workbooks (`docs-xlsx`). The code is the lab's `bench/controlled/`. Recording and `refresh` are under *Recorded answers*; a lever's arms under *Judging a lever*.
+- **Generated, not drawn by hand:** a project's facts are drawn from a seed within plausible ranges and laid out by code. The same seed gives the same bytes, so the pipeline asks the same queries and recorded answers replay. A test (`test_controlled`, `Corpus`) generates every committed document again and compares bytes; it skips under a PyMuPDF other than the fixture's.
+- **What a key knows:** each fact (entity and aliases, attribute and synonyms, value, unit, conditions, basis) and where it's placed; every printed number's role (a fact, a distractor such as a superseded value, a section or page number, a tick label); the relations between parts, each with its phrasings and its inverse (`relations.py`).
+- **How claims are classed:**
+  - right; loose (the fact's value and attribute, a vague entity); misbound (a fact's value under another fact's entity or attribute); wrong unit; misread (a printed number that isn't a fact); inexact (a bar read against its axis, off by more than a quarter step); hallucinated (a value printed nowhere, whether it conflicts or not); facts missed
+  - conditions kept, by reader
+  - relations: right, implied, reversed, wrong, invented
+  - revision pairs: changes, additions and removals found, unchanged facts confirmed, and the share of "different" findings that are changes
+- **Reading the figures:** one seed and one sample per query, so they're counts to compare between knobs and arms, not rates to quote. Claims the scorer marks wrong are read by hand; the scorer's flaws found that way are fixed before a figure is quoted.
+
+### Knobs built
+
+A knob draws a document under one difficulty, with the same facts as its clean drawing, so its effect is the difference; `all` combines a family's knobs.
+
+| Documents | Knobs |
+|---|---|
+| Equipment and track schedules (`wtp-tables`, `coaster-tables`) | `stacked` (a section row relabelling the columns), `multilevel` (grouped headers), `multivalue` (two values in a cell), `dense` (20 rows), `continued` (split across a page, the header repeated) |
+| A convention centre's design basis (`lcc`) | `traps` (alternatives compared, a scope, context in a caption only, requirements and negations, a range, an abbreviation defined elsewhere, a part of a part), `furniture` (a running header of numbers that aren't facts), `two-column`; for refinement and tile selection, `decorated`, `landscape`, `slide`, `wide-letter`, `frame`, `frame-lines`, `background`, `scanned-frame` |
+| Chart studies (`lcc-energy`, `lcc-enduse`, `lcc-metered`): grouped and stacked bars, lines | `axis` (no printed values), `raster` (the chart as an image), `legend-caption` (series named only in the caption), `scan` (every page an image) |
+| Schematics (`ahu-schematic`, `uv-layout`) | `prose`, `prose-hard` (no figure; plain, or inverse, passive and narrated), `figure-only` (the text cites the figure), `leaders` (names on leader lines), `folded` (the path snaking back), `legend` (link kinds told only by line style) |
+| A floor plan sheet (`lcc-plan`) | `small` (4.5 pt dimension text), `vertical` (depths written sideways), `rotated` (stored turned 90°) |
+| A procedure diagram (`attach`): a message sequence chart | `raster` |
+| Word only (`word.py`) | tracked changes, footnotes, numbered lists, merged cells, nested tables, a layout table, text boxes, comments, Word charts |
+| Slide decks (`slides.py`) | speaker notes |
+
+Bases that are a difficulty in themselves: two sheets told apart only by their title blocks (`lcc-plans`); a link protocol's specification (`spec`: look-alike formats, fields beside their length fields, numbered conditions, values whose state only a lead-in names); data sheets of headerless key-value blocks (`wtp-datasheets`); proposals' summaries whose claims have holders and attitudes (`views`, `views-grouped`, `views-prose`, `views-poll`, `views-echo`); design notes with hedged values (`hedges`). Revision pairs (`revisions.py`) edit a corpus document: values changed in every form, items added, dropped, renamed, moved or split, a superseded value printed beside the new, conditions changed or reworded, a numbered condition inserted, a message inserted, a holder's view or a hedge changed, and context records alone restated.
+
+### The catalogue of situations
+
+Every situation met in this project's documents, where it was recorded, and the knob or base that reproduces it ("–": none yet). A situation met later, in a round, a spot check or a trial, gets a row, and a knob when one is built.
+
+- **Reviews:** sc01 = [spot check sc01](reviews/spotcheck-sc01-2026-09-30.md); s01 = [evaluation s01](reviews/evaluation-s01-2026-09-25.md); rNN = round reviews; overall = [overall review](reviews/overall-review-2026-09-28.md); levers = [lever index](reviews/levers.md).
+- **Research:** eye = [eye tests](research/eye-tests-2026-09-30.md); RH = [round-01 heuristics](research/round-01-context-heuristics-2026-09-26.md).
+- **Code:** extract and situate = their modules' comments.
+
+**Tables**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| Stacked tables | Two tables in one grid, split by a styled header row; the second header lost, rows bound to the first | sc01 item 1 (HabEx p4) | `stacked` |
+| Multi-level headers | "Cameras > UV Channel" cut to "UV" | sc01 | `multilevel`; Word's merged cells |
+| Wrapped cells | A cell's second line arrives as an unlabelled row; "Spectrometer resolution" read as counts | sc01 | – |
+| Several values in a cell | `1×1 CCD201` (format and model) | the table plan | `multivalue` |
+| Components of components | A camera's detector; how to name a part of a part | sc01 | `traps` (AHU-3's supply fan motor); the schematics |
+| Dense tables | 20 rows: values from the same row or column, though legible | eye | `dense` |
+| Case tables | Operating points (wind speed 14, 15, 16…) as inputs, not properties | s01; NREL p10 | – |
+| Subject above the table | Rows that need the lead-in ("Module A", "NREL 5-MW baseline") | r01; levers | the track schedules' lead-in; `spec` |
+| Continued across pages | A repeated header, and a false continuation (the next day's schedule of the same form) | store m4 review; extract | `continued` (no false continuation) |
+| False tables | Chart gridlines, sheet frames, boxed paragraphs, equation debris; a borderless real table missed | RH; levers | – |
+| One-row tables | The only row sent as its own header | levers | – |
+| Values taken for numbered items | Rows starting "3.83 -43.73E+6" read as section numbers | query improvement; extract | – |
+| Schedules on rotated sheets | Wiring schedules; their lead-in the title block | r03; overall | `rotated` (the door schedule) |
+| Pseudo-tables in text | Table-like text in a text chunk; misbinding rose under loose quote matching | r09 | – |
+| Quotes spanning cells | Cells joined with "\|", a header read with its value | r09 | – |
+| Wide rows | Split by column; a split that separated header from values | extract; robustness baseline | – |
+| Units in headers, totals rows, ± columns, min/nominal/max, footnote markers | Planned hazards | the table plan | – |
+
+**Charts**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| Readings off the axis | Values at 23° and 25° on an axis ending at 20° | r07, r08 | – |
+| Trends for readings | Curves that peak and fall described as "increasing" | r08 | – |
+| Stacked series and legends | Series swapped; legends split from charts by tiles | r07; r03 | `lcc-enduse`; `legend-caption` |
+| Axis labels and multipliers as values | "0" and "1e10" read as stiffness | r09 | tick labels, in every chart (no multipliers) |
+| Stacked bars across alternatives | Monthly use for a 2-ton and a 2.5-ton unit; readings selective | sc01 item 2 | `lcc-energy` (two options' bars) |
+| Panel labels | "(a) Mass density" taken for a numbered item | levers; extract | – |
+| Printed values on grouped bars | Another bar's value; a category code as a value | eye | `lcc-energy` |
+| Unfamiliar conventions, signs | A minus sign dropped on re-asking | s01; r01 | – |
+
+**Drawings and sheets**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| Rotated sheets | Context taken from beside a table; before and after swapped | overall; meta-audit | `rotated` |
+| Small dimension text | 2'-9 1/2" read as 2'-3" from an overview | s01; gemma-4 images research | `small`, `vertical` |
+| Labels cut at tile edges | "2x4 CEDAR HANDRAILS" as "2x4 CED" | s01; RH | – |
+| Close details | Values bound to the wrong module, grid line or detail; titles misattached | r05 | – |
+| Title blocks and revision tables | Read as administration only, or switched extraction off; small print in large crops | r05; extract | `lcc-plan`; `lcc-plans` |
+| Watermarks, blank tiles | "PRODUCED BY AN AUTODESK STUDENT PRODUCT"; "the image is blank" | levers; extract | – |
+| Grid-referenced details | "B4" titles; detail markers that aren't figures | RH; extract | – |
+| Single-letter identifiers | Module A merged with Module B | r08 | – |
+| Distinct facts sharing a value | Door D1 and window W2, both 1.02 | duplicate-claims research | `lcc-plan` (door sizes repeat) |
+| Arrows | Direction reversed (gemma-4: 15 of 118) | eye | the schematics |
+| Dense sheets | 100–300 claims per unit; an illegible page thumbnail | overall; r06, r07 | – |
+| Fake bold | Text drawn twice, offset | situate | – |
+
+**Schematics and concept diagrams**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| Facts only in a figure | "Item 5 again ignores the figure as a source": a text unit has none of its page's figure readings | sc01 items 2 and 5 | `figure-only` |
+| Text that walks a figure's path, citing it | HabEx Figure 5.5-12: the UV channel's path in the figure and in the paragraph beside it | sc01 item 5 | the schematics' `clean` and `all` |
+| Paths as sequences | Readers wrote "DM1 -> DM2 -> Focal plane mask -> Lyot stop" and its fragments as separate claims | sc01 item 9 | scored in every schematic |
+| Alternatives on one component | "The focal plane mask can either be an HLC or a VVC" (caption and figure) | sc01 item 9 | `uv-layout` (a field stop's two options) |
+| Annotations as locations or conditions | "DM1 (in pupil)", "Lyot stop (in pupil)" | sc01 item 9 | `uv-layout` |
+| Stages of a process | Lenslets, pinhole mask, dispersed images, data cube | sc01 item 5 (Figure 5.5-11) | – |
+| Movable parts and modes | Double arrows on filters, grism and field stops; a "Guide mode" branch | sc01 item 5 (Figure 5.5-12) | `uv-layout` |
+
+**Prose**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| Alternatives as conditions | "2 ton unit" and "baseline unit size" as conditions | sc01 item 2 | `traps` |
+| Scope as a condition | "across the four mission concepts"; a count bound to the wrong noun | sc01 item 3 | `traps` |
+| Context in a caption only | The baseline's size named only in a figure caption | sc01 | `traps` (a table's hall); `legend-caption` |
+| Conditions lost or mixed in | "during the cool, martensite phase" dropped; attribute and condition run together | r07; s01 | scored in every document |
+| Part stated as the whole | One layer's material as the composition | s01 | – |
+| Quantity roles | Clearance read as depth; an elevation as a length | s01 | – |
+| Abbreviations defined elsewhere, one entity under two names | "PI = proportional-integral"; "baseline blade-pitch controller" | levers; r03 | `traps` (an abbreviation) |
+| Quote forms | Elided quotes, line-end hyphenation, Unicode variants, paraphrase | r09 | – |
+| Requirements, negation, ranges, inequalities | "shall not exceed 60 C" as "is 60 C"; "<= 85 dBA" as 85 dBA | extract (guarded); taxonomy examples | `traps` |
+
+**Layout, furniture and the text layer**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| Running headers and footers, page numbers | In context in 5 of 8 sampled queries | levers | `furniture` |
+| Text cut mid-sentence | "This focus is", "defined in the W" | levers | – |
+| Numbered items across pages | "Contest 9 > 9-3 > k. > (iii)"; a heading split over lines | RH; extract | – |
+| Several sections on one page | Rules attributed to the next section, which starts lower on the page | s01 | – |
+| Boxed headings | Taken for figures | s01 | – |
+| Caption traps | "Table 5-1 summarizes…", "Figure 1 shows…", list-of-figures entries, M201 against M-201 | s01; situate | – |
+| Equations | Garbled, one character per line | RH | – |
+| Scans | Images with little text | situate | `scan`, `scanned-frame` |
+| Two columns, no outline | Layouts the samples lack | RH; store m4 review | `two-column` |
+
+**Across pages and documents**
+
+| Situation | As met | Seen in | Built as |
+|---|---|---|---|
+| A caption on another page | Filter values bound only through a cited caption | r05 | – |
+| Missing context, as judges saw it | Surrounding text 68, another page 36, legend 20, table header 16, heading 15, caption 13 | s01 | – |
+| Two teams' designs | One design's datum used for the other | s01 | – |
+| Units by case | `mW` as megawatts; "ton", kVA against kW, gauge against absolute (planned) | robustness baseline; units plan | – |
+| Synonyms across documents | "P-101" against "primary pump" | store plan; retrieval plan | – |
+| Superseded values | A hidden superseded sheet; errata (planned) | synthetic workbook | `coaster` (a superseded lift height); Word's tracked changes |
+
+### Backlog
+
+Besides the rows above marked "–", from the plan's milestones:
+- **Prose and layout:** harder prose traps, where the context a value needs is far from it (an alternative named only in a figure caption). The short, self-contained sentences of `traps` didn't trip gemma-4.
+- **Scans:** noise; text drawn as outlines.
+- **Drawing sheets:** details, callouts and sections; the drawing's scale, a fair claim the key lacks (1–4 claims classed misread per sheet).
+- **Relations:** more of them, and more systems presenting them in different ways (the owner, 2026-10-01: "We'll need to develop a fairly wide array of 'relations', e.g. component of, within, attached to, etc. and a lot of control docs that present relations in different ways, with varying levels of difficulty."); mechanical assemblies (attached to, mounted on, supported by) are the gap that stands out. Relations aren't compared on revision pairs yet (`comparison.py`).
+- **The corpus:** sweeps of one knob at a time against a clean document (font size, density), generated on demand; more seeds; the backup domains (city traffic control, a district heating network, an observatory instrument, a micro-hydro plant, a ferry terminal, a data centre's cooling plant, a ski lift).
+
 ## Judging a lever
 
 A lever changes some queries, and gemma-4 answers a changed query anew. A reworded image prompt moves facts both ways even at temperature 0: on 2026-10-14 a rule meant to do nothing ("Read the image carefully.") moved the corpus's relations read right 416 → 444, as far as the arrow rule it was a control for. Totals can't tell that churn from a gain. Arms on the controlled corpus are compared document by document instead:
@@ -148,4 +306,4 @@ scripts/embedding_server.sh start intfloat/multilingual-e5-small 8082
 scripts/embedding_server.sh stop
 ```
 
-The current release doesn't use embeddings yet; see the [retrieval plan](plans/retrieval-recall-2026-09-23.md).
+Since 2026-10-20 the search uses embeddings where an embedding model is named (`embed_model`, and `embed_url` for an endpoint of its own, such as this one): a search by meaning, and *Claims like this* ([decision 0033](decisions/0033-self-contained-reports-and-their-search.md)). Comparison's candidate retrieval doesn't use them yet; see the [retrieval plan](plans/retrieval-recall-2026-09-23.md).

@@ -1,6 +1,7 @@
 # Better retrieval recall: model keywords, alias consolidation, embeddings
 
 - **Status:** Planned (2026-09-24). Its benchmark, planned in [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) (closed 2026-10-04), is now its milestone 0; the results choose the defaults.
+- **Since written (reviewed 2026-10-21):** an embedding client (`embed.py`, cached in the answers cache), a reranker (`rerank.py`: the common `/rerank` API, DeepInfra's or TEI's; proposals only, off unless configured) and the model's other names for one thing (`synonyms.py`, `search_names`, a default) are built, but the embeddings and other names feed only the search, and the reranker only which retrieved pairs are judged: proposals' candidates are still TF-IDF over entity, attribute, conditions and value with configured aliases (`retrieval.py`); revisions align instead ([revision comparison](revision-comparison-2026-10-02.md)). The embedding model chosen and measured is Qwen3-Embedding at 256 dimensions, with an instruction, embedding a claim as a sentence. Milestone 1 becomes feeding those into proposals' candidate retrieval. Milestone 0's benchmark can start from the search plan's judged-pairs measure and the reranker's offline measure on six recorded runs.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections); its own benchmark (milestone 0) to measure
 
 ## Problem

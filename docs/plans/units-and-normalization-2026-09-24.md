@@ -1,6 +1,7 @@
 # Units, quantities and normalization
 
 - **Status:** Planned
+- **Since written (reviewed 2026-10-21):** later plans built parts of its ground, and it starts from them. `values.py` holds three unit tables, apart by design: the product's (`UNITS`, which enters prompts), the scorer's (`UNIT_KINDS`) and the search's (`SEARCH_UNITS`, SI-bridged, with case and spelling folds); `value_range` reads points, ranges, bounds and approximate values, for search only (the [search plan](search-2026-10-20.md), milestone 3), with no tolerances, and a comma always read as thousands where this plan would abstain. The search plan counted real unit strings: across 42 local reports, 10,580 claim units known and 1,272 not, most of those not units. `compare.numeric_check` still compares plain numbers. Not built: milestones 2–5. To decide again before milestone 2: `pint`, or extending `values.py`'s tables.
 - **Depends on:** nothing strictly; claim fields from schema v2 in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (basis, uncertainty)
 - **Used by:** claim-level comparison and `check`; normalization in [n-way-comparison](n-way-comparison-2026-09-23.md); spreadsheet summaries in [multi-format-adapters](multi-format-adapters-2026-09-23.md); claim matching in [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md)
 

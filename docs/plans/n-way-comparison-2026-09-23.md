@@ -1,6 +1,13 @@
 # Criteria-first comparison of sources
 
 - **Status:** Planned (design settled 2026-09-24). Next after scheduling-and-triage: this is the main use case, since two-way proposal comparison goes criteria first too.
+- **Since written (reviewed 2026-10-21):** the claim model this plan assumes (§1, "claims carry context") is now [claim context](claim-context-2026-10-14.md)'s: subject, scope, frame, provenance and stance kept apart. Revisions are no longer compared pairwise from the content difference: they're aligned items-first ([revision comparison](revision-comparison-2026-10-02.md)). Situating's "about" statements exist (PDFs only). Criteria built on reviewers' annotations need an annotation mechanism, which doesn't exist yet. `compare` takes exactly two sources. The portable report (gzipped parts, search, topics) is the base a matrix view would extend.
+- **Proposals mode, from the closed [comparing revisions](revision-comparison-2026-10-02.md) plan (2026-10-21; its decision 9):** the owner, 2026-10-02: "Let's defer proposals comparison mode for a little bit longer, but it is an important use case that we shouldn't defer too much longer, so we should seek opportunities where it begins to make sense to pursue it." Its openings, as Claude read them:
+  - alignment's signals scoring counterparts across two designs, with structure and kind standing in for anchors ([0038](../decisions/0038-revisions-aligned-then-differences-explained.md))
+  - the entity register ([claim context](claim-context-2026-10-14.md))
+  - the fetched competing sets: `3gpp-ran1-beam-management` (four companies' contributions on one agenda item) and `3gpp-rel19-aiml-views` (nine companies' views, in `.pptx`, `.docx` and PDF), readable since the adapters
+  - controlled proposals: two fictional designs of one system from one fact sheet's kinds, counterparts known
+- **Open question (from [review batch s01](../reviews/evaluation-s01-2026-09-25.md), 2026-09-25, the owner's call):** what the relations mean across proposals. The panel called NREL 5 MW's pitch angle at 25 m/s against IEA 15 MW's pitch controller objective "unrelated" (different turbines), Claude "complementary"; in proposals the interesting relation is "same attribute, different value across designs", which today's labels mix with contradiction.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (claim context fields, store); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) to recommend criteria; benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
 
 ## Goal

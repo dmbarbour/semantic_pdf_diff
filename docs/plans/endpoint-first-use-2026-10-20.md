@@ -1,6 +1,6 @@
 # An endpoint checked and calibrated on first use
 
-- **Status:** Active (2026-10-20)
+- **Status:** Completed (2026-10-21). Every milestone done 2026-10-20. Decision: [0034](../decisions/0034-endpoint-checked-and-calibrated-on-first-use.md); [0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md) (a measured layer under the user's settings) and [0012](../decisions/0012-temperature-zero-and-model-neutral-defaults.md) (the context window and an image's tokens measured, not set by hand; no default model) amended. Nothing was left unfinished. What it didn't take on stays in the [index](README.md)'s tentative rows: choosing a model per task and keeping those a user allows in *Model discovery and per-task selection*, slicing from what a model can read in *Vision profiles and adaptive slicing*.
 - **The owner (2026-10-20):** "Yes, we should always auto-test the model endpoint if it isn't tested in memory. Without verbose mode, we can get 13k bad requests without noticing. (guess how I know!) Also, remove the "gemma-4" default model, just error if one isn't configured." Then: "It isn't clear that we run any calibration on first use of an endpoint. I think we should."
 - **On the models listing (2026-10-20):** "IIRC there is also a 'models' endpoint for the OpenAI API. We could let people know what's available." Then: "Also provide that list on request."
 
@@ -37,6 +37,7 @@
    - **A failed check stops the run** before anything is asked (exit 5), its lines printed as `config test` prints them.
    - **A pass is forgotten** when a check of it fails, or when its URL trips milestone 1's stop.
    - **When nothing is checked:** runs replaying a fixture (`--fixture`, tests and the lab) are never checked; a run whose answers all come from the cache sends nothing, so it isn't either.
+     - *Corrected 2026-10-21, on closing:* the check comes before a run learns what the cache holds (`pipeline.run`), so a run answered wholly from the cache is checked too, unless remembered. The configuration guide says only that fixture replays aren't.
    - Checks cost about $0.0002 on DeepInfra. They're said in the run's log, not counted under its cost cap.
    - `config test` records its results too, in the record beside the cache the store uses.
    - **Tested** with a stub endpoint: a first run checks (a sum, the card, the card's prompt alone) and the next doesn't; a wrong sum stops the run with nothing asked; a run whose requests fail in a row empties the record. The tests' stand-in skips the check everywhere else (tests/stubs.py).

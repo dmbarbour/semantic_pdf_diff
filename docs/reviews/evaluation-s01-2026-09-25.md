@@ -1,6 +1,7 @@
 # Review: first review batch (s01) and what it found
 
 - **Date:** 2026-09-25
+- **Status:** Closed (2026-10-21), with its plan (closed 2026-10-04). Findings 1–3 and 6 were fixed; the levers of findings 4 and 7 have rows in the [lever index](levers.md) (*Ideas not built yet*); finding 5 is in the extraction instructions (an attribute names the part a value belongs to, `tasks.py`). The open design question (what relations mean across proposals) is an open question of [criteria-first comparison](../plans/n-way-comparison-2026-09-23.md). The owner's s02 labels, pending when it was written, are moot: review batches gave way to the controlled documents and the rounds.
 - **Plan:** [evaluation-benchmarks](../plans/evaluation-benchmarks-2026-09-23.md), with [test-models-and-record-replay](../plans/test-models-and-record-replay-2026-09-24.md)
 - **Batch:** `benchmarks/batches/s01`: 17 items (12 claims, 3 about statements, 2 claim pairs) sampled from gemma-4-31B's recorded answers on the turbine, drawing and rules slices
 - **Reviewers so far:** Claude (Opus 5.5, in session), and a panel of google/gemini-3.1-pro, Qwen/Qwen3.5-397B-A17B and moonshotai/Kimi-K3 (about $0.70 per full panel pass on this batch). The owner's labels are pending.
