@@ -11,14 +11,15 @@ an order drawn from it instead, as a live run's might be: what a run writes must
 determinism review, 2026-10-12).
 
 Each answer's handler runs within the progress item it was asked for (progress.carried): what it asks next is its
-page's, so a page counts as read once its follow-ups are answered too.
+page's, so a page counts as read once its follow-ups are answered too. It runs saying whether its answer came from the
+cache (or from another request for the same query) or from the model (progress.handling), as the status counts them.
 """
 import copy
 import os
 import random
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from .failures import ModelFailure
-from .progress import carried
+from .progress import carried, handling
 
 ANSWER_ORDER = "SEMANTIC_PDF_DIFF_ANSWER_ORDER"
 
@@ -48,9 +49,11 @@ class Dispatcher:
             try:
                 value = self.client.ask(prompt, schema, images, key=key)
             except ModelFailure as e:
-                finish(None, e)
-                return
-            finish(value, None)
+                value, error = None, e
+            else:
+                error = None
+            with handling(False):  # where a client without the split found it isn't known
+                finish(value, error)
             return
         try:
             request = self.client.prepare(prompt, schema, images, key)
@@ -63,7 +66,8 @@ class Dispatcher:
         if self.shuffle is not None:
             self.held.append((None, finish, None, error))
         else:
-            finish(None, error)
+            with handling(False):
+                finish(None, error)
 
     def submit_request(self, request, finish):
         """A prepared request (another endpoint's too: a reranker's, rerank.request) looked up, then sent if it must
@@ -77,12 +81,14 @@ class Dispatcher:
             self._failed_early(finish, e)
             return
         if value is not None and self.shuffle is None:
-            finish(value, None)
+            with handling(True):
+                finish(value, None)
             return
         same = self._same(request)
         if value is None and same in self.outcomes:  # its lookup counted it already
             value, error = self.outcomes[same]
-            finish(None, error) if error is not None else finish(copy.deepcopy(value), None)
+            with handling(error is None):
+                finish(None, error) if error is not None else finish(copy.deepcopy(value), None)
             return
         if same is not None and same in self.waiting:
             self.waiting[same].append((request, finish))
@@ -93,7 +99,8 @@ class Dispatcher:
             except ModelFailure as e:
                 if same is not None:
                     self.outcomes[same] = (None, e)
-                finish(None, e)
+                with handling(False):
+                    finish(None, e)
                 return
         if same is not None:
             self.waiting[same] = []
@@ -127,17 +134,20 @@ class Dispatcher:
                 self.client.failed(request, e)
             if same is not None:
                 self.outcomes[same] = (None, e)
-            for done in [finish] + [done for _, done in waiting]:
-                done(None, e)
+            with handling(False):
+                for done in [finish] + [done for _, done in waiting]:
+                    done(None, e)
             return
         if not cached:
             self.client.save(request, value)
         if same is not None:
             self.outcomes[same] = (copy.deepcopy(value), None)
-        finish(value, None)
+        with handling(cached):
+            finish(value, None)
         for other, done in waiting:  # each its own copy: a callback may change what it's given (the review, D4)
             self._noted(other)
-            done(copy.deepcopy(value), None)
+            with handling(True):
+                done(copy.deepcopy(value), None)
 
     def pending(self):
         return len(self.inflight) + len(self.held)
@@ -153,7 +163,8 @@ class Dispatcher:
         if self.held and (not self.inflight or self.shuffle.random() < 0.5):
             request, finish, value, error = self.held.pop(self.shuffle.randrange(len(self.held)))
             if error is not None:
-                finish(None, error)
+                with handling(False):
+                    finish(None, error)
             elif value is not None:
                 self._complete(request, finish, lambda: value, cached=True)
             else:  # unrecorded: sending fails as it would have

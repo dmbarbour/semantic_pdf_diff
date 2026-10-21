@@ -10,6 +10,10 @@ A page is done once every request asked for it is answered, follow-ups included.
 worked on when it's asked (within); the dispatcher runs each answer's handler within the item it was asked for
 (carried), so a follow-up the handler asks belongs to its parent's page. All of it runs on the calling thread, as the
 handlers do.
+
+The status counts the answers that came from the cache (a fixture's, in a replay) rather than the model: the dispatcher
+says which each answer is as its handler runs (handling). The owner, 2026-10-21: "it would be convenient if we also
+mention how many were answered from cache, e.g. 1234 answered (1179 from cache) or similar".
 """
 import contextlib
 import logging
@@ -28,6 +32,7 @@ EVERY = 0.1  # seconds between redraws at most
 
 _current = None  # the item being worked on (the calling thread's)
 _board = None    # the terminal's bars, while a stage draws them
+_cached = False  # whether the answer being handled came from the cache, not the model (handling)
 
 def setup_logging(verbosity=0, quiet=False, log_file=None):
     """-q: warnings only; default: progress and summaries; -v: tasks; -vv: requests."""
@@ -95,6 +100,18 @@ def carried(finish):
         with within(item):
             return finish(*args)
     return run
+
+@contextlib.contextmanager
+def handling(cached):
+    """An answer's handler run (the dispatcher's): cached, whether the answer came from the cache (a fixture's too) or
+    from another request for the same query, rather than from the model, as the status counts it (Progress.finish).
+    Set for every answer, so a handler that waits on others (make_room) leaves each its own."""
+    global _cached
+    outer, _cached = _cached, cached
+    try:
+        yield
+    finally:
+        _cached = outer
 
 class Item:
     """One thing a bar counts (a page): done once it's closed and none of its requests is waiting."""
@@ -249,7 +266,8 @@ class Progress:
 
     def __init__(self, stage, client=None, bar=None, heartbeat=30.0, clock=time.monotonic, stream=None, width=None):
         self.stage, self.client, self.heartbeat, self.clock = stage, client, heartbeat, clock
-        self.total = self.done = self.failed = 0
+        self.total = self.done = self.failed = self.cached = 0
+        self.wrapped = False  # the status in two lines, once it didn't fit one (lines)
         self.started = self.last_beat = clock()
         self.tokens_at_start = self._tokens()
         self.bars = []
@@ -281,9 +299,10 @@ class Progress:
         self.changed()
 
     def finish(self, status="complete"):
-        """A request answered (or failed), in its handler: its item's."""
+        """A request answered (or failed), in its handler: its item's; from the cache, if the dispatcher says so."""
         self.done += 1
         self.failed += status == "failed"
+        self.cached += _cached and status != "failed"
         if _current is not None:
             _current.open -= 1
         self.changed()
@@ -323,27 +342,34 @@ class Progress:
             name = b.label if len(b.label) <= label else b.label[:label - 1] + "…"
             out.append(f"{self.stage if not i else '':<8} {name:<{label}} {bar_text(b.done, b.total, cells)} "
                        f"{b.done:>{counts},}/{b.total:<{counts},} {b.unit}".rstrip())
-        out.append(" " * 9 + self.status())
+        status = self.status()
+        if 9 + len(" · ".join(status)) > width:  # the counts on one line, the rates on the next: none cut off, and
+            self.wrapped = True                    # kept so for the stage, so the bars don't jump as numbers change
+        out += [" " * 9 + " · ".join(part) for part in ([status[:1], status[1:]] if self.wrapped else [status])]
         return out
 
+    def requests(self):
+        """The requests answered (those from the cache among them), waiting and failed."""
+        cached = f" ({self.cached:,} from cache)" if self.cached else ""
+        return (f"{self.done:,} answered{cached}, {self.total - self.done:,} waiting"
+                + (f", {self.failed:,} failed" if self.failed else ""))
+
     def status(self):
-        """The requests answered, waiting and failed (counts, with no total: theirs grows as answers ask more);
-        tokens a minute; cost; time left."""
-        requests = f"{self.done:,} answered, {self.total - self.done:,} waiting" + (
-            f", {self.failed:,} failed" if self.failed else "")
-        parts = [requests, f"{tokens(self.rates()['tokens/min'])} tokens/min"]
+        """The status's parts: the requests (counts, with no total: theirs grows as answers ask more); tokens a minute;
+        cost; time left."""
+        parts = [self.requests(), f"{tokens(self.rates()['tokens/min'])} tokens/min"]
         cost = getattr(self.client, "cost", 0) or 0
         if cost:
             parts.append(f"${cost:.2f}")
         left = self.left()
         if left is not None:
             parts.append(minutes(left))
-        return " · ".join(parts)
+        return parts
 
     def line(self):
         """The heartbeat line: the bars' counts, then the status."""
         bars = ", ".join(f"{b.label} {b.done:,}/{b.total:,} {b.unit}" for b in self.bars if not b.full)
-        return f"{self.stage}: " + (bars + "; " if bars else "") + "requests " + self.status().replace(" · ", ", ")
+        return f"{self.stage}: " + (bars + "; " if bars else "") + "requests " + ", ".join(self.status())
 
     def close(self):
         global _board
@@ -353,8 +379,9 @@ class Progress:
             if _board is self.board:
                 _board = None
             self.board = None
-        log.info(f"{self.stage}: {self.done:,} requests answered" + (f", {self.failed:,} failed" if self.failed else "")
-                 + f" in {self.clock() - self.started:.0f}s")
+        cached = f" ({self.cached:,} from cache)" if self.cached else ""
+        failed = f", {self.failed:,} failed" if self.failed else ""
+        log.info(f"{self.stage}: {self.done:,} requests answered{cached}{failed} in {self.clock() - self.started:.0f}s")
 
 class NoBar:
     """A bar counting nothing (NoProgress's)."""

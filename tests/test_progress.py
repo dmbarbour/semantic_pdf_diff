@@ -132,13 +132,35 @@ class Bars(unittest.TestCase):
         term = Terminal(columns=40)
         stage = staged(term)
         stage.bar('a-file-with-a-long-name-indeed.pdf', 561, 'pages').tick(200)
-        stage.add(3)
+        stage.add(3000)
+        with module.handling(True):
+            for _ in range(1000):
+                stage.finish()
         stage.board.redraw()
         rows = term.rows()
-        self.assertEqual(len(rows), 2)  # nothing wrapped onto another row
+        self.assertEqual(len(rows), 3)  # the bar, the counts, the rates: nothing wrapped onto another row
         self.assertTrue(all(len(r) <= 39 for r in rows), rows)
         self.assertIn('200/561', rows[0])
         self.assertTrue(rows[1].endswith('…'))
+        self.assertEqual(rows[2], '         0 tokens/min · about 1 s left')
+
+    def test_a_status_too_long_for_a_line_takes_two_and_keeps_them(self):
+        term = Terminal()
+        client = type('C', (), {'usage': {'prompt_tokens': 0, 'completion_tokens': 0}, 'cost': 1.23})()
+        stage = staged(term, client=client)
+        stage.bar('a.pdf', 561, 'pages').tick(97)
+        stage.board.redraw()
+        self.assertEqual(len(term.rows()), 2)  # it fits
+        stage.add(12_000)
+        for answer in range(11_790):
+            with module.handling(answer < 11_000):
+                stage.finish()
+        stage.board.redraw()
+        self.assertEqual(term.rows()[1:], ['         11,790 answered (11,000 from cache), 210 waiting',
+                                           '         0 tokens/min · $1.23 · about 1 s left'])
+        stage.add(-11_000)  # shorter again: still two lines, so the bars don't jump about
+        stage.board.redraw()
+        self.assertEqual(len(term.rows()), 3)
 
     def test_closing_leaves_the_summary_and_no_bars(self):
         term = Terminal()
@@ -299,6 +321,75 @@ class Pages(unittest.TestCase):
         self.assertEqual(pages.done, 0)
         item.close()
         self.assertEqual(pages.done, 1)
+
+class FromCache(unittest.TestCase):
+    """The status counts the answers that came from the cache (the owner, 2026-10-21: "it would be convenient if we
+    also mention how many were answered from cache, e.g. 1234 answered (1179 from cache) or similar")."""
+
+    def setUp(self):
+        setup_logging()
+        self.addCleanup(setup_logging)
+
+    def test_the_dispatcher_says_which_answers_were_cached(self):
+        from types import SimpleNamespace
+        from semantic_pdf_diff.dispatch import Dispatcher
+        from semantic_pdf_diff.failures import ModelFailure
+
+        class Client:  # a, b and the second ask of e are in its cache; c and d are asked; f fails
+            s = SimpleNamespace(concurrency=1)
+            known = {'a': 'cached a', 'b': 'cached b'}
+
+            def prepare(self, prompt, schema, images, key):
+                return SimpleNamespace(query=prompt, key=key, unrecorded=False, admitted=False)
+
+            def cached(self, request):
+                return self.known.get(request.query)
+
+            def send(self, request):
+                if request.query == 'f':
+                    raise ModelFailure('HTTP 500')
+                self.known[request.query] = 'asked ' + request.query
+                return self.known[request.query]
+
+            def save(self, request, value):
+                pass
+        stage = Progress('extract', None, bar=False, heartbeat=1e9)
+        dispatch = Dispatcher(Client())
+
+        def ask(query, then=()):
+            stage.add()
+
+            def finish(value, error):
+                for follow_up in then:  # asked from its handler: the follow-up's own answer counted as its own
+                    ask(follow_up)
+                stage.finish('failed' if error else 'complete')
+            dispatch.submit(query, None, (), None, finish)
+        ask('a')
+        ask('b', then=['c', 'f'])
+        ask('d')
+        ask('d')  # asked before: now in the cache
+        dispatch.drain()
+        self.assertEqual((stage.done, stage.cached, stage.failed), (6, 3, 1))
+        self.assertEqual(stage.requests(), '6 answered (3 from cache), 0 waiting, 1 failed')
+        with self.assertLogs('semantic_pdf_diff', level='INFO') as logs:
+            stage.close()
+        self.assertIn('extract: 6 requests answered (3 from cache), 1 failed in', logs.output[0])
+
+    def test_a_run_asked_again_is_answered_from_the_cache(self):
+        with model_server() as (url, state), tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            for name, power in (('a.pdf', 10), ('b.pdf', 12)):
+                (root / name).write_bytes(pdf_bytes(f'Pump rated power {power} kW'))
+            said = []
+            for again in ([], ['--reset']):  # everything read again, the cache kept (the store's, in tests)
+                err = io.StringIO()
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                    cli.main(['compare', str(root / 'a.pdf'), str(root / 'b.pdf'), '--store', str(root / 'out'),
+                              '--base-url', url, '--no-situate', *again])
+                said.append([line for line in err.getvalue().splitlines() if line.startswith('extract: ')])
+        asked = said[0][0].split()[1]
+        self.assertRegex(said[0][0], rf'^extract: {asked} requests answered in \d+s$')
+        self.assertRegex(said[1][0], rf'^extract: {asked} requests answered \({asked} from cache\) in \d+s$')
 
 class Heartbeats(unittest.TestCase):
     def setUp(self):

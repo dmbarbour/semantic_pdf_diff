@@ -2,6 +2,7 @@
 
 - **Status:** Active (2026-10-20)
 - **The owner (2026-10-20):** "Progress bars: it's very awkward to have say 97/100 items followed by 98/115. I spend 90% of my time at 90% done, like a metaphor for software development. I'd prefer to have multiple stacked progress bars that are each stable size."
+- **On the status (2026-10-21):** "currently we have answered/waiting/failed and tokens/min as status, which is nice, but it would be convenient if we also mention how many were answered from cache, e.g. 1234 answered (1179 from cache) or similar."
 - **On testing (2026-10-20):** "How are you testing progress bar rendering in any case? Seems difficult, though IIUC libghostty has some support for headless terminal testing."
 - **Earlier (2026-10-08, the [trials review](../reviews/trials-2026-10-08.md), findings 3 and 4, until now a tentative row):** "What we need is something closer to pinned progress bars at the bottom with a rolling log above or similar." And: "It would be better to develop some clear concept of what needs processing and base it on that, and use multiple progress bars for hierarchical subtasks that open into more tasks."
 
@@ -50,3 +51,6 @@
 3. **Situating's and comparing's bars** (done 2026-10-20): each PDF's figures, figures cited and sections, and the PDFs when there are several; the claims reranked, the pairs judged, the findings explained, the sentences embedded. The other names' requests are counted in the status line; the topics' one request isn't.
    - **Replayed on a pseudo-terminal** (the turbines slices, answers in a shuffled order): both files' page bars rose together, 1, 4 and then 8 of 12 pages, with "about 36 s left" falling to 6 s. The screen kept every log line whole, and no bar was left once a stage closed.
 4. **Heartbeat lines** from the same numbers, for runs without a terminal (done 2026-10-20, with milestone 1).
+5. **Answers from the cache counted** (done 2026-10-21): "1,234 answered (1,179 from cache), 12 waiting", in the status, the heartbeat and each stage's closing line.
+   - The dispatcher says which each answer is as its handler runs: from the cache (a fixture's, in a replay), from another request for the same query, or from the model. A handler that waits on others' answers leaves each its own. The client's count of cache hits, taken at lookup, would have run ahead of the answers handled, and counts the requests no bar counts (a topic's naming).
+   - The status grew past 80 columns, so time left would have been cut off. Where it doesn't fit a line, the counts take one and the rates the next, and stay so for the stage, so the bars don't jump as numbers grow and shrink.
