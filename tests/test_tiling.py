@@ -1,5 +1,5 @@
-"""A tiling's measures without the model (tile-selection-2026-10-10, milestone 1): tiling.measure, and the lab's runs
-over a folder."""
+"""A tiling's measures without the model (docs/research/tilings-2026-10-12.md, milestone 1): tiling.measure, and the
+lab's runs over a folder."""
 import tempfile
 import unittest
 from pathlib import Path

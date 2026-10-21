@@ -1,4 +1,4 @@
-"""The model chooses a page's tiling: the question (docs/plans/tile-selection-2026-10-10.md, milestones 4 and 5).
+"""The model chooses a page's tiling: the question (docs/research/tilings-2026-10-12.md, milestones 4 and 5).
 
 One shrunk image of the page as it is, then one per candidate tiling: the page with that candidate's tiles outlined,
 washed and numbered, and the candidate's letter in a strip above it. The model names the best candidate (or, asked with

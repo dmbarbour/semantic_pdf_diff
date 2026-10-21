@@ -3,7 +3,7 @@
 A tile is refined in halves only when its answer is partial or failed, which is rare in a run (36 tiles in the slices
 fixture): too few to judge a change to how tiles are halved. So the lab forces it. `forced()` marks every answer to
 an unrefined tile partial, as it reaches the task, and a run with `refinement_depth` 1 then asks each tile's two
-halves once. The product has no such setting (review-bugs-2026-10-09, item 6; the owner: "seems reasonable").
+halves once. The product has no such setting (the owner, 2026-10-09: "seems reasonable").
 
 Each half is then counted from the run's store: its claims, whether it found none, and against a controlled
 document's key, its right and misbound claims (controlled.score). Checks without a key (`checks`, `against`): what

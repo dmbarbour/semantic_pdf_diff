@@ -1,7 +1,7 @@
 # 0029. A page's tiles are chosen by measures; the model's questions about tiling stay calibrated levers
 
 - **Status:** Accepted (2026-10-12)
-- **Source:** the [tile selection plan](../plans/tile-selection-2026-10-10.md), from the [trials review](../reviews/trials-2026-10-08.md)'s finding 5
+- **Source:** the [tile selection plan](../plans/README.md#retired), from the trials review's finding 5; its measurements in [tilings](../research/tilings-2026-10-12.md)
 
 ## Context
 
@@ -36,6 +36,7 @@ What was found:
   - labelling regions (`region_labels`)
   - naming the edges a tile cuts (`another_tiling: asked`)
   - Each has a calibration bench (`scripts/calibration.py`, `labelling.py`, `asking.py`), and is trusted only where its profile passes.
+  - Choosing a tiling is asked while the page is planned (`Context.ask`), so a replay replays the choice before the tiles it decides; a failed question or an answer naming none falls back to the rule.
 - **Every change is a lever, off until measured;** defaults change by judgement on measured evidence ([0011](0011-settings-classified-by-effect.md), [0013](0013-levers-as-mixins.md)).
 
 ## Consequences
@@ -44,7 +45,7 @@ What was found:
   - The controlled corpus: 873 → 841 image tasks, facts right 3,438 → 3,439, loose claims 490 → 432, misbound 261 → 244.
   - The samples' report pages send half their tiles.
   - Held-out slides cut half as many lines.
-- **Defaults not set by a round:** four were set by judgement, recorded in the lever index and the plan. `benchmarks/round0.json` pins them off, so round 0 stays round 0.
+- **Defaults not set by a round:** four were set by judgement, recorded here and in the lever index, their evidence in [tilings](../research/tilings-2026-10-12.md), milestone 8. `benchmarks/round0.json` pins them off, so round 0 stays round 0.
 - **Tests:** tests of a mechanism written against the old cut name it (`stubs.TILING_BEFORE`).
 - **Asking the model needs a calibration first.** A model or prompt without a passing profile gets the measures' choice.
 - **Not settled:**

@@ -1,7 +1,7 @@
 # 0028. The modules are layered without import cycles, each concept in one module
 
 - **Status:** Accepted (2026-10-09)
-- **Source:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), its architecture items 1 to 13; refines the one-owner rule of the [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md)
+- **Source:** the [code review of 2026-10-08](../plans/README.md#retired), its architecture items 1 to 13; refines the one-owner rule of the [architecture clean-up](../plans/README.md#retired) (2026-10-02: each concept given one owner, where its knowledge had sat in 3–7 hand-synchronised places)
 
 ## Context
 
@@ -31,4 +31,4 @@ The review found one import cycle through 21 of the product's modules, and two i
 
 - An import placed inside a function no longer hides a cycle. A new one fails `test_boundaries`.
 - A new format registers in `textjob.FORMATS` (or `jobs.READERS`) instead of joining an if-chain.
-- Callbacks that run late bind what they read when they're made (`PdfTable`): the late-binding bug the review found in the text formats' job (B1) can't recur there.
+- Callbacks that run late bind what they read when they're made (`PdfTable`): the late-binding bug the review found in the text formats' job (a late answer's rows filed under the page the loop had reached) can't recur there.

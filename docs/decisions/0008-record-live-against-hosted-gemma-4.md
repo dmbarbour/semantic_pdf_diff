@@ -1,7 +1,7 @@
 # 0008. Fixtures are recorded by running the pipeline live against hosted gemma-4
 
 - **Status:** Accepted (2026-09-25)
-- **Source:** [test models plan](../plans/test-models-and-record-replay-2026-09-24.md): [idea](../plans/test-models-and-record-replay-2026-09-24.md#idea), [milestones](../plans/test-models-and-record-replay-2026-09-24.md#milestones) (reordered 2026-09-25), [decisions 2026-09-25](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-25) and [2026-09-24](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-24); [content-addressed queries: progress](../plans/content-addressed-queries-2026-09-28.md#progress), milestone 2 (recordings save resolved settings)
+- **Source:** [test models plan](../plans/README.md#retired): idea, milestones (reordered 2026-09-25), decisions 2026-09-25 and 2026-09-24; [content-addressed queries: progress](../plans/README.md#retired), milestone 2 (recordings save resolved settings)
 
 ## Context
 
@@ -22,3 +22,4 @@ The pipeline is adaptive: refinement, re-asks, situating and comparisons depend 
 - `record_runs.py` resumes (recorded answers replay), stops at `--max-cost` with exit code 3, and tags spend in a ledger (`--ledger`, `--tag`).
 - Only one responder is recorded so far, so replay can't yet bracket behaviour between a strong and a weak model.
 - Credentials stay in the environment (`OPENAI_*`; a git-ignored `.env` for development). Fixtures hold answers only.
+- **A complete replay doesn't show it's the same run.** Runs' `settings.json` once held only the settings a round changed, so replayed under the promoted defaults (2026-09-28), old baselines became champion runs and replayed completely for that reason. That rebuild was undone; recordings have saved their settings resolved since.

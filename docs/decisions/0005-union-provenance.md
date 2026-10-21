@@ -1,7 +1,7 @@
 # 0005. Union provenance: one claim per fact in a piece of content, every sighting kept
 
 - **Status:** Accepted (2026-09-24)
-- **Source:** [evidence store plan: decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23) ("Union provenance", amending the completed plan); [store review](../plans/README.md#retired) (de-duplication under concurrency)
+- **Source:** [evidence store plan: decisions](../plans/README.md#retired) ("Union provenance", amending the completed plan); [store review](../plans/README.md#retired) (de-duplication under concurrency)
 
 ## Context
 

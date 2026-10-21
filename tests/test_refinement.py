@@ -1,4 +1,4 @@
-"""A partial tile refined in halves cut between lines or columns (review-bugs-2026-10-09, item 6; trials finding 5)."""
+"""A partial tile refined in halves cut between lines or columns (decision 0029)."""
 import tempfile
 import unittest
 from pathlib import Path

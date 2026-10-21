@@ -1,7 +1,7 @@
 # 0010. A fixture holds answers only; evaluation answers have fixtures of their own
 
 - **Status:** Accepted (2026-09-28)
-- **Source:** [content-addressed queries plan](../plans/content-addressed-queries-2026-09-28.md): [goal](../plans/content-addressed-queries-2026-09-28.md#goal), [design](../plans/content-addressed-queries-2026-09-28.md#design-proposed-for-review) items 2 and 8, [progress](../plans/content-addressed-queries-2026-09-28.md#progress) milestones 2, 3 and 6, [decisions](../plans/content-addressed-queries-2026-09-28.md#decisions-2026-09-28)
+- **Source:** [content-addressed queries plan](../plans/README.md#retired): goal, design items 2 and 8, progress milestones 2, 3 and 6, decisions
 
 ## Context
 

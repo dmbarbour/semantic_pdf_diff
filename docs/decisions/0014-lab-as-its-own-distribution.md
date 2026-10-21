@@ -1,7 +1,7 @@
 # 0014. The lab is its own distribution, installed as `semantic-pdf-diff[lab]`
 
 - **Status:** Accepted (2026-10-02)
-- **Source:** [code review 2026-10-01: decisions](../reviews/code-review-2026-10-01.md#decisions-2026-10-02) item 3; [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md): [decisions](../plans/architecture-cleanup-2026-10-02.md#decisions-2026-10-02), [design](../plans/architecture-cleanup-2026-10-02.md#packaging-the-lab-as-an-extra), [progress](../plans/architecture-cleanup-2026-10-02.md#progress) milestone 8
+- **Source:** [code review 2026-10-01: decisions](../plans/README.md#retired) item 3; [architecture clean-up](../plans/README.md#retired): decisions, design, progress milestone 8
 
 ## Context
 

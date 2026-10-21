@@ -708,7 +708,7 @@ TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_sch
 # knobs: page furniture (a running header of numbers that aren't facts) and two columns. For refinement (the bug
 # plan of 2026-10-09, item 6): decoration (side bars, a logo, a rule: graphics that send a page's prose as image
 # tiles), alone and with two columns, and a landscape page (wider than bands allow: tiled in a grid). For tile
-# selection (docs/plans/tile-selection-2026-10-10.md, milestone 2), each a cause of a bad tiling: a text-only slide
+# selection (docs/research/tilings-2026-10-12.md, milestone 2), each a cause of a bad tiling: a text-only slide
 # (720 x 540), a page slightly wider than Letter (690 points: a grid, where bands stop at 672), a border frame drawn
 # as one path and as four lines, a full-page background image behind the text, and a scan of a framed page.
 PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all", "decorated", "decorated+two-column", "landscape",

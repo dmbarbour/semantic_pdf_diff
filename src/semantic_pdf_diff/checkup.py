@@ -1,6 +1,5 @@
-"""`semantic-pdf-diff config test` and `config models` (docs/plans/configuration-in-the-store-2026-10-20.md,
-milestone 5, as cameo_ingest's): the endpoint, the key and each model the settings name checked for a few cents, and
-the endpoint's models listed.
+"""`semantic-pdf-diff config test` and `config models` (decision 0032, as cameo_ingest's): the endpoint, the key and
+each model the settings name checked for a few cents, and the endpoint's models listed.
 
 The checks ask for real: never the answers cache, so a check passes only when the model answers now. The image check
 is an eye-test card: a random code drawn large, which can't be guessed, read back exactly (the lab's eye tests measure

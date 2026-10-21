@@ -1,7 +1,7 @@
 # 0022. Spreadsheet cells are read as Excel shows them, never evaluated
 
 - **Status:** Accepted (2026-10-04)
-- **Source:** [multi-format adapters](../plans/multi-format-adapters-2026-09-23.md), "Excel, in detail" (decision 2) and the plan's decisions
+- **Source:** [multi-format adapters](../plans/README.md#retired), "Excel, in detail" (decision 2) and the plan's decisions
 
 ## Context
 
@@ -14,6 +14,7 @@ A workbook holds values, number formats, formulas with or without cached results
 - **openpyxl** in the `office` extra reads them (MIT; number formats, merged cells, defined tables, cached values). The library choice was left to Claude (the owner: "I'll leave it to you. You can review the decision if there are any quality or integration concerns.").
 - **Directness isn't trust:** a claim read from cells says so in its derivation, but whether its columns were interpreted right (a model step, recorded as such) is still open to question.
 - Hidden sheets are read and marked.
+- `.xlsm` is read as `.xlsx`, its macros never run; external links and pivot caches are never followed; a chart sheet is recorded as not read.
 
 ## Consequences
 

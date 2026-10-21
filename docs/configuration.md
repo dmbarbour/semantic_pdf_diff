@@ -8,7 +8,7 @@ When no environment variable or override is supplied, the default endpoint is `h
 
 Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > what first-use checks measured (`context_tokens`, `image_tokens`) > built-in defaults**. The user's settings (`config set --user`, kept in `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `semantic-pdf-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `semantic-pdf-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
 
-Four environment variables, as the owner listed them ([the plan](plans/configuration-in-the-store-2026-10-20.md)):
+Four environment variables, as the owner listed them ([decision 0032](decisions/0032-settings-in-layers-and-one-answers-cache.md)):
 
 | Environment variable | What it is |
 | --- | --- |
@@ -30,7 +30,7 @@ Two more variables aren't settings:
 
 ## The user's and a store's settings: `semantic-pdf-diff config`
 
-A store keeps its own settings, set once for every run in it; the user's are shared by every store ([the plan](plans/configuration-in-the-store-2026-10-20.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$SEMANTIC_PDF_DIFF_STORE`, else `./diff-output`). `set`, `unset`, `export` and `import` take `--user` for the user's settings instead of the store's.
+A store keeps its own settings, set once for every run in it; the user's are shared by every store ([decision 0032](decisions/0032-settings-in-layers-and-one-answers-cache.md)). Names are the settings' own, in snake case, everywhere (flags keep their dashes). Each command takes `--store DIR` (default: `$SEMANTIC_PDF_DIFF_STORE`, else `./diff-output`). `set`, `unset`, `export` and `import` take `--user` for the user's settings instead of the store's.
 
 | Command | What it does |
 | --- | --- |

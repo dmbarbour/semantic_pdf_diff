@@ -1,5 +1,5 @@
-"""Pictures drawn as Windows metafiles (WMF, EMF, EMF+), drawn into a PDF page (docs/plans/multi-format-adapters-
-2026-09-23.md, "Pictures in Word documents").
+"""Pictures drawn as Windows metafiles (WMF, EMF, EMF+), drawn into a PDF page
+(docs/decisions/0021-metafiles-drawn-by-vendored-renderer.md; docs/research/formats-beyond-pdf-2026-10-07.md).
 
 The vendored metafile_render (vendor/README.md) plays a picture's records back into drawing commands; this module
 draws the commands into a one-page PDF, in order:

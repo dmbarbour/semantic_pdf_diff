@@ -1,4 +1,4 @@
-"""A tiling's measures, without the model (docs/plans/tile-selection-2026-10-10.md, milestone 1).
+"""A tiling's measures, without the model (docs/research/tilings-2026-10-12.md, milestone 1).
 
 A tiling is a page's image tasks: its tiles, and the figures read whole beside them (visual_regions; the overview is
 counted, not measured). Each tile is measured against the page's text lines, words and graphics, as displayed:

@@ -1,9 +1,9 @@
 # How levers are modelled, and how they could be
 
 - **Date:** 2026-10-02
-- **Asked by:** the owner, after the [code review](../reviews/code-review-2026-10-01.md): "We'll still be doing a lot with levers, and a lot of experiments with the parked ones (e.g. the genetic programming ideas later), perhaps we should treat them as settings of some form for now; I'd also like to investigate *how* levers are modeled, i.e. in architectural terms, e.g. some form of hierarchical mixin from OOP could support composition with less entanglement than conditional branching, leveraging extensibility."
+- **Asked by:** the owner, after the [code review](../plans/README.md#retired): "We'll still be doing a lot with levers, and a lot of experiments with the parked ones (e.g. the genetic programming ideas later), perhaps we should treat them as settings of some form for now; I'd also like to investigate *how* levers are modeled, i.e. in architectural terms, e.g. some form of hierarchical mixin from OOP could support composition with less entanglement than conditional branching, leveraging extensibility."
 - **Method:** read the lever code (`extract.py`, `models.py`, `provenance.py`, `store.py`) and the review's findings. Nothing changed.
-- **Status:** settled 2026-10-02 as **mixins on a platform class**, the owner's preference. The options below are kept as the record. The design is in the [architecture clean-up plan](../plans/architecture-cleanup-2026-10-02.md); its six points were proposed by Claude, and the owner's verdict on them was "Looks good to me."
+- **Status:** settled 2026-10-02 as **mixins on a platform class**, the owner's preference. The options below are kept as the record. The design is in [decision 0013](../decisions/0013-levers-as-mixins.md) (from the [architecture clean-up plan](../plans/README.md#retired)); its six points were proposed by Claude, and the owner's verdict on them was "Looks good to me."
 
 ## How a lever is built today
 

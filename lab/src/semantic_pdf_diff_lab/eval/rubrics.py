@@ -1,4 +1,4 @@
-"""Judges' rubrics as clause mixins (docs/plans/architecture-cleanup-2026-10-02.md, milestone 5): the same lever
+"""Judges' rubrics as clause mixins (docs/decisions/0013-levers-as-mixins.md): the same lever
 model as the pipeline's (levers.py). Each rubric version is a named configuration: an ordered list of clauses.
 
 - Structural clauses change the pairwise template (what a judge is shown and asked to return) and what is read

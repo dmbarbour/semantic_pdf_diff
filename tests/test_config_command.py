@@ -1,5 +1,5 @@
-"""A store's own settings and `semantic-pdf-diff config` (configuration.py, settinghelp.py; docs/plans/configuration-
-in-the-store-2026-10-20.md, milestone 1). The owner, 2026-10-20: "User layer is fine. Snake case or kebab case is fine,
+"""A store's own settings and `semantic-pdf-diff config` (configuration.py, settinghelp.py; decision 0032).
+The owner, 2026-10-20: "User layer is fine. Snake case or kebab case is fine,
 if consistent. Definitely will need navigation of settings and adequate help for each. Redo instead of refusing, yes."
 """
 import stubs  # noqa: F401 (a clean environment)

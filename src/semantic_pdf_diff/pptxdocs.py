@@ -1,4 +1,4 @@
-"""Slide decks (.pptx; docs/plans/multi-format-adapters-2026-09-23.md, milestone 3), read through the text reader as
+"""Slide decks (.pptx; docs/how-it-works.md, Text files and Word documents), read through the text reader as
 Word documents are (docxdocs.py): a deck becomes a TextDocument whose pages are its slides and whose lines are its
 shapes' paragraphs, table rows and speaker notes, so sections, grouping, the context levers and the task core work
 unchanged, and a claim's locator names its slide and lines.

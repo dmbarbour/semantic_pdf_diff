@@ -8,7 +8,7 @@ index) weigh records from all of them.
 
 Verdict files keep their layout, so rounds can still be re-decided offline from them alone; this
 adapter is the one place that reads it. The rule for asking again after a failure lives here too.
-(docs/plans/content-addressed-queries-2026-09-28.md, item 7)
+(docs/decisions/0018-several-raters-none-ground-truth.md)
 """
 import json
 from dataclasses import dataclass, field

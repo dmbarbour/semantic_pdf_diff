@@ -1,6 +1,6 @@
-"""Pictures drawn as metafiles, rendered for inspection (docs/plans/multi-format-adapters-2026-09-23.md, "Pictures in
-Word documents"): every distinct EMF and WMF in the sample Word documents, drawn into a page by metafiles.draw, each
-saved as a PNG with what was drawn and what wasn't, and a summary of them all.
+"""Pictures drawn as metafiles, rendered for inspection (docs/research/formats-beyond-pdf-2026-10-07.md, Metafiles):
+every distinct EMF and WMF in the sample Word documents, drawn into a page by metafiles.draw, each saved as a PNG
+with what was drawn and what wasn't, and a summary of them all.
 
     python scripts/metafiles.py render                      # into benchmarks/metafiles (git-ignored)
     python scripts/metafiles.py render --only 38300-j30 --reference DIR

@@ -8,7 +8,7 @@
   - **The cache acted on** (with the owner's report, 2026-10-20: "SEMANTIC_PDF_DIFF_STORE is nit respected by all commands, some still require '--store'"): the one the stores it names are bound to (`--store`, prune's `--keep`), else `$SEMANTIC_PDF_DIFF_STORE`'s, else the cache in effect; `cache remove` without `--store` removes the store in effect's answers. Stores bound to different caches, or a `SEMANTIC_PDF_DIFF_CACHE` naming another than a store's, need `--cache`: which cache is meant isn't guessed.
 - **Amended 2026-10-20, a store bound to its cache** ([answers cache maintenance](../plans/answers-cache-maintenance-2026-10-20.md), milestone 2; the owner: "Supporting a configurable cache makes sense."): one cache per user stays the default, but a store records the cache its first run used (`answers_cache`) and keeps using it whatever the environment says. A run whose `SEMANTIC_PDF_DIFF_CACHE` names another is refused. The owner keeps sensitive projects' answers apart ("Can't even let it mix without marking home cache CUI or higher").
 - **Amended 2026-10-20:** one name for the command, the package, the folders and the variables (the owner: "We also should unify naming a bit. Right now, iirc, it's PDF_DIFF, pdf-semantic-diff, and semantic-pdf-diff. I'm fine with any one name, but three is a bit awkward."). The command `pdf-semantic-diff` is now `semantic-pdf-diff`, as the distribution, the package (`semantic_pdf_diff`), the user's folders and the files' formats were named already. The variables follow: `PDF_DIFF_STORE` and `PDF_DIFF_CACHE` are `SEMANTIC_PDF_DIFF_STORE` and `SEMANTIC_PDF_DIFF_CACHE`, the old names ignored with a warning (`settings.variable`); the owner's quote below keeps the names as said.
-- **Source:** [configuration in the store](../plans/configuration-in-the-store-2026-10-20.md), milestones 1 to 5; the [trials review](../reviews/trials-2026-10-08.md), finding 2
+- **Source:** [configuration in the store](../plans/README.md#retired), milestones 1 to 5; the [trials review](../plans/README.md#retired), finding 2
 
 ## Context
 
@@ -17,6 +17,7 @@ Settings came in four ways, highest first: about 25 flags per command, a `--conf
 - **The owner (2026-10-08):** "I think we need to greatly clean up and simplify configuration. We should keep just a few environment variables, perhaps four: OPENAI_BASE_URL, OPENAI_API_KEY, PDF_DIFF_STORE, PDF_DIFF_CACHE. [...] Other configuration items should be adjusted in the store via the CLI, e.g. `pdf-semantic-diff config (set|unset|import|export|show|test)...` with import/export using JSON. Use of `show` should describe options, defaults, examples where feasible."
 - **On the cache (2026-10-08):** "The per-user default is tempting. Let's go with that instead."
 - **On the design (2026-10-20):** "User layer is fine. Snake case or kebab case is fine, if consistent. Definitely will need navigation of settings and adequate help for each. Redo instead of refusing, yes." And earlier that day: "A flag as override is okay." cameo_ingest's `config` was the model to align with: "I have similar for the cameo_ingest product, including import and export via json files."
+- **Not answered:** question 4 (`PDF_DIFF_<NAME>` and `OPENAI_MODEL` retired, with a warning), which follows the owner's own four variables (2026-10-08), and question 6 (`--config FILE` kept as one run's overrides), which changes nothing.
 
 ## Decision
 
@@ -50,3 +51,4 @@ Settings came in four ways, highest first: about 25 flags per command, a `--conf
 - The tests keep a cache in each store (tests/stubs.py) and read an empty folder's user settings, so a developer's own settings and answers never reach them.
 - The lab's `.env` holds only the key and the endpoint; its other values are the user's settings. Scripts name fixtures, as before.
 - Judges and checkers still take only endpoint settings from the user's settings ([0011](0011-settings-classified-by-effect.md)).
+- **Per-role keys weren't built:** a reranker or embedding model served elsewhere (`rerank_url`, `embed_url`) is sent `OPENAI_API_KEY` too. The evidence store plan (2026-09-24, [retired](../plans/README.md#retired)) had a role's configuration name the variable holding its key; its milestone 7 was marked done without it. Whether such a model gets a key of its own is in the plans index's *Deferred decisions*.

@@ -7,7 +7,7 @@
   - milestone 5, epistemic status and skeptical prompting, and situating's quality measured (from the evaluation benchmarks plan) to [claim context](claim-context-2026-10-14.md); "about" embeddings aligning sections stay [retrieval recall](retrieval-recall-2026-09-23.md)'s (its section alignment)
   - *Alternatives to evaluate later*, PDF tables of contents and reference lists as boilerplate, and the milestone 4 review's reused "about" to the [lever index](../reviews/levers.md)'s ideas; that review's external references to *Runtime quality spot checks*
   - **Superseded since:** `tqdm` (bars drawn by the product, [progress display](progress-display-2026-10-20.md)); `--plan`'s estimates ([0026](../decisions/0026-plan-estimates-dropped.md), *Dry runs*); a 262,144-token context configured to match (defaults fit 32k, [0012](../decisions/0012-temperature-zero-and-model-neutral-defaults.md); measured on first use, [endpoint first use](endpoint-first-use-2026-10-20.md))
-- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections as units of work)
+- **Depends on:** [sources-and-evidence-store](README.md#retired) (sections as units of work)
 
 ## Context
 
@@ -86,7 +86,7 @@ Mechanical checks run on every run and are reported, never silently applied:
 - **Grounding:** the key terms of a figure's or section's "about" should appear in its caption, referencing prose, claims or text. Low overlap flags a possible hallucination.
 - **Shape:** length bounds; every section with extracted claims gets an "about".
 
-Human checks: reports offer a small sample of figure and section "abouts" for review (usefulness and correctness as reusable annotations). The [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) label figure–reference links and rate "abouts" against the public corpus.
+Human checks: reports offer a small sample of figure and section "abouts" for review (usefulness and correctness as reusable annotations). The [evaluation benchmarks](README.md#retired) label figure–reference links and rate "abouts" against the public corpus.
 
 #### Alternatives to evaluate later
 
@@ -128,7 +128,7 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 
 ## Milestones
 
-0. ✅ *Done 2026-09-24 (`6a2b622`).* **Prerequisite: union provenance** (see the store plan's *Decisions*), so results don't depend on which task finishes first.
+0. ✅ *Done 2026-09-24 (`6a2b622`).* **Prerequisite: union provenance** ([0005](../decisions/0005-union-provenance.md)), so results don't depend on which task finishes first.
 1. ✅ *Done 2026-09-24 (`1a3d460`, `456e6a9`, and progress/logging; see the [review](README.md#retired)).* **Merged with milestone 2 (decided 2026-09-24; see the [store completion review](README.md#retired)): an in-memory task queue run by worker threads with a single store writer, plus** the concurrent client: time-of-day rate-limit rules, adaptive backoff, a modest concurrency cap; tests against a stub server that simulates latency and 429s; token and time estimates in `--plan`; progress bars, heartbeats and configurable verbosity.
 2. ◐ *Partly done 2026-09-24: fair share across compared sources (pages fed round-robin, one queue for all their PDFs) and `not_reached` for work cut off by `max_calls`. Section priorities wait for triage (milestones 3–4); persisting the queue waits for preliminary reports (milestone 6).* **Persisting the task queue and the section queue** (the queue itself arrives with milestone 1): tasks persisted for progress reporting; fair share across sections and across compared sources; `not_reached` coverage status.
 3. ✅ *Done 2026-09-24 (see the [review](README.md#retired)): per-section signals, and repeated table rows followed.* **Triage without the model:** cheap signals and boilerplate detection. Use drawing sets as a test case: table detection there finds mostly drawing geometry, and about half the rows repeat across sheets (title blocks, legends; see the [store milestone 4 review](README.md#retired)).
@@ -138,7 +138,7 @@ Whatever its derivation, a claim can be a measurement, a calculation, a simulati
 7. **Claim quality signals** with sorting and filtering in reports.
 8. **Reviewer feedback:** review controls in reports and `import-reviews` (the first capture path for annotations), feeding calibration.
 
-*From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* situating's quality, measured.
+*From the closed [evaluation benchmarks](README.md#retired) plan (2026-10-04):* situating's quality, measured.
 - **Figure–reference links:** which prose cites which figure, labelled on curated pages; link precision and recall, and figure detection recall (reports' unresolved-reference counts are a label-free proxy).
 - **"About" statements:** rated for usefulness and correctness (what the section or figure is about, without values); and whether "about" embeddings align sections across sources better than headings alone.
 - Synthetic diagrams with known structure are built: the controlled corpus's schematics.
@@ -158,4 +158,4 @@ None currently.
 - **`tqdm`** is accepted as a dependency for progress bars.
 - **Concurrent requests:** assume the server caps them. Use a modest, configurable concurrency limit (single digits by default) and let adaptive backoff find the working level, leaving room for the user's other tools on the same server. Tune the default from real runs.
 - **Time budgets:** none. Runs proceed unattended until done or stopped; preliminary reports cover the need to look early.
-- **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*)).
+- **Reviewer feedback:** stored as reusable annotations in the store, exportable and importable (see [Annotations](n-way-comparison-2026-09-23.md#annotations)).

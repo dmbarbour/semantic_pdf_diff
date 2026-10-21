@@ -1,5 +1,5 @@
-"""A Word document's pictures, read as a PDF's figures are (docs/plans/multi-format-adapters-2026-09-23.md, "Pictures
-in Word documents"; the owner: "we'll want similar context as what PDF pics get", and "Every pic.").
+"""A Word document's pictures, read as a PDF's figures are (docs/decisions/0021-metafiles-drawn-by-vendored-renderer.md;
+the owner: "we'll want similar context as what PDF pics get", and "Every pic.").
 
 Each picture becomes a page of a pictures document, at its displayed size: an EMF or WMF drawn by metafiles.py
 (vector, its labels a text layer), a raster image as it is. The page gets a PDF page's image tasks (visual_regions:

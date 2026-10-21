@@ -10,8 +10,8 @@
 - **From:** [controlled documents](controlled-documents-2026-10-01.md) milestone 4, where every change was found but most "different" findings weren't changes.
 - **Depends on:**
   - controlled documents (revision pairs, exact comparison scoring)
-  - [multi-format adapters](multi-format-adapters-2026-09-23.md) (`.txt`/`.md` and `.docx`), to read real revision series
-  - the [architecture clean-up](architecture-cleanup-2026-10-02.md)'s levers (the `candidates` hook)
+  - [multi-format adapters](README.md#retired) (`.txt`/`.md` and `.docx`), to read real revision series
+  - the [architecture clean-up](README.md#retired)'s levers (the `candidates` hook)
 - **Why:**
   - **The owner (2026-10-02):** "Any suggestions for improving analysis of differences? I assume we can use some form of multi-pass approach, e.g. establish candidate differences then analyze them by some means for 'why different' with attention to known issues like renamings or context shifts. And I don't have ideas for the second issue other than somehow improving analysis and comprehension of near-tacit entities within a corpus, which is non-trivial."
   - **The measured problem:** on six revision pairs, gemma-4 found 22 of 22 changes and confirmed 198 of 198 unchanged facts, but only 41 of 120 "different" findings were changes.
@@ -127,7 +127,7 @@ The mechanisms below are Claude's, built on the owner's multi-pass idea and deci
 **4. Identity at extraction (the owner's "near-tacit entities").**
 - **Cheap partial steps first:**
   - readers asked to name a row by its tag and a dimension by what it measures, not by position (the lever index row "names that carry identity")
-  - table claims carry the parse's row label and column header ([one table model](one-table-model-2026-09-30.md) overlaps)
+  - table claims carry the parse's row label and column header ([one table model](README.md#retired) overlaps)
   - tags found by pattern near a value
 - **A per-document entity register later:** tags, row labels, captions, headings and defined abbreviations, with a model pass only for what's left. Claims would point at register entries.
 - **Revisions need this least,** since alignment infers identity from the other revision. Proposals need it most (two designs share no values).
@@ -244,7 +244,7 @@ Claude's reading of where proposals mode begins to make sense:
 - **[Retrieval recall](retrieval-recall-2026-09-23.md):** BM25 and embeddings are signals here and providers of the `candidates` hook there. For revisions, alignment comes first; for proposals, retrieval.
 - **[Criteria-first comparison](n-way-comparison-2026-09-23.md):** proposals and N-way comparison (decision 9).
 - **Recognising versions of one document** (plans index): pairs whose order is known; the version signals help find real series.
-- **[Multi-format adapters](multi-format-adapters-2026-09-23.md):** `.txt`/`.md` and `.docx` first, which unlock the real series.
+- **[Multi-format adapters](README.md#retired):** `.txt`/`.md` and `.docx` first, which unlock the real series.
 - **[Lever index](../reviews/levers.md):** the two rows from controlled documents milestone 4 ("a change needs the same item", "names that carry identity") are built here.
 
 ## Not in scope

@@ -1,5 +1,5 @@
 """Asking calibration: does a tile's answer ask for another tiling when the tile cuts content?
-(lab/src/semantic_pdf_diff_lab/bench/asking.py; docs/plans/tile-selection-2026-10-10.md, milestone 7.)
+(lab/src/semantic_pdf_diff_lab/bench/asking.py; docs/research/tilings-2026-10-12.md, milestone 7.)
 
     set -a; . ./.env; set +a
     python scripts/asking.py run --model google/gemma-4-31B-it --max-cost 1

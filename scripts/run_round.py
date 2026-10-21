@@ -203,7 +203,7 @@ class RoundRunner:
                 self.mark(step, "done")
 
     def check(self):
-        """3b. Queries checked before any money goes on judging (docs/plans/content-addressed-queries): a sample of
+        """3b. Queries checked before any money goes on judging (decision 0037): a sample of
         what each variant changed is dumped (queries-<variant>/index.html) for people and Claude to look over, and
         strong models from other families check it for obvious errors. A flagged query holds the round until it's
         fixed or the flags are accepted (--accept-checks)."""

@@ -10,9 +10,9 @@ them doesn't change under us. Each package keeps its license file; changes made 
   `metafile_render-0.3.0-py3-none-any.whl` (sha256 `94144d7e6195711d…`, uploaded 2026-09-05), every file checked
   against the wheel's RECORD when copied (2026-10-03).
 - **License:** MIT, © 2026 Xiaomeng Zhao (myhloli); `metafile_render/LICENSE`.
-- **Why:** pictures in Word documents (docs/plans/multi-format-adapters-2026-09-23.md, "Pictures in Word
-  documents"); the owner chose it over porting Apache POI or writing a renderer of our own (2026-10-03), which stay
-  fallbacks.
+- **Why:** pictures in Word documents (docs/decisions/0021-metafiles-drawn-by-vendored-renderer.md; the renderers
+  tried are in docs/research/formats-beyond-pdf-2026-10-07.md); the owner chose it over porting Apache POI or
+  writing a renderer of our own (2026-10-03), which stay fallbacks.
 - **Dependencies:** Pillow and pyclipper (the `office` extra).
 
 **Changes here** (each marked `semantic_pdf_diff:` in the code), found on 3GPP TS 38.300's 163 figures (Visio

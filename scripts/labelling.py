@@ -1,5 +1,5 @@
 """Region labels calibration: can a model label a page's regions? (lab/src/semantic_pdf_diff_lab/bench/labelling.py;
-docs/plans/tile-selection-2026-10-10.md, milestone 6.)
+docs/research/tilings-2026-10-12.md, milestone 6.)
 
     set -a; . ./.env; set +a
     python scripts/labelling.py run --model google/gemma-4-31B-it --max-cost 0.5

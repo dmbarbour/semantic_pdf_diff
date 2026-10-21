@@ -6,7 +6,7 @@ responder M answered query H, as its `sample`-th answer (0 unless asked for anot
 control does), with the outcome: `ok`, `invalid` (a failure of the model's: replayed as a failure)
 or `transient` (timeouts, server errors: asked again when recording). Everything else is rebuilt
 from the sample documents, so replaying the same runs forms the same reports. A changed query has
-another hash: it's a miss, never a stale answer. (docs/plans/content-addressed-queries-2026-09-28.md)
+another hash: it's a miss, never a stale answer. (docs/decisions/0009-content-addressed-queries.md)
 
 Side tables hold what's convenient for summaries, never used for lookup: facts about each
 query's own content (`description`) and how the pipeline built it (`recipe`: role, content,

@@ -5,7 +5,7 @@
   - `context_tokens` and `image_tokens` are no longer calibrated by hand only. Where no layer sets them, a run uses what its first-use checks measured: the model's context window as the endpoint lists it, and an image's tokens at `image_side` with a tenth added. The defaults below (32,768 and 1,200) stay where nothing was measured; the other budgets are still set by hand.
   - There is no default model. The owner (2026-10-20): "remove the "gemma-4" default model, just error if one isn't configured."
   - The last consequence below, a user calibrating `image_tokens` by hand, now applies where the endpoint gives no measure, or counts a long image by more than its area.
-- **Source:** [code review 2026-10-01: decisions](../reviews/code-review-2026-10-01.md#decisions-2026-10-02) items 1 and 5, and findings 1, 2 and 12; [architecture clean-up: decisions](../plans/architecture-cleanup-2026-10-02.md#decisions-2026-10-02) (commit `7ccccf1`)
+- **Source:** [code review 2026-10-01: decisions](../plans/README.md#retired) items 1 and 5, and findings 1, 2 and 12; [architecture clean-up: decisions](../plans/README.md#retired) (commit `7ccccf1`)
 
 ## Context
 

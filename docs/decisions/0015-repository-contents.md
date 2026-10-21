@@ -1,7 +1,7 @@
 # 0015. The repository holds code, docs and the answers tests replay
 
 - **Status:** Accepted (2026-10-03)
-- **Source:** [code review 2026-10-01: decisions](../reviews/code-review-2026-10-01.md#decisions-2026-10-02) item 6; [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md): [decisions](../plans/architecture-cleanup-2026-10-02.md#decisions-2026-10-02), [progress](../plans/architecture-cleanup-2026-10-02.md#progress) milestone 9; [the rounds' record](../research/rounds.md) (2026-10-03); commit `715925a`
+- **Source:** [code review 2026-10-01: decisions](../plans/README.md#retired) item 6; [architecture clean-up](../plans/README.md#retired): decisions, progress milestone 9; [the rounds' record](../research/rounds.md) (2026-10-03); commit `715925a`
 
 ## Context
 

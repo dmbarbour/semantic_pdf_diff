@@ -1,4 +1,4 @@
-"""What `semantic-pdf-diff config` says about each setting (docs/plans/configuration-in-the-store-2026-10-20.md): the
+"""What `semantic-pdf-diff config` says about each setting (decision 0032): the
 group it's listed in, a line on what it does, more for `config help`, and an example where one helps. The owner,
 2026-10-20: "Definitely will need navigation of settings and adequate help for each." tests/test_configuration.py
 checks every setting has its entry.

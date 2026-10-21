@@ -1,7 +1,7 @@
 # 0013. Levers are mixins on a platform class, composed from data
 
 - **Status:** Accepted (2026-10-02)
-- **Source:** [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md): [decisions](../plans/architecture-cleanup-2026-10-02.md#decisions-2026-10-02), [design](../plans/architecture-cleanup-2026-10-02.md#levers-as-mixins-on-a-platform-class), [progress](../plans/architecture-cleanup-2026-10-02.md#progress) milestones 3–5; [lever architecture research](../research/lever-architecture-2026-10-02.md), [the owner's direction](../research/lever-architecture-2026-10-02.md#the-owners-direction-2026-10-02-and-a-prototype); [code review 2026-10-01: decisions](../reviews/code-review-2026-10-01.md#decisions-2026-10-02) item 4
+- **Source:** [architecture clean-up](../plans/README.md#retired): decisions, design, progress milestones 3–5; [lever architecture research](../research/lever-architecture-2026-10-02.md), [the owner's direction](../research/lever-architecture-2026-10-02.md#the-owners-direction-2026-10-02-and-a-prototype); [code review 2026-10-01: decisions](../plans/README.md#retired) item 4
 
 ## Context
 

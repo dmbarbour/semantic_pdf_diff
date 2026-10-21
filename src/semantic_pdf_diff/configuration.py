@@ -1,5 +1,5 @@
-"""A store's own settings and what `semantic-pdf-diff config` does with them (docs/plans/configuration-in-the-store-
-2026-10-20.md): values given as text parsed by their setting's type and checked; settings listed by group with what
+"""A store's own settings and what `semantic-pdf-diff config` does with them (decision 0032):
+values given as text parsed by their setting's type and checked; settings listed by group with what
 each does (settinghelp.py), found by words, explained one by one; a layer exported and imported as JSON, in
 cameo_ingest's format. The owner, 2026-10-08: "Other configuration items should be adjusted in the store via the CLI,
 e.g. `pdf-semantic-diff config (set|unset|import|export|show|test)...` with import/export using JSON."
@@ -133,7 +133,7 @@ def resolved(layers):
     return out
 
 def redoes(name):
-    """What changing a setting changes: the store's work its next run redoes (docs/plans/content-addressed-queries:
+    """What changing a setting changes: the store's work its next run redoes (decision 0011:
     each setting's class says what it can change)."""
     if name == "answers_cache":
         return "nothing read again: later answers are kept there (cache copy brings those asked before)"

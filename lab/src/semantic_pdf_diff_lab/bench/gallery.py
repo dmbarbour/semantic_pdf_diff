@@ -1,4 +1,4 @@
-"""A gallery of the worst pages' tilings, on an offline page (docs/plans/tile-selection-2026-10-10.md, milestone 2).
+"""A gallery of the worst pages' tilings, on an offline page (docs/research/tilings-2026-10-12.md, milestone 2).
 
 Pages are picked by the measures of a run (bench/tiling.py): for each failure, the pages highest on its measure, at
 most one per document so one drawing set doesn't fill a row, from the development pages only (a path holding

@@ -1,5 +1,5 @@
 """Tilings measured without the model: every page of a folder's PDFs and images, tiled as a configuration tiles it
-(lab/src/semantic_pdf_diff_lab/bench/tiling.py; docs/plans/tile-selection-2026-10-10.md, milestone 1).
+(lab/src/semantic_pdf_diff_lab/bench/tiling.py; docs/research/tilings-2026-10-12.md, milestone 1).
 
     python scripts/tiling.py measure samples --first 40 --out runs/tiling-default.json
     python scripts/tiling.py measure samples --first 40 --set tiling=grid --out runs/tiling-grid.json

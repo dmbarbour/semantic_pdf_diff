@@ -1,4 +1,4 @@
-"""The model labels a page's regions (docs/plans/tile-selection-2026-10-10.md, milestone 6).
+"""The model labels a page's regions (docs/research/tilings-2026-10-12.md, milestone 6).
 
 One shrunk image of the page as it is, then the page with its regions outlined, washed and numbered, what no region
 holds greyed out (tilechoice.sketch, as calibrated for the tiling question). The model labels each region from a

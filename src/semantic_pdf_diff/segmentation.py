@@ -103,7 +103,7 @@ def _gaps(boxes, axis, lo, hi):
     return [g for g in out if g[1] >= g[0]]
 
 def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP, parts=()):
-    """A partial tile's two halves for refinement (review-bugs-2026-10-09, item 6), each grown to whole lines.
+    """A partial tile's two halves for refinement (decision 0029), each grown to whole lines.
 
     The cut crosses no text line where it can: in a gap between lines or between columns (no graphic crossed either,
     nor a part the tile holds, if possible: parts, boxes such as a figure's), nearest the middle of what the tile
@@ -188,7 +188,7 @@ def _middle(rect, overlap):
     return [pymupdf.Rect(rect.x0, rect.y0, rect.x1, mid + overlap),
             pymupdf.Rect(rect.x0, mid - overlap, rect.x1, rect.y1)]
 
-# --- candidate tilings (tile-selection-2026-10-10, milestone 3): each a lever, off by default (levers.py)
+# --- candidate tilings (docs/research/tilings-2026-10-12.md, milestone 3): each a lever (levers.py)
 
 RULE_POINTS = 8.0  # a graphic no thicker than this, and at least RULE_REACH of the page's width or height long, is a
 RULE_REACH = 1 / 3  # rule, a bar down a margin or a frame's side

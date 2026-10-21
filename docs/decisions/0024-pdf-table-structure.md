@@ -1,7 +1,7 @@
 # 0024. A PDF table's structure: heuristics first, then rules a model writes where lines are suspect
 
 - **Status:** Accepted (2026-10-07; amended 2026-10-10)
-- **Source:** [one table model](../plans/one-table-model-2026-09-30.md): decision 1 (2026-09-30), "PDF tables onto the rules path, in detail", "Structure rules, in detail" and its progress
+- **Source:** [one table model](../plans/README.md#retired): decision 1 (2026-09-30), "PDF tables onto the rules path, in detail", "Structure rules, in detail" and its progress
 
 ## Context
 
@@ -24,3 +24,4 @@ A PDF's tables come from a parser that guesses cells from drawn edges and text: 
 - Columns are joined mechanically only where every split word is cut; a model's column joins in the wrong place weren't caught by whole-text examples, so a body row's separate values are never joined.
 - The layout add-on (`pymupdf-layout`) was measured and not adopted: no gain over the heuristics, 261 MB of dependencies.
 - New hazards become signals and actions in the vocabulary, each measured on the corpus and the development slices.
+- **The section row under the header (2026-10-10):** every table PyMuPDF detects in the samples and the corpus (4,187 pages), mended as extraction mends it, logged 153 header joins in 18 documents, 29 of a row holding only its first cell. The 14 of those under a filled first header cell were all section or title rows, none a header's second line ("HabEx Coronagraph (HCG) – Channel A" under "Instrument", HabEx p. 182). Under an empty first header cell such a row can be one ("Parameter", HabEx p. 369), so those join as before.

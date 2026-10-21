@@ -1,4 +1,4 @@
-"""Tilings measured without the model (docs/plans/tile-selection-2026-10-10.md, milestone 1).
+"""Tilings measured without the model (docs/research/tilings-2026-10-12.md, milestone 1).
 
 Every page of a folder's PDFs and images, tiled as a configuration's visual_regions tiles it, measured by the
 product's tiling.measure: lines and words cut, text-only and blank tiles, graphics share, lines read twice, overlap,

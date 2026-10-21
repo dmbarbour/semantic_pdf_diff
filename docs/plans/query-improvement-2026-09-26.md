@@ -4,7 +4,7 @@
   - **2026-10-03:**
     - Nothing waits on the sc01 survey any more. The owner: "I won't get back to that spotcheck." That covers re-judging sc01 with v6, agreement with the owner's sc01 verdicts, the measurements owed after the surveys, and the next round.
     - The rounds' working data left the repository (the owner); their record is [docs/research/rounds.md](../research/rounds.md).
-- **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md) (fixtures, recording by responder); [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) (review pages, panel, consensus).
+- **Depends on:** [test-models-and-record-replay](README.md#retired) (fixtures, recording by responder); [evaluation-benchmarks](README.md#retired) (review pages, panel, consensus: [0018](../decisions/0018-several-raters-none-ground-truth.md), [0019](../decisions/0019-offline-review-pages.md)).
 - **Feeds:** every prompt and context change in [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) (e.g. epistemic status) and later plans.
 
 ## Goal
@@ -237,7 +237,7 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Promotion (A, approved):**
   - A lever reaches the defaults only after a combination round and a held-out check. The held-out criterion is written into `round.json` before judging (e.g. mean above 0.5 and no stratum loss), and the held-out effect is the one quoted, since development figures of accepted levers are inflated by selection.
   - "No worse" needs a gain named in advance, with its metric and threshold.
-  - **Built (2026-09-30):** `criteria` in `round.json` (`models.Criteria`: role, thresholds, named gain, held-out rule), fixed when judging starts. Simulated rates are in the [content-addressed queries plan](content-addressed-queries-2026-09-28.md).
+  - **Built (2026-09-30):** `criteria` in `round.json` (`models.Criteria`: role, thresholds, named gain, held-out rule), fixed when judging starts. Simulated rates are in [decision 0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md).
   - **The held-out rule** (the owner, 2026-09-30: "Use middle rule"): the held-out mean above 0.5, its interval's lower bound at least 0.45, and no stratum loss.
     - Simulated with five null variants per round, 4.5% of rounds promote one, against 12.8% for the mean alone and 1.0% for winning again.
     - A lever with a true rate of 0.65 is promoted 47% of the time.

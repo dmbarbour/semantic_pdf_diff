@@ -1,7 +1,7 @@
 # 0027. Behaviour changes are kept apart from refactors, and refactors are proven by replay
 
 - **Status:** Accepted (2026-10-09)
-- **Source:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md) and the owner's answer there; its [bug plan](../plans/review-bugs-2026-10-09.md)
+- **Source:** the [code review of 2026-10-08](../plans/README.md#retired) and the owner's answer there; its [bug plan](../plans/README.md#retired)
 
 ## Context
 
@@ -16,7 +16,7 @@ The owner, 2026-10-09: "We'll focus on bugfixes, then architecture, then new fea
   - refactors and performance work, which don't
   - features
 - **Order:** bugs first, then refactors, then features. A bug much easier to fix after a refactor is the exception, recommended to the owner first.
-- **A behaviour change found during a refactor isn't made there.** It goes to the owner and joins the next batch of fixes, as C7 and D8 did.
+- **A behaviour change found during a refactor isn't made there.** It goes to the owner and joins the next batch of fixes, as dropping `--plan` ([0026](0026-plan-estimates-dropped.md)) and the saved comparison's marks did.
 - **A refactor is proven offline, by outputs identical before and after:**
   - the slices' development runs replayed from the committed fixture (`scripts/record_runs.py --replay`), each report as before, no request unrecorded
   - the controlled corpus replayed from its packed fixture (`scripts/controlled.py run --replay`), every report's content as recorded

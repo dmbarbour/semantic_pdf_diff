@@ -70,7 +70,7 @@ def jittery_model():
                        'quote': f'{v} kW', 'confidence': .9} for v in re.findall(r'(\d+) kW', data)]
             answer = {'claims': claims, 'complete': True, 'issues': []}
         # What reached the model, for tests of what settings change: the body without the model's
-        # name or how the answer travels (docs/plans/content-addressed-queries).
+        # name or how the answer travels (decision 0009).
         role = ('table-rules' if prompt.startswith('This is one table') else 'key-value'
                 if prompt.startswith('This is a block of two columns') else 'table-review'
                 if prompt.startswith('You wrote the rules below') else 'table-structure'

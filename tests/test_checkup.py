@@ -1,6 +1,6 @@
-"""`semantic-pdf-diff config test` and `config models` (checkup.py; docs/plans/configuration-in-the-store-2026-10-20.md,
-milestone 5): the endpoint, a JSON answer, an eye-test card, the reranker and the embedding model checked by asking;
-the endpoint's models listed, those in use marked."""
+"""`semantic-pdf-diff config test` and `config models` (checkup.py; decision 0032): the endpoint, a JSON answer, an
+eye-test card, the reranker and the embedding model checked by asking; the endpoint's models listed, those in use
+marked."""
 import stubs  # noqa: F401 (a clean environment)
 import contextlib
 import io

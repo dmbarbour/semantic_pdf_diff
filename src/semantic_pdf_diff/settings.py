@@ -87,7 +87,7 @@ class SettingsBase(Strict):
         overrides (a store's own settings, a --config file, a run's flags, a caller's). `only`: the fields read from
         the user's settings and the environment (default all).
 
-        The environment is read for the endpoint alone (docs/plans/configuration-in-the-store-2026-10-20.md: the
+        The environment is read for the endpoint alone (decision 0032: the
         owner's four variables); a PDF_DIFF_<NAME> or OPENAI_MODEL still set is ignored, with a warning naming the
         setting that replaces it. Plain Settings() stays deterministic for library callers and fixtures."""
         levers = overrides.pop("levers", None)
@@ -198,7 +198,7 @@ Settings = settings_class()
 SETTING_CLASSES = setting_classes(Settings)
 
 # What each lever added to a query, found by the lines its builder writes (the levers' marks). For
-# diagnostics only (the queries dump, docs/plans/content-addressed-queries-2026-09-28.md): a query is found by
+# diagnostics only (the queries dump, docs/decisions/0010-fixtures-hold-answers-only.md): a query is found by
 # its hash, never by these. Moved from context, which never used them (code review 2026-10-08, C4).
 # tests/test_sections.py checks each builder against its mark.
 LEVER_MARKS = lever_marks(Settings)

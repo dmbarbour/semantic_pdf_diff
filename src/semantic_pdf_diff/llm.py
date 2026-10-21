@@ -141,7 +141,7 @@ def query_hash(prompt, image_hashes, params, images_first=False):
     """A query's name: the SHA-256 of what reaches the model (the system and user text, each image's
     bytes by hash, the response format and generation settings as sent, and the images' place when they come
     before the text), leaving out the model (the responder) and how the answer travels. A changed query has another
-    name, so a recorded answer never stands in for it (docs/plans/content-addressed-queries-2026-09-28.md)."""
+    name, so a recorded answer never stands in for it (docs/decisions/0009-content-addressed-queries.md)."""
     canonical = {"system": SYSTEM, "user": prompt, "images": list(image_hashes), "params": params,
                  **({"order": "images first"} if images_first and image_hashes else {})}
     return hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()

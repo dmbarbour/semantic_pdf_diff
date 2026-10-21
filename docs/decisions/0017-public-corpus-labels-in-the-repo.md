@@ -1,7 +1,7 @@
 # 0017. Public-corpus labels committed as annotation files
 
 - **Status:** Superseded by [0015](0015-repository-contents.md) (2026-10-03)
-- **Source:** [evaluation benchmarks plan: decisions 2026-09-24](../plans/evaluation-benchmarks-2026-09-23.md#decisions-2026-09-24) and [Keeping it](../plans/evaluation-benchmarks-2026-09-23.md#keeping-it)
+- **Source:** [evaluation benchmarks plan: decisions 2026-09-24](../plans/README.md#retired) and Keeping it
 
 ## Context
 

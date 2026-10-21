@@ -18,13 +18,13 @@ python examples/demo.py
 - A pre-commit hook lets a commit through when its staged tree has a recorded pass. Otherwise it checks the staged tree out into a temporary folder (with `samples/` linked in), runs the quick suite there (about 3 minutes), records the pass, and blocks the commit on a failure. A partial commit is tested as committed.
 - `python scripts/gate.py status` says whether the working tree and the staged tree have passes.
 
-Tests use a local HTTP stub, temporary PDFs and controlled evidence. They exercise cross-format and many-to-one retrieval, case-sensitive unit conversion, uncertainty gates, UTF-8 chunking, text grouping and refinement, table column splitting, tile spacing and coverage, rotated pages, visual quote checks, malformed/truncated/null API output, `Retry-After`, claim salvage, caching, budgets, quote validation and HTML escaping. Synthetic spreadsheet tests check that the generated messy samples match their answer keys; they need the `dev` extra and are skipped without it. None of this establishes real-model extraction accuracy; see [VALIDATION.md](VALIDATION.md) and the [evaluation plan](plans/evaluation-benchmarks-2026-09-23.md).
+Tests use a local HTTP stub, temporary PDFs and controlled evidence. They exercise cross-format and many-to-one retrieval, case-sensitive unit conversion, uncertainty gates, UTF-8 chunking, text grouping and refinement, table column splitting, tile spacing and coverage, rotated pages, visual quote checks, malformed/truncated/null API output, `Retry-After`, claim salvage, caching, budgets, quote validation and HTML escaping. Synthetic spreadsheet tests check that the generated messy samples match their answer keys; they need the `dev` extra and are skipped without it. None of this establishes real-model extraction accuracy; see [VALIDATION.md](VALIDATION.md) and [what's measured](../benchmarks/README.md#whats-measured).
 
 `examples/demo-output/report.html` is an explicitly hand-authored fixture report; it makes no API calls.
 
 ## Public sample corpus
 
-A public test corpus of competing proposals and design revisions can be downloaded into the git-ignored `samples/` folder. Every file is checked against a pinned SHA-256 hash, and TLS is always verified:
+A public test corpus of competing proposals and design revisions can be downloaded into the git-ignored `samples/` folder. Real documents are sensitive and aren't shared (the tool runs on them inside a multi-layer sandbox), so readers' heuristics are developed on this corpus and must fall back gracefully where real documents differ, e.g. a PDF without an outline (the evidence store plan, 2026-09-24). Every file is checked against a pinned SHA-256 hash, and TLS is always verified:
 
 ```bash
 python scripts/fetch_samples.py --list      # sets, sizes, sources and terms
@@ -152,6 +152,7 @@ Bases that are a difficulty in themselves: two sheets told apart only by their t
 Every situation met in this project's documents, where it was recorded, and the knob or base that reproduces it ("–": none yet). A situation met later, in a round, a spot check or a trial, gets a row, and a knob when one is built.
 
 - **Reviews:** sc01 = spot check sc01; s01 = evaluation s01; rNN = round reviews; overall = the overall review of 2026-09-28 (all four retired 2026-10-21: the [plans index](plans/README.md#retired) says how to read one, and the [rounds' record](research/rounds.md) keeps their findings); levers = [lever index](reviews/levers.md).
+- **Plans:** the table plan = the one table model plan; the store plan = the evidence store plan; both retired 2026-10-21, as was the robustness baseline (the [plans index](plans/README.md#retired) says how to read one; the table plan's decisions are [0023](decisions/0023-tables-read-by-rules-a-model-writes.md) and [0024](decisions/0024-pdf-table-structure.md)).
 - **Research:** eye = [eye tests](research/eye-tests-2026-09-30.md); RH = [round-01 heuristics](research/round-01-context-heuristics-2026-09-26.md).
 - **Code:** extract and situate = their modules' comments.
 

@@ -12,7 +12,7 @@ from semantic_pdf_diff.llm import Client
 
 class ConfigurationTests(unittest.TestCase):
     def test_the_users_settings_the_endpoint_and_the_key(self):
-        # the owner's four variables (docs/plans/configuration-in-the-store-2026-10-20.md): the endpoint and the key
+        # the owner's four variables (decision 0032): the endpoint and the key
         # from the environment, every other setting the user's (`config set --user`) or a store's
         env = {'OPENAI_BASE_URL':'http://example.test/v1', 'OPENAI_API_KEY':'test-only-key'}
         with patch.dict(os.environ, env), user_settings({'model':'small-vlm', 'max_calls':27, 'timeout':3.5,

@@ -66,9 +66,9 @@ def needs_lab():
 # tests of mechanics (refinement, tiling, prompt layout) that don't depend on the levers use these.
 ROUND0 = json.loads((Path(__file__).resolve().parent.parent / 'benchmarks' / 'round0.json').read_text())
 
-# Tile selection as it was before milestone 8 made the rule, decoration, text-only tiles skipped (but on sheets) and
-# refinement under another cut the defaults (docs/plans/tile-selection-2026-10-10.md): for tests of a mechanism written
-# against the cut it gave (bands on a report page, the grid on a wider one, partial tiles halved).
+# Tile selection as it was before decision 0029 (docs/decisions/0029-tiles-chosen-by-measures.md) made the rule,
+# decoration and refinement under another cut the defaults (skip_text_only pinned off too): for tests of a mechanism
+# written against the cut it gave (bands on a report page, the grid on a wider one, partial tiles halved).
 TILING_BEFORE = {"decoration": False, "tile_choice": "off", "skip_text_only": False, "another_tiling": "off",
                  "halve_parts": False}
 

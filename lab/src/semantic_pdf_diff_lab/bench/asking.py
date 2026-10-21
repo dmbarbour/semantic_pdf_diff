@@ -1,5 +1,5 @@
-"""Calibration: does a tile's answer ask for another tiling when the tile cuts content? (docs/plans/
-tile-selection-2026-10-10.md, milestone 7.)
+"""Calibration: does a tile's answer ask for another tiling when the tile cuts content? (docs/research/
+tilings-2026-10-12.md, milestone 7.)
 
 The page tests' warning (2026-10-01): prompted only to zoom "as needed", neither model did, because a model doesn't
 know what it can't read. So before the another_tiling lever's said and asked modes are trusted, tiles whose cuts are

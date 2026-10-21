@@ -1,4 +1,4 @@
-"""Word documents (.docx; docs/plans/multi-format-adapters-2026-09-23.md, milestone 2), read into the text document
+"""Word documents (.docx; docs/how-it-works.md, Text files and Word documents), read into the text document
 (textmodel.py): a .docx becomes a TextDocument whose "lines" are its paragraphs and table rows in order, so sections,
 grouping, the context levers and the task core work unchanged, and a claim's locator names its paragraphs.
 

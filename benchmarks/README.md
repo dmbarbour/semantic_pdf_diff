@@ -10,9 +10,9 @@ Nobody is ground truth here. Each rater (people, model judges, exact keys, mecha
 |---|---|---|
 | `controlled/` | yes (not `fixture.sqlite`) | Controlled documents: PDFs, Markdown and Word versions with their answer keys, the recorded answers the standard runs replay (`replay.zip`, written by `scripts/controlled.py pack`; the `--unaligned` runs' and superseded answers stay in the local `fixture.sqlite`), and the scores (`results.json` for extraction, `comparisons.json` for revision pairs, with explanations' kinds). Plan: [controlled documents](../docs/plans/controlled-documents-2026-10-01.md) |
 | `eyetest/` | yes (not `images/`, not `report.html`) | Eye tests for vision models (`scripts/eye_test.py`): `results.json` compares the models; `replay.zip` holds their answers, which a test replays; the images and the report are drawn again on demand |
-| `calibration/` | yes (not `images/`, not `report.html`) | Tiling calibration (`scripts/calibration.py`): can a model choose a known-good tiling among known-bad ones? `results.json` is each model's profile; `replay.zip` holds the answers; the pictures and the report are drawn again on demand. Arms: outlined, dimmed, near, and both asked with ties. Plan: [tile selection](../docs/plans/tile-selection-2026-10-10.md), milestones 4 and 5 |
-| `labelling/` | yes (not `images/`, not `report.html`) | Region labels calibration (`scripts/labelling.py`): can a model label a page's regions? `results.json` is each model's profile; `replay.zip` holds the answers. Plan: [tile selection](../docs/plans/tile-selection-2026-10-10.md), milestone 6 |
-| `asking/` | yes (not `reads/`) | Asking calibration (`scripts/asking.py`): does a tile's answer ask for another tiling when the tile cuts content? `results.json` is each model's profile by arm; `replay.zip` holds the answers. Plan: [tile selection](../docs/plans/tile-selection-2026-10-10.md), milestone 7 |
+| `calibration/` | yes (not `images/`, not `report.html`) | Tiling calibration (`scripts/calibration.py`): can a model choose a known-good tiling among known-bad ones? `results.json` is each model's profile; `replay.zip` holds the answers; the pictures and the report are drawn again on demand. Arms: outlined, dimmed, near, and both asked with ties. Findings: [tilings](../docs/research/tilings-2026-10-12.md), milestones 4 and 5 |
+| `labelling/` | yes (not `images/`, not `report.html`) | Region labels calibration (`scripts/labelling.py`): can a model label a page's regions? `results.json` is each model's profile; `replay.zip` holds the answers. Findings: [tilings](../docs/research/tilings-2026-10-12.md), milestone 6 |
+| `asking/` | yes (not `reads/`) | Asking calibration (`scripts/asking.py`): does a tile's answer ask for another tiling when the tile cuts content? `results.json` is each model's profile by arm; `replay.zip` holds the answers. Findings: [tilings](../docs/research/tilings-2026-10-12.md), milestone 7 |
 | `real-pairs/` | yes (not `fixture.sqlite` or `replay.zip`) | Real revision pairs (`scripts/real_pairs.py`): the settings and the raters' results; the recorded answers stay local, as the samples do. Plan: [comparing revisions](../docs/plans/revision-comparison-2026-10-02.md) |
 | `champion.json`, `round0.json` | yes | The defaults since the improvement rounds, and the settings before them (tests pin both) |
 | `rounds/<name>/` | no | Improvement rounds (`scripts/run_round.py`): their specs, pairs, verdicts and decisions. Five batches that tests judge again offline are in `tests/fixtures/rounds/` |
@@ -24,7 +24,7 @@ Nobody is ground truth here. Each rater (people, model judges, exact keys, mecha
 
 ## What's measured
 
-From the closed [evaluation benchmarks plan](../docs/plans/evaluation-benchmarks-2026-09-23.md): what extraction, retrieval and comparison quality mean here, and which rater gives each ([decision 0018](../docs/decisions/0018-several-raters-none-ground-truth.md): none is ground truth).
+From the evaluation benchmarks plan (closed 2026-10-04, [retired](../docs/plans/README.md#retired)): what extraction, retrieval and comparison quality mean here, and which rater gives each ([decision 0018](../docs/decisions/0018-several-raters-none-ground-truth.md): none is ground truth).
 
 | Measure | Question | Rated by |
 |---|---|---|

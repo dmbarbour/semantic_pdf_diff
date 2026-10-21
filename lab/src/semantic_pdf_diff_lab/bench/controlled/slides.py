@@ -1,5 +1,5 @@
-"""The controlled corpus as slide decks (.pptx; the adapters plan, milestone 3; from the closed evaluation benchmarks
-plan: "the controlled corpus written as slides too, scored by the same keys"), and the decks' own difficulties.
+"""The controlled corpus as slide decks (.pptx; decision 0036, representations as controls: "Each reader's format gets
+the corpus, scored by the same key"), and the decks' own difficulties.
 
 - **A slide per section:** the document's title on a title slide; each section a slide titled by its heading, its
   paragraphs one text box's paragraphs, a bold caption its own text box, each table a table, each chart a chart

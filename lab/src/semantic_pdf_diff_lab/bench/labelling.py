@@ -1,4 +1,4 @@
-"""Calibration for region labels: can a model label a page's regions? (docs/plans/tile-selection-2026-10-10.md,
+"""Calibration for region labels: can a model label a page's regions? (docs/research/tilings-2026-10-12.md,
 milestone 6.)
 
 Each page of the controlled corpus gets regions whose labels are known, asked about in two questions:

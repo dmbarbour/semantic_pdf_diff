@@ -1,4 +1,4 @@
-"""Calibration: can a model judge tilings? (docs/plans/tile-selection-2026-10-10.md, milestone 4.)
+"""Calibration: can a model judge tilings? (docs/research/tilings-2026-10-12.md, milestone 4.)
 
 The owner, 2026-10-10: "a calibration step that tests if a model is any good at this sort of question, tuned with
 known-bad cuts and pseudo-random candidate ordering."

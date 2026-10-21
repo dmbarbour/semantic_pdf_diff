@@ -1,7 +1,7 @@
 # 0025. Commits wait on the disk only for the changes people make
 
 - **Status:** Accepted (2026-10-09)
-- **Source:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), C2 and C3, and the owner's answer there; refines [0003](0003-sqlite-evidence-store.md)
+- **Source:** the [code review of 2026-10-08](../plans/README.md#retired), C2 and C3, and the owner's answer there; refines [0003](0003-sqlite-evidence-store.md)
 
 ## Context
 

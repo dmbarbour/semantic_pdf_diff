@@ -1,11 +1,11 @@
 # 0003. A resumable SQLite evidence store in a local folder
 
 - **Status:** Accepted (2026-09-23)
-- **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [layout](../plans/sources-and-evidence-store-2026-09-23.md#layout), [why SQLite](../plans/sources-and-evidence-store-2026-09-23.md#why-sqlite), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23), [milestones](../plans/sources-and-evidence-store-2026-09-23.md#milestones) 2 and 7; [store milestone 2 review](../plans/README.md#retired); [architecture clean-up: progress](../plans/architecture-cleanup-2026-10-02.md#progress), milestone 6c (read-only `Store.open`)
+- **Source:** [evidence store plan](../plans/README.md#retired): layout, why SQLite, decisions, milestones 2 and 7; [store milestone 2 review](../plans/README.md#retired); [architecture clean-up: progress](../plans/README.md#retired), milestone 6c (read-only `Store.open`)
 
 ## Context
 
-0.1 extracted, compared and reported in one run, with a folder of cached responses. Long runs over many files must survive interruption, several sources must share work, and many views (evidence with provenance, coverage, differences, exports) should come from one body of evidence.
+0.1 extracted, compared and reported in one run, with a folder of cached responses. Long runs over many files must survive interruption, several sources must share work, and many views (evidence with provenance, coverage, differences, exports) should come from one body of evidence. The expected scale (2026-09-23): a few sources per user, typically a few revisions and a few competing teams, so one store usually holds several sources and shares work among them.
 
 ## Decision
 

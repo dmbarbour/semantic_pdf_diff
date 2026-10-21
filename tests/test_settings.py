@@ -1,7 +1,7 @@
 """Every setting keeps to its class (models.SETTING_CLASSES): toggled on its own, through the whole
 pipeline, an endpoint setting changes no query that reaches the model, a post-processing one no
 extraction query, and a shaping or selecting one changes some query (else it's dead or misfiled).
-See docs/plans/content-addressed-queries-2026-09-28.md, milestone 1.
+See docs/decisions/0011-settings-classified-by-effect.md.
 """
 import stubs  # noqa: F401 (a clean environment)
 from stubs import slow

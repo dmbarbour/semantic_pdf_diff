@@ -1,7 +1,7 @@
 # 0006. Recorded model answers replay as test fixtures
 
 - **Status:** Accepted (2026-09-25)
-- **Source:** [test models and record/replay plan](../plans/test-models-and-record-replay-2026-09-24.md): [design](../plans/test-models-and-record-replay-2026-09-24.md#design), [milestones](../plans/test-models-and-record-replay-2026-09-24.md#milestones) 1–4 (`record-new`, 2026-09-27), [decisions 2026-09-25](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-25); [content-addressed queries: progress](../plans/content-addressed-queries-2026-09-28.md#progress), milestone 1 (the prune guard); [meta-audit](../plans/README.md#retired), flaws 3, 11 and 21
+- **Source:** [test models and record/replay plan](../plans/README.md#retired): design, milestones 1–4 (`record-new`, 2026-09-27), decisions 2026-09-25; [content-addressed queries: progress](../plans/README.md#retired), milestone 1 (the prune guard); [meta-audit](../plans/README.md#retired), flaws 3, 11 and 21
 
 ## Context
 

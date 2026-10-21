@@ -1,8 +1,8 @@
 # Better retrieval recall: model keywords, alias consolidation, embeddings
 
-- **Status:** Planned (2026-09-24). Its benchmark, planned in [evaluation-benchmarks](evaluation-benchmarks-2026-09-23.md) (closed 2026-10-04), is now its milestone 0; the results choose the defaults.
+- **Status:** Planned (2026-09-24). Its benchmark, planned in the evaluation benchmarks plan (closed 2026-10-04; [retired](README.md#retired)), is now its milestone 0; the results choose the defaults.
 - **Since written (reviewed 2026-10-21):** an embedding client (`embed.py`, cached in the answers cache), a reranker (`rerank.py`: the common `/rerank` API, DeepInfra's or TEI's; proposals only, off unless configured) and the model's other names for one thing (`synonyms.py`, `search_names`, a default) are built, but the embeddings and other names feed only the search, and the reranker only which retrieved pairs are judged: proposals' candidates are still TF-IDF over entity, attribute, conditions and value with configured aliases (`retrieval.py`); revisions align instead ([revision comparison](revision-comparison-2026-10-02.md)). The embedding model chosen and measured is Qwen3-Embedding at 256 dimensions, with an instruction, embedding a claim as a sentence. Milestone 1 becomes feeding those into proposals' candidate retrieval. Milestone 0's benchmark can start from the search plan's judged-pairs measure and the reranker's offline measure on six recorded runs.
-- **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (sections); its own benchmark (milestone 0) to measure
+- **Depends on:** the evidence store's sections (built: [how it works](../how-it-works.md#pipeline), step 0); its own benchmark (milestone 0) to measure
 
 ## Problem
 
@@ -56,14 +56,14 @@ Implications:
 
 ## Milestones (after the benchmark exists)
 
-0. **The retrieval benchmark.** *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):*
+0. **The retrieval benchmark.** *From the closed [evaluation benchmarks](README.md#retired) plan (2026-10-04):*
    - **Documents:** the public corpus's competing proposals (the Solar Decathlon teams, the wind turbine designs, the 3GPP contributions with the moderator's summaries as a head start on which positions correspond), revisions (QUIC, the IEA 15 MW spreadsheets, the NASA interim and final reports), and vocabulary drift between authors.
    - **Candidate pairs** from a generous union of methods (TF-IDF at a high `k`, embeddings, keyword overlap), with random pairs as controls: labelling only what TF-IDF finds would hide the misses to be measured.
    - **Labels** on a review page ([decision 0019](../decisions/0019-offline-review-pages.md)): same topic, different topic or unsure, and the relation of a same-topic pair (equivalent, different, complementary, unrelated). A few hundred pairs, drafted by Claude and checked by the owner.
    - **Scores:** recall@k and precision per method and setting, by claim kind and by within- and between-source pairs; the comparison step's relations' accuracy; each local embedding model's throughput.
    - **Methods, first round:** TF-IDF with and without aliases; each local embedding model, embedding claim topics without values; TF-IDF and embeddings together; with model-generated section keywords once they exist.
    - **Real documents** are spot-checked inside the sandbox.
-1. Embedding client plus cache, using the shared endpoint by default with per-role overrides (see *Endpoints per role* in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md)); hybrid retrieval behind a setting.
+1. Embedding client plus cache (built: `embed.py`, at the chat endpoint's `/embeddings` unless `embed_url` names another, which is sent `OPENAI_API_KEY` too; [configuration](../configuration.md)); hybrid retrieval behind a setting.
 2. Keyword field in extraction; per-source consolidation into an alias map.
 3. Cross-source vocabulary merge.
 4. Choose defaults from benchmark results; document the tradeoffs.
@@ -90,4 +90,4 @@ None currently.
 
 - **Available models:** listed above.
 - **Language:** current sources are English, so English models are the default candidates. Keep the multilingual E5 models in the benchmark and as a configurable option, since future users may have other languages; don't assume English anywhere it is cheap not to (e.g. tokenization already uses Unicode word rules).
-- **Alias maps and other reviewer decisions:** every human QA judgment is **reusable data**. Accepting or rejecting a proposed alias, confirming a keyword merge, correcting an extraction or labelling a benchmark pair are all stored as annotations keyed by stable IDs. They survive report regeneration and store resets, can be exported as their own report and imported into another store, and, for alias decisions, can be exported as a configuration fragment (the `aliases` mapping). Aliases shape retrieval, which is recorded per comparison, so applying an updated alias map never needs a store reset. The annotation mechanism is specified in [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (*Annotations*).
+- **Alias maps and other reviewer decisions:** every human QA judgment is **reusable data**. Accepting or rejecting a proposed alias, confirming a keyword merge, correcting an extraction or labelling a benchmark pair are all stored as annotations keyed by stable IDs. They survive report regeneration and store resets, can be exported as their own report and imported into another store, and, for alias decisions, can be exported as a configuration fragment (the `aliases` mapping). Aliases shape retrieval, which is recorded per comparison, so applying an updated alias map never needs a store reset. The annotation mechanism is specified in [criteria-first comparison](n-way-comparison-2026-09-23.md#annotations) (superseded in part 2026-09-24: no per-claim corrections; an errata document instead).

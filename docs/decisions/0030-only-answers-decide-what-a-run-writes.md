@@ -1,7 +1,7 @@
 # 0030. Only answers decide what a run writes; how the run went is recorded apart
 
 - **Status:** Accepted (2026-10-13)
-- **Source:** the [determinism review](../reviews/determinism-2026-10-12.md), found by the controlled corpus re-recorded under `leave_text: tables`
+- **Source:** the [determinism review](../plans/README.md#retired), found by the controlled corpus re-recorded under `leave_text: tables`
 
 ## Context
 
@@ -22,6 +22,7 @@ The owner, 2026-10-12: "We definitely need to fix things so race conditions aren
 - **Budget caps pause a run, they don't end it:**
   - Requests are admitted on the calling thread as they're asked; `max_calls` counts requests, not attempts.
   - Which work a cap cuts still follows the order earlier answers came in. So a report a cap cut says `paused`, and the lab refuses to score it; the run is resumed instead. The owner: "Paused, not a result."
+  - Each attempt checks the cost cap again once it has waited its turn: a request admitted as it was asked can wait behind others while their costs reach the cap (found 2026-10-13, after the review closed: a test's cap overran about 1 run in 5).
 - **A repeated table row's lead is its first sighting by page:** rows that may repeat are held until the document's pages are read and its requests answered, then read in (page, tag) order. The owner: "Hold until the document is fed."
 - **Left as is:** a failure's text says how the answer came to be absent (HTTP 503 or a timeout), and may differ between runs that both lack it.
 

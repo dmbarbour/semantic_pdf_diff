@@ -1,7 +1,7 @@
 # 0026. `--plan` is dropped until estimates can come from the reading itself
 
 - **Status:** Accepted (2026-10-10)
-- **Source:** the [code review of 2026-10-08](../reviews/code-review-2026-10-08.md), C7, and the owner's answer
+- **Source:** the [code review of 2026-10-08](../plans/README.md#retired), C7, and the owner's answer
 
 ## Context
 
@@ -26,5 +26,5 @@ The owner, 2026-10-10: "Yes, drop --plan. I think there is merit in a `--dry-run
 ## Consequences
 
 - No pre-run estimate of calls, tokens or time; `max_cost`, `max_calls` and resuming bound a run instead.
-- The progress display (the trials' findings 3 and 4) can't take its totals from `--plan`; its totals come from the run, as each level opens.
+- The progress display ([0035](0035-progress-drawn-by-the-product.md)) can't take its totals from `--plan`; its totals come from the run, as each level opens.
 - `--dry-run` today means "with `--reset`, report what would be cleared" (and the same for `gc`). A dry run of the reading would extend that flag or need another name.

@@ -66,7 +66,7 @@ The [query improvement plan](../plans/query-improvement-2026-09-26.md) tried lev
 
 **Four units judged on the wrong crop (found 2026-10-02):**
 - **What happened:** a text unit and a visual unit cut into bands of the same number, on one page, got one image name. The first unit's crop was kept for both, so the second was judged on a crop of another band: 1 unit in r09 (excerpts), 2 in r09b (fragments), 1 in r09h (fragments, held out).
-- **Found** while making the rounds' images again from the slices (the [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md), milestone 9). New batches name a band's crop by its kind.
+- **Found** while making the rounds' images again from the slices (the [architecture clean-up](../plans/README.md#retired), milestone 9). New batches name a band's crop by its kind.
 - **Re-decided without them,** as the owner asked ("Go ahead"), offline from the recorded verdicts:
 
   | Batch | Recorded | Today's rules, all units | Today's rules, without them |
@@ -76,6 +76,10 @@ The [query improvement plan](../plans/query-improvement-2026-09-26.md) tried lev
   | r09h fragments (held out) | no worse, 0.66 (0.50–0.81) | accepted: wins, 0.66 (0.50–0.81) | no worse, 0.64 (0.48–0.79) |
 
 - **No conclusion changes.** Under the held-out rule (since 2026-09-30), r09h holds out with or without the unit, so fragments stays a default. Its development-rule verdict flips between "wins" and "no worse" on one unit because its lower bound sits at 0.5: the borderline the round reported, not a new result.
+
+**One unit score (2026-10-02):**
+- A unit's score, flips, disagreement and "unsettled" got one definition (`judgements.UnitVerdicts`), used by the decision, `unsettled`, the analyses and the post-mortem.
+- The committed analyses' scores were recomputed offline: 16 units in 9 batches changed score, 2 units no judge saw in both orders left the analyses, and each batch's split list lost at most one unit. Their issue notes and the post-mortems stand as written.
 
 ## What the method's numbers were
 
@@ -150,7 +154,7 @@ Every model call's reported cost, from the ledgers, as of 2026-10-03.
 ## Also removed, with their records
 
 - **Spot check sc01** (2026-09-30, items 1–5 of 16, round 0 against the champion):
-  - **Its findings:** tables lost their structure before the model saw them (a stacked table's second header row, header cells cut short, wrapped cells as unlabelled rows; the [one table model](../plans/one-table-model-2026-09-30.md)); entity against conditions was underspecified ("2 ton unit" given as a condition); a unit held one reader's claims while people and judges saw the whole page. Its lever ideas have rows in the lever index, its situations rows in the [catalogue](../samples-and-testing.md#the-catalogue-of-situations), and its rubric v7 candidate is in *Resumed query rounds*.
+  - **Its findings:** tables lost their structure before the model saw them (a stacked table's second header row, header cells cut short, wrapped cells as unlabelled rows; mended since: [decision 0024](../decisions/0024-pdf-table-structure.md)); entity against conditions was underspecified ("2 ton unit" given as a condition); a unit held one reader's claims while people and judges saw the whole page. Its lever ideas have rows in the lever index, its situations rows in the [catalogue](../samples-and-testing.md#the-catalogue-of-situations), and its rubric v7 candidate is in *Resumed query rounds*.
   - The owner (2026-10-03): "I won't get back to that spotcheck." So the survey it awaited is dropped, and nothing waits on it.
 - **Evaluation batches s01 and s02** (2026-09-25; 17 items each, labelled by the owner, Claude and a panel of up to seven hosted models):
   - **Agreement:** on claims, verdict α 0.75 and the usable-or-not gate 0.89 with four reviewers; 0.59 and 0.68 with eight, some much more lenient. Dawid–Skene estimated the reviewers' accuracy at 0.58–1.00 from the labels alone; the owner agreed with the others' majority on 9 of 12 claims. Per field, entity and attribute reached α 0.72–0.73, basis 0.20; α understates agreement when nearly every answer is "ok", so raw agreement is reported beside it ([decision 0018](../decisions/0018-several-raters-none-ground-truth.md)).

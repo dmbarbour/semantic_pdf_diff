@@ -1,4 +1,4 @@
-"""Levers as mixins on a platform class (docs/plans/architecture-cleanup-2026-10-02.md, milestone 3).
+"""Levers as mixins on a platform class (docs/decisions/0013-levers-as-mixins.md).
 
 The owner, 2026-10-02: "having one platform/container class for the instantiated configuration (instead of
 global state) would be relatively conventional OO"; "condition-based composition isn't very robust or
@@ -42,7 +42,7 @@ EVERY_ROLE = EXTRACT + TRIAGE + COMPARE
 
 @dataclass(frozen=True)
 class Declared:
-    """What a setting can change (docs/plans/content-addressed-queries-2026-09-28.md):
+    """What a setting can change (docs/decisions/0011-settings-classified-by-effect.md):
     - endpoint: how requests travel, budgets and limits; never what any query says
     - shaping: the content of queries (text, images, generation settings)
     - selecting: which queries are made (tasks added or removed), and which sources are read
@@ -1197,7 +1197,7 @@ class DedupeRepeated(Lever):
 # The canonical order: the prompt's (instructions, then context lines as the providers write them), then the
 # stages that choose and keep. The defaults are the champion of the improvement rounds, promoted 2026-09-28
 # (rounds 1-9; benchmarks/champion.json), and since 2026-10-12 the tile selection plan's, by judgement (decoration,
-# tile_choice, another_tiling, halve_parts: docs/plans/tile-selection-2026-10-10.md, milestone 8), leave_text's
+# tile_choice, another_tiling, halve_parts: docs/decisions/0029-tiles-chosen-by-measures.md), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
 # view_rows, align_hedges, hedges_apart, read_holders and hedge_rule (docs/reviews/levers.md); round 0's settings

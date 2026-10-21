@@ -1,5 +1,5 @@
-"""Tables read by rules a model writes (docs/plans/multi-format-adapters-2026-09-23.md, "Excel, in detail", step 5;
-docs/plans/one-table-model-2026-09-30.md, item 4): one query per table, whatever its length, rather than one a row.
+"""Tables read by rules a model writes (docs/decisions/0023-tables-read-by-rules-a-model-writes.md): one query per
+table, whatever its length, rather than one a row.
 
 The owner (2026-10-04): "ask a model how to handle the table. We should give the model the headers and samples of the
 rows, report number of claims and our own heuristic opinion (summary vs. point per claim) based on size and a short

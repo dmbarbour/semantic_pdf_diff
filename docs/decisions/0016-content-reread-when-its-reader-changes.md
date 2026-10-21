@@ -1,7 +1,7 @@
 # 0016. Content is read again when its reader changes
 
 - **Status:** Accepted (2026-10-04)
-- **Source:** [multi-format adapters: merged and nested cells](../plans/multi-format-adapters-2026-09-23.md#progress) ("A gap met on the way"); the plans review of 2026-10-04 (the owner: "Go for the cheap wins!")
+- **Source:** [multi-format adapters: merged and nested cells](../plans/README.md#retired) ("A gap met on the way"); the plans review of 2026-10-04 (the owner: "Go for the cheap wins!")
 
 ## Context
 

@@ -248,8 +248,8 @@ class ContentAddressedCache(unittest.TestCase):
             self.assertEqual(state['requests'], 1)  # unchanged queries aren't paid for again
 
 class TheUsersCache(unittest.TestCase):
-    """One answers cache per user, shared by every store (docs/plans/configuration-in-the-store-2026-10-20.md,
-    milestone 3; the owner, 2026-10-08: "The per-user default is tempting. Let's go with that instead.")."""
+    """One answers cache per user, shared by every store (decision 0032; the owner,
+    2026-10-08: "The per-user default is tempting. Let's go with that instead.")."""
     def test_one_cache_answers_every_store(self):
         from semantic_pdf_diff.pipeline import RunOptions, make_client
         from stubs import per_user_cache

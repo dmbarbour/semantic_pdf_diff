@@ -111,7 +111,7 @@ def _unloadable(job, error):
     return
     yield  # a generator, as a reader's steps are
 
-# Readers by normalized extension (the adapters plan: chosen by extension only, no sniffing).
+# Readers by normalized extension, chosen by extension only, never by sniffing content (decision 0002).
 TEXT_EXTENSIONS = (".txt", ".md", ".docx", ".pptx", ".xlsx", ".xlsm", ".csv", ".tsv")
 # Images read as one-page documents (a TIFF's frames as pages) by the PDF reader's vision tasks (image_pdf)
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp", ".gif")

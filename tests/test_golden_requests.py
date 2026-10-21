@@ -3,8 +3,8 @@ defaults, round 0's settings and a drawing sheet.
 
 Recorded answers are found by what reached the model, so a refactor that changes a request's bytes makes every
 recorded answer to it miss, and it is paid again. Judge prompts have their goldens (test_judge_prompts); these
-cover the rest of the pipeline, so the architecture clean-up (docs/plans/architecture-cleanup-2026-10-02.md)
-can show each step changed no request it didn't mean to. A golden holds one line per request (its role and a
+cover the rest of the pipeline, so a refactor (docs/decisions/0009-content-addressed-queries.md) can
+show it changed no request it didn't mean to. A golden holds one line per request (its role and a
 hash of its prompt, image hashes and parameters) and each role's first prompt in full, so a change to a
 template reads as a diff. After an intended change, regenerate with GOLDEN_UPDATE=1 and review the diff.
 

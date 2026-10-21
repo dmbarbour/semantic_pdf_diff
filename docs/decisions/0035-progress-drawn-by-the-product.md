@@ -1,7 +1,7 @@
 # 0035. Progress is drawn by the product, in bars of fixed total
 
 - **Status:** Accepted (2026-10-21)
-- **Source:** [progress in stacked bars of fixed size](../plans/progress-display-2026-10-20.md), milestones 1 to 7; the [trials review](../reviews/trials-2026-10-08.md), findings 3 and 4
+- **Source:** [progress in stacked bars of fixed size](../plans/progress-display-2026-10-20.md), milestones 1 to 7; the [trials review](../plans/README.md#retired), findings 3 and 4
 
 ## Context
 

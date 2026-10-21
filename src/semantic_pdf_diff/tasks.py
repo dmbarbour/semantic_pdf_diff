@@ -1,4 +1,4 @@
-"""What every reader does with an extraction task (docs/plans/multi-format-adapters-2026-09-23.md, milestone 1): queue
+"""What every reader does with an extraction task (docs/decisions/0020-formats-share-one-task-core.md): queue
 the request, check the answer's quotes, make evidence and coverage rows, follow exactly repeated blocks, refine a
 partial answer, and the text and table tasks themselves, which take text segments and a reader for their context
 whatever the format. A reader (extract's PDF job, textjob's text job) supplies its parts: where a task sits (a page

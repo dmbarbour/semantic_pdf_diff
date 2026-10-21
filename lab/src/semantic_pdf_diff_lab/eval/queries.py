@@ -5,7 +5,7 @@ stratified by document and kind of region, with the images each was sent and wha
 (settings.lever_notes). Against a baseline's runs it keeps only what a variant changed, as diffs.
 Checker models then look for obvious errors (junk context, wrong headings, cut-off text, bad
 images) before a round spends money judging answers. The dump is a folder: queries.jsonl, the
-images, index.html, and checks/<model>.json. (docs/plans/content-addressed-queries-2026-09-28.md)
+images, index.html, and checks/<model>.json. (docs/decisions/0037-levers-judged-paired-and-promoted-held-out.md)
 """
 import difflib
 import hashlib

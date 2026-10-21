@@ -1,7 +1,7 @@
 # Controlled documents with known facts
 
 - **Status:** Completed (2026-10-21): milestones 1, 2 (table, prose and layout knobs), 3 (charts, scans, schematics, relations and drawing sheets) and 4 (revision pairs and comparison scoring) done (2026-10-01 to 02), milestone 6 begun and the formats' knobs added (2026-10-03 to 04). The generated corpus stays as standing test infrastructure. Decision in force: [0036](../decisions/0036-controlled-documents-with-exact-keys.md). Moved: the scenario catalogue, the knobs built and the backlog (milestone 6) to [samples and testing](../samples-and-testing.md#controlled-documents); milestone 5 (the controlled stratum in rounds, with decision 3's proposed rule) to the plans index's *Resumed query rounds*; milestone 7 to *Measured accuracy in the docs* (both Tentative); model profiles (Uses) to *Model discovery and per-task selection*.
-- **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](one-table-model-2026-09-30.md) (table hazards; its table eye tests become part of this); [content-addressed queries](content-addressed-queries-2026-09-28.md) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
+- **Depends on:** the [eye and page tests](../research/eye-tests-2026-09-30.md) (drawing code, recorded queries, profiles); [one table model](README.md#retired) (table hazards; its table eye tests become part of this); [content-addressed queries](README.md#retired) (the same documents ask the same queries, so answers replay); [query improvement](query-improvement-2026-09-26.md) (rounds).
 - **Why:**
   - **The owner (2026-10-01):** "similar to the eye test as a controlled test, we could have controlled PDF tests, i.e. where you generate a few PDFs with known facts to extract for fictional projects. This might provide a more robust control without relying on yours or my ability to extract facts."
   - **And:** "pseudo-random so we can still leverage caching and fast testing. We can include things like the stacked tables as another difficulty knob, and generally build a list of troublesome and messy scenarios we've already encountered, mitigating some weaknesses of this approach."
@@ -140,7 +140,7 @@ Moved (2026-10-21) to [samples and testing](../samples-and-testing.md#the-catalo
 4. **Revision pairs and comparison scoring.**
 5. **Into rounds:** the controlled stratum reported beside judged win rates, exactly scored.
 6. **New failures become knobs:** each round's review and post-mortem adds the situations it finds.
-7. **Measured accuracy in the docs.** *From the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan (2026-10-04):* measured accuracy figures in the user docs ([limitations](../limitations.md) now says only that extraction "has been measured with one real model ... not on labeled representative proposals"), the controlled scores beside judged ones, each with what it rests on.
+7. **Measured accuracy in the docs.** *From the closed [evaluation benchmarks](README.md#retired) plan (2026-10-04):* measured accuracy figures in the user docs ([limitations](../limitations.md) now says only that extraction "has been measured with one real model ... not on labeled representative proposals"), the controlled scores beside judged ones, each with what it rests on.
 
 ## Progress
 
@@ -486,11 +486,11 @@ Moved (2026-10-21) to [samples and testing](../samples-and-testing.md#the-catalo
 
    - **The owner (2026-10-01):** "We can try this rule, though it may be a bit rigid. We should probably contemplate tracking multiple 'cursors' for leading configurations of levers to mitigate the local minima/maxima traps that we might run into with rigid rules." The cursors idea is recorded with the lever search (plans index).
 4. **Representations as controls (2026-10-02).** The owner: "When we do add the alternative readers, we'll implicitly get a new form of control tests: same facts across two or more representations, within constraints of being unable to effectively represent all media (I'm not inclined to even try to interpret ASCII art as figures, for example.)"
-   - **Claude's reading:** as each reader is added ([multi-format adapters](multi-format-adapters-2026-09-23.md)), the corpus is also written in that reader's format (`.txt`/`.md`, `.docx`, later `.pptx`, `.csv`/`.xlsx`), each fact with a known place in it. The same key then scores each representation, and the medium becomes a knob beside the others, extending the table plan's medium test (Uses).
+   - **Claude's reading:** as each reader is added ([multi-format adapters](README.md#retired)), the corpus is also written in that reader's format (`.txt`/`.md`, `.docx`, later `.pptx`, `.csv`/`.xlsx`), each fact with a known place in it. The same key then scores each representation, and the medium becomes a knob beside the others, extending the table plan's medium test (Uses).
    - **Only what a format carries:**
      - a chart or schematic stays out of plain text rather than being drawn as text
      - the facts it holds are marked absent from that representation, not missed
-   - **Markdown, the first (2026-10-03):** `representations.py` writes the clean and trap documents and their revisions as Markdown (`docs-md`), 17 documents, scored by the same facts. Results are in the [adapters plan](multi-format-adapters-2026-09-23.md) (Progress): full recall, and no misbinding where the PDF schedules had 6–18.
+   - **Markdown, the first (2026-10-03):** `representations.py` writes the clean and trap documents and their revisions as Markdown (`docs-md`), 17 documents, scored by the same facts. Results are in [formats beyond PDF](../research/formats-beyond-pdf-2026-10-07.md): full recall, and no misbinding where the PDF schedules had 6–18.
 
 ## Open questions
 

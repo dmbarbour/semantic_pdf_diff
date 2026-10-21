@@ -344,7 +344,7 @@ Before records are built, so each later milestone has a baseline. Almost all of 
 - **Subject sources:** headings, row labels and title blocks as records; situating's figure and section abouts as subject and scope records.
 - **Milestone 1's position** refers to its list's record instead of copying the lead-in; the stamp and figure-panel cases told apart by the record's kind.
 - **Name as printed, mechanically:**
-  - table claims: the parse's row label and column header (the [one table model](one-table-model-2026-09-30.md) has them)
+  - table claims: the parse's row label and column header (the rules' grid has them: [0023](../decisions/0023-tables-read-by-rules-a-model-writes.md))
   - text claims: the label before the value in its sentence ("timeout of 856 ms")
 - **Stated, none, unknown** recorded per kind on each claim.
 - **Identity, a first proxy** ([Claim identity](#claim-identity)): printed identifiers as alignment's own feature, positions and place as small terms, weights per mode; `claim_id`'s parts named (a refactor, proven by replay).
@@ -492,7 +492,7 @@ Its milestone 5, and a measure it held, moved here when [scheduling and triage](
 - **The basis veto in comparison:** a measured value and a projected one aren't a contradiction. A basis mismatch makes a confident "different" or "equivalent" uncertain, as unmatched conditions do. Basis is already part of a claim's identity (`claim_id`).
 - **Skeptical prompting:** the reader asked to question its own reading of columns and labels, and to notice presentation that can mislead: truncated or log axes, missing error bars, selective ranges, projections presented as results, totals that don't add up, claims that don't fit together. Suspicions are recorded as issues on the claim or finding and shown, never dropping evidence.
 - **The schema's other unfilled fields,** `context`, `topic` and `role` ([Where the code mixes them today](#where-the-code-mixes-them-today)): defined, or retired.
-- **Situating's quality, measured** (moved into scheduling from the closed [evaluation benchmarks](evaluation-benchmarks-2026-09-23.md) plan, 2026-10-04), before figures' and sections' "abouts" become subject and scope records (milestone 4's remainder):
+- **Situating's quality, measured** (moved into scheduling from the closed [evaluation benchmarks](README.md#retired) plan, 2026-10-04), before figures' and sections' "abouts" become subject and scope records (milestone 4's remainder):
   - figure–reference links labelled on curated pages: link precision and recall, figure detection recall (reports' unresolved references a label-free proxy)
   - "abouts" rated for usefulness and correctness (what a figure or section is about, without values) by panels of models ([Measurement](#measurement), layer 6)
 

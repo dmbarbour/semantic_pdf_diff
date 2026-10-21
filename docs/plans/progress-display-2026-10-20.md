@@ -6,7 +6,7 @@
 - **On Ctrl+C (2026-10-21):** "these processes can run a long time and resume cleanly. But, currently, ctrl+c just leaves a mess of exception info in the terminal. Please capture it and exit cleanly, with a short message about how to resume."
 - **On concurrency (2026-10-21):** "Is the `concurrency` setting ignored? I regularly seem to have `"7 waiting"` when I configure concurrency at 2, for example. My in-house setup has only a few servers for gemma-4, and I need to not be taking all of them."
 - **On testing (2026-10-20):** "How are you testing progress bar rendering in any case? Seems difficult, though IIUC libghostty has some support for headless terminal testing."
-- **Earlier (2026-10-08, the [trials review](../reviews/trials-2026-10-08.md), findings 3 and 4, until now a tentative row):** "What we need is something closer to pinned progress bars at the bottom with a rolling log above or similar." And: "It would be better to develop some clear concept of what needs processing and base it on that, and use multiple progress bars for hierarchical subtasks that open into more tasks."
+- **Earlier (2026-10-08, the [trials review](README.md#retired), findings 3 and 4, until now a tentative row):** "What we need is something closer to pinned progress bars at the bottom with a rolling log above or similar." And: "It would be better to develop some clear concept of what needs processing and base it on that, and use multiple progress bars for hierarchical subtasks that open into more tasks."
 
 ## Why
 

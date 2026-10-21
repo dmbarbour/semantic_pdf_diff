@@ -1,4 +1,4 @@
-"""Excel workbooks (.xlsx, .xlsm; docs/plans/multi-format-adapters-2026-09-23.md, milestone 5, "Excel, in detail"),
+"""Excel workbooks (.xlsx, .xlsm; docs/decisions/0022-spreadsheet-cells-as-excel-shows-them.md),
 read through the text reader as Word documents are: a workbook becomes a TextDocument whose pages are its sheets and
 whose lines are its regions' rows and cells, each line placed by its sheet and cell range.
 

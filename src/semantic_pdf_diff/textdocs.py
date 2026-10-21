@@ -1,5 +1,5 @@
-"""Plain text and Markdown documents (docs/plans/multi-format-adapters-2026-09-23.md, milestone 1), and Word
-documents read into the same form (docxdocs.py, milestone 2).
+"""Plain text and Markdown documents (docs/how-it-works.md, Text files and Word documents), and Word documents read
+into the same form (docxdocs.py).
 
 A text file is read as pages of lines: a form feed starts a page (as in RFCs), else the file is one page. Where a
 PDF task sits on a page in a box of points, a text task sits in lines: its box is (0, first line, 1, last line + 1),

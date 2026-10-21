@@ -1,4 +1,4 @@
-"""A partial tile read again under another tiling (docs/plans/tile-selection-2026-10-10.md, milestone 7).
+"""A partial tile read again under another tiling (docs/research/tilings-2026-10-12.md, milestone 7).
 
 The owner, 2026-10-10: "models could feasibly request an alternative tiling as a refinement option", and "It isn't
 necessarily a problem to combine claims from two different tilings of the same page." So a tile whose answer is
