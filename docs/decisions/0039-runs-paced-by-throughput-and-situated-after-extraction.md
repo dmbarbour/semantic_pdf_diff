@@ -1,7 +1,7 @@
 # 0039. Runs are paced by the server's throughput, fair across sources, and situated after extraction
 
 - **Status:** Accepted (2026-10-21)
-- **Source:** the [scheduling and triage plan](../plans/scheduling-and-triage-2026-09-23.md) (its decisions, 2026-09-23 to 2026-10-14; milestones 1 to 4) and its reviews: [concurrency](../reviews/scheduling-m1-concurrency-2026-09-24.md), [fair share](../reviews/scheduling-m2-fair-share-2026-09-24.md), [triage signals](../reviews/scheduling-m3-triage-signals-2026-09-24.md), [situating](../reviews/scheduling-m4-situating-2026-09-25.md)
+- **Source:** the [scheduling and triage plan](../plans/scheduling-and-triage-2026-09-23.md) (its decisions, 2026-09-23 to 2026-10-14; milestones 1 to 4) and its reviews: [concurrency](../plans/README.md#retired), [fair share](../plans/README.md#retired), [triage signals](../plans/README.md#retired), [situating](../plans/README.md#retired)
 
 ## Context
 

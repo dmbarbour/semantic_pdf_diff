@@ -7,7 +7,7 @@
   - the entity register ([claim context](claim-context-2026-10-14.md))
   - the fetched competing sets: `3gpp-ran1-beam-management` (four companies' contributions on one agenda item) and `3gpp-rel19-aiml-views` (nine companies' views, in `.pptx`, `.docx` and PDF), readable since the adapters
   - controlled proposals: two fictional designs of one system from one fact sheet's kinds, counterparts known
-- **Open question (from [review batch s01](../reviews/evaluation-s01-2026-09-25.md), 2026-09-25, the owner's call):** what the relations mean across proposals. The panel called NREL 5 MW's pitch angle at 25 m/s against IEA 15 MW's pitch controller objective "unrelated" (different turbines), Claude "complementary"; in proposals the interesting relation is "same attribute, different value across designs", which today's labels mix with contradiction.
+- **Open question (from [review batch s01](README.md#retired), 2026-09-25, the owner's call):** what the relations mean across proposals. The panel called NREL 5 MW's pitch angle at 25 m/s against IEA 15 MW's pitch controller objective "unrelated" (different turbines), Claude "complementary"; in proposals the interesting relation is "same attribute, different value across designs", which today's labels mix with contradiction.
 - **Depends on:** [sources-and-evidence-store](sources-and-evidence-store-2026-09-23.md) (claim context fields, store); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) to recommend criteria; benefits from [retrieval-recall](retrieval-recall-2026-09-23.md)
 
 ## Goal

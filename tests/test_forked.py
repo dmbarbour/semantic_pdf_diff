@@ -1,4 +1,4 @@
-"""Runs at once (lab bench/recording.forked; docs/plans/recording-tooling-2026-10-17.md, milestone 3): the controlled
+"""Runs at once (lab bench/recording.forked; docs/samples-and-testing.md, Runs at once): the controlled
 corpus's re-record of 2026-10-17 took about 3 hours in hand-split processes; controlled.py and record_runs.py now
 spread their runs over forked processes sharing the fixture."""
 import stubs  # noqa: F401 (a clean environment)

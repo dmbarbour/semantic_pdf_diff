@@ -85,7 +85,7 @@ A variant is accepted when all of these hold:
 4. **Regression set:** no confirmed-good claim is lost without a better one replacing it.
 
 **Decided once, at a fixed sample** (from round 9, 2026-09-28):
-- **Every variant is judged to its full sample (32 units) and decided once.** Rounds 1–8 stopped as soon as an interval cleared, looking at 16, 24 and 32 units; simulations on their data put the chance of accepting a lever with no effect at 12–18%, against 6–9% for a single look (see the [overall review](../reviews/overall-review-2026-09-28.md)). Extending an inconclusive round is another look, so it's noted in the review.
+- **Every variant is judged to its full sample (32 units) and decided once.** Rounds 1–8 stopped as soon as an interval cleared, looking at 16, 24 and 32 units; simulations on their data put the chance of accepting a lever with no effect at 12–18%, against 6–9% for a single look (see the [overall review](README.md#retired)). Extending an inconclusive round is another look, so it's noted in the review.
 - **A stratum needs at least 6 units to block a variant.** Two lost units could otherwise reject it.
 - **Win rates are over changed units only.** Decisions report their coverage (the share of units a lever changed) alongside.
 - **Units larger than 25 claims are cut into up to 4 bands of the page,** each judged as its own crop.
@@ -203,7 +203,7 @@ Round 1 showed that asking the same question again often gets a different answer
 - **Fixed:** every attempt is now recorded, failed verdicts are asked once more at the end, and answers are streamed, so the timeout applies between chunks and slow answers complete.
 - **For estimates:** treat the dashboard as authoritative, and allow for this known undercount in rounds 1–9.
 
-**Statistics and review fixes (the owner, 2026-09-28: "improve known flaws in our statistics and review to find more of them"; details in the [statistics audit](../reviews/statistics-audit-2026-09-28.md)):**
+**Statistics and review fixes (the owner, 2026-09-28: "improve known flaws in our statistics and review to find more of them"; details in the [statistics audit](README.md#retired)):**
 - **Intervals are clustered by page region:** bands cut from one region share a crop, a reading and often a judge's mood, so they aren't independent.
   - **The method:** a cluster-robust t interval replaces the percentile bootstrap. It's deterministic and corrected for small samples.
   - **Past rounds:** no decision in rounds 1–9 changes.

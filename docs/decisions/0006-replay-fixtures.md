@@ -1,7 +1,7 @@
 # 0006. Recorded model answers replay as test fixtures
 
 - **Status:** Accepted (2026-09-25)
-- **Source:** [test models and record/replay plan](../plans/test-models-and-record-replay-2026-09-24.md): [design](../plans/test-models-and-record-replay-2026-09-24.md#design), [milestones](../plans/test-models-and-record-replay-2026-09-24.md#milestones) 1–4 (`record-new`, 2026-09-27), [decisions 2026-09-25](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-25); [content-addressed queries: progress](../plans/content-addressed-queries-2026-09-28.md#progress), milestone 1 (the prune guard); [meta-audit](../reviews/meta-audit-2026-09-28.md), flaws 3, 11 and 21
+- **Source:** [test models and record/replay plan](../plans/test-models-and-record-replay-2026-09-24.md): [design](../plans/test-models-and-record-replay-2026-09-24.md#design), [milestones](../plans/test-models-and-record-replay-2026-09-24.md#milestones) 1–4 (`record-new`, 2026-09-27), [decisions 2026-09-25](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-25); [content-addressed queries: progress](../plans/content-addressed-queries-2026-09-28.md#progress), milestone 1 (the prune guard); [meta-audit](../plans/README.md#retired), flaws 3, 11 and 21
 
 ## Context
 
@@ -33,5 +33,5 @@ Integration tests against a real model are slow, cost money and vary from run to
   - more than half the answers would go
 
   An unguarded prune once emptied the fixture.
-- **Amended 2026-10-17 ([recording tooling](../plans/recording-tooling-2026-10-17.md)): committed zips are exported, not pruned.** Each corpus's working fixture is an archive keeping every variant's answers; a zip is the answers its runs are served, copied into a new fixture as they replay from fresh stores (`--fixture-export`, `record_runs.py --pack`, `controlled.py pack`). Pruning by last use stays, unneeded. Several processes may record into one archive at once (SQLite's write-ahead log).
+- **Amended 2026-10-17 ([recording tooling](../plans/README.md#retired)): committed zips are exported, not pruned.** Each corpus's working fixture is an archive keeping every variant's answers; a zip is the answers its runs are served, copied into a new fixture as they replay from fresh stores (`--fixture-export`, `record_runs.py --pack`, `controlled.py pack`). Pruning by last use stays, unneeded. Several processes may record into one archive at once (SQLite's write-ahead log).
 - How to record and export: [samples and testing](../samples-and-testing.md#recorded-answers-replay-fixtures).

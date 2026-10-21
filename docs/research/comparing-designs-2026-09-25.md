@@ -3,7 +3,7 @@
 - **Date:** 2026-09-25
 - **Status:** Input for discussion; nothing here is decided.
 - **Prompted by:** the owner's brainstorm (not authoritative). When comparing different designs, ask whether a value matters to an external client or user, or is internal to the design. Relevance depends on context (a pitch rate affects moment of inertia, which may matter depending on how the system is mounted), so perhaps ask *where* a value could become externally relevant.
-- **Triggering case:** the first review batch ([evaluation-s01](../reviews/evaluation-s01-2026-09-25.md)). The reviewers split on whether NREL 5 MW's pitch angle at 25 m/s and IEA 15 MW's pitch-controller objective are "complementary" or "unrelated".
+- **Triggering case:** the first review batch ([evaluation-s01](../plans/README.md#retired)). The reviewers split on whether NREL 5 MW's pitch angle at 25 m/s and IEA 15 MW's pitch-controller objective are "complementary" or "unrelated".
 
 ## What established practice offers
 

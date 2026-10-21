@@ -1,7 +1,7 @@
 # 0009. Queries are content-addressed: keyed by what reaches the model
 
 - **Status:** Accepted (2026-09-28)
-- **Source:** [test models plan: decisions 2026-09-28](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-28); [content-addressed queries plan](../plans/content-addressed-queries-2026-09-28.md): [goal](../plans/content-addressed-queries-2026-09-28.md#goal), [design](../plans/content-addressed-queries-2026-09-28.md#design-proposed-for-review) items 1–3, [migration](../plans/content-addressed-queries-2026-09-28.md#migration-without-paying), [progress](../plans/content-addressed-queries-2026-09-28.md#progress) milestones 2 and 5, [decisions](../plans/content-addressed-queries-2026-09-28.md#decisions-2026-09-28); [meta-audit](../reviews/meta-audit-2026-09-28.md)
+- **Source:** [test models plan: decisions 2026-09-28](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-28); [content-addressed queries plan](../plans/content-addressed-queries-2026-09-28.md): [goal](../plans/content-addressed-queries-2026-09-28.md#goal), [design](../plans/content-addressed-queries-2026-09-28.md#design-proposed-for-review) items 1–3, [migration](../plans/content-addressed-queries-2026-09-28.md#migration-without-paying), [progress](../plans/content-addressed-queries-2026-09-28.md#progress) milestones 2 and 5, [decisions](../plans/content-addressed-queries-2026-09-28.md#decisions-2026-09-28); [meta-audit](../plans/README.md#retired)
 
 ## Context
 

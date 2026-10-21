@@ -1,7 +1,7 @@
 # 0031. A commit needs a recorded pass of the tree it commits
 
 - **Status:** Accepted (2026-10-17)
-- **Source:** [recording tooling](../plans/recording-tooling-2026-10-17.md), milestone 1
+- **Source:** [recording tooling](../plans/README.md#retired), milestone 1
 
 ## Context
 

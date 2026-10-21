@@ -1,4 +1,4 @@
-"""The commit gate (scripts/gate.py; docs/plans/recording-tooling-2026-10-17.md, milestone 1): on 2026-10-17 a commit
+"""The commit gate (scripts/gate.py; docs/decisions/0031-commits-need-a-recorded-pass.md): on 2026-10-17 a commit
 went in after a test command that named a module that doesn't exist. A commit now needs a recorded pass of the tree
 it commits, or the quick suite run on that tree."""
 import stubs  # noqa: F401 (a clean environment)

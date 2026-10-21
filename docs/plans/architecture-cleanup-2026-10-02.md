@@ -161,7 +161,7 @@ None now. The two left at the end were answered (2026-10-02):
 
 - **Re-decide rounds 9, 9b and 9h without the 4 units judged on another unit's crop?** The owner: "Go ahead."
   - Done offline, as each batch's `decision-corrected.json`. No conclusion changed.
-  - Fragments still holds out, so it stays in the champion. See the correction in [round 9's review](../reviews/round-09-2026-09-28.md).
+  - Fragments still holds out, so it stays in the champion. See the correction in the [rounds' record](../research/rounds.md#corrections).
 - **`run_round --only decide`**, accepted but checked by no step. The owner: "Go ahead and drop it, especially if it's not hard to rebuild later." Dropped. To decide a judged batch again without judging more, call `rounds.decide`, as the correction above did.
 
 ## Progress

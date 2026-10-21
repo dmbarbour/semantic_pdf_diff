@@ -7,7 +7,7 @@
   - **The owner (2026-09-30):** "I don't believe medium should be a severe differentiater here. A viable approach might be to logically turn our tables into CSV or XLSX or a shared intermediate representation with some model support (it seems PDF text extraction is doing a bad job of preserving table structure in many cases) then ensure we have a consistent processing model for tables from any source."
   - **And on building the rules:** "that's based on our prior discussion of how to process tables, e.g. for CSV or .xlsx files. We ask a model how to turn table rows into claims, and we might look for exceptions to this"; "Perhaps we need clear visualization of tables when building rules in cases like this? Clear identification of hazards, too."
   - **The evidence:**
-    - [Spot check sc01](../reviews/spotcheck-sc01-2026-09-30.md), item 1: a stacked table's second header row was lost, header cells were cut short, and wrapped cells arrived as unlabelled rows, so values were bound to the wrong table.
+    - [Spot check sc01](README.md#retired), item 1: a stacked table's second header row was lost, header cells were cut short, and wrapped cells arrived as unlabelled rows, so values were bound to the wrong table.
     - The [eye tests](../research/eye-tests-2026-09-30.md): gemma-4 misbound values in dense tables it could read.
 
 ## Goal

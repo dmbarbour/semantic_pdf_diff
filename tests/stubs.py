@@ -49,7 +49,7 @@ def user_settings(values):
         save_user_settings(USER)
 
 # A quick run for iterating (QUICK=1 python -m unittest discover -s tests): the slowest tests skipped, about two thirds
-# of the time (docs/plans/quick-wins-2026-10-02.md). Every commit is still checked by the full suite.
+# of the time (docs/samples-and-testing.md). Every commit is still checked by the full suite.
 QUICK = bool(os.environ.get("QUICK"))
 
 def slow(item):

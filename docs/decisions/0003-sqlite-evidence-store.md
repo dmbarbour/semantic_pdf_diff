@@ -1,7 +1,7 @@
 # 0003. A resumable SQLite evidence store in a local folder
 
 - **Status:** Accepted (2026-09-23)
-- **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [layout](../plans/sources-and-evidence-store-2026-09-23.md#layout), [why SQLite](../plans/sources-and-evidence-store-2026-09-23.md#why-sqlite), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23), [milestones](../plans/sources-and-evidence-store-2026-09-23.md#milestones) 2 and 7; [store milestone 2 review](../reviews/store-m2-sqlite-store-2026-09-24.md); [architecture clean-up: progress](../plans/architecture-cleanup-2026-10-02.md#progress), milestone 6c (read-only `Store.open`)
+- **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [layout](../plans/sources-and-evidence-store-2026-09-23.md#layout), [why SQLite](../plans/sources-and-evidence-store-2026-09-23.md#why-sqlite), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23), [milestones](../plans/sources-and-evidence-store-2026-09-23.md#milestones) 2 and 7; [store milestone 2 review](../plans/README.md#retired); [architecture clean-up: progress](../plans/architecture-cleanup-2026-10-02.md#progress), milestone 6c (read-only `Store.open`)
 
 ## Context
 

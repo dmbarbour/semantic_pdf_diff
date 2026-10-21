@@ -151,7 +151,7 @@ Bases that are a difficulty in themselves: two sheets told apart only by their t
 
 Every situation met in this project's documents, where it was recorded, and the knob or base that reproduces it ("–": none yet). A situation met later, in a round, a spot check or a trial, gets a row, and a knob when one is built.
 
-- **Reviews:** sc01 = [spot check sc01](reviews/spotcheck-sc01-2026-09-30.md); s01 = [evaluation s01](reviews/evaluation-s01-2026-09-25.md); rNN = round reviews; overall = [overall review](reviews/overall-review-2026-09-28.md); levers = [lever index](reviews/levers.md).
+- **Reviews:** sc01 = spot check sc01; s01 = evaluation s01; rNN = round reviews; overall = the overall review of 2026-09-28 (all four retired 2026-10-21: the [plans index](plans/README.md#retired) says how to read one, and the [rounds' record](research/rounds.md) keeps their findings); levers = [lever index](reviews/levers.md).
 - **Research:** eye = [eye tests](research/eye-tests-2026-09-30.md); RH = [round-01 heuristics](research/round-01-context-heuristics-2026-09-26.md).
 - **Code:** extract and situate = their modules' comments.
 

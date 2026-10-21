@@ -1,7 +1,7 @@
 # 0019. Labels are collected on offline review pages, questions judged blind first
 
 - **Status:** Accepted (2026-09-25)
-- **Source:** [evaluation benchmarks plan: decisions 2026-09-25](../plans/evaluation-benchmarks-2026-09-23.md#decisions-2026-09-25); [evaluation s01 review](../reviews/evaluation-s01-2026-09-25.md); [benchmarks README: reviewing a batch](../../benchmarks/README.md#reviewing-a-batch-for-people)
+- **Source:** [evaluation benchmarks plan: decisions 2026-09-25](../plans/evaluation-benchmarks-2026-09-23.md#decisions-2026-09-25); [evaluation s01 review](../plans/README.md#retired); [benchmarks README: reviewing a batch](../../benchmarks/README.md#reviewing-a-batch-for-people)
 
 ## Context
 

@@ -1,7 +1,7 @@
 # 0001. The v0.2.0 robustness baseline is the stable tag
 
 - **Status:** Accepted (2026-09-23)
-- **Source:** [robustness baseline plan](../plans/robustness-baseline-2026-09-23.md); [plans index: suggested order](../plans/README.md#suggested-order); [evidence store plan: decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23) (no store migrations)
+- **Source:** [robustness baseline plan](../plans/README.md#retired); [plans index: suggested order](../plans/README.md#suggested-order); [evidence store plan: decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23) (no store migrations)
 
 ## Context
 

@@ -1,7 +1,7 @@
 # 0002. Evidence attaches to content, and sources are declared in the store
 
 - **Status:** Accepted (2026-09-23)
-- **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [concepts](../plans/sources-and-evidence-store-2026-09-23.md#concepts), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23), [comparison consequences](../plans/sources-and-evidence-store-2026-09-23.md#comparison-consequences), [folder and archive concerns](../plans/sources-and-evidence-store-2026-09-23.md#folder-and-archive-concerns); [store review](../reviews/store-complete-2026-09-24.md)
+- **Source:** [evidence store plan](../plans/sources-and-evidence-store-2026-09-23.md): [concepts](../plans/sources-and-evidence-store-2026-09-23.md#concepts), [decisions](../plans/sources-and-evidence-store-2026-09-23.md#decisions-2026-09-23), [comparison consequences](../plans/sources-and-evidence-store-2026-09-23.md#comparison-consequences), [folder and archive concerns](../plans/sources-and-evidence-store-2026-09-23.md#folder-and-archive-concerns); [store review](../plans/README.md#retired)
 
 ## Context
 

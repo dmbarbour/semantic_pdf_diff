@@ -1,7 +1,7 @@
 # 0011. Every setting is declared once, classified by what it can affect
 
 - **Status:** Accepted (2026-09-28)
-- **Source:** [content-addressed queries plan](../plans/content-addressed-queries-2026-09-28.md): [design](../plans/content-addressed-queries-2026-09-28.md#design-proposed-for-review) item 4, [progress](../plans/content-addressed-queries-2026-09-28.md#progress) milestone 1; [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md): [design](../plans/architecture-cleanup-2026-10-02.md#levers-as-mixins-on-a-platform-class), [progress](../plans/architecture-cleanup-2026-10-02.md#progress) milestones 2b, 3 and 9; [meta-audit](../reviews/meta-audit-2026-09-28.md)
+- **Source:** [content-addressed queries plan](../plans/content-addressed-queries-2026-09-28.md): [design](../plans/content-addressed-queries-2026-09-28.md#design-proposed-for-review) item 4, [progress](../plans/content-addressed-queries-2026-09-28.md#progress) milestone 1; [architecture clean-up](../plans/architecture-cleanup-2026-10-02.md): [design](../plans/architecture-cleanup-2026-10-02.md#levers-as-mixins-on-a-platform-class), [progress](../plans/architecture-cleanup-2026-10-02.md#progress) milestones 2b, 3 and 9; [meta-audit](../plans/README.md#retired)
 
 ## Context
 

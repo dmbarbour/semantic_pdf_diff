@@ -1,7 +1,7 @@
 # 0037. A lever is judged on the same inputs as its baseline, by rules fixed before judging, and promoted only on held-out evidence
 
 - **Status:** Accepted (2026-10-21)
-- **Source:** the [query improvement plan](../plans/query-improvement-2026-09-26.md) (acceptance rules; decisions of 2026-09-26 and 2026-09-28; the audit's proposals, answered 2026-09-28 to 30); the [overall review](../reviews/overall-review-2026-09-28.md) and [statistics audit](../reviews/statistics-audit-2026-09-28.md); the [rounds' record](../research/rounds.md); the [lever index](../reviews/levers.md); [judging a lever](../samples-and-testing.md#judging-a-lever)
+- **Source:** the [query improvement plan](../plans/query-improvement-2026-09-26.md) (acceptance rules; decisions of 2026-09-26 and 2026-09-28; the audit's proposals, answered 2026-09-28 to 30); the [overall review](../plans/README.md#retired) and [statistics audit](../plans/README.md#retired); the [rounds' record](../research/rounds.md); the [lever index](../reviews/levers.md); [judging a lever](../samples-and-testing.md#judging-a-lever)
 
 ## Context
 

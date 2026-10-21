@@ -1,7 +1,7 @@
 # 0018. Quality is judged by several raters, none of them ground truth
 
 - **Status:** Accepted (2026-09-25; restated 2026-09-28)
-- **Source:** [evaluation benchmarks plan: decisions 2026-09-25](../plans/evaluation-benchmarks-2026-09-23.md#decisions-2026-09-25); [evaluation s01 review](../reviews/evaluation-s01-2026-09-25.md); [quality without ground truth](../research/quality-without-ground-truth-2026-09-28.md); [benchmarks README](../../benchmarks/README.md)
+- **Source:** [evaluation benchmarks plan: decisions 2026-09-25](../plans/evaluation-benchmarks-2026-09-23.md#decisions-2026-09-25); [evaluation s01 review](../plans/README.md#retired); [quality without ground truth](../research/quality-without-ground-truth-2026-09-28.md); [benchmarks README](../../benchmarks/README.md)
 
 ## Context
 

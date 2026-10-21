@@ -1,4 +1,4 @@
-"""The commit gate (docs/plans/recording-tooling-2026-10-17.md, milestone 1): a commit needs a recorded pass of the
+"""The commit gate (docs/decisions/0031-commits-need-a-recorded-pass.md): a commit needs a recorded pass of the
 test suite on the exact tree it commits.
 
     python scripts/gate.py hook        # the pre-commit hook's check (scripts/hooks/pre-commit)

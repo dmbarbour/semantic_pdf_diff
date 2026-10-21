@@ -1,7 +1,7 @@
 # 0007. Recorded answers keyed by request meaning and an interpreter fingerprint
 
 - **Status:** Superseded by [0009](0009-content-addressed-queries.md) (2026-09-28)
-- **Source:** [test models plan: assessment](../plans/test-models-and-record-replay-2026-09-24.md#assessment), [decisions 2026-09-25](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-25) and [2026-09-28](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-28); [store milestone 2 review](../reviews/store-m2-sqlite-store-2026-09-24.md); [meta-audit](../reviews/meta-audit-2026-09-28.md); [content-addressed queries](../plans/content-addressed-queries-2026-09-28.md)
+- **Source:** [test models plan: assessment](../plans/test-models-and-record-replay-2026-09-24.md#assessment), [decisions 2026-09-25](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-25) and [2026-09-28](../plans/test-models-and-record-replay-2026-09-24.md#decisions-2026-09-28); [store milestone 2 review](../plans/README.md#retired); [meta-audit](../plans/README.md#retired); [content-addressed queries](../plans/content-addressed-queries-2026-09-28.md)
 
 ## Context
 

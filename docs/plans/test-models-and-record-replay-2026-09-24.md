@@ -87,7 +87,7 @@ Reordered 2026-09-25 (see *Decisions*): a cheap hosted gemma-4 makes live record
 ## Decisions (2026-09-28)
 
 **Requests are keyed by what reaches the model** (the owner: "it roughly allows us to treat queries as content-addressed, and essentially build triples of 'how model M responded to query HASH' for replay, albeit with some extra accounting for failures").
-- **Supersedes the semantic keys and fingerprint above.** The [meta-audit](../reviews/meta-audit-2026-09-28.md) found them kept in step with the prompt by hand: a lever that added a slot needed its own key suffix (the chart rules nearly weren't keyed), the locator thumbnail still isn't keyed, and table numbers are keyed without reaching the model.
+- **Supersedes the semantic keys and fingerprint above.** The [meta-audit](README.md#retired) found them kept in step with the prompt by hand: a lever that added a slot needed its own key suffix (the chart rules nearly weren't keyed), the locator thumbnail still isn't keyed, and table numbers are keyed without reaching the model.
 - **The owner on why this is better:** it is robust not only to whether a lever applies to a query, but to how it applies.
 - **Levers:** tracking which levers contribute to which queries is needed only for diagnostics.
   - Per query, the levers observed while building it may be recorded.

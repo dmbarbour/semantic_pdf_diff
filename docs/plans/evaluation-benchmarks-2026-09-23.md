@@ -111,7 +111,7 @@ All answer keys for the public corpus (expected-claim lists, adjudications, pair
 - **Verdict, then flags:** a coarse verdict per item and multi-select error flags from a taxonomy consolidated from published error analyses (entity and scope binding first). See `benchmarks/README.md`.
 - **Review page:** a local, self-contained HTML page (works offline and in the sandbox for real documents), one item per screen, progress saved in the browser, labels exported as a file and imported with `review import`. Batches of about 15–20 items per session.
 - **Evidence-web relations** (component of, input to, output of, source of, contradicts…) get their own item type when that work starts.
-- First batch and findings: [evaluation-s01 review](../reviews/evaluation-s01-2026-09-25.md).
+- First batch and findings: [evaluation-s01 review](README.md#retired).
 
 ## Decisions (2026-09-24)
 

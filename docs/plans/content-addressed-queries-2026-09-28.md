@@ -4,7 +4,7 @@
 - **Depends on:** [test-models-and-record-replay](test-models-and-record-replay-2026-09-24.md), whose keys this replaces; [query improvement](query-improvement-2026-09-26.md), whose rounds get the checks.
 - **Feeds:** every later round; the [weighted quality estimates](README.md) (judgement records); a lever search (plans index).
 - **Why:**
-  - **The owner's question:** better separation of concerns. The [meta-audit](../reviews/meta-audit-2026-09-28.md) found no test had caught any of 21 flaws, about half of them the kind structure and checks catch.
+  - **The owner's question:** better separation of concerns. The [meta-audit](README.md#retired) found no test had caught any of 21 flaws, about half of them the kind structure and checks catch.
   - **The owner's decision:** requests keyed by what reaches the model (record/replay decisions, 2026-09-28).
 
 ## Goal

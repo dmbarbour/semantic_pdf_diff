@@ -5,7 +5,7 @@
 - **Asked by:** the owner. "a general code review with attention to architecture, separation of concerns, and redundancy or refactoring opportunities. It's been a while since we did a full review."
 - **Scope:**
   - all of `src/` (13,069 lines, 34 modules), `scripts/` (1,621 lines) and `tests/` (5,761 lines)
-  - the status of the [overall review](overall-review-2026-09-28.md) and [meta-audit](meta-audit-2026-09-28.md) of 2026-09-28
+  - the status of the [overall review](../plans/README.md#retired) and [meta-audit](../plans/README.md#retired) of 2026-09-28
   - the code has grown from about 7,600 to 14,700 lines since then
 - **Method:**
   - Five read-only reviews ran in parallel: extraction; store, CLI and outputs; evaluation tooling; measurement benches; cross-cutting (the import graph, scripts, tests, docs, and the earlier items).

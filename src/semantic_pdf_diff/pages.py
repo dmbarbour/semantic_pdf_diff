@@ -4,7 +4,7 @@ A PDF page's boxes (text blocks, drawings, and the locators we record) are in it
 coordinates. What a reader sees is the page turned by its /Rotate: drawing sheets are often
 stored sideways. Reading order, "above", "before" and positions on the page are about what's
 displayed. Every conversion between the two goes through here: the rotated-sheet bugs came back
-once because conversions were fixed site by site (docs/reviews/meta-audit-2026-09-28.md).
+once because conversions were fixed site by site (docs/research/rounds.md, What the audits found).
 """
 import weakref
 import pymupdf
