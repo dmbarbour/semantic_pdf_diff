@@ -189,6 +189,24 @@ def read(paths, configurations, out, base, fixture, max_cost, ledger=None, tags=
                                                       {"exit": code, **answers(folder / "store.sqlite", key)})
     return found, spent
 
+def complaints(folders):
+    """{run: its tiles counted, as a run counts them (retiling.tile_counts: paths, and those saying their text was
+    cut)} for every run under the folders (a folder holding report.json), and "total": a baseline from answers already
+    recorded, at no cost (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 1). Runs from before 2026-10-28 have
+    no paths, only complaints."""
+    from collections import Counter
+    from semantic_pdf_diff.retiling import tile_counts
+    out, total = {}, {"tiles": 0, "paths": Counter(), "middle": 0, "no_text": 0, "said_cut": Counter(),
+                      "said_cut_empty": 0}
+    for folder in map(Path, folders):
+        for report in sorted(folder.rglob("report.json")):
+            found = tile_counts(json.loads(report.read_text(encoding="utf-8"))["coverage"])
+            out[str(report.parent.relative_to(folder)) or folder.name] = found
+            for name, value in found.items():
+                total[name] += Counter(value) if isinstance(value, dict) else value
+    out["total"] = {k: dict(v) if isinstance(v, Counter) else v for k, v in total.items()}
+    return out
+
 def save(rows, path):
     Path(path).write_text(json.dumps(rows))
 

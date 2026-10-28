@@ -24,8 +24,8 @@ OTHER_CUT = re.compile(r":(?:bands|grid|snapped|xycut)\d+")
 def child(task):
     return "-r" in task or "-a" in task or bool(OTHER_CUT.search(task))
 
-COMPLAINT = re.compile(r"fragment|crop|cut off|truncat|partial (?:view|image|section)|incomplete (?:view|image|text)"
-                       r"|illegib|unreadable|blank", re.I)
+COMPLAINT = re.compile(r"fragment|crop|clip|cut off|truncat|partial (?:view|image|section)"
+                       r"|incomplete (?:view|image|text)|illegib|unreadable|blank", re.I)
 
 @contextlib.contextmanager
 def forced(fresh_halves=False):

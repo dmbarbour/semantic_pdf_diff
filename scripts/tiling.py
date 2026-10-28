@@ -9,6 +9,10 @@
         --config today --config "grid:tiling=grid"
     python scripts/tiling.py read benchmarks/controlled/docs/lcc-s1-slide.pdf --config today \
         --config "cut:tile_cut=xycut;decoration=true" --max-cost 0.05
+    python scripts/tiling.py complaints benchmarks/runs/controlled/recorded
+
+`complaints` counts recorded runs' tiles as a run does (retiling.tile_counts): by path, and those whose answers say
+their text was cut (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 1), each run and in total.
 
 No model calls but `read`'s, which reads each document under each configuration with the configured model (the
 corpus's settings, benchmarks/controlled/settings.json, unless --base), recording into benchmarks/tiling/fixture.sqlite
@@ -55,6 +59,9 @@ def main(argv=None):
     show.add_argument("--samples", default="samples", help="the folder the run measured")
     show.add_argument("--out", required=True)
     show.add_argument("--config", action="append", default=[], metavar="LABEL[:NAME=VALUE;...]")
+    said = sub.add_parser("complaints", help="recorded runs' tiles counted: by path, and those saying they're cut")
+    said.add_argument("folders", nargs="+", help="folders holding runs (each a folder with report.json)")
+    said.add_argument("--json", action="store_true")
     read = sub.add_parser("read", help="documents read with the model under each configuration, scored by their keys")
     read.add_argument("documents", nargs="+")
     read.add_argument("--config", action="append", default=[], metavar="LABEL[:NAME=VALUE;...]")
@@ -66,6 +73,18 @@ def main(argv=None):
     given = getattr(args, "config", None) or ["today"]
     configurations = {label: dict(_setting(o) for o in overrides.split(";") if o)
                       for label, _, overrides in (text.partition(":") for text in given)}
+    if args.command == "complaints":
+        found = tiling.complaints(args.folders)
+        if args.json:
+            print(json.dumps(found, indent=1))
+            return 0
+        print(f"{'run':40} {'tiles':>5} {'said cut':>8} {'empty':>5} {'no text':>7}  paths")
+        for run, c in found.items():
+            if c["tiles"] or run == "total":
+                print(f"{run[:40]:40} {c['tiles']:5} {sum(c['said_cut'].values()):8} {c['said_cut_empty']:5} "
+                      f"{c['no_text']:7}  " + ", ".join(f"{k} {n}" for k, n in c["paths"].items())
+                      + (f" ({c['middle']} down the middle)" if c["middle"] else ""))
+        return 0
     if args.command == "read":
         from semantic_pdf_diff_lab.bench import recording
         found, spent = tiling.read(args.documents, configurations, args.out, args.base, Path(args.fixture),

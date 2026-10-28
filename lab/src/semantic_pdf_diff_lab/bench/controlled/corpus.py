@@ -711,8 +711,16 @@ TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_sch
 # selection (docs/research/tilings-2026-10-12.md, milestone 2), each a cause of a bad tiling: a text-only slide
 # (720 x 540), a page slightly wider than Letter (690 points: a grid, where bands stop at 672), a border frame drawn
 # as one path and as four lines, a full-page background image behind the text, and a scan of a framed page.
+# Noise (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 1; the owner, 2026-10-28: "We can probably create test
+# cases that force zooming or that have light background decorations, complex border decorations, illuminated
+# initials, and so on, i.e. test cases for tiling with more noise."): a light diagonal watermark (text, in the text
+# layer), a tinted panel behind the text, an ornate border, a decorated initial beside each page's first line,
+# footnotes in small print, the body in small print (7 pt), a scan with an invisible text layer (OCR's), the text
+# drawn as outlines (no text layer, many paths), and the first five together (noisy).
+NOISE_KNOBS = ("watermark", "tinted", "ornate", "initials", "footnotes", "small-print", "scanned-ocr", "outlined",
+               "noisy")
 PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all", "decorated", "decorated+two-column", "landscape",
-               "slide", "wide-letter", "frame", "frame-lines", "background", "scanned-frame")
+               "slide", "wide-letter", "frame", "frame-lines", "background", "scanned-frame", *NOISE_KNOBS)
 SLIDE = (720, 540)
 WIDE_LETTER = (690, 792)
 FRAME_INSET = 24  # points from the page's edge
@@ -1125,13 +1133,17 @@ def raster(page, rect, draw, dpi=150):
     page.insert_image(rect, stream=canvas.get_pixmap(dpi=dpi, alpha=False).tobytes("png"))
     return result
 
-def scanned(data, dpi=150):
-    """The PDF as images only, one per page (a scan): no text layer."""
+def scanned(data, dpi=150, ocr=False):
+    """The PDF as images only, one per page (a scan): no text layer; with ocr, an invisible one over the image,
+    word by word, as OCR software leaves one."""
     import pymupdf
     src, out = pymupdf.open("pdf", data), pymupdf.open()
     for page in src:
         new = out.new_page(width=page.rect.width, height=page.rect.height)
         new.insert_image(new.rect, stream=page.get_pixmap(dpi=dpi, alpha=False).tobytes("png"))
+        for x0, y0, x1, y1, word, *_ in (page.get_text("words") if ocr else ()):
+            new.insert_text((x0, y1 - 0.2 * (y1 - y0)), word, fontname="helv", fontsize=0.8 * (y1 - y0),
+                            render_mode=3)
     out.set_metadata({})
     return out.tobytes(garbage=3, deflate=True, no_new_id=True)
 RUNNING_HEADER = "Lakeshore Convention Center · Doc LCC-HC-DB-004 · Rev C · 2026-03-14"
@@ -1142,6 +1154,7 @@ CSS = ("body {font-family: sans-serif; font-size: 10pt; line-height: 1.35} h1 {f
        "table {border-collapse: collapse; margin: 6pt 0} td, th {border: 1px solid #888; padding: 2px 6px} "
        "th {background-color: #1f3b5c; color: white} .caption {font-weight: bold; margin-top: 8pt}")
 
+SMALL_PRINT = "body {font-size: 7pt}"  # the small-print knob's body
 PAGE_BREAK = "<!--page-->"
 
 def _esc(s):
@@ -1316,7 +1329,7 @@ def render(project, page_size="letter"):
         columns = [pymupdf.Rect(body.x0, body.y0, body.x0 + body.width / 2 - 9, body.y1),
                    pymupdf.Rect(body.x0 + body.width / 2 + 9, body.y0, body.x1, body.y1)] if two else [body]
         for part in html(project, breaks).split(PAGE_BREAK):  # a page break starts the next part on a new page
-            story = pymupdf.Story(html=part, user_css=CSS)
+            story = pymupdf.Story(html=part, user_css=CSS + (" " + SMALL_PRINT if project.has("small-print") else ""))
             more = True
             while more:
                 page += 1
@@ -1361,6 +1374,7 @@ def render(project, page_size="letter"):
                 page.draw_line(pymupdf.Point(*a), pymupdf.Point(*b), color=(0.2, 0.2, 0.2), width=1.5)
         if project.has("background"):  # a pale picture behind the page's text
             page.insert_image(rect, pixmap=_background(rect), overlay=False)
+        _noise(project, page, rect)
     drawn = draw_charts(project, doc, figures)
     project.chart_boxes = {n: (page_no, tuple(box)) for n, (page_no, box) in figures.items()  # for representations
                            if n <= len(charts(project))}
@@ -1369,7 +1383,62 @@ def render(project, page_size="letter"):
     doc.set_metadata({})
     data = doc.tobytes(garbage=3, deflate=True, no_new_id=True)
     log = locate(project, pymupdf.open("pdf", data), placed, drawn)
-    return (scanned(data) if project.has("scan") or project.has("scanned-frame") else data), log
+    if project.has("scan") or project.has("scanned-frame"):
+        data = scanned(data)
+    elif project.has("scanned-ocr"):
+        data = scanned(data, ocr=True)
+    elif project.has("outlined"):
+        data = outlined(data)
+    return data, log
+
+WATERMARK = "DRAFT FOR REVIEW"
+FOOTNOTES = ("* Areas and capacities are as designed; the final layout of the halls may move rooms and change them. "
+             "** Loads follow the owner's criteria, not the code minimums, where the two differ.")  # no numbers
+
+def _noise(project, page, rect):
+    """The noise knobs' decorations on a page (NOISE_KNOBS); noisy, the first five together."""
+    import pymupdf
+    noisy = project.has("noisy")
+    w, h = rect.width, rect.height
+    if noisy or project.has("tinted"):  # a pale panel behind the middle of the page's text
+        page.draw_rect(pymupdf.Rect(46, 0.38 * h, w - 46, 0.62 * h), color=None, fill=(0.91, 0.94, 0.98),
+                       overlay=False)
+    if noisy or project.has("ornate"):  # a double rule, and small ornaments between, circles and diamonds by turns
+        outer = rect + (FRAME_INSET, FRAME_INSET, -FRAME_INSET, -FRAME_INSET)
+        page.draw_rect(outer, color=(0.35, 0.25, 0.15), width=1.2)
+        page.draw_rect(outer + (8, 8, -8, -8), color=(0.35, 0.25, 0.15), width=0.5)
+        places = ([(x, y) for x in range(round(outer.x0) + 12, round(outer.x1) - 6, 12) for y in (outer.y0 + 4,
+                                                                                                    outer.y1 - 4)]
+                  + [(x, y) for y in range(round(outer.y0) + 12, round(outer.y1) - 6, 12) for x in (outer.x0 + 4,
+                                                                                                     outer.x1 - 4)])
+        for i, (x, y) in enumerate(places):
+            if i % 2:
+                page.draw_polyline([(x, y - 2.2), (x + 2.2, y), (x, y + 2.2), (x - 2.2, y), (x, y - 2.2)],
+                                   color=None, fill=(0.55, 0.35, 0.15))
+            else:
+                page.draw_circle(pymupdf.Point(x, y), 1.6, color=None, fill=(0.35, 0.45, 0.25))
+    if noisy or project.has("initials"):  # a decorated initial in the margin, beside the page's first line
+        page.draw_rect(pymupdf.Rect(18, 54, 48, 84), color=(0.45, 0.3, 0.1), fill=(0.86, 0.72, 0.38), width=1)
+        page.draw_circle(pymupdf.Point(33, 69), 12, color=(0.6, 0.15, 0.1), width=0.75)
+        page.insert_text((24, 79), "L", fontname="tibo", fontsize=26, color=(0.35, 0.1, 0.05))
+    if noisy or project.has("footnotes"):  # a short rule, and footnotes in small print above the page number
+        page.draw_line(pymupdf.Point(54, h - 68), pymupdf.Point(200, h - 68), color=(0.4, 0.4, 0.4), width=0.5)
+        page.insert_textbox(pymupdf.Rect(54, h - 65, w - 54, h - 42), FOOTNOTES, fontname="helv", fontsize=6.5)
+    if noisy or project.has("watermark"):  # light, diagonal, under the page's text: text, in the text layer
+        page.insert_text((0.16 * w, 0.62 * h), WATERMARK, fontname="hebo", fontsize=54, color=(0.86, 0.86, 0.86),
+                         morph=(pymupdf.Point(w / 2, h / 2), pymupdf.Matrix(-38)), overlay=False)
+
+def outlined(data):
+    """The PDF with its text drawn as outlines: paths, and no text layer, as some design tools and printers write
+    it (a page of them is taken for a drawing sheet: figures.is_sheet)."""
+    import pymupdf
+    src, out = pymupdf.open("pdf", data), pymupdf.open()
+    for page in src:
+        with pymupdf.open("svg", page.get_svg_image(text_as_path=True).encode()) as drawn:
+            with pymupdf.open("pdf", drawn.convert_to_pdf()) as converted:
+                out.insert_pdf(converted)
+    out.set_metadata({})
+    return out.tobytes(garbage=3, deflate=True, no_new_id=True)
 
 def _background(rect):
     """A pale wash, lighter toward the top: a full-page picture as templates put behind a page's text."""

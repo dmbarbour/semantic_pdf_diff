@@ -254,6 +254,23 @@ class Figures(unittest.TestCase):
         self.assertEqual([f.kind for f in reader.figures(doc[2], 2)], kinds[2])
         self.assertEqual([f.id for f in reader.figures(doc[2], 2)], [f.id for f in reader.figures(doc[2], 3)])
 
+class Complaints(unittest.TestCase):
+    def test_recorded_runs_tiles_counted_as_a_run_counts_them_and_in_total(self):
+        import json
+        from semantic_pdf_diff_lab.bench import tiling
+        with tempfile.TemporaryDirectory() as d:
+            for name, rows in (("a", [{"task": "tile:p1:0", "status": "partial", "issues": ["Text is clipped"],
+                                       "claims": 0, "tiling": {"cut": "bands", "depth": 0, "text": False}}]),
+                               ("b/c", [{"task": "tile:p2:0-r1", "status": "complete", "issues": [], "claims": 4},
+                                        {"task": "text:p1:0", "status": "complete", "issues": [], "claims": 2}])):
+                (Path(d) / name).mkdir(parents=True)
+                (Path(d) / name / "report.json").write_text(json.dumps({"coverage": rows}))
+            found = tiling.complaints([d])
+        self.assertEqual(set(found), {"a", "b/c", "total"})
+        self.assertEqual(found["total"], {"tiles": 2, "paths": {"bands": 1}, "middle": 0, "no_text": 1,
+                                          "said_cut": {"partial": 1}, "said_cut_empty": 1})
+        self.assertEqual(found["b/c"]["paths"], {})  # a run from before paths were kept
+
 class LabRuns(unittest.TestCase):
     def test_a_folder_measured_under_two_settings_compares_page_by_page(self):
         from semantic_pdf_diff.settings import Settings
