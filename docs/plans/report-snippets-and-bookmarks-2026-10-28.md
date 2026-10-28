@@ -1,6 +1,6 @@
 # The report: the text a claim came from, and views kept in the address
 
-- **Status:** Planned (2026-10-28); [design questions](#design-questions) open.
+- **Status:** Planned (2026-10-28); [milestone 2](#2-every-view-kept-in-the-address) done the same day (the owner: "Please proceed with report bookmarks"). Milestone 1's [design questions](#design-questions) open.
 - **The owner, 2026-10-28, from trials:**
   - "when a claim comes from text or the PDF text layer, we should include the relevant snippet of text in the report even when the image is dropped due to lower priority."
   - "bookmarking of views in the report, e.g. with `#anchor` but a javascript-driven anchor?"
@@ -60,6 +60,19 @@ The page keeps two things in its address already: the view and the search (`#cla
   - Changing view, following a card's link and "Claims like this" each add a step, so Back returns to the view before.
 - **Split reports** (`--split`): a link names its part file, and the index's links carry the address on.
 - **Tested** in the headless browser: an address opens its view and filters; a card's link scrolls to its card past the first hundred; Back returns.
+- **Done 2026-10-28:**
+  - **The address keeps,** defaults left out, in this order:
+    - the view (`claims`)
+    - each control: `relation`, `kind`, `side`, `status`, `read`, `file`, `order`
+    - the boxes unticked (`fold=off`, `counterparts=off`)
+    - the topic and the search
+    - a linked item: `claim=ID` or `finding=A~B`, by the claims' ids
+  - **Opening an address** sets every control from it; a value the report hasn't is left at its default.
+  - **A linked item** is paged to, scrolled to and outlined. Where the address's filters leave it out, they and the search are cleared, and equal findings unfolded.
+  - **A Link button** on each finding and on each claim in the Claims view, not on each card inside a finding: a finding's link holds both its claims.
+  - **Steps Back returns from:** changing view, a Link, *Claims like this* and a coverage table's topic. Filters, topics and typing replace the address and drop a linked item.
+  - **Split reports:** the index's links carry its address on to the part opened, and a part's link back to the index carries its own, without its linked item.
+  - **Tested** in headless Chromium (`AddressInABrowser`): an address with a side, a kind and a search opens them; an edited address pages to the 150th claim; a Link gives `#finding=A-0~B-0`; Back twice returns through the findings view to the claim.
 
 ## Design questions
 

@@ -90,9 +90,11 @@ border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}.topics 
 .views button{font-size:15px;margin-right:6px}.topics button small{color:inherit;opacity:.7}
 #query{width:min(28em,90%)}#order-box{white-space:nowrap}mark{background:var(--mark);color:inherit;border-radius:2px}\
 .search-help{font-size:13px;margin:0 8px}.search-help ul{margin:6px 0}\
-button.like{padding:0 6px;border:1px solid var(--field);border-radius:4px;background:var(--card);color:var(--accent);\
-cursor:pointer;font-size:12px}#also button{padding:4px 8px;margin:2px;border:1px solid var(--field);\
-border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}#also small{opacity:.7}
+.linked{outline:3px solid var(--accent);outline-offset:3px}\
+button.like,button.link{padding:0 6px;border:1px solid var(--field);border-radius:4px;background:var(--card);\
+color:var(--accent);cursor:pointer;font-size:12px}\
+#also button{padding:4px 8px;margin:2px;border:1px solid var(--field);border-radius:6px;background:var(--card);\
+color:var(--fg);cursor:pointer}#also small{opacity:.7}
 @media(max-width:700px){.pair{grid-template-columns:1fr}body{padding:0 12px}}
 '''
 # The page's script: it inflates the report's parts and shows them, and finds what's searched (files beside this one,
@@ -318,6 +320,10 @@ def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=T
     return account
 
 SPLIT = "report-split"  # a split report's folder, beside report.json
+# the index's links to its parts carry its address on (#claims&q=pump), so each part opens on that view and search
+CARRY = ('<script>document.addEventListener("click", (e) => {const a = e.target.closest("a[href]"); '
+         'if (a && location.hash && !a.getAttribute("href").includes("#")) a.href = a.getAttribute("href") '
+         '+ location.hash;});</script>')
 
 def write_split(data, output, pairs, stored, budget, write):
     """One report file a pair of files (its findings, those reaching other pairs' files too, and its claims without a
@@ -342,7 +348,7 @@ def write_split(data, output, pairs, stored, budget, write):
     split = (f'<p class="meta">A split report: a file a pair of files, {len(pairs)} in this folder beside this '
              'index. Keep them together (zip the folder to send it); each opens on its own too.</p>')
     index = html_page('Semantic PDF comparison', split + header_html(data, listed=False) + files_html(
-        data, pairs, files, total, Cards(data).where, links=[name for name, _ in parts]), STYLE)
+        data, pairs, files, total, Cards(data).where, links=[name for name, _ in parts]) + CARRY, STYLE)
     total.size += len(index.encode())
     if write:
         folder.mkdir(exist_ok=True, parents=True)

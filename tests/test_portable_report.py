@@ -262,6 +262,7 @@ class ManyFiles(unittest.TestCase):
         self.assertTrue((self.root / "out" / "report.json").exists())
         index = (folder / "index.html").read_text()
         self.assertIn('<a href="01-p.html">Open</a>', index)
+        self.assertIn("location.hash", index)  # its links carry its address on to the parts
         self.assertIn("A split report: a file a pair of files, 2 in this folder", index)
         first = unpacked((folder / "01-p.html").read_text())
         self.assertIn('Part 1 of 2 of a split report (v1/p.pdf → v2/p.pdf): <a href="index.html">', first)
@@ -566,6 +567,91 @@ HARNESS = """<script>(async () => {
   document.body.append(pre);
 })();</script>"""
 
+ADDRESS_HARNESS = """<script>(async () => {
+  const wait = () => new Promise((r) => setTimeout(r, 10));
+  const until = async (test) => {
+    for (let i = 0; i < 500 && !test(); i++) await wait();
+  };
+  await until(() => document.getElementById('count') && document.getElementById('count').textContent);
+  const $ = (id) => document.getElementById(id), out = {};
+  const state = () => ({hash: location.hash, count: $('count').textContent, side: $('side').value,
+    read: $('claimkind').value, q: $('query').value, view: document.querySelector('.views button.on').dataset.view,
+    articles: document.querySelectorAll('main > article').length,
+    linked: [...document.querySelectorAll('main > .linked section small')].map((s) => s.textContent.split(' · ')[0])});
+  const back = () => new Promise((r) => {
+    window.addEventListener('hashchange', r, {once: true});
+    history.back();
+  });
+  out.opened = state();
+  location.hash = '#claims&claim=LAST';  // an address edited: a claim past the first hundred
+  await until(() => document.querySelector('main .linked'));
+  out.claim = state();
+  document.querySelector('.views button[data-view="findings"]').click();  // a step
+  out.findings = state();
+  document.querySelector('main > article button.link').click();  // a step: the first finding's own address
+  out.finding = state();
+  await back();
+  out.back = state();
+  await back();
+  out.back2 = state();
+  const pre = document.createElement('pre');
+  pre.id = 'results';
+  pre.textContent = JSON.stringify(out);
+  document.body.append(pre);
+})();</script>"""
+
+class AddressInABrowser(unittest.TestCase):
+    """Views kept in the page's address (docs/plans/report-snippets-and-bookmarks-2026-10-28.md, milestone 2; the owner,
+    2026-10-28: "bookmarking of views in the report, e.g. with `#anchor` but a javascript-driven anchor?"): an address
+    opens its view and filters, a claim's address pages to it and marks it, a Link button gives an item's address, and
+    Back steps through the views."""
+    @classmethod
+    def setUpClass(cls):
+        import html
+        import re
+        browser = next((b for b in map(shutil.which, BROWSERS) if b), None)
+        if browser is None:
+            raise unittest.SkipTest("no headless browser installed (chromium)")
+        claims = [ev(f"A-{i}", attribute=f"flow {i}") for i in range(150)]
+        others = [ev(f"B-{i}", attribute=f"flow {i}") for i in range(150)]
+        cls.last = sorted(c.id for c in claims)[-1]  # the claims view's 150th: A's are listed by id
+        with tempfile.TemporaryDirectory() as d:
+            write_report(report(claims + others, [finding(a, b, "different") for a, b in zip(claims, others)]),
+                         Path(d))
+            page = Path(d) / "report.html"
+            page.write_text(page.read_text().replace("</body>", ADDRESS_HARNESS.replace("LAST", cls.last)
+                                                     + "</body>"))
+            flags = ["--headless", "--no-sandbox", "--disable-gpu", "--virtual-time-budget=10000", "--dump-dom"]
+            dom = subprocess.run([browser, *flags, page.as_uri() + "#claims&side=1&read=table&q=flow"],
+                                 capture_output=True, text=True, timeout=120).stdout
+        found = re.search(r'<pre id="results">(.*?)</pre>', dom, re.S)
+        cls.results = json.loads(html.unescape(found.group(1))) if found else {}
+
+    def test_an_address_opens_its_view_and_filters(self):
+        opened = self.results["opened"]
+        self.assertEqual((opened["view"], opened["side"], opened["read"], opened["q"]),
+                         ("claims", "1", "table", "flow"))
+        self.assertEqual(opened["hash"], "#claims&side=1&read=table&q=flow")
+        self.assertTrue(opened["count"].startswith("0 of 300 claims"))  # none read from a table
+
+    def test_a_claims_address_pages_to_it_and_marks_it(self):
+        claim = self.results["claim"]
+        self.assertEqual((claim["view"], claim["side"], claim["read"], claim["q"]), ("claims", "all", "all", ""))
+        self.assertEqual(claim["linked"], [self.last])
+        self.assertEqual(claim["articles"], 200)  # its page, the second, shown
+        self.assertEqual(claim["hash"], f"#claims&claim={self.last}")
+
+    def test_a_link_button_gives_an_items_address_and_back_steps_through_the_views(self):
+        self.assertEqual((self.results["findings"]["view"], self.results["findings"]["hash"]), ("findings", ""))
+        finding = self.results["finding"]
+        self.assertEqual(finding["hash"], "#finding=A-0~B-0")
+        self.assertEqual(finding["linked"], ["A-0", "B-0"])
+        self.assertEqual((self.results["back"]["view"], self.results["back"]["hash"], self.results["back"]["linked"]),
+                         ("findings", "", []))
+        back = self.results["back2"]
+        self.assertEqual((back["view"], back["hash"], back["linked"]), ("claims", f"#claims&claim={self.last}",
+                                                                        [self.last]))
+
 class SearchInABrowser(unittest.TestCase):
     """The page's search (milestone 6; the owner, 2026-10-20: "Broader search is good."), run by a headless browser
     where one is installed: words in any order and as beginnings, phrases, exclusions, either, fields, pages, numbers
@@ -583,8 +669,9 @@ class SearchInABrowser(unittest.TestCase):
                                          ">70kW", ">70 kW", "value:75kW", "value:0.075MW", "power <20kW",
                                          "value:55L/s", "<40dBA", "value:>40dBA", ">1000", ">1mw", ">1e9 N•m2",
                                          "value:2.5GN.m2", "drive")]
-        cases += [("claims", "near:A-pump"), ("claims", "near:A-heater"), ("claims", 'meaning:"pumps"'),
-                  ("findings", "pump"), ("claims", "drive", True), ("claims", "output", True)]
+        cases += [("claims", "near:A-pump"), ("claims", "near:A-heater"), ("claims", "pump feed", True),
+                  ("claims", 'meaning:"pumps"'), ("findings", "pump"), ("claims", "drive", True),
+                  ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
             page = Path(d) / "report.html"
@@ -658,8 +745,9 @@ class SearchInABrowser(unittest.TestCase):
     def test_the_address_keeps_the_view_and_the_search(self):
         # the page opened on the view and the search its address held (#claims&q=feed%20pump)
         self.assertEqual(self.got("feed pump", "opened")["count"], "3 of 13 claims: 2 in A; 1 in B")
-        self.assertEqual(self.got("pump feed")["hash"], "#claims&q=pump%20feed")
-        self.assertEqual(self.got("pump", "findings")["hash"], "#q=pump")
+        self.assertEqual(self.got("pump feed")["hash"], "#claims&counterparts=off&q=pump%20feed")  # unticked here
+        self.assertEqual(self.got("pump", "findings")["hash"], "#counterparts=off&q=pump")
+        self.assertEqual(self.got("pump feed +counterparts")["hash"], "#claims&q=pump%20feed")
 
     def test_counterparts_come_after_the_claims_found_and_offer_the_other_sources_names(self):
         # the search plan, milestone 1: the names the documents differ on, from the comparison's own pairs
