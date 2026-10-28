@@ -29,9 +29,13 @@ Checked in the code and the tilings note, 2026-10-28.
   - **Why a tile holds paragraphs at all:**
     - Where text tasks read a page, a band holding only text isn't sent.
     - A tile holding paragraphs is one that also holds a graphic, such as the corner logo (sent with the paragraphs beside it), or a page without a text layer.
-- **Still unknown: which cut gives three slices side by side.**
-  - It could be a grid's or a snapped cut's columns on a page wider than about 764 pt, or a band and its two halves.
-  - Milestone 1 records each tile's cut and depth, so a run on the owner's documents can say.
+- **Reproduced 2026-10-28, at the owner's suggestion ("also try a PDF with text as image"): a scan written at its pixel size.**
+  - **The case:** some scanners and image-to-PDF converters make each page as many points as the image has pixels. A letter page scanned at 100 dpi becomes 850 × 1100 pt, and at 150 dpi 1275 × 1650 pt. It looks like any report page on screen.
+  - **What the defaults do:** past 672 pt wide there are no bands. Two sample report slices (Solar Decathlon rules, NREL 5 MW), scanned at 100 dpi and written so, get a grid of 9 tiles a page, 3 columns by 3 rows. Every paragraph and bullet is cut into a left, a middle and a right part, the owner's three slices. At 150 dpi it's 20 tiles, 4 columns by 5 rows.
+  - **The measures don't see it.** Without a text layer they count no lines, so no cut looks worse than another; tile choice keeps the grid. With an OCR layer over the same scans they count 77 to 136 lines cut sideways a page.
+  - **Nothing is gained:** a 420 pt tile drawn at 1,000 px enlarges each of the scan's pixels about 2.4 times, showing nothing a full-width band doesn't.
+  - **Not it:** the same pages scanned at letter size (612 × 792 pt) get bands. Read with the model ($0.036), their 48 band tiles were answered complete, none halved and none saying its text was cut.
+- **Still to confirm on the owner's documents:** their runs' tile paths (milestone 1). Grid or snapped tiles on portrait report pages, or a page size far beyond letter or A4 in a viewer's document properties, would mean this case; "halves, down the middle" would mean the halving case above.
 
 ### Wide pages and drawing sheets
 
@@ -126,6 +130,11 @@ Checked in the code and the tilings note, 2026-10-28.
 ### 2. Whole lines, and complaints acted on
 
 Each item is a lever, judged against null arms on the controlled corpus ([0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)), report pages first.
+
+- **First, tiles no finer than the page's own pixels:**
+  - On a page that is one image (a scan), a tile's detail is capped at the image's: its side in points is at least what the image shows in `image_side` pixels.
+  - So a scan written at its pixel size is cut as a page of its physical size would be: full-width bands on a report page.
+  - **Measured** on the sample slices scanned at pixel size (100 and 150 dpi, with and without an OCR layer), and on the corpus's scans, against the grid they get now.
 
 - **Whole lines in every tile's text layer:** each line the tile touches in full, as refined halves get them, with line breaks kept.
 - **A tile that says its text is cut** is read again under another cut, as a partial one is, even when it's answered complete.
