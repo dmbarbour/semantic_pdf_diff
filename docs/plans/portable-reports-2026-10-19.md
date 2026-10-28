@@ -170,4 +170,4 @@
 Raised by the owner on 2026-10-19 (the first quote above). Each was offered with a recommendation:
 
 - **More search** (2026-10-20, beyond milestone 6): the owner, on the four ideas: "I like all the ideas for search. So, lowest hanging fruit first, I guess." They're the [search](search-2026-10-20.md) plan's.
-- **More than two sources:** premature (the owner, 2026-10-19). It would belong to [criteria-first comparison](n-way-comparison-2026-09-23.md) and claim clustering: claims of every source grouped into topics, shown as a matrix of topics by sources.
+- **More than two sources:** premature (the owner, 2026-10-19). It would belong to [criteria-first comparison](n-way-comparison-2026-09-23.md) and claim clustering ([single-document analysis](single-document-analysis-2026-10-28.md) since 2026-10-28): claims of every source grouped into topics, shown as a matrix of topics by sources.

@@ -52,4 +52,4 @@ What was found:
   - Small text, which the measures count but don't weigh against fewer cuts.
   - Scans, where a tile's graphic is the page itself.
   - Real pages with no answer key: the evidence there is distinct values, not facts.
-  - These are rows in the plans index (*Tile selection, further*) and the lever index.
+  - These are in [text cut by tiles](../plans/text-cut-by-tiles-2026-10-28.md) (*Moved in: Tile selection, further*, 2026-10-28) and the lever index.

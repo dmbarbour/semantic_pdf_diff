@@ -56,8 +56,8 @@ def setup_logging(verbosity=0, quiet=False, log_file=None):
         import pymupdf  # when imported, past the bars' guard (Guarded), which print()s do reach
         pymupdf.set_messages(pylogging_logger=log, pylogging_level=logging.INFO)
         # Nor its notice recommending its layout package, printed in every run (the owner, 2026-10-14: "I keep getting
-        # a notice "Consider using the pymupdf_layout package [...]""): whether to use it is the tentative row
-        # "PyMuPDF's layout analysis" (docs/plans/README.md).
+        # a notice "Consider using the pymupdf_layout package [...]""): whether to use it is in the plan
+        # docs/plans/text-cut-by-tiles-2026-10-28.md ("Moved in: PyMuPDF's layout analysis").
         pymupdf.no_recommend_layout()
     except (ImportError, AttributeError):
         pass

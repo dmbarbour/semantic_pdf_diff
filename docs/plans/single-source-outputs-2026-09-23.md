@@ -1,6 +1,6 @@
 # Single-source outputs: consistency check, RAG export, overviews
 
-- **Status:** Planned (consistency check and export); Tentative (model-written summaries)
+- **Status:** Planned (export); Tentative (model-written summaries). Since 2026-10-28, `check` (feature 1, milestone 1) and the fact sheet (feature 3, milestone 3) are [single-document analysis](single-document-analysis-2026-10-28.md)'s: inconsistencies found within a subject's claims, confirmed by a second pass, and a one-source report with a Subjects view. They're kept below as written.
 - **Since written (reviewed 2026-10-21):** the portable report's Claims view, topics and search (`search`, the command too) make a claims browser without the model, but only of a two-source comparison; the owner, 2026-10-20: "As a user of the report, it would be convenient to have an easily searchable database of claims even without the comparisons". Milestone 3 would be that report for one source. `export` is taken (`source export`, `config export`), so the RAG export needs another name. Comparing a source with itself compares nothing (shared evidence is never compared with itself), so `check` needs its own pass. Situating's "about" statements exist for PDFs only.
 - **Depends on:** the evidence store (built: [0002](../decisions/0002-evidence-attaches-to-content.md), [0003](../decisions/0003-sqlite-evidence-store.md)); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) for per-section export chunks and fact-sheet context
 
@@ -102,9 +102,9 @@ A model-written overview for humans: section summaries, then topic summaries. Wi
 
 ## Milestones
 
-1. `check` subcommand and report view.
+1. `check` subcommand and report view (moved 2026-10-28 to single-document analysis, milestone 4).
 2. `export` as Markdown chunks with front matter (per section first, then per topic and per finding), discovery chunks, `index.md`, content-derived file names and delta exports; optional JSON array; `.docx` chunks as a later configuration option.
-3. HTML fact sheet.
+3. HTML fact sheet (moved 2026-10-28 to single-document analysis, milestones 1 and 2).
 4. (Tentative) cited summaries with citation verification.
 
 ## Decisions (2026-09-23)
