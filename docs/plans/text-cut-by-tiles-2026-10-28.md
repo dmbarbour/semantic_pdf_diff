@@ -1,6 +1,6 @@
 # Text cut by tiles: counted, then given whole and with its surroundings
 
-- **Status:** Planned (2026-10-28). [Design question](#design-questions) 1 answered the same day (report pages); 2 and 3 open.
+- **Status:** Planned (2026-10-28); [milestone 1](#1-count-it-on-noisy-pages-and-on-the-owners) done the same day (the owner: "Please proceed with report bookmarks and tiling counts with noisy pages."). [Design question](#design-questions) 1 answered (report pages); 2 and 3 open.
 - **The owner, 2026-10-28, from trials:** "we're still clipping a lot vertically across text in ways that make the text useless for claims. I wonder if techniques like fish-eye lenses would help, or if we need to include multiple clips in a query with some overlap in these cases, or similar strategies. We have a lot more context than we're using."
 - **The owner, answering design question 1 (2026-10-28):** "I'm getting most from ordinary report pages. Often with a border decoration, page numbers (and footnotes cut vertically, too), but not always, so I'm not sure whether that's the cause. It's as if our heuristics decided to zoom in, so now we just have three parts of a paragraph or bullet point (or multiple paragraphs) across three tiles, sliced vertically. The left part, middle part, right part. Basically useless, and it's unclear if the broken text is what our heuristics wanted to focus on at all (perhaps it's trying to focus on some small diagram in a corner? invisitext?). It might be useful to fog out parts of a tile that shouldn't receive model attention, then drop the tiles that would be mostly fog, or zoom in on the bits that aren't. We can probably create test cases that force zooming or that have light background decorations, complex border decorations, illuminated initials, and so on, i.e. test cases for tiling with more noise."
 - **Earlier, 2026-10-14,** on samples too sensitive to share (the tentative row *PyMuPDF's layout analysis*, moved in here):
@@ -98,6 +98,30 @@ Checked in the code and the tilings note, 2026-10-28.
 
   Measured without the model first (`scripts/tiling.py`), then read against their keys, for cents.
 - **The baseline every later milestone is measured against.**
+- **Done 2026-10-28:**
+  - **In the product** (`311dc03`): each image tile's coverage row records its path (`tiling`: the page's cut, halves and whether down the middle, the region again, or another cut; its depth; whether its page has a text layer). The report's coverage ledger shows each tile's path and counts them with the tiles that said their text was cut (`retiling.tile_lines`); a run logs the same lines as it ends.
+  - **In the lab** (`b2dd2a0`):
+    - `scripts/tiling.py complaints RUNS...` counts recorded runs' tiles the same way.
+    - The lab's complaint pattern gains "clip".
+  - **Nine noisy layouts** of the convention centre's design basis, keyed as the corpus is: `lcc-s1-watermark`, `-tinted`, `-ornate`, `-initials`, `-footnotes`, `-small-print`, `-scanned-ocr`, `-outlined`, and `-noisy` (the first five together).
+    - Their answers are in the corpus's archive (the variant `noise-2026-10-28`).
+    - They join `replay.zip` and `results.json` at the next refresh.
+  - **Baseline, from answers already recorded (no cost):**
+
+    | Runs | Tiles | Said their text was cut | Of them, no claims |
+    |---|---|---|---|
+    | The corpus's recorded runs (278) | 543 | 29 (5%) | 2 |
+    | The slices' latest round (r09, baseline arm) | 972 | 37 (4%) | 25 |
+
+    - **Slices by kind:** 36 of the 37 are on construction drawing sets (ken-cd 17, dc-cd 12, calg-cd 7), and 1 is on a report page (lcit-report).
+    - **No paths in these counts:** the runs predate the paths, so they count complaints only.
+  - **The noisy layouts read with the model** ($0.044), with the clean layout and the scanned frame for reference:
+    - **Tiles:** 26, all bands. None was halved and none said its text was cut.
+    - **Without a text layer:** 11 of the tiles, on the outlined layout and the two scans.
+    - **Recall:** every layout scored 1.00 (23 of 23 facts right).
+  - **What it says:**
+    - The noise the owner listed doesn't cut text on its own. Neither do pages without a text layer, unless a band is answered partial and halved.
+    - The slicing the owner sees on report pages isn't in our documents. Their counts will name its path: the run's last lines and the report's coverage ledger give each tile's path. "halves, down the middle, no text layer" would confirm the cause reproduced above; another path would point elsewhere.
 
 ### 2. Whole lines, and complaints acted on
 
