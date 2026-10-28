@@ -545,10 +545,14 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     page += ('<details class="coverage"><summary>Files not scanned ('+str(len(data.get('scan_issues', [])))
              +'): hidden, unsafe or over limits</summary><table><thead><tr><th>Source</th><th>Path</th><th>Reason</th>'
              '</tr></thead><tbody>'+issues_found+'</tbody></table></details>')
+    from .retiling import path_text, tile_lines
     coverage = ''.join('<tr><td>'+esc(card.where(r['content']))+'</td><td>'
-                       +esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])+'</td><td>'
+                       +esc(r['page'] if r['page'] is not None else '')+'</td><td>'+esc(r['task'])
+                       +(f" ({esc(path_text(r['tiling']))})" if r.get('tiling') else '')+'</td><td>'
                        +esc(r['status'])+'</td><td>'+esc('; '.join(r['issues']))+'</td></tr>' for r in data['coverage'])
-    page += ('<details class="coverage"><summary>Source coverage ledger</summary><table><thead><tr><th>File</th>'
+    tiles = ''.join(f'<p class="meta">{esc(line)}.</p>' for line in tile_lines(data['coverage']))
+    page += ('<details class="coverage"><summary>Source coverage ledger</summary>' + tiles
+             + '<table><thead><tr><th>File</th>'
              '<th>Page</th><th>Task</th><th>Status</th><th>Issues</th></tr></thead><tbody>'+coverage
              +'</tbody></table></details>')
     page += crops_left_out_html(account)

@@ -345,6 +345,9 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     split = out / SPLIT / 'index.html'
     page = split if options.split and split.exists() else out / 'report.html'
     print(f"Report: {page}" + (' (incomplete source coverage)' if incomplete else ''))
+    from .retiling import tile_lines
+    for line in tile_lines(coverage):  # how the image tiles were cut, and which said their text was
+        log.info(line)
     omitted = data['retrieval']['omitted_by_pair_limit']
     if omitted:
         print(f"{omitted} of {data['retrieval']['candidate_pairs']} candidate pairs weren't judged: --max-pairs sets "

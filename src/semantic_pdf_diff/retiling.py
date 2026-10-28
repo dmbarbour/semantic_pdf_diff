@@ -93,3 +93,44 @@ def retiled(settings, reader, page, tag, rect, done):
     found["sent"].update(new)
     stem = tag.rpartition(":")[0]  # "tile:p3" of "tile:p3:2" (a PDF's), "tile" of "tile:2"
     return [(f"{stem}:{found['how']}{i}", found["rects"][i]) for i in new]
+
+# --- what a run's tiles did (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 1; the owner, 2026-10-28: "I'm
+# getting most from ordinary report pages [...] It's as if our heuristics decided to zoom in"): counted from the
+# coverage rows, so a run on documents that can't be shared says how its tiles were cut and which said so
+
+def path_text(tiling):
+    """A tile's path in words (schema.CoverageRow.tiling): "bands", "halves, down the middle", "another grid"; ", no
+    text layer" where its page has none."""
+    return (tiling["cut"] + (", down the middle" if tiling.get("middle") else "")
+            + ("" if tiling.get("text", True) else ", no text layer"))
+
+def tile_counts(rows):
+    """{"tiles": image tiles read (continuations aside), "paths": {cut: n}, "middle": halved down the middle,
+    "no_text": on pages without a text layer, "said_cut": {status: n} of those whose issues say they're cut,
+    "said_cut_empty": those of them with no claims}."""
+    from collections import Counter
+    from .regions import region_of
+    tiles = [r for r in rows if region_of(r["task"]) == "tile" and not re.search(r"-c\d+$", r["task"])
+             and r["status"] in ("complete", "partial", "failed")]
+    paths = [r["tiling"] for r in tiles if r.get("tiling")]
+    said = [r for r in tiles if says_cut(r.get("issues", ()))]
+    return {"tiles": len(tiles), "paths": dict(Counter(p["cut"] for p in paths)),
+            "middle": sum(1 for p in paths if p.get("middle")), "no_text": sum(1 for p in paths if not p["text"]),
+            "said_cut": dict(Counter(r["status"] for r in said)),
+            "said_cut_empty": sum(1 for r in said if not r.get("claims"))}
+
+def tile_lines(rows):
+    """What a run's tiles did, in a line or two (tile_counts); none where no tile was read."""
+    found = tile_counts(rows)
+    if not found["tiles"]:
+        return []
+    cuts = ", ".join(f"{cut} {n}" + (f" ({found['middle']} down the middle)" if cut == "halves" and found["middle"]
+                                     else "") for cut, n in found["paths"].items())
+    out = [f"Image tiles read: {found['tiles']}" + (f" ({cuts})" if cuts else "")
+           + (f"; {found['no_text']} on pages without a text layer" if found["no_text"] else "")]
+    said = sum(found["said_cut"].values())
+    if said:
+        out.append(f"{said} said their text was cut (" + ", ".join(f"{n} answered {status}" for status, n in
+                                                                   sorted(found["said_cut"].items()))
+                   + f"), {found['said_cut_empty']} of them with no claims")
+    return out

@@ -237,8 +237,11 @@ class PdfReading:
                 # Task tags are unique within content: "<region>:p<page>[:<index>]".
                 region, _, index = tag.partition(":")
                 tag = f"{region}:p{number}" + (f":{index}" if index else "")
+                # a tile's path, kept on its coverage row: the page's cut, and whether the page has a text layer
+                tiling = ({"cut": self.s.tiling_of(self.context_of, page), "depth": 0,
+                           "text": bool(self.context_of.lines(page))} if region == "tile" else None)
                 # A figure's caption, or a sheet detail's titles, as source text.
-                self.visuals.task(number, page, tag, rect, text=note)
+                self.visuals.task(number, page, tag, rect, text=note, tiling=tiling)
         else:
             self.record(coverage_row(content=self.content, page=number, bbox=list(native_page(page)),
                                      task=f"vision:p{number}", status="skipped",

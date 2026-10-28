@@ -176,6 +176,7 @@ class Task:
     mark: object = None  # mark(box) -> where a claim placed at box sits on the task's crop (pages.on_crop), or None
     stance: tuple = ()  # the Links holding every claim it reads (a table row's holder: the table_holders lever)
     view: object = None  # a Claim: the view its row's yes-or-no cell states, kept if the reader gives none (view_rows)
+    tiling: dict | None = None  # an image tile's path, kept on its coverage row (schema.CoverageRow)
 
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
@@ -322,7 +323,8 @@ class TaskCore:
             if entry["task"] != task:
                 entry = None  # an early sighting, extracted normally before repetition is proven
         found = []
-        row = coverage_row(content=content, page=page_no, bbox=list(bbox), task=task, image=image, status="complete")
+        row = coverage_row(content=content, page=page_no, bbox=list(bbox), task=task, image=image, status="complete",
+                           tiling=made.tiling)
         images = ([self.output / image] if image else []) + [self.output / x for x in extra_images]
         section = self.sections.box(page_no, bbox)  # the heading above the region, not the page's
         # A region spanning sections (a tile, an overview) is told all their headings.

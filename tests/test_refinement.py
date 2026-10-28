@@ -6,6 +6,7 @@ import pymupdf
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.schema import Extraction
 from semantic_pdf_diff.pages import lines
+from semantic_pdf_diff.retiling import tile_lines
 from semantic_pdf_diff.segmentation import halves
 from stubs import TILING_BEFORE
 from test_robustness import CID, Recorder, pdf
@@ -137,6 +138,29 @@ class Refined(unittest.TestCase):
                     if f'{number:02d} the' in shown:
                         self.assertIn(f'{number:02d} {WORDS}', shown)
             self.assertTrue(layers)
+
+    def test_a_scans_partial_band_is_halved_down_its_middle_and_its_rows_say_so(self):
+        # the cause reproduced 2026-10-28 (docs/plans/text-cut-by-tiles-2026-10-28.md): with no text layer there are
+        # no lines to cut between, so a band is halved down every line in it; each tile's row records its path
+        def build(page):  # a letter page, scanned
+            source = pymupdf.open().new_page(width=612, height=792)
+            paragraph(source, count=40)
+            page.insert_image(page.rect, pixmap=source.get_pixmap(dpi=100))
+        with tempfile.TemporaryDirectory() as d:
+            client = Recorder(lambda source, prompt: Extraction(claims=[], complete=False), refinement_depth=1)
+            _, coverage = extract_pdf(pdf(Path(d) / 's.pdf', build, 612, 792), CID, Path(d), client)
+        tiles = [r for r in coverage if r['task'].startswith('tile')]
+        first = [r['tiling'] for r in tiles if '-r' not in r['task']]
+        halved = [r for r in tiles if '-r' in r['task']]
+        self.assertTrue(first and halved)
+        self.assertEqual({str(x) for x in first}, {str({'cut': 'bands', 'depth': 0, 'text': False})})
+        self.assertEqual({str(r['tiling']) for r in halved},
+                         {str({'cut': 'halves', 'depth': 1, 'text': False, 'middle': True})})
+        for row in halved:  # the cut runs down the band: each half about half the page's width
+            self.assertLess(pymupdf.Rect(row['bbox']).width, 0.6 * 612)
+        self.assertEqual(tile_lines(coverage)[0],
+                         f'Image tiles read: {len(tiles)} (bands {len(first)}, halves {len(halved)} ({len(halved)} '
+                         f'down the middle)); {len(tiles)} on pages without a text layer')
 
 if __name__ == '__main__':
     unittest.main()

@@ -15,6 +15,32 @@ from semantic_pdf_diff.tiling import cut_by
 CORPUS = Path(__file__).resolve().parent.parent / "benchmarks/controlled/docs"
 WIDE = ("lcc-s1-wide-letter", 0)  # a grid of six tiles, each cutting lines; XY-cut holds them in two
 
+class Counted(unittest.TestCase):
+    """A run's tiles counted from its coverage rows (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 1)."""
+    def test_tiles_by_path_and_those_saying_their_text_was_cut(self):
+        def row(task, status="complete", issues=(), claims=0, **tiling):
+            return {"task": task, "status": status, "issues": list(issues), "claims": claims,
+                    **({"tiling": {"depth": 0, "text": True, **tiling}} if tiling else {})}
+        rows = [row("tile:p1:0", cut="bands", claims=3),
+                row("tile:p1:1", "partial", ["Text is clipped on the right side"], cut="bands"),
+                row("tile:p1:1-r0", issues=["The text is heavily clipped"], cut="halves", middle=True, text=False),
+                row("tile:p1:1-r1", cut="halves", claims=2),
+                row("tile:p2:grid3", "failed", cut="another grid"),
+                row("tile:p1:0-c1", cut="bands"),  # a continuation: the same tile, asked for more
+                row("overview:p1", issues=["clipped"]), row("text:p1:0", issues=["truncated"]),
+                row("tile:p3:0", "not_reached", cut="bands"),
+                row("tile:p4:0", issues=[f"{retiling.CUT_NOTE} right edge"], cut="xycut")]  # the edges' note aside
+        self.assertEqual(retiling.tile_counts(rows), {
+            "tiles": 6, "paths": {"bands": 2, "halves": 2, "another grid": 1, "xycut": 1}, "middle": 1, "no_text": 1,
+            "said_cut": {"partial": 1, "complete": 1}, "said_cut_empty": 2})
+        self.assertEqual(retiling.tile_lines(rows), [
+            "Image tiles read: 6 (bands 2, halves 2 (1 down the middle), another grid 1, xycut 1); 1 on pages "
+            "without a text layer", "2 said their text was cut (1 answered complete, 1 answered partial), 2 of them "
+            "with no claims"])
+        self.assertEqual(retiling.tile_lines([row("text:p1:0")]), [])
+        self.assertEqual(retiling.path_text({"cut": "halves", "depth": 1, "text": False, "middle": True}),
+                         "halves, down the middle, no text layer")
+
 def said(*issues, cut=()):
     return {"row": {"issues": list(issues)}, "claims": (), "cut": list(cut)}
 

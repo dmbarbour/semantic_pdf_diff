@@ -506,11 +506,16 @@ class CoverageRow(Strict):
     issues: list[str] = Field(default_factory=list)
     claims: int = 0
     duplicate_of: str | None = None  # a repeated block's first occurrence, whose result it follows
+    # an image tile's path (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 1): {"cut": the page's cut
+    # ("bands", "grid", "snapped", "xycut"), "halves", "again" or "another <cut>", "depth": refinements before it,
+    # "text": whether its page has a text layer, "middle": halved down its middle, holding no text}
+    tiling: dict | None = None
 
     def row(self):
         out = self.model_dump()
-        if out["duplicate_of"] is None:
-            del out["duplicate_of"]
+        for name in ("duplicate_of", "tiling"):
+            if out[name] is None:
+                del out[name]
         return out
 
 def coverage_row(**fields):
