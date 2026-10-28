@@ -1,0 +1,43 @@
+# Changelog
+
+Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
+
+## 0.3.0 (2026-10-28)
+
+Everything since 0.2.0 (2026-09-24, about 630 commits), in brief. Each item's decision record has the detail.
+
+- **Sources and stores:**
+  - Files, folders, zip archives and manifests are declared as sources in a resumable store, a local folder ([0002](docs/decisions/0002-evidence-attaches-to-content.md), [0003](docs/decisions/0003-sqlite-evidence-store.md)).
+  - A claim is kept once per piece of content, with every place it was read ([0005](docs/decisions/0005-union-provenance.md)).
+  - A store reads again what a changed setting or reader affects ([0004](docs/decisions/0004-store-bound-to-its-interpreters.md), [0016](docs/decisions/0016-content-reread-when-its-reader-changes.md)).
+- **Formats:** plain text, Markdown, Word, PowerPoint, Excel, CSV and images besides PDF, through one task core ([0020](docs/decisions/0020-formats-share-one-task-core.md)).
+  - Office drawings are rendered ([0021](docs/decisions/0021-metafiles-drawn-by-vendored-renderer.md)).
+  - Spreadsheet cells are read as Excel shows them ([0022](docs/decisions/0022-spreadsheet-cells-as-excel-shows-them.md)).
+  - Every table is read by rules a model writes for it ([0023](docs/decisions/0023-tables-read-by-rules-a-model-writes.md), [0024](docs/decisions/0024-pdf-table-structure.md)).
+- **PDF pages:**
+  - Tiles are chosen by measures of each candidate cut ([0029](docs/decisions/0029-tiles-chosen-by-measures.md)).
+  - Figures are linked to the prose citing them, and figures and sections are given what they're about ([0039](docs/decisions/0039-runs-paced-by-throughput-and-situated-after-extraction.md)).
+- **Claims in context:** each claim carries its headings, lead-ins, notes and title blocks, and who holds it (a company's view, a hedge).
+- **Comparing:**
+  - Proposals' claims are paired by retrieval and a reranker, then judged.
+  - Revisions are aligned item by item, equal values settled without a model, and each difference named by kind ([0038](docs/decisions/0038-revisions-aligned-then-differences-explained.md)).
+- **The report:** `report.html` is one self-contained file ([0033](docs/decisions/0033-self-contained-reports-and-their-search.md)):
+  - crops under a size budget
+  - topics, and every claim of both sources
+  - a search the command line shares (`semantic-pdf-diff search`)
+  - views, filters and items kept in the page's address
+  - `--split` for comparisons too large for one file
+- **Setup:** settings in layers, set with `semantic-pdf-diff config`; four environment variables; one answers cache per user ([0032](docs/decisions/0032-settings-in-layers-and-one-answers-cache.md)).
+  - There's no default model.
+  - The endpoint is checked and calibrated on first use ([0034](docs/decisions/0034-endpoint-checked-and-calibrated-on-first-use.md)).
+  - The endpoint's URL comes from `$OPENAI_BASE_URL` or the user's settings, never a store's.
+- **Runs:**
+  - Requests are paced by the server's throughput ([0039](docs/decisions/0039-runs-paced-by-throughput-and-situated-after-extraction.md)).
+  - Progress is shown in bars ([0035](docs/decisions/0035-progress-drawn-by-the-product.md)).
+  - Ctrl+C stops cleanly; the same command resumes.
+  - Every request is at temperature 0 ([0012](docs/decisions/0012-temperature-zero-and-model-neutral-defaults.md)).
+- **Diagnostics:** each image tile's path is recorded and counted, with the tiles whose answers say their text was cut.
+- **Incompatible with 0.2.0:**
+  - `OPENAI_MODEL` and `PDF_DIFF_<NAME>` aren't read; a run that finds one set says which `config set --user` replaces it.
+  - The output folder is now a store.
+- **The lab** is its own distribution, `semantic-pdf-diff[lab]` ([0014](docs/decisions/0014-lab-as-its-own-distribution.md)): improvement rounds, controlled documents with known facts ([0036](docs/decisions/0036-controlled-documents-with-exact-keys.md)), and levers judged against their baselines ([0037](docs/decisions/0037-levers-judged-paired-and-promoted-held-out.md)).

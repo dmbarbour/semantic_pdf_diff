@@ -20,6 +20,6 @@ The tooling that measures and improves the product (rounds, judges, rubrics, rev
 
 - A plain install is the diff tool alone.
 - The rounds, spot checks and benches run as scripts (`scripts/run_round.py`, `scripts/spotcheck.py`, `scripts/controlled.py` and others), which need the lab installed.
-- The two distributions pin each other's version (`0.2.0`), so they're released together.
+- The two distributions pin each other's version (`0.2.0` then), so they're released together; versions are raised together ([0040](0040-versions-raised-at-checkpoints.md)).
 - Types used only by evaluation live in the lab (`eval/models.py`: `RoundSpec`, `Criteria` and others), not in the product's `models.py`.
 - Code both sides need belongs in the product (as `printed_value` moved to `values.py`).

@@ -1,4 +1,4 @@
-# Limits and engineering review (v0.2.0)
+# Limits and engineering review
 
 - This is not a validated engineering sign-off system. Extraction has been measured with one real model (gemma-4-31B) on public sample documents and on controlled documents with known facts (the lab, `lab/`), not on labeled representative proposals. Evaluate against yours before relying on findings.
 - Small models may misread dense diagrams, arrow direction, legends, log axes and merged table headers. Overview context can help but does not solve arbitrary cross-page relationships. No local OCR engine, engineering solver, graph-isomorphism engine or full table reconstruction is included.

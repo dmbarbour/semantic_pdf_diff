@@ -4,7 +4,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.2.0** (tagged) compares two PDFs. The main branch has since gained:
+**v0.3.0** (2026-10-28; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
 
 - **Sources** as files, folders and zip archives, declared in a persistent, resumable store
 - **Replay fixtures:** recorded model answers, so runs replay offline
