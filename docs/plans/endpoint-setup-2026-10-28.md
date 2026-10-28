@@ -1,6 +1,6 @@
 # Endpoint setup: choosing a model, trying it, and seeing what's remembered
 
-- **Status:** Planned (2026-10-28). [Design question](#design-questions) 1 answered the same day (the environment and the user's settings); 2 and 3 open.
+- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day. [Design question](#design-questions) 1 answered (the environment and the user's settings); 2 and 3 open.
 - **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
 - **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
 - **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
@@ -52,6 +52,15 @@
   - The user's URL is used where `$OPENAI_BASE_URL` is unset; `--base-url` beats both.
 - **The first-run error** says what to set when the endpoint can't be reached (`OPENAI_BASE_URL`, `OPENAI_API_KEY`) and names `config test`.
 - **The key check fails** when the endpoint answers 401 or 403, saying the key was refused.
+- **Done 2026-10-28** (`3e4dacd`):
+  - **Every command takes the URL in one order:** `--base-url` (or a `--config` file) for the run, then `$OPENAI_BASE_URL`, then the user's `base_url`.
+    - Found while fixing it: a run merged the user's settings over the variable (`cli.compare_command`), so the user's URL beat `$OPENAI_BASE_URL` in runs but not in `config test`.
+  - **A store keeps none:**
+    - `config set` and `config import` refuse it (`store.USERS_ONLY`).
+    - One kept before is read without it, with a warning naming `config unset base_url`.
+  - **`config show` and `config help base_url`** mark the variable's URL "(environment)".
+  - **The key check fails on 401 or 403.** A listing refused that way stays a failure, where it had read as "lists no models".
+  - **The first-use checks, `config test` and the no-model error** say which variable names the endpoint when it can't be reached, and which holds the key when it's refused.
 
 ### 2. Trying, seeing and forgetting checks
 
