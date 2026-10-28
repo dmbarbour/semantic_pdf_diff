@@ -1,8 +1,9 @@
 # Endpoint setup: choosing a model, trying it, and seeing what's remembered
 
-- **Status:** Planned (2026-10-28); [design questions](#design-questions) open.
+- **Status:** Planned (2026-10-28). [Design question](#design-questions) 1 answered the same day (the environment and the user's settings); 2 and 3 open.
 - **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
 - **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
+- **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
 - **Builds on:** [an endpoint checked and calibrated on first use](endpoint-first-use-2026-10-20.md) ([0034](../decisions/0034-endpoint-checked-and-calibrated-on-first-use.md)), settings in layers ([0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md)).
 
 ## What exists (built 2026-10-20)
@@ -45,7 +46,10 @@
 
 ### 1. The bug, and the first-run error (bugs first, [0027](../decisions/0027-behaviour-changes-apart-from-refactors.md))
 
-- **`base_url`'s layers made to agree** with its help, or the help made to agree with them ([design question 1](#design-questions)).
+- **`base_url` kept by the environment and the user's settings only** ([design question 1](#design-questions), answered), as its help says:
+  - `config set base_url` and `config import` refuse it for a store.
+  - A store that holds one is read without it, with a warning naming the store.
+  - The user's URL is used where `$OPENAI_BASE_URL` is unset; `--base-url` beats both.
 - **The first-run error** says what to set when the endpoint can't be reached (`OPENAI_BASE_URL`, `OPENAI_API_KEY`) and names `config test`.
 - **The key check fails** when the endpoint answers 401 or 403, saying the key was refused.
 
@@ -93,9 +97,7 @@
 
 ## Design questions
 
-1. **Where the endpoint's URL lives** (milestone 1's fix):
-   - **(a) The environment and the user's settings only** (proposed). The help's rule is kept: `config set base_url` without `--user` is refused, and the user's URL is used where the variable is unset. A store never carries one.
-   - **(b) Any layer, the store's winning,** as the code does now. The help is changed to say so.
+1. **Where the endpoint's URL lives:** answered 2026-10-28 (quoted at the top): the environment and the user's settings, never a store ([milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027)).
 2. **Interactive or config ops only:** you said either would do.
    - **I'd build milestones 2 and 3 first** (commands only), then `config setup` as a thin walk through them, if those still leave the first run awkward.
 3. **The probes' cost and when they run:** only on `config test --probes`, or also on a model's first use?
