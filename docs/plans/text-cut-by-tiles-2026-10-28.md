@@ -35,6 +35,16 @@ Checked in the code and the tilings note, 2026-10-28.
   - **The measures don't see it.** Without a text layer they count no lines, so no cut looks worse than another; tile choice keeps the grid. With an OCR layer over the same scans they count 77 to 136 lines cut sideways a page.
   - **Nothing is gained:** a 420 pt tile drawn at 1,000 px enlarges each of the scan's pixels about 2.4 times, showing nothing a full-width band doesn't.
   - **Not it:** the same pages scanned at letter size (612 × 792 pt) get bands. Read with the model ($0.036), their 48 band tiles were answered complete, none halved and none saying its text was cut.
+- **The owner's document, 2026-10-28:** "One document is 13.33 x 7.50 inches, as if for powerpoint presentations. The text is selectable, and highlights properly. But the selection cursor shows up sideways compared to normal. There is also a banner on the left side of each page that is written such that the text would be upright if the page was rotated 90 degrees. That text highlights in a sensible manner for the sideways cursor."
+  - **Rebuilt (synthetic, no model):** a 16:9 page, 960 × 540 pt as displayed, stored portrait with its content turned and `/Rotate` 90 or 270 turning it upright, and a banner horizontal in the stored page, displayed on the left. A title, five bullets about 720 pt long and a note.
+  - **Reproduced: the three slices.** Wider than 672 pt, the page gets no bands. Tile choice takes the snapped grid, 3 columns by 2 rows, cutting every bullet into a left, middle and right part: 6 tiles, 22 lines cut sideways.
+    - XY-cut cuts 10, but in 13 tiles, so it doesn't beat the grid on every measure and isn't chosen.
+    - The tiles hold only text, which the text tasks read whole anyway. On a letter page the bands holding only text aren't sent.
+  - **Not the rotation:** the same page stored upright tiles alike (lines are placed as displayed: `pages.shown`), and the banner changes nothing.
+  - **What would send no slices here** (measured without the model): bands up to 960 pt (`band_width` 2.3), or text-only tiles not sent (`skip_text_only`). Each sends this page no tile at all.
+    - On 2026-10-12, `skip_text_only: except_sheets` saved 34 corpus tiles and cost 4 facts, on charts whose text went into a larger tile ([tilings](../research/tilings-2026-10-12.md), milestone 8).
+    - Wide pages' bands were dropped for their lower detail (milestone 3 there).
+  - **The corpus has no 16:9 page:** its slide is 720 × 540, where XY-cut's one tile wins. Milestone 2 adds one.
 - **Still to confirm on the owner's documents:** their runs' tile paths (milestone 1). Grid or snapped tiles on portrait report pages, or a page size far beyond letter or A4 in a viewer's document properties, would mean this case; "halves, down the middle" would mean the halving case above.
 
 ### Wide pages and drawing sheets
@@ -131,7 +141,13 @@ Checked in the code and the tilings note, 2026-10-28.
 
 Each item is a lever, judged against null arms on the controlled corpus ([0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)), report pages first.
 
-- **First, tiles no finer than the page's own pixels:**
+- **First, the owner's 16:9 pages (960 × 540 pt):**
+  - A corpus layout of that size, with the owner's banner.
+  - Two candidates against today's cut, read with the model and scored by the keys (a few cents):
+    - bands on pages up to 960 pt wide, lower so their area stays 1.6 tiles (`band_width` 2.3)
+    - text-only tiles not sent but on drawing sheets (`skip_text_only: except_sheets`)
+  - The better made the default if it loses no facts on the corpus's charts and sheets.
+- **Then, tiles no finer than the page's own pixels:**
   - On a page that is one image (a scan), a tile's detail is capped at the image's: its side in points is at least what the image shows in `image_side` pixels.
   - So a scan written at its pixel size is cut as a page of its physical size would be: full-width bands on a report page.
   - **Measured** on the sample slices scanned at pixel size (100 and 150 dpi, with and without an OCR layer), and on the corpus's scans, against the grid they get now.
