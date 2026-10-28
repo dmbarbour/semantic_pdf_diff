@@ -89,10 +89,17 @@ def interpreter_differences(old, new):
 # Each lever setting's off value: what asks exactly what leaving its lever out asks (Lever.off)
 OFF = {name: value for lever in REGISTRY.values() for name, value in lever.off.items()}
 
+OWN_VERSION = "versions.semantic-pdf-diff"  # this package's version, which a change asks nothing new by
+
 def _asks_alike(key, a, b, old, new):
     """Whether a difference asks nothing new: a setting one side doesn't have, at its lever's off value on the
     other, or levers added or dropped with every setting of theirs off (a lever built, off, after a store was made
-    asks what the store's run asked)."""
+    asks what the store's run asked); or this package's own version. What a new version asks differently is bound by
+    the prompts, the settings and each reader's version (jobs.READERS), so a version raised at a checkpoint doesn't
+    read every store again (the owner, 2026-10-28: "It's about time to be systematically updating version
+    numbers.")."""
+    if key == OWN_VERSION:
+        return True
     name = key.split(".", 1)[1] if key.startswith("settings.") else None
     if name == "levers" and isinstance(a, list) and isinstance(b, list):
         return _levers_moved(a, b, old, new)

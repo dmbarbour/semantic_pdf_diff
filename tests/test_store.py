@@ -133,6 +133,19 @@ class Binding(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
             self.assertEqual(bind(store, extraction_interpreter(Settings())), {})
 
+    def test_a_new_version_of_the_package_binds_quietly(self):
+        # what a version asks differently is bound by its prompts, settings and readers, not by its number
+        with tempfile.TemporaryDirectory() as d, self.seeded(d) as store:
+            before = store.interpreter('extract')
+            before['versions']['semantic-pdf-diff'] = '0.1.0'
+            store.save_interpreter('extract', before)
+            self.assertEqual(bind(store, extraction_interpreter(Settings())), {})
+            self.assertEqual(self.count(store, 'evidence'), 3)  # nothing cleared
+            self.assertNotEqual(store.interpreter('extract')['versions']['semantic-pdf-diff'], '0.1.0')  # rebound
+            before['versions']['PyMuPDF'] = '1.0.0'  # a library's still reads again: text and rendering depend on it
+            store.save_interpreter('extract', before)
+            self.assertIn('versions.PyMuPDF', ' '.join(bind(store, extraction_interpreter(Settings()))['changed']))
+
     def test_a_lever_built_off_since_binds_quietly(self):
         # a store made before a lever existed: the lever, off, asks what the store's run asked
         import json
