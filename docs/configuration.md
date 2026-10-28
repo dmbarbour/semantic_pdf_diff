@@ -8,6 +8,8 @@ When no environment variable or override is supplied, the default endpoint is `h
 
 Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > what first-use checks measured (`context_tokens`, `image_tokens`) > built-in defaults**. The user's settings (`config set --user`, kept in `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `semantic-pdf-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `semantic-pdf-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
 
+The endpoint's URL is the exception: `--base-url` or a `--config` file for one run, then `$OPENAI_BASE_URL`, then the user's `base_url` (`config set --user base_url URL`). A store never keeps one: `config set` and `config import` refuse it (the owner, 2026-10-28: "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."). A store that kept one before then is read without it, with a warning saying how to remove it. When the endpoint can't be reached or turns the key away, the first-use checks and `config test` say which variable to set.
+
 Four environment variables, as the owner listed them ([decision 0032](decisions/0032-settings-in-layers-and-one-answers-cache.md)):
 
 | Environment variable | What it is |

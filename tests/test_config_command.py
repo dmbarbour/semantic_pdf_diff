@@ -2,18 +2,21 @@
 The owner, 2026-10-20: "User layer is fine. Snake case or kebab case is fine,
 if consistent. Definitely will need navigation of settings and adequate help for each. Redo instead of refusing, yes."
 """
-import stubs  # noqa: F401 (a clean environment)
+import stubs  # a clean environment
 import argparse
 import contextlib
 import io
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from semantic_pdf_diff import cli, configuration
+from semantic_pdf_diff.pipeline import settings_from
 from semantic_pdf_diff.settinghelp import GROUPS, HELP
-from semantic_pdf_diff.settings import Settings
+from semantic_pdf_diff.settings import Settings, user_settings
 from semantic_pdf_diff.store import Store
 
 def run(*argv):
@@ -160,6 +163,55 @@ class Layers(unittest.TestCase):
         self.assertEqual((flagged.mode, flagged.report_budget, flagged.split), ("proposals", 5_000_000, False))
         plain = RunOptions.from_args(parser.parse_args(["a", "b"]))
         self.assertEqual((plain.mode, plain.report_budget, plain.split), ("proposals", 20_000_000, False))
+
+class EndpointUrl(unittest.TestCase):
+    """The endpoint's URL is the environment's and the user's, never a store's (docs/plans/endpoint-setup-2026-10-28.md,
+    milestone 1; the owner, 2026-10-28: "Endpoint URL in environment and user settings is sufficient. I'd hate to
+    complicate things too much on the user's end.")."""
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.store = Path(temp.name) / "store"
+
+    def test_a_store_refuses_it_and_the_user_keeps_it(self):
+        code, _, err = run("config", "set", "base_url", "https://store.example/v1", "--store", self.store)
+        self.assertEqual(code, 1)
+        self.assertIn("base_url is the user's, never a store's", err)
+        file = self.store.parent / "settings.json"
+        file.write_text(json.dumps({"format": 1, "settings": {"base_url": "https://store.example/v1", "top_k": 6}}))
+        self.assertEqual(run("config", "import", file, "--store", self.store)[0], 1)
+        self.assertEqual(Store.settings_of(self.store), {})
+        with stubs.user_settings(stubs.USER):
+            code, out, _ = run("config", "set", "--user", "base_url", "https://user.example/v1")
+            self.assertEqual(code, 0)
+            self.assertEqual(user_settings()["base_url"], "https://user.example/v1")
+            with patch.dict(os.environ, {"OPENAI_BASE_URL": "https://env.example/v1"}):
+                _, shown, _ = run("config", "help", "base_url", "--store", self.store)
+            self.assertIn("now: https://env.example/v1 (environment)", shown)
+
+    def test_the_variable_then_the_users_a_flag_over_both_and_a_stores_left_out(self):
+        with Store(self.store) as kept:  # kept before 2026-10-28, when a store could
+            kept.save_own_settings({"base_url": "https://store.example/v1", "top_k": 6})
+        with self.assertLogs("semantic_pdf_diff", "WARNING") as warned:
+            own = Store.settings_of(self.store)
+        self.assertEqual(own, {"top_k": 6})
+        self.assertIn("config unset base_url", warned.output[0])
+        parser = cli.compare_parser()
+        with stubs.user_settings({**stubs.USER, "base_url": "https://user.example/v1"}):
+            layer = {**user_settings(), **own}  # as a run reads them (cli.compare_command)
+            def url(*flags):
+                return cli.load_settings(parser.parse_args(["a", "b", *flags]), layer).base_url
+            with patch.dict(os.environ, {"OPENAI_BASE_URL": "https://env.example/v1"}):
+                self.assertEqual(url(), "https://env.example/v1")
+                self.assertEqual(url("--base-url", "https://flag.example/v1"), "https://flag.example/v1")
+            self.assertEqual(url(), "https://user.example/v1")
+            self.assertEqual(cli.load_settings(parser.parse_args(["a", "b"]), layer).top_k, 6)
+
+    def test_a_config_file_gives_it_for_the_run_as_the_flag_does(self):
+        file = self.store.parent / "c.json"
+        file.write_text(json.dumps({"base_url": "https://file.example/v1"}))
+        with patch.dict(os.environ, {"OPENAI_BASE_URL": "https://env.example/v1"}):
+            self.assertEqual(settings_from(file).base_url, "https://file.example/v1")
 
 if __name__ == "__main__":
     unittest.main()

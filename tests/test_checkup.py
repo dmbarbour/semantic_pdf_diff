@@ -156,6 +156,13 @@ class NoModel(unittest.TestCase):
         self.assertEqual(len(said), 2 + 15 + 1)
         self.assertEqual(said[-1], "  and 5 more: `semantic-pdf-diff config models vision`")
 
+    def test_an_endpoint_out_of_reach_says_what_names_it(self):
+        from semantic_pdf_diff.settings import Settings
+        said = checkup.unset_model(Settings(base_url="http://127.0.0.1:9/v1")).splitlines()[1]
+        self.assertRegex(said, r"^The endpoint at http://127\.0\.0\.1:9/v1 can't be asked for its models "
+                               r"\(URLError: .*\)\. \$OPENAI_BASE_URL names the endpoint, else the user's base_url .* "
+                               r"`semantic-pdf-diff config test` checks it\.$")
+
 class ConfigModels(unittest.TestCase):
     def test_the_endpoints_models_those_in_use_marked(self):
         with endpoint(listed=("gemma-4", "gemma-4-turbo", "llama")), tempfile.TemporaryDirectory() as d:

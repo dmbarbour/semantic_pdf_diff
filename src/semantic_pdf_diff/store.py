@@ -16,12 +16,19 @@ or "unsupported" where none could. A run re-reads an item whose reader has chang
 that has gained a reader): its tasks are made again, and those whose queries didn't change replay.
 """
 import json
+import logging
 import os
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 from .regions import crops_of, region_of
 from .schema import Evidence, Figure, FileRef, Section, Source, merge_occurrences
+
+# Settings a store never keeps: the endpoint's URL is $OPENAI_BASE_URL's, else the user's (the owner, 2026-10-28:
+# "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's
+# end.").
+USERS_ONLY = ("base_url",)
+_warned = set()  # the stores warned of keeping one
 
 SCHEMA_VERSION = 9  # 8: responses cached by query hash and model; the query log; 9: context records
 
@@ -397,9 +404,18 @@ class Store:
         return claims
 
     def own_settings(self):
-        """The store's own settings, as `semantic-pdf-diff config` set them (configuration.py): {name: value}."""
+        """The store's own settings, as `semantic-pdf-diff config` set them (configuration.py): {name: value}. One a
+        store never keeps (USERS_ONLY), kept before 2026-10-28, is left out, with a warning once a store."""
         row = self.db.execute("SELECT value FROM meta WHERE key='settings'").fetchone()
-        return json.loads(row[0]) if row else {}
+        values = json.loads(row[0]) if row else {}
+        kept = [name for name in USERS_ONLY if name in values]
+        if kept and str(self.folder) not in _warned:
+            _warned.add(str(self.folder))
+            logging.getLogger("semantic_pdf_diff").warning(
+                "%s keeps %s, which is the user's, never a store's: $OPENAI_BASE_URL or `semantic-pdf-diff config set "
+                "--user base_url URL` sets it; `semantic-pdf-diff config unset base_url --store %s` removes the "
+                "store's", self.folder, ", ".join(kept), self.folder)
+        return {k: v for k, v in values.items() if k not in USERS_ONLY}
 
     def save_own_settings(self, values):
         """The store's own settings replaced (checked by the caller: configuration.applied)."""

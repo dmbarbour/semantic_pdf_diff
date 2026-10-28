@@ -918,7 +918,9 @@ def config_command(argv):
     from .settings import save_user_settings, user_path, user_settings
     store = args.store or default_store()
     user, own = user_settings(), Store.settings_of(store)
-    layers = [('measured', measured_layer(store)), ('user', user), ('store', own)]
+    url = (os.environ.get('OPENAI_BASE_URL') or '').strip()  # over the user's (Settings.from_env); a store keeps none
+    env = {'base_url': url} if url else {}
+    layers = [('measured', measured_layer(store)), ('user', user), ('environment', env), ('store', own)]
     if args.user:  # the layer set, unset, exported or imported
         own = user
     if args.action == 'show' and args.json:
@@ -988,9 +990,13 @@ def config_command(argv):
     if args.user and 'answers_cache' in changes:
         raise ValueError("answers_cache is a store's: the user's cache is $SEMANTIC_PDF_DIFF_CACHE's, else "
                          "~/.cache/semantic-pdf-diff")
+    from .store import USERS_ONLY
+    if not args.user and any(changes.get(name) is not None for name in USERS_ONLY):
+        raise ValueError("base_url is the user's, never a store's: `semantic-pdf-diff config set --user base_url URL` "
+                         "keeps it, under $OPENAI_BASE_URL")
     if args.user:
         save_user_settings(values)
-        now = configuration.resolved([('user', values), ('store', Store.settings_of(store))])
+        now = configuration.resolved([('user', values), ('environment', env), ('store', Store.settings_of(store))])
     else:
         with Store(store) as kept:
             kept.save_own_settings(values)
@@ -1004,7 +1010,8 @@ def config_command(argv):
             name, configuration.resolved(layers)[name][0])
         print(f"{name} = {configuration.shown(name, value)}" + (" (the default)" if layer == 'default' else
                                                                 ' (the store\'s)' if args.user and layer == 'store'
-                                                                else '')
+                                                                else ' ($OPENAI_BASE_URL\'s)' if args.user
+                                                                and layer == 'environment' else '')
               + (f"; the next run redoes: {configuration.redoes(name)}" if moved else ''))
         before = configuration.resolved(layers)[name][0]
         if name == 'answers_cache' and moved and before:

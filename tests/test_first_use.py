@@ -146,6 +146,21 @@ class FirstUse(unittest.TestCase):
         self.assertEqual(state['requests'], state['checks'])
         self.assertNotIn(f'chat {url} gemma-4', json.loads(self.memory.read_text())['passed'])
 
+    def test_an_endpoint_out_of_reach_or_turning_the_key_away_says_what_to_set(self):
+        code, said = compare(self.root, 'http://127.0.0.1:9/v1')  # nothing answers there
+        self.assertEqual(code, checkup.FAILED)
+        self.assertIn("the endpoint can't be reached: $OPENAI_BASE_URL names the endpoint", said)
+
+        def refused(handler):
+            handler.send_response(401)
+            handler.end_headers()
+        with serving(refused, get=refused) as url:
+            code, said = compare(self.root, url)
+        self.assertEqual(code, checkup.FAILED)
+        self.assertIn("key       FAILED: refused (HTTP 401): OPENAI_API_KEY isn't set", said)
+        self.assertIn("the endpoint refused the key: OPENAI_API_KEY holds the one it takes", said)
+        self.assertIn('Stopped: endpoint, key, json, image failed their check', said)
+
     def test_requests_failing_in_a_row_forget_what_was_remembered(self):
         for name, power in (('a.pdf', 10), ('b.pdf', 12)):  # 40 pages a side: more requests than the 25 that stop it
             text_pdf(self.root / name, [f'Pump {k} rated power {power + k} kW' for k in range(40)])

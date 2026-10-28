@@ -33,7 +33,8 @@ HELP = {
                   "depends on it: a store read with one model reads again with another.",
                   "google/gemma-4-31B-it", basic=True),
     "base_url": Help("endpoint", "the OpenAI-compatible endpoint, with /v1 where it needs it",
-                     "Set by $OPENAI_BASE_URL (or --base-url), not kept in a store: the endpoint is the user's.",
+                     "Set by $OPENAI_BASE_URL, else the user's settings (`config set --user base_url URL`); "
+                     "--base-url beats both for one run. Never kept in a store: the endpoint is the user's.",
                      "https://api.deepinfra.com/v1/openai"),
     "context_tokens": Help("endpoint", "the model's context window, in tokens: requests are sized to fit",
                            "Measured on first use where the endpoint lists the model's (`config show` marks it "

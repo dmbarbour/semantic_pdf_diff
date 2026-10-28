@@ -43,12 +43,16 @@ NO_MODEL = "http://127.0.0.1:9/v1"  # an address nothing answers: for replays th
 
 def settings_from(config=None, layer=None, **overrides):
     """Settings as the CLI gives them: the environment, then a store's own (layer: `config set`'s), then the --config
-    file, then overrides."""
+    file, then overrides. The endpoint's URL (store.USERS_ONLY) is $OPENAI_BASE_URL's, else the user's, unless the
+    --config file or an override (--base-url) gives it for the run: one in the layer (the user's, as a run merges them
+    in) is left to the user's place, under the variable."""
     from .settings import Settings
+    from .store import USERS_ONLY
     options = json.loads(Path(config).read_text()) if config else {}
     if not isinstance(options, dict):
         raise ValueError(f'{config}: settings file must contain a JSON object')
-    return Settings.from_env(**{**(layer or {}), **options, **overrides})
+    layer = {k: v for k, v in (layer or {}).items() if k not in USERS_ONLY}
+    return Settings.from_env(**{**layer, **options, **overrides})
 
 def attempt(run_it, *args, **kwargs):
     """A run's exit code, an error reported as the CLI reports one (exit 1)."""

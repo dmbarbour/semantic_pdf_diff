@@ -9,6 +9,7 @@ import json
 import math
 import os
 import random
+import re
 import tempfile
 import time
 import urllib.error
@@ -22,6 +23,7 @@ from .schema import Lenient
 
 LETTERS = "ABCDEFGHJKLMNPRSTUVWXYZ"  # no I, O or Q, as drawings avoid them
 FAILED = 5  # the exit code when a check fails (cameo_ingest's)
+REFUSED = re.compile(r"\bHTTP(?: Error)? (401|403)\b")  # the endpoint turning the key away, as a check's failure says
 
 class Sum(Lenient):
     sum: int = 0
@@ -120,7 +122,11 @@ def unset_model(settings):
     try:
         found = listed(settings, os.getenv("OPENAI_API_KEY", ""))
     except (OSError, ValueError) as e:
-        return "\n".join(said + [f"{where} can't be asked for its models ({type(e).__name__}: {e})."])
+        failure = f"{type(e).__name__}: {e}"
+        hint = (" It refused the key: OPENAI_API_KEY holds the one it takes." if REFUSED.search(failure) else
+                f" {WHERE}." if _unreachable(failure) else "")
+        return "\n".join(said + [f"{where} can't be asked for its models ({failure}).{hint} `semantic-pdf-diff "
+                                 "config test` checks it."])
     seeing = [m for m in found if m.reads_images]
     shown = seeing or found
     if not found:
@@ -220,7 +226,8 @@ def run(settings, rng=None, only=None):
         if checks[-1].ok is False and not ids and _unreachable(checks[-1].said):
             return checks + [Check(name, None, "skipped: the endpoint isn't reachable") for name in
                              ("json", "image", "reranker", "embedding") if name in wanted], client.cost
-        if checks[-1].ok is False and not ids:  # reachable, but listing no models (some servers don't)
+        if checks[-1].ok is False and not ids and not REFUSED.search(checks[-1].said):  # reachable, but listing
+            # no models (some servers don't); one turning the key away fails, and the key check says why
             checks[-1] = Check("endpoint", None, "lists no models: " + checks[-1].said, checks[-1].seconds)
         if not key and not is_local(settings.base_url):
             checks.append(Check("key", None, "OPENAI_API_KEY isn't set (a local server may need none)"))
@@ -275,6 +282,12 @@ def run(settings, rng=None, only=None):
     if "embedding" in wanted:
         checks.append(_timed("embedding", embedding) if settings.embed_model else
                       Check("embedding", None, "none set (embed_model)"))
+    refused = next((REFUSED.search(c.said) for c in checks if c.ok is False and "balance" not in c.said), None)
+    if refused:  # 401 or 403: the key isn't one the endpoint takes (a provider's balance exhausted aside)
+        checks = [c for c in checks if c.name != "key"]
+        at = 1 if checks and checks[0].name == "endpoint" else 0
+        checks.insert(at, Check("key", False, f"refused (HTTP {refused.group(1)}): OPENAI_API_KEY "
+                                + ("isn't set" if not key else "isn't a key this endpoint takes")))
     return checks, client.cost
 
 def _asked(request, settings_named):
@@ -290,12 +303,26 @@ def _asked(request, settings_named):
 def _unreachable(said):
     return said.startswith(("URLError", "ConnectionRefusedError", "TimeoutError", "socket.timeout", "OSError"))
 
+WHERE = ("$OPENAI_BASE_URL names the endpoint, else the user's base_url (`semantic-pdf-diff config set --user base_url "
+         "URL`); --base-url for one run")
+
+def advice(checks):
+    """What to set, where the checks found the endpoint out of reach or its key refused: [line]."""
+    out = []
+    if any(c.name == "endpoint" and c.ok is False and _unreachable(c.said) for c in checks):
+        out.append(f"the endpoint can't be reached: {WHERE}")
+    if any(c.name == "key" and c.ok is False for c in checks):
+        out.append("the endpoint refused the key: OPENAI_API_KEY holds the one it takes")
+    return out
+
 def lines(settings, checks, cost):
-    """`config test`'s report: what was checked, each check, what it cost, and how many failed."""
+    """`config test`'s report: what was checked, each check, what to set where the endpoint is out of reach or its
+    key refused (advice), what it cost, and how many failed."""
     from .llm import redact_url
     out = [f"checking {settings.model or 'no model'} at {redact_url(settings.base_url)}"]
     out += [c.line() for c in checks]
     failed = [c.name for c in checks if c.ok is False]
+    out += advice(checks)
     out.append(f"cost: ${cost:.4f}, as the provider reports it")
     out.append(f"{len(failed)} check(s) failed: {', '.join(failed)}" if failed else "every check passed")
     return out
