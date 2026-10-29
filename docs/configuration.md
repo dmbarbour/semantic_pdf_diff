@@ -16,7 +16,7 @@ Four environment variables, as the owner listed them ([decision 0032](decisions/
 | --- | --- |
 | `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere) |
 | `OPENAI_BASE_URL` | Chat Completions API base URL, including `/v1` when required |
-| `SEMANTIC_PDF_DIFF_STORE` | The store every command works on without `--store` (`compare`, `source`, `show`, `report`, `gc`, `search`, `config`, `settings`, `cache`; unset: `./diff-output`) |
+| `SEMANTIC_PDF_DIFF_STORE` | The store every command works on without `--store` (`compare`, `source`, `show`, `report`, `gc`, `search`, `config`, `settings`, `cache`, `debug`; unset: `./diff-output`) |
 | `SEMANTIC_PDF_DIFF_CACHE` | The answers cache's folder for stores not bound to one yet (a store's first run binds it: `answers_cache`): every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
 
 Two more variables aren't settings:

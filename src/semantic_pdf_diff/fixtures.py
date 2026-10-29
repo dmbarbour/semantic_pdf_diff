@@ -338,6 +338,19 @@ class Fixture:
         """(the first answer's time, the last's, when an answer was last used), as recorded: None if none."""
         return self.db.execute("SELECT MIN(recorded), MAX(recorded), MAX(used) FROM response").fetchone()
 
+    def outcomes(self, queries):
+        """{query: (outcome, error)} for each of queries it holds an answer or a failure to: "ok" where any responder
+        answered it, else the failure last recorded (`semantic-pdf-diff debug`)."""
+        out, queries = {}, list(queries)
+        for start in range(0, len(queries), 500):
+            chunk = queries[start:start + 500]
+            for query, outcome, error in self.db.execute(
+                    f"SELECT query, outcome, error FROM response WHERE query IN ({','.join('?' * len(chunk))}) "
+                    "ORDER BY COALESCE(used, recorded)", chunk):
+                if out.get(query, ("",))[0] != "ok":
+                    out[query] = (outcome, error)
+        return out
+
     def summary(self):
         """Answers per responder, role and outcome, with token usage, and the documents recorded
         from (from the side tables: a query's role is its first recipe's)."""

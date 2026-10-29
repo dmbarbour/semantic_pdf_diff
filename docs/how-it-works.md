@@ -142,6 +142,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `dispatch.py` | Worker threads for model requests; everything else stays on the main thread |
 | `progress.py` | Progress bars, heartbeats and logging |
 | `store.py` | SQLite evidence store: per-task records, the query log (the answers are in the user's cache, `pipeline.answers_cache`), the reader version each content item was read with, comparisons |
+| `debugging.py` | `debug`: what a store's runs asked and what failed, by step, with the errors the answers cache recorded and their counts |
 | `checkup.py` | `config test` and `config models`: the endpoint, the key and each model checked by asking (an eye-test card among the checks), the endpoint's models listed |
 | `binding.py` | A store's binding to its interpreters: what differs, whether reading again can cost a model call, what it clears and asks again at most, the log's line that says so |
 | `cli.py` | Commands: arguments into settings and run options, exit semantics; the lab's commands by entry point |

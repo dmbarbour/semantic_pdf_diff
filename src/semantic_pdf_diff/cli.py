@@ -7,6 +7,7 @@
     semantic-pdf-diff fixtures summary|pack|prune|merge ...
     semantic-pdf-diff cache show|copy|remove|prune ...   # the answers cache
     semantic-pdf-diff search WORDS... [--store DIR ...]  # stores' claims, as a report's search finds them
+    semantic-pdf-diff debug [--store DIR]               # what a store's runs asked and what failed, with counts
     semantic-pdf-diff review|queries ...                # with the lab installed (semantic-pdf-diff[lab])
 """
 import argparse
@@ -106,6 +107,8 @@ def command(argv, client):
         return cache_command(argv[1:])
     if argv[0] == 'search':
         return search_command(argv[1:])
+    if argv[0] == 'debug':
+        return debug_command(argv[1:])
     lab = lab_commands().get(argv[0])
     if lab:
         return lab(argv[1:])
@@ -132,6 +135,7 @@ Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help C
   settings    print the settings a run would use, as JSON
   cache       the answers cache: show it; copy, remove or prune a project's answers
   fixtures    recorded model answers, replayed instead of asked (testing)
+  debug       what a store's runs asked and what failed: requests by step, the errors recorded, with counts
 """
 
 START_HELP = """\
@@ -720,6 +724,49 @@ def stores_queries(folders):
         with Store.open(folder) as store:
             queries |= store.query_hashes()
     return queries
+
+DEBUG_HELP = """\
+Prints, in a few lines to read off a screen: the version; the endpoint and the models the store's settings name (URLs
+redacted, the key never); the requests the store's runs asked, by step (extract, compare, rerank, embed, ...), with
+how many were answered, failed or never answered (not sent, as after sending stopped); the last comparison's counts;
+and the errors the answers cache recorded, the most frequent first. Nothing of the documents is printed but what a
+server's error quotes. Asks no model.
+
+Examples:
+  semantic-pdf-diff debug --store result
+  semantic-pdf-diff debug --store result --errors 30
+  semantic-pdf-diff debug --store result --json
+"""
+
+def debug_parser():
+    parser = help_text(Parser(prog='semantic-pdf-diff debug'), DEBUG_HELP,
+                       "What a store's runs asked and what failed: requests by step, and the errors recorded, with "
+                       "counts.")
+    parser.add_argument('--store', type=Path, default=None,
+                        help='The store (default: $SEMANTIC_PDF_DIFF_STORE, else ./diff-output)')
+    parser.add_argument('--cache', type=Path, help="the answers cache: a folder holding answers.sqlite, or the file "
+                                                   "(default: the one the store's runs use)")
+    parser.add_argument('--errors', type=int, default=10, metavar='N', help='the N most frequent errors (default 10)')
+    parser.add_argument('--json', action='store_true', help='everything as JSON')
+    return parser
+
+def debug_command(argv):
+    """`semantic-pdf-diff debug` (debugging.py)."""
+    from . import debugging
+    from .settings import cache_file, cache_path
+    args = debug_parser().parse_args(argv)
+    store = args.store or default_store()
+    made = (store / 'store.sqlite').exists()
+    try:
+        path = cache_file(args.cache) if args.cache else cache_in_use([store]) if made else cache_path()
+    except (StoreError, ValueError) as e:
+        print(e, file=sys.stderr)
+        return 1
+    settings = settings_from(layer={k: v for k, v in Store.settings_of(store).items()
+                                    if k not in configuration.RUN_OPTIONS})
+    found = debugging.gather(store, path, settings, limit=max(1, args.errors))
+    print(json.dumps(found, indent=1) if args.json else '\n'.join(debugging.lines(found)))
+    return 0
 
 def cache_in_use(folders):
     """The answers cache the stores' runs use (pipeline.cache_of), else, with none named, the default store's (one made
