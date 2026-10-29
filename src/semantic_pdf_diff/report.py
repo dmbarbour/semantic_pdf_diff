@@ -312,7 +312,7 @@ def analysis_header_html(data, issues):
 # A report document's parts the page shows in their own places, left out of its run metadata (each file's grows with
 # the files compared: the revisions' groupings were 208 KB of TS 38.300's 1.4 MB, gzipped).
 SHOWN_ELSEWHERE = ('evidence', 'coverage', 'findings', 'unmatched', 'shared', 'groupings', 'sections', 'situation',
-                   'records', 'record_changes', 'files', 'file_difference', 'scan_issues')
+                   'records', 'record_changes', 'files', 'file_difference', 'scan_issues', 'index')
 
 RECORD_KINDS = {"note": "Note", "legend": "Legend", "list": "List lead-in", "table": "Table"}
 
@@ -336,19 +336,27 @@ def record_changes_html(changes, esc):
 
 def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=True, split=False):
     """Write report.json and report.html, one file holding its crops (rendered into `assets`, default output/assets)
-    as far as the byte budget allows, in crops.py's order of value. Returns the budget's account (crops.Account);
+    as far as the byte budget allows, in crops.py's order of value, and its indexes beside them (indexfiles.py).
+    Returns the budget's account (crops.Account);
     with write=False, only the account (`report --dry-run`). With split, and more than one pair of files, the page is
     one file a pair of files instead, each under the budget, and an index, in report-split/ (SPLIT)."""
     output = Path(output)
     assets = Path(assets) if assets else output / "assets"
     stored = lambda image: assets / image.split("/", 1)[1] if image.startswith("assets/") else output / image
+    saved = data  # report.json: the comparison as the store keeps it
+    if not data.get('index'):  # one saved before indexes: built for its files and page, report.json as it was
+        from . import indexes
+        data = {**data, 'index': indexes.built(data)}
+    if write:  # its indexes beside it: index.md, index.xlsx, index/*.csv
+        from . import indexfiles
+        indexfiles.written(data['index'], {e['id']: e for e in data['evidence']}, output)
     pairs = file_pairs(data) if split else []
     if len(pairs) > 1:
-        return write_split(data, output, pairs, stored, budget, write)
+        return write_split(data, output, pairs, stored, budget, write, saved)
     page, account = report_page(data, stored, budget)
     if write:
         output.mkdir(exist_ok=True, parents=True)
-        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output/"report.json").write_text(json.dumps(saved, indent=2, ensure_ascii=False), encoding="utf-8")
         (output/'report.html').write_text(page, encoding='utf-8')
     return account
 
@@ -358,7 +366,7 @@ CARRY = ('<script>document.addEventListener("click", (e) => {const a = e.target.
          'if (a && location.hash && !a.getAttribute("href").includes("#")) a.href = a.getAttribute("href") '
          '+ location.hash;});</script>')
 
-def write_split(data, output, pairs, stored, budget, write):
+def write_split(data, output, pairs, stored, budget, write, saved=None):
     """One report file a pair of files (its findings, those reaching other pairs' files too, and its claims without a
     counterpart), each under the budget, and index.html listing them: a folder to zip and send, for comparisons too
     large for one file (the owner, 2026-10-19: "or distribution with a zip folder"). The account adds up the parts'."""
@@ -385,7 +393,7 @@ def write_split(data, output, pairs, stored, budget, write):
     total.size += len(index.encode())
     if write:
         folder.mkdir(exist_ok=True, parents=True)
-        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output/"report.json").write_text(json.dumps(saved or data, indent=2, ensure_ascii=False), encoding="utf-8")
         (folder / "index.html").write_text(index, encoding="utf-8")
         for name, page in parts:
             (folder / name).write_text(page, encoding="utf-8")
