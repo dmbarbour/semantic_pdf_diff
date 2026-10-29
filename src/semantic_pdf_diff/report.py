@@ -80,7 +80,8 @@ def place(loc):
 STYLE = '''
 :root{font-family:system-ui,sans-serif}body{max-width:1200px;margin:32px auto;padding:0 24px}
 h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:var(--accent)}.meta{color:var(--muted)}
-article,header,details.coverage{background:var(--card);border:1px solid var(--line);\
+div.subject table{table-layout:fixed}div.subject th:first-child{width:28%}
+article,header,details.coverage,div.subject{background:var(--card);border:1px solid var(--line);\
 border-radius:12px;padding:22px;margin:18px 0}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}\
 section{min-width:0;padding:12px;background:var(--panel);border-radius:8px}
@@ -543,9 +544,14 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     one = one_source(data)  # an analysis: its claims alone, no findings, no sides or how claims fared
     if way:
         page += topic_coverage_html(claims, names, sides)
+    index = data.get('index') or {}
+    subjects, figures = index.get('subjects', []), index.get('figures', [])
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
-             + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button></div>')
+             + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
+             + (f'<button data-view="subjects">Subjects {len(subjects)}</button>' if subjects else '')
+             + (f'<button data-view="figures">Figures and tables {len(figures)}</button>' if figures else '')
+             + '</div>')
     page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
              + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
              + '</select></label>')
@@ -590,6 +596,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
+    page += subjects_html(subjects, index.get('sources', [])) + figures_html(figures, len(sides) > 1)
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -623,6 +630,58 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
             f'<script type="application/gzip" id="report-data">{packed}</script>'
             f'<script type="application/json" id="report-crops">{images}</script><script>{SCRIPT}</script>')
     return html_page('Source analysis' if one else 'Semantic PDF comparison', body, STYLE)
+
+def subjects_html(subjects, sources):
+    """The Subjects view (indexes.py): each subject, its other names and its properties, each value linked to its
+    claim's card; in a comparison a column a source, "—" where one gives nothing (weak: not saying isn't absence).
+    A search shows the subjects whose words it has (data-text)."""
+    if not subjects:
+        return ''
+    many = len(sources) > 1
+    def values(vs):
+        return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">{esc(said_of(v))}</a> <small>{esc(v["where"])}</small>'
+                           for v in vs) or '—'
+    out = []
+    for s in subjects:
+        names = [n for n in s['names'] if n.casefold() != s['name'].casefold()]  # ("Airfoil" isn't also "airfoil")
+        meta = ([f"also {', '.join(names[:8])}"] if names else []) + (
+            ['claims: ' + ', '.join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
+             + (f" (matched by {s['matched_by']})" if s['matched_by'] else '')] if many else [])
+        heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Values</th>'
+        rows = ''.join(
+            f"<tr><td>{esc(p['name'])}</td>"
+            + (''.join(f"<td>{values([v for v in p['values'] if v['source'] == src])}</td>" for src in sources)
+               if many else f"<td>{values(p['values'])}</td>") + '</tr>' for p in s['properties'])
+        words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties'])]).casefold()
+        out.append(f'<div class="subject" data-text="{esc(words)}"><h3>{esc(s["name"])}</h3>'
+                   + (f'<p class="meta">{esc("; ".join(meta))}</p>' if meta else '')
+                   + f'<table><thead><tr><th>Property</th>{heads}</tr></thead><tbody>{rows}</tbody></table></div>')
+    return ('<section data-for="subjects" class="index" hidden><p class="meta">Each subject as its claims name it '
+            '(a tag, else its words), its properties and every value given, each linked to its claim'
+            + ('; a source giving nothing for one is marked “—”: not saying isn\'t evidence of absence' if many else '')
+            + '. Also in index.md and index.xlsx, beside this page.</p>' + ''.join(out) + '</section>')
+
+def said_of(v):
+    unit = '' if v['unit'] in ('', '-') else v['unit']  # "-": none
+    return ' '.join(x for x in (str(v['value']), unit) if x) + (f" ({v['conditions']})" if v['conditions'] else '')
+
+def figures_html(figures, many):
+    """The Figures and tables view: each figure, drawing sheet and table, where it is, what it's about, and its
+    claims (the first linked)."""
+    if not figures:
+        return ''
+    rows = ''.join(
+        f'<tr data-text="{esc(" ".join([f["label"], f["title"], f["about"], f["file"]]).casefold())}">'
+        + (f'<td>{esc(f["source"])}</td>' if many else '')
+        + f'<td>{esc(f["file"])}</td><td>{esc(f["page"] if f["page"] is not None else "")}</td>'
+        f'<td>{esc(f["kind"])}</td><td>{esc(f["label"])}</td><td>{esc(f["title"])}</td><td>{esc(f["about"])}</td>'
+        + (f'<td><a href="#claim={esc(f["claims"][0])}">{len(f["claims"])}</a></td>' if f['claims'] else '<td>0</td>')
+        + '</tr>' for f in figures)
+    heads = ('<th>Source</th>' if many else '') + ''.join(
+        f'<th>{h}</th>' for h in ('File', 'Page', 'Kind', 'Label', 'Title or caption', 'About', 'Claims'))
+    return ('<section data-for="figures" class="index" hidden><p class="meta">The figures, drawing sheets and tables '
+            'found, with what situating said each is about (PDFs, when it ran) and the claims read from it.</p>'
+            f'<table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></section>')
 
 # How a claim fared in the comparison, as the claims view filters it.
 STATUSES = {"findings": "In findings", "compared": "Compared, no counterpart", "unaligned": "Possibly added or removed",

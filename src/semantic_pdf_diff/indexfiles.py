@@ -23,8 +23,13 @@ FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # every member's, so the same index gives th
 NUMBER = re.compile(r"-?(?:0|[1-9]\d*|[1-9]\d{0,2}(?:,\d{3})+)(?:\.\d+)?")
 
 def said(v):
-    """A value as written: its value, unit and conditions."""
-    return " ".join(x for x in (str(v["value"]), v["unit"]) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
+    """A value as written: its value, unit (none for "-") and conditions."""
+    unit = "" if v["unit"] in ("", "-") else v["unit"]
+    return " ".join(x for x in (str(v["value"]), unit) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
+
+def counted(n, one, many=None):
+    """ "1 claim", "2 claims"."""
+    return f"{n} {one if n == 1 else many or one + 's'}"
 
 def title(index):
     return " ↔ ".join(index["sources"]) or "(no source)"
@@ -41,7 +46,7 @@ def markdown(index):
              "relying on it." + (" A source giving nothing for a subject or property another gives is marked “—”: "
                                  "not saying isn't evidence of absence." if many else ""), "", "## Subjects", ""]
     for s in index["subjects"]:
-        names = [n for n in s["names"] if n != s["name"]]
+        names = [n for n in s["names"] if n.casefold() != s["name"].casefold()]
         lines.append(f"### {s['name']}" + (f" (also {', '.join(names[:5])})" if names else ""))
         if many:
             lines.append("Claims: " + "; ".join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
@@ -65,9 +70,9 @@ def markdown(index):
     for f in index["figures"]:
         name = " ".join(x for x in (f["label"], f"“{f['title']}”" if f["title"] else "") if x) or f["kind"]
         place = (f"{f['source']}: " if many else "") + f["file"] + (f", page {f['page']}" if f["page"] else "")
-        lines.append(f"- **{name}** ({place})" + (f": {f['about']}" if f["about"] else "")
-                     + (f"; {len(f['claims'])} claims" if f["claims"] else "")
-                     + (f"; cited {f['cited']} times" if f["cited"] else ""))
+        lines.append(f"- **{name}** ({place})" + (f": {f['about'].rstrip('.')}" if f["about"] else "")
+                     + (f"; {counted(len(f['claims']), 'claim')}" if f["claims"] else "")
+                     + ("; cited once" if f["cited"] == 1 else f"; cited {f['cited']} times" if f["cited"] else ""))
     return "\n".join(lines).rstrip() + "\n"
 
 # --- the tables: CSV and the workbook's sheets ---------------------------------------------------------------------
@@ -168,9 +173,9 @@ def workbook(index, evidence):
     outlined, outline = [], []
     for s in index["subjects"]:
         n = sum(len(c) for c in s["claims"].values())
-        outlined.append([s["name"], f"{len(s['properties'])} properties, {n} claims"
-                         + (f"; also {', '.join(x for x in s['names'] if x != s['name'])[:200]}"
-                            if len(s["names"]) > 1 else "")])
+        others = [x for x in s["names"] if x.casefold() != s["name"].casefold()]
+        outlined.append([s["name"], f"{counted(len(s['properties']), 'property', 'properties')}, {counted(n, 'claim')}"
+                         + (f"; also {', '.join(others)[:200]}" if others else "")])
         outline.append((0, BOLD))
         for p in s["properties"]:
             for v in p["values"]:

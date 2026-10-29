@@ -11,8 +11,9 @@ from pathlib import Path
 
 from semantic_pdf_diff import indexes, indexfiles
 from semantic_pdf_diff.schema import Evidence, PdfLocator
+from semantic_pdf_diff.report import unpacked
 from stubs import serving
-from test_analyze import asked, plant, run
+from test_analyze import asked, drawn, plant, run
 
 def claim(cid, content, entity, attribute, value, unit, page=1):
     return Evidence(id=cid, content=content, locator=PdfLocator(page=page, bbox=(0, 0, 1, 1), region="text", task="t"),
@@ -75,8 +76,8 @@ class Subjects(unittest.TestCase):
         self.assertEqual([(f["label"], f["page"], f["kind"], f["claims"], f["cited"]) for f in index["figures"]],
                          [("Figure 2", 4, "figure", ["A-2"], 1), ("Table 5. Pumps", 9, "table", ["A-4"], 0)])
         self.assertEqual(index["figures"][0]["title"], "Pump curve")
-        self.assertIn('- **Figure 2 “Pump curve”** (a.pdf, page 4): The pumps\' head against flow.; 1 claims; cited 1 '
-                      'times', indexfiles.markdown(index))
+        self.assertIn('- **Figure 2 “Pump curve”** (a.pdf, page 4): The pumps\' head against flow; 1 claim; cited once',
+                      indexfiles.markdown(index))
 
 class Files(unittest.TestCase):
     def test_csv_a_row_a_value(self):
@@ -107,6 +108,10 @@ class Files(unittest.TestCase):
         self.assertEqual(book["About"]["B1"].value, "a")
         self.assertEqual(book["Claims"].max_row, 5)
 
+    def test_a_unit_of_dash_is_none(self):
+        self.assertEqual(indexfiles.said({"value": "1.5", "unit": "-", "conditions": "at -100 deg"}),
+                         "1.5 (at -100 deg)")
+
     def test_tags_and_long_numbers_stay_text(self):
         self.assertIn("<v>1200</v>", indexfiles.cell("A1", "1,200"))
         for text in ("007", "1234567890123456", "12 kW", "P-101"):
@@ -129,6 +134,8 @@ class Written(unittest.TestCase):
             again, _, _ = run("report", "--store", out)  # written again with the report
             rewritten = (out / "index.md").read_text()
             book = (out / "index.xlsx").read_bytes()
+            shown = unpacked((out / "report.html").read_text())
+            searched = drawn((out / "report.html").as_uri() + "#subjects&q=blower")
         self.assertEqual((code, again), (0, 0))
         self.assertEqual(len(data["index"]["subjects"]), 15)
         self.assertEqual(files, ["claims.csv", "figures.csv", "properties.csv", "subjects.csv"])
@@ -136,6 +143,12 @@ class Written(unittest.TestCase):
         self.assertRegex(page, r"### blower0\n\n- \*\*discharge head\*\*: 20 m \(\S*blowers\.md, lines \d+–\d+\)")
         self.assertEqual(page, rewritten)
         self.assertEqual(book[:2], b"PK")
+        self.assertIn('<button data-view="subjects">Subjects 15</button>', shown)  # the page's views
+        self.assertRegex(shown, r'<div class="subject" data-text="blower0 discharge head"><h3>blower0</h3><table>'
+                                r'<thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td>discharge '
+                                r'head</td><td><a href="#claim=[^"]+">20 m</a>')
+        if searched is not None:  # a search shows the subjects holding its words
+            self.assertIn("5 of 15 subjects", searched)
 
 if __name__ == "__main__":
     unittest.main()

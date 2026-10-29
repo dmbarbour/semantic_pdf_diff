@@ -171,9 +171,28 @@
   const chips = [...root.querySelectorAll('.topics button')];
   const keyOf = (x) => (x.cards ? x.cards.join('~') : x.card);  // a finding's address, or a claim's
   let listed = [], reach = () => undefined;  // the items shown, and the way to one of them
+  // the index's views (subjects, figures and tables): written in the page, a search showing those holding its words
+  const listOnly = [root.querySelector('.topics'), file && file.closest('label')].filter(Boolean);
+  const indexed = (step) => {
+    for (const x of listOnly) x.hidden = true;  // (the topics and files filter findings and claims)
+    const words = query.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const items = [...root.querySelectorAll(`[data-for="${view}"] [data-text]`)];
+    let n = 0;
+    for (const x of items) {
+      x.hidden = !words.every((w) => x.dataset.text.includes(w));
+      if (!x.hidden) n += 1;
+    }
+    for (const tab of tabs) tab.textContent = labels.get(tab);
+    $('count').textContent = `${n} of ${items.length} ${view === 'figures' ? 'figures and tables' : view}`;
+    main.textContent = '';
+    listed = [];
+    remember(step);
+  };
   const show = (step) => {
     for (const tab of tabs) tab.classList.toggle('on', tab.dataset.view === view);
     for (const part of root.querySelectorAll('[data-for]')) part.hidden = part.dataset.for !== view;
+    if (view !== 'findings' && view !== 'claims') return indexed(step);
+    for (const x of listOnly) x.hidden = false;
     const groups = Search.parse(query.value, index.unitOf);
     const among = groups.length ? index.find(groups) : null;
     const searched = among && {findings: among(R.findings), claims: among(R.claims)};
@@ -212,6 +231,7 @@
     offer('The model\'s other names for it: ', others.map((o) => [o.name, 0]));
     const found = searched && searched[view];
     for (const tab of tabs) {
+      if (tab.dataset.view !== 'findings' && tab.dataset.view !== 'claims') continue;
       const all = tab.dataset.view === 'findings' ? R.findings : R.claims;
       tab.textContent = searched ? `${labels.get(tab)} (${searched[tab.dataset.view].size} found)` : labels.get(tab);
       if (searched) tab.title = `${searched[tab.dataset.view].size} of ${all.length} found by the search`;
@@ -296,8 +316,8 @@
     const a = address();
     target = a.has('finding') ? {kind: 'finding', id: a.get('finding')}
       : a.has('claim') ? {kind: 'claim', id: a.get('claim')} : null;
-    view = target ? (target.kind === 'claim' ? 'claims' : 'findings') : a.has('claims') ? 'claims'
-      : a.has('findings') ? 'findings' : home;
+    view = target ? (target.kind === 'claim' ? 'claims' : 'findings')
+      : (tabs.find((tab) => a.has(tab.dataset.view)) || {dataset: {view: home}}).dataset.view;
     for (const [key, c] of CONTROLS) {
       c.value = a.has(key) ? a.get(key) : initial.get(key);
       if (c.selectedIndex < 0) c.value = initial.get(key);  // an option this report hasn't
