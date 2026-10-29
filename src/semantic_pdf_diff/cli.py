@@ -729,8 +729,8 @@ DEBUG_HELP = """\
 Prints, in a few lines to read off a screen: the version; the endpoint and the models the store's settings name (URLs
 redacted, the key never); the requests the store's runs asked, by step (extract, compare, rerank, embed, ...), with
 how many were answered, failed or never answered (not sent, as after sending stopped); the last comparison's counts;
-and the errors the answers cache recorded, the most frequent first. Nothing of the documents is printed but what a
-server's error quotes. Asks no model.
+and the errors the answers cache recorded, the most frequent first, an extraction's by the region asked ("extract
+(tile)"). Nothing of the documents is printed but what a server's error quotes. Asks no model.
 
 Examples:
   semantic-pdf-diff debug --store result

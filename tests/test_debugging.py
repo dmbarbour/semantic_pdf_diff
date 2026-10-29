@@ -88,13 +88,15 @@ class Debug(unittest.TestCase):
         self.assertIn("endpoint (the store's settings): ", out)
 
     def test_errors_counted_by_step_most_frequent_first_and_cut_short(self):
-        roles = {"q1": "extract", "q2": "extract", "q3": "extract", "q4": "rerank", "q5": "rerank"}
+        roles = {"q1": ("extract", "text"), "q2": ("extract", "tile"), "q3": ("extract", "tile"),
+                 "q4": ("rerank", "proposals"), "q5": ("rerank", "proposals")}
         outcomes = {"q1": ("ok", None), "q2": ("invalid", "Invalid: no JSON"), "q3": ("invalid", "Invalid: no JSON"),
                     "q4": ("invalid", "x" * 400)}
         steps, errors = debugging.steps(roles, outcomes)
         self.assertEqual(steps, [{"step": "extract", "asked": 3, "answered": 1, "failed": 2, "never_answered": 0},
                                  {"step": "rerank", "asked": 2, "answered": 0, "failed": 1, "never_answered": 1}])
-        self.assertEqual(errors.most_common(1), [(("extract", "Invalid: no JSON"), 2)])
+        self.assertEqual(errors.most_common(), [(("extract (tile)", "Invalid: no JSON"), 2),
+                                                (("rerank", "x" * 297 + "..."), 1)])
         self.assertEqual(len(debugging.short("x" * 400)), debugging.ERROR_CHARACTERS)
 
     def test_a_long_step_name_keeps_the_columns(self):

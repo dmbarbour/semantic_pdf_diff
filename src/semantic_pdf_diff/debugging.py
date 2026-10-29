@@ -14,6 +14,9 @@ from collections import Counter
 from types import SimpleNamespace
 
 ERROR_CHARACTERS = 300  # of each error printed: a server's may quote the whole request
+# the steps whose errors are told apart by the region asked: an extraction's text, table, tile, overview or figure
+# (the owner's run, 2026-10-29: "extract 763 Truncated")
+BY_REGION = ("extract", "triage")
 
 def short(error):
     """An error on one line, at most ERROR_CHARACTERS."""
@@ -40,10 +43,11 @@ def endpoint(values):
                           "dimensions": settings.embed_dimensions} if settings.embed_model else None}
 
 def steps(roles, outcomes):
-    """The requests by step ({hash: role}, {hash: (outcome, error)}): ([{step, asked, answered, failed,
-    never_answered}], Counter of (step, error) for those failed)."""
+    """The requests by step ({hash: (role, region)}, {hash: (outcome, error)}): ([{step, asked, answered, failed,
+    never_answered}], Counter of (step, error) for those failed, an extraction's step with its region: "extract
+    (tile)")."""
     counts, errors = {}, Counter()
-    for query, role in roles.items():
+    for query, (role, region) in roles.items():
         row = counts.setdefault(role or "other", {"step": role or "other", "asked": 0, "answered": 0, "failed": 0,
                                                   "never_answered": 0})
         row["asked"] += 1
@@ -54,7 +58,7 @@ def steps(roles, outcomes):
             row["never_answered"] += 1
         else:
             row["failed"] += 1
-            errors[row["step"], short(error)] += 1
+            errors[f"{row['step']} ({region})" if role in BY_REGION and region else row["step"], short(error)] += 1
     return sorted(counts.values(), key=lambda r: (-r["asked"], r["step"])), errors
 
 def comparison(data):

@@ -485,8 +485,9 @@ class Store:
         return {h for (h,) in self.db.execute("SELECT DISTINCT hash FROM query")}
 
     def query_roles(self):
-        """{hash: its role} for every query its runs asked (`semantic-pdf-diff debug` counts them by step)."""
-        return dict(self.db.execute("SELECT hash, role FROM query"))
+        """{hash: (its role, its region)} for every query its runs asked (`semantic-pdf-diff debug` counts them by
+        step)."""
+        return {h: (role, region) for h, role, region in self.db.execute("SELECT hash, role, region FROM query")}
 
     def queries(self, content=None, task=None, role=None):
         """Logged queries: [{hash, recipe, role, region, content, task, prompt, images}], latest last."""
