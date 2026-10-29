@@ -29,7 +29,7 @@ def embedding_model(asked):
     def post(handler):
         body = request_body(handler)
         asked.append(body)
-        rows = [{"index": i, "embedding": toy_vector(text)[:body["dimensions"]]}
+        rows = [{"index": i, "embedding": toy_vector(text)[:body.get("dimensions")]}
                 for i, text in enumerate(body["input"])]
         handler.send_response(200)
         handler.end_headers()

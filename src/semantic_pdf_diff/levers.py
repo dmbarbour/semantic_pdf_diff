@@ -1131,15 +1131,18 @@ class SearchNames(Lever):
         return self.search_names
 
 class Embed(Lever):
-    lever_name, stage, off = "embed", "comparison", {"embed_model": None, "embed_url": None, "embed_dimensions": 256}
+    lever_name, stage, off = "embed", "comparison", {"embed_model": None, "embed_url": None, "embed_dimensions": None}
     # the claims embedded after the comparison, each distinct sentence once, for a search by meaning: near:ID (the
     # claims most like a claim), and meaning:"..." from the command line (embed.py; docs/plans/search-2026-10-20.md,
     # milestone 5). On only where an embedding model is named, as the reranker
     embed_model: Annotated[str | None, _selecting(roles=COMPARE)] = None  # e.g. Qwen/Qwen3-Embedding-0.6B
     # where it's asked ({model} filled in); none: the chat endpoint's /embeddings
     embed_url: Annotated[str | None, Declared("endpoint")] = None
-    # each vector's size, asked of the model (one trained to be cut answers any) and kept in the report
-    embed_dimensions: Annotated[int, _selecting(roles=COMPARE)] = Field(default=256, ge=32, le=4096)
+    # each vector's size, asked of the model (one trained to be cut answers any) and kept in the report; unset, none
+    # is asked and the model answers its own. Unset by default since 2026-10-29: most models can't be cut, and a
+    # proxy refuses the size for them (the owner: "The configuration allows us to set `embed_dimensions`. The
+    # default should probably be unset now, instead of 256.")
+    embed_dimensions: Annotated[int | None, _selecting(roles=COMPARE)] = Field(default=None, ge=32, le=4096)
 
     def embeds(self):
         return bool(self.embed_model)

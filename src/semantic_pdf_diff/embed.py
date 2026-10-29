@@ -5,9 +5,9 @@ command line, which embeds what's typed too.
 A claim is embedded as the sentence the reranker reads ("The rated power of the rotor, for 10 m/s.": what it's about,
 not its value), each distinct sentence once, EMBED_A_REQUEST to a request. A request is a query like any other
 (llm.Request): named by what reaches the model, recorded, replayed and cached as the judge's are. Its answer is kept
-small: each vector, of the dimensions asked for (embed_dimensions; a model trained to be cut, as Qwen3-Embedding is,
-answers any), unit length, its components as signed bytes in base64. Cosine of two: their bytes' dot product over
-their lengths.
+small: each vector, of the dimensions asked for (embed_dimensions, unset by default: the model's own; a model trained
+to be cut, as Qwen3-Embedding is, answers any), unit length, its components as signed bytes in base64. Cosine of two:
+their bytes' dot product over their lengths.
 
 The OpenAI-compatible /embeddings endpoint ({"model", "input", "dimensions"}), the chat endpoint's own unless embed_url
 names another. A server refusing that (HTTP 400: a model that can't be cut, as vLLM says of BAAI/bge-large-en-v1.5) is
@@ -55,10 +55,12 @@ def request(s, texts, key=None, query=False):
     sent = [f"Instruct: {INSTRUCTION}\nQuery: {t}" if query else t for t in texts]
     canonical = {"embed": s.embed_model, "dimensions": s.embed_dimensions, "version": VERSION, "input": sent}
     name = hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-    prompt = "\n".join([f"EMBED {s.embed_model} ({s.embed_dimensions} dimensions)", *sent])
+    size = f"{s.embed_dimensions} dimensions" if s.embed_dimensions else "its own dimensions"
+    prompt = "\n".join([f"EMBED {s.embed_model} ({size})", *sent])
 
     def body(cut=True):
-        asked = {"dimensions": s.embed_dimensions, "encoding_format": "float"} if cut else {}
+        asked = ({"dimensions": s.embed_dimensions} if s.embed_dimensions else {}) | {"encoding_format": "float"}
+        asked = asked if cut else {}
         return json.dumps({"model": s.embed_model, "input": sent, **asked}).encode()
 
     def read(result):

@@ -121,7 +121,8 @@ def lines(found):
     reranker, embedding = point["reranker"], point["embedding"]
     out.append(f"  reranker   {reranker['model']} ({reranker['api']} API) at {reranker['url']}" if reranker else
                "  reranker   none set")
-    out.append(f"  embedding  {embedding['model']} at {embedding['url']} ({embedding['dimensions']} dimensions asked)"
+    out.append(f"  embedding  {embedding['model']} at {embedding['url']} ("
+               + (f"{embedding['dimensions']} dimensions asked)" if embedding["dimensions"] else "its own dimensions)")
                if embedding else "  embedding  none set")
     wide = max([len(r["step"]) for r in found["steps"]] + [len(e["step"]) for e in found["errors"]] + [12]) + 2
     if not found["steps"]:

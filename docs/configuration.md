@@ -180,7 +180,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `search_names` | `true` | selecting | search_names | compare | - |
 | `embed_model` | `null` | selecting | embed | compare | - |
 | `embed_url` | `null` | endpoint | embed | - | - |
-| `embed_dimensions` | `256` | selecting | embed | compare | - |
+| `embed_dimensions` | `null` | selecting | embed | compare | - |
 | `rerank_model` | `null` | selecting | rerank | compare | - |
 | `rerank_api` | `"rerank"` | selecting | rerank | compare | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |
