@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.6.0 (2026-10-29)
+
+- **Answers cut short no longer stop a run.** An answer that's cut short, or isn't the JSON asked for, shows the endpoint working, so it doesn't count toward `stop_after_failures`. Before, 25 dense pages in a row stopped a whole run before its reranker, judge, names and topics were asked, even though those pages are asked again in smaller pieces anyway.
+- **Requests not sent are counted apart from failures.** The reranker's and the embedding model's summaries and warnings say how many weren't sent (because sending had stopped, or a cap was reached) and how many failed. `debug` says so too.
+- **`embed_dimensions` is unset by default.** No size is asked for, and the model answers at its own. Set it for a model trained to be cut: 256 was measured best for Qwen3-Embedding-8B. A store embedded at 256 embeds its claims again on its next comparison, for a fraction of a cent.
+- **`debug`** names the region of each extraction error (text, table, tile, overview, figure), and fits its step column to the longest step's name.
+
 ## 0.5.0 (2026-10-29)
 
 - **`semantic-pdf-diff debug`** says what a store's runs asked and what failed, in a few lines to read off a screen. It shows:
