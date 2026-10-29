@@ -315,21 +315,36 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         records=document.records,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
-    data = traced(data)
+    data = searchable(traced(data), settings, client, options.mode, provenance.text_hash(comparing.model_dump_json()),
+                      progress)
+    progress.close()  # the comparison's requests, its search's (names, vectors) too
+    incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
+                  or data['retrieval']['omitted_by_pair_limit'] > 0
+                  or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
+                         for f in data['findings']))
+    return saved_and_written(options, settings, store, client, data, out, incomplete)
+
+def searchable(data, settings, client, mode, label, progress):
+    """A report's data with what its browsing and search use, each as its lever says: the topics' way and names, the
+    other names, the claims' vectors. label: the run's interpreter's, naming its requests."""
     if settings.names_topics():  # the model's choice among the topics' ways, and its names (topics.py)
         from .schema import TopicNames
         found, claims = report_topics(data)
-        key = ('topics', options.mode, provenance.text_hash(comparing.model_dump_json()))
+        key = ('topics', mode, label)
         data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key))
     if settings.names_synonyms():  # the documents' other names for one thing, for the search (synonyms.py)
-        data['synonyms'] = other_names(data, client, options.mode, provenance.text_hash(comparing.model_dump_json()),
-                                       progress)
+        data['synonyms'] = other_names(data, client, mode, label, progress)
     if settings.embeds():  # the claims' vectors, for a search by meaning (embed.py)
         from . import embed
         with Dispatcher(client) as dispatch:
-            data['vectors'] = embed.embedded(data['evidence'], dispatch, settings,
-                                             provenance.text_hash(comparing.model_dump_json()), progress)
-    progress.close()  # the comparison's requests, its search's (names, vectors) too
+            data['vectors'] = embed.embedded(data['evidence'], dispatch, settings, label, progress)
+    return data
+
+def saved_and_written(options, settings, store, client, data, out, incomplete):
+    """The report saved in the store and written (report.json, report.html; run.json, how the run went), what it
+    left out said; the exit code: 0, 2 incomplete, 3 paused for budget or a rate limit, 5 for requests failing in
+    a row."""
+    coverage = data['coverage']
     store.save_comparison(data['created_at'], data)
     account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
                            split=options.split)
@@ -338,10 +353,6 @@ def compare_and_report(options, settings, store, client, names, read, document, 
              **fixture_usage(client, options.fixture)}
     (out / 'run.json').write_text(json.dumps({'created_at': data['created_at'], 'usage': usage}, indent=2) + '\n',
                                   encoding='utf-8')
-    incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
-                  or data['retrieval']['omitted_by_pair_limit'] > 0
-                  or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
-                         for f in data['findings']))
     split = out / SPLIT / 'index.html'
     page = split if options.split and split.exists() else out / 'report.html'
     print(f"Report: {page}" + (' (incomplete source coverage)' if incomplete else ''))
