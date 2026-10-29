@@ -90,6 +90,13 @@ class ConfigTest(unittest.TestCase):
         self.assertTrue(out.endswith("every check passed\n"))
         self.assertFalse(self.store.exists())  # a check makes no store
 
+    def test_very_verbose_logs_each_request(self):
+        with endpoint(), user_settings({"model": "gemma-4"}), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()) as err:
+            code = cli.main(["config", "test", "--store", str(self.store), "-vv"])
+        self.assertEqual(code, 0)
+        self.assertRegex(err.getvalue(), r"Sum : ok in [\d.]+s \(95 tokens\)")
+
     def test_a_failed_check_exits_5_saying_what_failed(self):
         with endpoint(listed=("other-model",), misread=True), user_settings({"model": "gemma-4", "retries": 0}):
             code, out = run("config", "test", "--store", self.store)

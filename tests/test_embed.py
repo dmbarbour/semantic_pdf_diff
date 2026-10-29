@@ -15,7 +15,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from stubs import chat_answer, prompt_of, request_body, serving, source_data
-from semantic_pdf_diff import cli, embed, fixtures
+from semantic_pdf_diff import cli, embed, fixtures, llm
 from semantic_pdf_diff.dispatch import Dispatcher
 from semantic_pdf_diff.llm import Client
 from semantic_pdf_diff.settings import Settings
@@ -149,6 +149,24 @@ class Embedded(unittest.TestCase):
                 client.transport.send(embed.request(s, ["a"]))
             client.close()
         self.assertEqual(str(refused.exception), "HTTP 400: Bad Request: input is too long: 600 tokens, at most 512")
+
+    def test_very_verbose_logs_what_a_refused_request_sent_and_was_answered(self):
+        """The owner, 2026-10-29: "You don't have a `--verbose` debug mode for `config test` and for `comparing` it
+        just reports a query to the appropriate URL but not the content of that query."
+        """
+        asked = []
+        with serving(uncut_model(asked)) as url, self.assertLogs("semantic_pdf_diff.requests", "DEBUG") as said:
+            s = Settings(base_url=url, embed_model="toy", embed_dimensions=64, retries=0)
+            client = Client(s, None)
+            client.transport.send(embed.request(s, ["The feed pump.", "x" * 400]))
+            client.close()
+        self.assertRegex(said.output[-1], r"Vectors : ok in [\d.]+s \(\? tokens\)$")  # asked again, without them
+        refused = next(line for line in said.output if "sent to" in line)
+        self.assertIn(f'sent to {url}/embeddings: {{"model": "toy", "input": ["The feed pump.", "{"x" * 300}...(400 '
+                      'characters)"], "dimensions": 64, "encoding_format": "float"}', refused)
+        self.assertIn('answered: {"error": {"message": "Model \\"toy\\" does not support matryoshka', refused)
+        self.assertEqual(llm.shown(json.dumps({"url": "data:image/png;base64," + "A" * 5000}).encode()),
+                         '{"url": "data:image/png;base64,...(5022 characters)"}')
 
 LINE = re.compile(r"^(\w+) \| ([\w ]+) \| ([\d.]+) \| (\w+)$", re.M)
 

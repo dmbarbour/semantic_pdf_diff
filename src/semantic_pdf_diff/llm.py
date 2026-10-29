@@ -3,6 +3,7 @@ import base64
 import email.utils
 import hashlib
 import json
+import logging
 import os
 import re
 import sys
@@ -92,6 +93,25 @@ def server_said(body, content_type=""):
         text = ""
     text = " ".join(text.split())
     return text if len(text) <= 300 else text[:299] + "…"
+
+def shown(raw, longest=300):
+    """A request's body as -vv logs a refused one: its images and long texts shortened, the rest as sent (the owner,
+    2026-10-29: "for `comparing` it just reports a query to the appropriate URL but not the content of that
+    query")."""
+    def short(x):
+        if isinstance(x, str) and x.startswith("data:"):
+            return f"{x[:x.find(',') + 1]}...({len(x)} characters)"
+        if isinstance(x, str) and len(x) > longest:
+            return f"{x[:longest]}...({len(x)} characters)"
+        if isinstance(x, list):
+            return [short(v) for v in x]
+        if isinstance(x, dict):
+            return {k: short(v) for k, v in x.items()}
+        return x
+    try:
+        return json.dumps(short(json.loads(raw)), ensure_ascii=False)
+    except ValueError:
+        return raw[:2000].decode(errors="replace")
 
 def json_text(answer):
     """Extract a JSON object from a reply that may be fenced or wrapped in prose."""
@@ -312,14 +332,17 @@ class Transport:
                 result = self._post(http, shaped=request.read is None)
                 if request.read is not None:  # another endpoint's response: its own reading
                     value, usage = request.read(result)
-                    self._account(request, result if isinstance(result, dict) else {}, usage, entry)
+                    reported = self._account(request, result if isinstance(result, dict) else {}, usage, entry)
+                    requests_log.debug("%s %s: ok in %.2fs (%s tokens)", request.schema.__name__,
+                                       request.key.label if request.key else "", time.monotonic() - started,
+                                       reported or "?")
                     return value
                 usage = result.get("usage") or {}
                 generated = int(usage.get("completion_tokens") or 0) if isinstance(usage, dict) else 0
                 reported = self._account(request, result, usage, entry)
                 return self._answer(request, result, started, reported)
             except urllib.error.HTTPError as e:
-                last, wait, throttled = self._refused(request, e, started, wait)
+                last, wait, throttled = self._refused(request, e, started, wait, url)
             except (ValueError, KeyError, IndexError, TypeError, AttributeError, OSError, HTTPException) as e:
                 last = f"{type(e).__name__}: {e}"
             finally:
@@ -429,9 +452,10 @@ class Transport:
         except ValueError as e:  # pydantic's ValidationError too
             raise Invalid(f"{type(e).__name__}: {e}") from e
 
-    def _refused(self, request, e, started, wait):
+    def _refused(self, request, e, started, wait, url):
         """(the failure, the wait before retrying, whether throttled) for an HTTP error; the provider's balance
-        exhausted stops sending (OutOfBudget), an error not worth retrying fails (ModelFailure)."""
+        exhausted stops sending (OutOfBudget), an error not worth retrying fails (ModelFailure). -vv logs what was sent
+        to url and what the server answered."""
         requests_log.debug("%s %s: HTTP %s after %.2fs", request.schema.__name__,
                            request.key.label if request.key else "", e.code, time.monotonic() - started)
         last = f"HTTP {e.code}: {e.reason}"
@@ -443,6 +467,10 @@ class Transport:
         said = server_said(raw, (e.headers.get("Content-Type") if e.headers is not None else None) or "")
         if said:
             last += ": " + (said.replace(self.api_key, "...") if self.api_key else said)
+        if requests_log.isEnabledFor(logging.DEBUG):
+            answered = raw.decode(errors="replace")
+            requests_log.debug("  sent to %s: %s\n  answered: %s", redact_url(url), shown(request.raw),
+                               answered.replace(self.api_key, "...") if self.api_key else answered)
         if e.code == 402 or (e.code in (400, 403) and any(word in body for word in BILLING)) \
                 or (e.code == 429 and any(word in body for word in BILLING_429)):
             with self.lock:

@@ -180,7 +180,8 @@ def default(name):
 
 def add_log_options(parser):
     parser.add_argument('-q', '--quiet', action='store_true', help='Warnings and errors only')
-    parser.add_argument('-v', '--verbose', action='count', default=0, help='-v: tasks; -vv: also each model request')
+    parser.add_argument('-v', '--verbose', action='count', default=0,
+                        help='-v: tasks; -vv: also each model request, and what a refused one sent and was answered')
     parser.add_argument('--log-file', type=Path, help='Also write a detailed log here')
 
 def start_logging(args):
@@ -888,8 +889,10 @@ def config_parser():
     out.add_argument('file', nargs='?', type=Path)
     take = actions.add_parser('import', parents=[where], help='settings from a JSON file (- for standard input)')
     take.add_argument('file')
-    actions.add_parser('test', parents=[where], help='the endpoint, the key and each model the settings name, checked '
-                                                    'by asking (a few cents); exit 5 when a check fails')
+    check = actions.add_parser('test', parents=[where], help='the endpoint, the key and each model the settings name, '
+                                                            'checked by asking (a few cents); exit 5 when a check '
+                                                            'fails')
+    add_log_options(check)
     listed = actions.add_parser('models', parents=[where], help="the endpoint's models, with what it says of each "
                                                                 "(context, price, tags), those the settings name "
                                                                 "marked")
@@ -953,6 +956,7 @@ def config_command(argv):
             except (OSError, ValueError) as e:
                 raise ValueError(f"the endpoint's models can't be listed ({type(e).__name__}: {e})") from None
             return 0
+        start_logging(args)
         checks, cost = checkup.run(settings)
         print('\n'.join(checkup.lines(settings, checks, cost)))
         try:  # remembered, so a run needn't check again (checkup.first_use)
