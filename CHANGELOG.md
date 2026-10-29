@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.6.1 (2026-10-29)
+
+- **A rate limit that resets later pauses the run at once, saying when.** A 429 that says when its limit resets (`Retry-After`, or a LiteLLM proxy's `reset_at` header and "Limit resets at:" message) is waited for when that's within 10 minutes. Later than that, sending stops at the first such refusal, and the run pauses (exit 3) with "rate limit reached at URL until TIME (in 3 h 5 min)". Before, each request was retried a minute apart, and the run paused only once 25 in a row had failed, without saying when the limit resets.
+- The reranker's warning for requests not sent no longer says their pairs were judged: once sending has stopped, the judge isn't asked either.
+
 ## 0.6.0 (2026-10-29)
 
 - **Answers cut short no longer stop a run.** An answer that's cut short, or isn't the JSON asked for, shows the endpoint working, so it doesn't count toward `stop_after_failures`. Before, 25 dense pages in a row stopped a whole run before its reranker, judge, names and topics were asked, even though those pages are asked again in smaller pieces anyway.
