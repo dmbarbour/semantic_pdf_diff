@@ -10,7 +10,9 @@ answers any), unit length, its components as signed bytes in base64. Cosine of t
 their lengths.
 
 The OpenAI-compatible /embeddings endpoint ({"model", "input", "dimensions"}), the chat endpoint's own unless embed_url
-names another.
+names another. A server refusing that (HTTP 400: a model that can't be cut, as vLLM says of BAAI/bge-large-en-v1.5) is
+asked again with the model and the input alone, and the model answers its own size (the owner, 2026-10-29: "I still
+cannot get embeddings to work, even though I can use `curl` to access the intended model").
 """
 import base64
 import hashlib
@@ -54,9 +56,9 @@ def request(s, texts, key=None, query=False):
     name = hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     prompt = "\n".join([f"EMBED {s.embed_model} ({s.embed_dimensions} dimensions)", *sent])
 
-    def body():
-        return json.dumps({"model": s.embed_model, "input": sent, "dimensions": s.embed_dimensions,
-                           "encoding_format": "float"}).encode()
+    def body(cut=True):
+        asked = {"dimensions": s.embed_dimensions, "encoding_format": "float"} if cut else {}
+        return json.dumps({"model": s.embed_model, "input": sent, **asked}).encode()
 
     def read(result):
         """(the vectors, kept small, in order; usage as the chat endpoint reports it)."""
@@ -73,7 +75,7 @@ def request(s, texts, key=None, query=False):
     return Request(body, None if key is None else key, Vectors, words, prompt, (), query=name,
                    description={"template": "embed", "source_type": "", "text_chars": len(prompt), "image_bytes": [],
                                 "params": {"embed": s.embed_model, "dimensions": s.embed_dimensions}},
-                   url=endpoint(s), model=s.embed_model, read=read)
+                   url=endpoint(s), model=s.embed_model, read=read, instead=lambda: body(cut=False))
 
 def embedded(evidence, dispatch, s, label, progress=None):
     """The claims' vectors, as a report keeps them: {"model", "dimensions", "vectors": [kept vectors], "of": {claim's

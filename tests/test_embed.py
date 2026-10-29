@@ -36,6 +36,26 @@ def embedding_model(asked):
         handler.wfile.write(json.dumps({"data": rows, "usage": {"prompt_tokens": 7 * len(rows)}}).encode())
     return post
 
+def uncut_model(asked):
+    """A stub /embeddings endpoint serving a model that can't be cut, as vLLM does: dimensions refused (HTTP 400, why
+    in JSON), else the toy embedding of each input, all 32 of its dimensions."""
+    def post(handler):
+        body = request_body(handler)
+        asked.append(body)
+        if "dimensions" in body:
+            handler.send_response(400, "Bad Request")
+            handler.send_header("Content-Type", "application/json")
+            handler.end_headers()
+            handler.wfile.write(json.dumps({"error": {
+                "message": f'Model "{body["model"]}" does not support matryoshka representation, changing output '
+                           "dimensions will lead to poor results.", "type": "invalid_request_error"}}).encode())
+            return
+        rows = [{"index": i, "embedding": toy_vector(text)} for i, text in enumerate(body["input"])]
+        handler.send_response(200)
+        handler.end_headers()
+        handler.wfile.write(json.dumps({"data": rows}).encode())
+    return post
+
 class Vectors(unittest.TestCase):
     def test_kept_small_and_compared_by_cosine(self):
         kept = embed.packed([3.0, 4.0])
@@ -99,6 +119,36 @@ class Embedded(unittest.TestCase):
             client.close()
         self.assertEqual((kept["failed"], kept["vectors"], kept["of"]), (1, [], {}))
         self.assertIn(f"toy at {UNREACHABLE}/embeddings: 1 of 1 requests failed (", said.output[-1])
+
+    def test_a_model_that_cant_be_cut_is_asked_again_without_dimensions(self):
+        """The owner, 2026-10-29: "I still cannot get embeddings to work [...] Getting an `HTTP 400: Bad Request`"."""
+        evidence, asked = search_report()["evidence"], []
+        with serving(uncut_model(asked)) as url:
+            s = Settings(base_url=url, embed_model="toy", embed_dimensions=64, retries=0, stop_after_failures=1)
+            client = Client(s, None)
+            with Dispatcher(client) as dispatch:
+                kept = embed.embedded(evidence, dispatch, s, "label")
+            client.close()
+        self.assertEqual((kept["requests"], kept["failed"], len(kept["vectors"])), (1, 0, 13))
+        self.assertEqual([sorted(body) for body in asked], [["dimensions", "encoding_format", "input", "model"],
+                                                            ["input", "model"]])
+        self.assertEqual(len(embed.unpacked(kept["vectors"][0])), 32)  # the model's own size
+        self.assertIsNone(client.transport.failing)  # the refusal isn't the endpoint failing
+
+    def test_a_refusal_says_why_the_server_refused(self):
+        def refusing(handler):
+            request_body(handler)
+            handler.send_response(400, "Bad Request")
+            handler.send_header("Content-Type", "application/json")
+            handler.end_headers()
+            handler.wfile.write(b'{"error": {"message": "input is too long:\\n 600 tokens, at most 512"}}')
+        with serving(refusing) as url:
+            s = Settings(base_url=url, embed_model="toy", retries=0)
+            client = Client(s, None)
+            with self.assertRaises(Exception) as refused:
+                client.transport.send(embed.request(s, ["a"]))
+            client.close()
+        self.assertEqual(str(refused.exception), "HTTP 400: Bad Request: input is too long: 600 tokens, at most 512")
 
 LINE = re.compile(r"^(\w+) \| ([\w ]+) \| ([\d.]+) \| (\w+)$", re.M)
 

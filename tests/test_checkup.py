@@ -84,7 +84,8 @@ class ConfigTest(unittest.TestCase):
         self.assertRegex(out, r"  json      ok: (\d+) \+ (\d+) = \d+")
         self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"; an image 1000 px square is 258 tokens')
         self.assertIn("  reranker  ok: scores 0.91 for the counterpart, 0.02 for the unrelated claim", out)
-        self.assertIn("  embedding ok: cosine 1.00 with the counterpart, 0.01 with the unrelated claim", out)
+        self.assertIn("  embedding ok: cosine 1.00 with the counterpart, 0.01 with the unrelated claim; 3 dimensions, "
+                      "the model's own (not cut to 256)", out)
         self.assertIn("cost: $0.0000, as the provider reports it", out)
         self.assertTrue(out.endswith("every check passed\n"))
         self.assertFalse(self.store.exists())  # a check makes no store

@@ -133,8 +133,9 @@ HELP = {
     "embed_url": Help("endpoint", "where the embedding model is asked ({model} filled in); none: the chat endpoint's "
                       "/embeddings", "A model served elsewhere is sent OPENAI_API_KEY too."),
     "embed_dimensions": Help("comparing", "each claim's vector's size, asked of the embedding model and kept in the "
-                             "report", "A model trained to be cut (Qwen3-Embedding) answers any; a byte a dimension "
-                             "a claim in the report.", "256"),
+                             "report", "A model trained to be cut (Qwen3-Embedding) answers any; one that can't be "
+                             "answers its own (where its server refuses the size, it's asked again without it). A "
+                             "byte a dimension a claim in the report.", "256"),
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),
     # --- report

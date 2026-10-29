@@ -278,7 +278,9 @@ def run(settings, rng=None, only=None):
                          "embed_url")(client.transport)
         query, near, far = (embed.unpacked(v) for v in vectors.vectors)
         a, b = embed.cosine(query, near), embed.cosine(query, far)
-        return a > b, f"cosine {a:.2f} with the counterpart, {b:.2f} with the unrelated claim"
+        size = (f"{len(query)} dimensions" if len(query) == settings.embed_dimensions else
+                f"{len(query)} dimensions, the model's own (not cut to {settings.embed_dimensions})")
+        return a > b, f"cosine {a:.2f} with the counterpart, {b:.2f} with the unrelated claim; {size}"
     if "embedding" in wanted:
         checks.append(_timed("embedding", embedding) if settings.embed_model else
                       Check("embedding", None, "none set (embed_model)"))

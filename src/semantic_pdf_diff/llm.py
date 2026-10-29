@@ -72,6 +72,27 @@ def retry_after(error):
         seconds = (when - datetime.now(timezone.utc)).total_seconds()
     return max(0.0, min(seconds, MAX_RETRY_AFTER))
 
+def server_said(body, content_type=""):
+    """What a refusal's body says in words, on one line (at most 300 characters): a JSON error's message (OpenAI's
+    {"error": {"message"}}, others' "message", "detail" or "error"), or plain text; "" for a page (HTML) or nothing.
+    Before, a refusal said only its status ("HTTP 400: Bad Request"): the owner, 2026-10-29, of an embedding model
+    refusing the dimensions asked, "Getting an `HTTP 400: Bad Request`"."""
+    text = body.decode(errors="replace").strip()
+    try:
+        data = json.loads(text)
+    except ValueError:
+        data = None
+    if isinstance(data, dict):
+        found = data.get("error")
+        if isinstance(found, dict):
+            found = found.get("message") or found.get("detail")
+        found = found or data.get("message") or data.get("detail")
+        text = found if isinstance(found, str) else json.dumps(found) if found else ""
+    elif "html" in content_type or text.startswith("<"):
+        text = ""
+    text = " ".join(text.split())
+    return text if len(text) <= 300 else text[:299] + "…"
+
 def json_text(answer):
     """Extract a JSON object from a reply that may be fenced or wrapped in prose."""
     answer = answer.strip()
@@ -173,6 +194,9 @@ class Request:
     url: str = ""
     model: str = ""
     read: Callable | None = None
+    # A body to send instead, once, where the server refuses this one (HTTP 400): an embedding request with the model
+    # and the input alone, for a model that can't be cut to the dimensions asked (embed.request)
+    instead: Callable[[], bytes] | None = None
 
     @cached_property
     def raw(self):
@@ -250,6 +274,9 @@ class Transport:
         except BudgetExceeded:  # a cap's stop or the balance's, not the endpoint failing
             raise
         except ModelFailure as e:
+            if request.instead is not None and getattr(e.__cause__, "code", None) == 400:
+                request.raw, request.instead = request.instead(), None  # asked again, as the server may take it
+                return self.send(request)
             self.failed_at(url, e)
             raise
         with self.lock:
@@ -409,9 +436,13 @@ class Transport:
                            request.key.label if request.key else "", e.code, time.monotonic() - started)
         last = f"HTTP {e.code}: {e.reason}"
         try:
-            body = e.read(2000).decode(errors="replace").lower()
+            raw = e.read(2000)
         except Exception:
-            body = ""
+            raw = b""
+        body = raw.decode(errors="replace").lower()
+        said = server_said(raw, (e.headers.get("Content-Type") if e.headers is not None else None) or "")
+        if said:
+            last += ": " + (said.replace(self.api_key, "...") if self.api_key else said)
         if e.code == 402 or (e.code in (400, 403) and any(word in body for word in BILLING)) \
                 or (e.code == 429 and any(word in body for word in BILLING_429)):
             with self.lock:
