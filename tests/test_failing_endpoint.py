@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 from semantic_pdf_diff import cli
 from semantic_pdf_diff.checkup import Sum
-from semantic_pdf_diff.failures import EndpointFailing, ModelFailure
+from semantic_pdf_diff.failures import EndpointFailing, Invalid, ModelFailure, Truncated
 from semantic_pdf_diff.llm import Transport, build_request
 from semantic_pdf_diff.settings import Settings
 from stubs import chat_answer, serving, text_pdf
@@ -77,6 +77,26 @@ class InARow(unittest.TestCase):
             with self.assertRaisesRegex(EndpointFailing, '3 requests in a row'):  # not sent
                 ask()
         self.assertEqual(state['requests'], 6)
+
+    def test_answers_cut_short_or_not_json_dont_stop_sending(self):
+        """An answer came back: the endpoint works. The owner's run, 2026-10-29, paused on 25 extraction answers in a
+        row cut short (dense pages, refined into smaller pieces anyway), and its reranker and judge were never
+        asked."""
+        state = {'requests': 0}
+
+        def post(handler):
+            handler.rfile.read(int(handler.headers['Content-Length']))
+            state['requests'] += 1
+            if state['requests'] % 2:
+                return chat_answer(handler, {'sum': 2}, finish='length')
+            return chat_answer(handler, 'not JSON')
+        with serving(post) as url:
+            transport = Transport(Settings(base_url=url, stop_after_failures=3, retries=0), api_key='')
+            for n in range(8):
+                with self.assertRaises(Invalid if n % 2 else Truncated):
+                    transport.send(build_request(transport.s, 'Add 1 and 1.', Sum))
+            self.assertIsNone(transport.failing)
+        self.assertEqual(state['requests'], 8)
 
 if __name__ == '__main__':
     unittest.main()

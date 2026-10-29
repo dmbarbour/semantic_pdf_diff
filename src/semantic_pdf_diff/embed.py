@@ -20,6 +20,7 @@ import json
 import logging
 import math
 
+from .failures import BudgetExceeded
 from .llm import Request
 from .rerank import sentence
 
@@ -88,13 +89,16 @@ def embedded(evidence, dispatch, s, label, progress=None):
     for e in evidence:
         of_sentence.setdefault(sentence_of(e), []).append(e["id"])
     sentences = sorted(of_sentence)
-    vectors, of, failed, errors = [None] * len(sentences), {}, 0, []
+    vectors, of, failed, errors, unsent = [None] * len(sentences), {}, 0, [], []
 
     def finish(start, count):
         def done(value, error):
             nonlocal failed
             progress.finish("failed" if error is not None else "complete")
             bar.tick(count)
+            if isinstance(error, BudgetExceeded):  # not sent: sending had stopped, or a cap
+                unsent.append(error)
+                return
             if error is not None:
                 failed += 1
                 errors.append(error)
@@ -115,6 +119,9 @@ def embedded(evidence, dispatch, s, label, progress=None):
         log.warning(f"The embedding model {s.embed_model} at {endpoint(s)}: {failed} of {len(batches)} requests failed "
                     f"({errors[0]}); their claims weren't embedded, and the next run asks again. `semantic-pdf-diff "
                     f"config test` checks it; embed_url says where it's served")
+    if unsent:
+        log.warning(f"The embedding model {s.embed_model}: {len(unsent)} of {len(batches)} requests not sent "
+                    f"({unsent[0]}); their claims weren't embedded, and the next run asks again")
     kept = []
     for text, vector in zip(sentences, vectors):
         if vector is None:
@@ -123,7 +130,7 @@ def embedded(evidence, dispatch, s, label, progress=None):
             of[claim] = len(kept)
         kept.append(vector)
     return {"model": s.embed_model, "dimensions": s.embed_dimensions, "vectors": kept, "of": of,
-            "requests": len(batches), "failed": failed}
+            "requests": len(batches), "failed": failed, **({"not_sent": len(unsent)} if unsent else {})}
 
 class Claim:
     """A claim's fields as rerank.sentence reads them, from a report's evidence (a dict)."""

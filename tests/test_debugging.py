@@ -68,7 +68,11 @@ class Debug(unittest.TestCase):
         self.assertEqual(found["endpoint_of"], "the last comparison's")
         self.assertEqual(found["endpoint"]["reranker"], {"model": "Qwen/Qwen3-Reranker-8B", "api": "rerank",
                                                          "url": f"{url}/rerank"})
-        self.assertEqual(found["comparison"]["reranker"]["failed"], rerank["asked"])
+        # refused, or never sent once sending stopped: said apart
+        self.assertEqual(found["comparison"]["reranker"]["failed"], rerank["failed"])
+        self.assertEqual(found["comparison"]["reranker"]["not_sent"], rerank["never_answered"])
+        self.assertIn(f"  reranker: {rerank['asked']} requests, {rerank['failed']} failed, {rerank['never_answered']} "
+                      "not sent", out)
         self.assertIn(f"  reranker   Qwen/Qwen3-Reranker-8B (rerank API) at {url}/rerank", out)
         self.assertRegex(out, r"\n  rerank +\d+ +0 +\d+ +\d+\n")
         self.assertIn(f"  rerank        {rerank['failed']:>7}  ModelFailure: HTTP 400: Bad Request: {REFUSED}", out)
@@ -92,3 +96,16 @@ class Debug(unittest.TestCase):
                                  {"step": "rerank", "asked": 2, "answered": 0, "failed": 1, "never_answered": 1}])
         self.assertEqual(errors.most_common(1), [(("extract", "Invalid: no JSON"), 2)])
         self.assertEqual(len(debugging.short("x" * 400)), debugging.ERROR_CHARACTERS)
+
+    def test_a_long_step_name_keeps_the_columns(self):
+        """The owner, 2026-10-29: "table-structure-review [...] (this name is too wide for our columns)"."""
+        found = {"version": "0", "python": "3", "pymupdf": "", "store": "s", "cache": "c", "endpoint_of": "e",
+                 "endpoint": {"base_url": "u", "model": "m", "reranker": None, "embedding": None},
+                 "environment": {"OPENAI_BASE_URL": True, "OPENAI_API_KEY": True}, "comparison": None,
+                 "steps": [{"step": "table-structure-review", "asked": 16, "answered": 14, "failed": 2,
+                            "never_answered": 0},
+                           {"step": "extract", "asked": 7198, "answered": 6432, "failed": 772, "never_answered": 3}],
+                 "errors": [{"step": "table-structure-review", "count": 2, "error": "Truncated"}], "other_errors": 0}
+        table = [line for line in debugging.lines(found) if line.startswith("  ") and "asked" not in line][-3:-1]
+        self.assertEqual(table, ["  table-structure-review         16        14       2               0",
+                                 "  extract                     7,198     6,432     772               3"])

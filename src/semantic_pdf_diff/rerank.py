@@ -25,6 +25,7 @@ import hashlib
 import json
 import logging
 
+from .failures import BudgetExceeded
 from .llm import Request
 from .progress import NoProgress
 from .recipes import Recipe
@@ -110,13 +111,16 @@ def ranked(pairs, dispatch, client, mode, label, progress=None):
     candidates = {}
     for retrieved, a, b in pairs:
         candidates.setdefault(a.id, (a, []))[1].append(b)
-    scores, failed, errors = {}, 0, []
+    scores, failed, errors, unsent = {}, 0, [], []
 
     def finish(a, bs):
         def done(value, error):
             nonlocal failed
             progress.finish("failed" if error is not None else "complete")
             bar.tick()
+            if isinstance(error, BudgetExceeded):  # not sent: sending had stopped, or a cap
+                unsent.append(error)
+                return
             if error is not None:
                 failed += 1
                 errors.append(error)
@@ -138,9 +142,13 @@ def ranked(pairs, dispatch, client, mode, label, progress=None):
         log.warning(f"The reranker {s.rerank_model} at {endpoint(s)}: {failed} of {len(candidates)} requests failed "
                     f"({errors[0]}); their pairs were judged unranked, and the next run asks again. `semantic-pdf-diff "
                     f"config test` checks it; rerank_api and rerank_url say where it's served")
+    if unsent:  # the reranker's doing or not: said apart (the owner, 2026-10-29, on a run that paused before it:
+        # "reranker: 13,435 requests, 13,435 failed")
+        log.warning(f"The reranker {s.rerank_model}: {len(unsent)} of {len(candidates)} requests not sent "
+                    f"({unsent[0]}); their pairs were judged unranked, and the next run asks again")
     least = s.rerank_threshold / 100  # the setting's 1-10 are hundredths
     score = lambda p: scores.get((p[1].id, p[2].id), least)
     kept = sorted((p for p in pairs if score(p) >= least), key=lambda p: (-score(p), -p[0], p[1].id, p[2].id))
     summary = {"model": s.rerank_model, "threshold": least, "requests": len(candidates), "failed": failed,
-               "below_threshold": len(pairs) - len(kept)}
+               **({"not_sent": len(unsent)} if unsent else {}), "below_threshold": len(pairs) - len(kept)}
     return kept, scores, summary

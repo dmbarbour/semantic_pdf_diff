@@ -293,6 +293,12 @@ class Transport:
             value = self._send(request, url)
         except BudgetExceeded:  # a cap's stop or the balance's, not the endpoint failing
             raise
+        except (Truncated, Invalid):  # an answer came back, too long or not the JSON asked: the endpoint works.
+            # Until 2026-10-29 these counted as failing, and 25 dense pages in a row (refined into smaller pieces
+            # anyway) stopped a whole run: the owner's, its reranker and judge never asked
+            with self.lock:
+                self.in_a_row.pop(url, None)
+            raise
         except ModelFailure as e:
             if request.instead is not None and getattr(e.__cause__, "code", None) == 400:
                 request.raw, request.instead = request.instead(), None  # asked again, as the server may take it

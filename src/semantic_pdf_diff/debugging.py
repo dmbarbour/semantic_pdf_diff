@@ -61,7 +61,7 @@ def comparison(data):
     """The last comparison's counts: {created_at, mode, paused, coverage: {status: n}, reranker, embedding}."""
     reranked = (data.get("retrieval") or {}).get("reranked") or None
     vectors = data.get("vectors") or None
-    counts = ("model", "requests", "failed")
+    counts = ("model", "requests", "failed", "not_sent")
     return {"created_at": data.get("created_at", ""), "mode": data.get("mode", ""), "paused": data.get("paused") or "",
             "coverage": dict(Counter(r.get("status", "") for r in data.get("coverage") or []).most_common()),
             "reranker": {k: reranked[k] for k in counts if k in reranked} if reranked else None,
@@ -123,13 +123,14 @@ def lines(found):
                "  reranker   none set")
     out.append(f"  embedding  {embedding['model']} at {embedding['url']} ({embedding['dimensions']} dimensions asked)"
                if embedding else "  embedding  none set")
+    wide = max([len(r["step"]) for r in found["steps"]] + [len(e["step"]) for e in found["errors"]] + [12]) + 2
     if not found["steps"]:
         out.append("no requests asked yet" + ("" if found["comparison"] else " (no store, or no run in it)"))
     else:
         out.append("requests the store's runs asked, by step (never answered: not sent, as after sending stopped, a "
                    "cap or Ctrl+C; the next run asks again):")
-        out.append(f"  {'step':<14}{'asked':>9}{'answered':>10}{'failed':>8}{'never answered':>16}")
-        out += [f"  {r['step']:<14}{n(r['asked']):>9}{n(r['answered']):>10}{n(r['failed']):>8}"
+        out.append(f"  {'step':<{wide}}{'asked':>9}{'answered':>10}{'failed':>8}{'never answered':>16}")
+        out += [f"  {r['step']:<{wide}}{n(r['asked']):>9}{n(r['answered']):>10}{n(r['failed']):>8}"
                 f"{n(r['never_answered']):>16}" for r in found["steps"]]
     last = found["comparison"]
     if last:
@@ -140,11 +141,12 @@ def lines(found):
         for name in ("reranker", "embedding"):
             if last[name]:
                 asked = last[name].get("requests", 0)
+                unsent = last[name].get("not_sent", 0)
                 out.append(f"  {name}: {n(asked)} request{'' if asked == 1 else 's'}, "
-                           f"{n(last[name].get('failed', 0))} failed")
+                           f"{n(last[name].get('failed', 0))} failed" + (f", {n(unsent)} not sent" if unsent else ""))
     if found["errors"]:
         out.append("errors recorded, the most frequent first (a server's error may quote what was sent):")
-        out += [f"  {e['step']:<14}{n(e['count']):>7}  {e['error']}" for e in found["errors"]]
+        out += [f"  {e['step']:<{wide}}{n(e['count']):>7}  {e['error']}" for e in found["errors"]]
         if found["other_errors"]:
             out.append(f"  and {n(found['other_errors'])} more failures with other errors (--errors N shows more)")
     elif found["steps"]:
