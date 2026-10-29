@@ -104,7 +104,7 @@ A model-written overview for humans: section summaries, then topic summaries. Wi
 
 1. `check` subcommand and report view (moved 2026-10-28 to single-document analysis, milestone 4).
 2. `export` as Markdown chunks with front matter (per section first, then per topic and per finding), discovery chunks, `index.md`, content-derived file names and delta exports; optional JSON array; `.docx` chunks as a later configuration option.
-3. HTML fact sheet (moved 2026-10-28 to single-document analysis, milestones 1 and 2).
+3. HTML fact sheet (moved 2026-10-28 to single-document analysis, milestones 1 and 2; its milestone 2 since 2026-10-29 [indexes and glossaries](indexes-and-glossaries-2026-10-29.md)').
 4. (Tentative) cited summaries with citation verification.
 
 ## Decisions (2026-09-23)

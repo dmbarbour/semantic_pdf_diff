@@ -1,6 +1,7 @@
 # Single-document analysis: claims situated among their subject's claims, inconsistencies and gaps
 
-- **Status:** Planned (2026-10-28). [Design questions](#design-questions) 1 and 3 answered the same day; 2, 4, 5 and 6 open.
+- **Status:** Active (2026-10-29): milestone 1, `analyze`, first; the rest planned. [Design questions](#design-questions) 1 and 3 answered 2026-10-28, 6 on 2026-10-29; 2, 4 and 5 open. Milestone 2 moved to [indexes and glossaries](indexes-and-glossaries-2026-10-29.md) (2026-10-29).
+- **The owner, 2026-10-29, setting the focus:** "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless." And: "Well, I say "single document" but I really mean "single source" that might be a folder of docs." The indexes are [their own plan](indexes-and-glossaries-2026-10-29.md).
 - **The owner, 2026-10-28, from trials:**
   - "we probably need to prioritize development of a second pass (or an entire refinement, situating, contextualizing strategy) where claims are analyzed in context, not just the provenance of where the claim is located but also situating it with other claims about the subject and distinguishing it with more nuance. A lot of comparisons don't make sense because they're compared without enough context. Context can help mitigate drift from heuristics (I hope!)."
   - "prioritize single-document analysis for a while, extracting and situating claims, perhaps analysis for gaps alongside inconsistencies in what is provided. Gaps in claims seems like a difficult target because we don't know where we should be looking for what we don't know without sufficient context."
@@ -136,18 +137,15 @@ Gaps in general ([design question 3](#design-questions), answered): what's known
 
 ## Milestones
 
-### 1. A one-source report
+### 1. A one-source report: `analyze`
 
-- **What:** `report` and a run of one source give the Claims view, topics and search, built from the portable report's parts, with no new model requests (the suggested order's first item).
-- **With it, from the trials:** the text a claim came from ([report snippets](report-snippets-and-bookmarks-2026-10-28.md)).
+- **The command** ([design question 6](#design-questions), answered): `semantic-pdf-diff analyze SOURCE --store DIR` reads one source and writes its report. A source is what `compare` takes: a file, a folder of documents or a zip archive, or a source declared in the store (the owner: "single source" that might be a folder of docs).
+- **What:** the Claims view, topics and search, built from the portable report's parts, with situating, other names and embeddings as a comparison's are; no findings, and no new kind of model request (the suggested order's first item). `report` writes it again.
+- **With it:** the [indexes](indexes-and-glossaries-2026-10-29.md) (that plan's milestone 1) and their files; from the trials, the text a claim came from ([report snippets](report-snippets-and-bookmarks-2026-10-28.md)).
 
 ### 2. Subjects, mechanically
 
-- **The index:** a per-document subject index from tags, names as printed, row labels, headings and records, with alignment's items (`align.Side`) used within one document.
-- **Measured** against the controlled keys.
-- **Shown** as a Subjects view in the one-source report.
-- **Then names merged** by other names and embeddings, and the model asked only for what's left.
-- **Claim context's entity register:** this index is the register, built here; that plan's item points here.
+Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.md): the subject index is its milestones 1 and 3, and it's claim context's entity register. The milestones below build on it.
 
 ### 3. Dossiers and the second pass
 
@@ -195,5 +193,4 @@ Gaps in general ([design question 3](#design-questions), answered): what's known
    - **I'd make it a stage, as situating is,** and turn it on in comparisons once milestone 6 measures it.
 5. **Images in the second pass:** text only (claims, quotes, records, abouts), with a suspected misread re-read from its crop as a follow-up? Or crops in the dossier from the start?
    - **I'd start with text.** A dossier of a busy subject would otherwise carry dozens of images.
-6. **The command:** one source given to `compare`, a new command (`analyze SOURCE`), or both? `check` then names the report's inconsistencies view, not a command.
-   - **I'd add `analyze`,** since "compare" with one source reads oddly.
+6. **The command:** answered 2026-10-29 (chosen from the options I offered): a new command, `analyze`, for one source; `compare` stays for two or more. `check` names the report's inconsistencies view, not a command.

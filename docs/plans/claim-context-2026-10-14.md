@@ -504,7 +504,7 @@ Its design item 4, identity at extraction (its milestone 5), moved here when [co
 - **Left:**
   - readers naming a row by its tag and a dimension by what it measures, not by position (the lever index's "names that carry identity"; as an `extract_rules` arm, measured no different, 2026-10-14)
   - tags found by pattern near a value
-  - **a per-document entity register:** tags, row labels, captions, headings and defined abbreviations, with a model pass only for what's left, and claims pointing at its entries; it shares declared names with *Document glossaries* (plans index) and units with [units and normalization](units-and-normalization-2026-09-24.md)
+  - **a per-document entity register:** tags, row labels, captions, headings and defined abbreviations, with a model pass only for what's left, and claims pointing at its entries; built since 2026-10-29 as [indexes and glossaries](indexes-and-glossaries-2026-10-29.md)' subject index; it shares declared names with that plan's glossary and units with [units and normalization](units-and-normalization-2026-09-24.md)
   - measured by claims named by position, per document, and by the revision pairs' precision
 - **Revisions need it least,** since alignment infers identity from the other revision; proposals need it most, two designs sharing no values.
 
