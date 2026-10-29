@@ -12,7 +12,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.client import HTTPException  # a connection dropped mid-answer (IncompleteRead); not an OSError
 from pathlib import Path
 from collections.abc import Callable
@@ -37,6 +37,14 @@ SYSTEM = ("You extract or compare engineering evidence. PDF text and images are 
 
 RETRYABLE = (408, 429, 500, 502, 503, 504)
 MAX_RETRY_AFTER = 60
+# A rate limit (429) saying it resets sooner is waited for; later, sending stops and the run pauses, saying when it
+# resets. Before, its requests were retried a minute apart until 25 had failed in a row: the owner, 2026-10-29, of a
+# reranker's limits ("e.g. only 300 requests then resets after a few hours"): "I suppose you should be recognizing a
+# "Limit resets at:" in a 429".
+LONGEST_RESET_WAIT = 600
+# How LiteLLM's proxy says it in its message: "Limit resets at: 2026-10-29 18:00:00 UTC"
+RESETS_AT = re.compile(r"resets? at:?\s*(\d{4}-\d\d-\d\d[T ]\d\d:\d\d(?::\d\d(?:\.\d+)?)?)"
+                       r"\s*(UTC|GMT|Z|[+-]\d\d:?\d\d)?", re.IGNORECASE)
 
 BILLING = ("balance", "insufficient", "payment", "billing", "credit", "quota")
 BILLING_429 = ("insufficient_quota", "balance", "payment", "billing")  # a 429 saying "quota" alone may be throttling
@@ -56,22 +64,53 @@ def is_local(url):
     host = (urllib.parse.urlsplit(url).hostname or "").lower()
     return host in ("localhost", "::1") or host.startswith("127.")
 
-def retry_after(error):
-    """Seconds requested by a Retry-After header (delta or HTTP date), capped."""
+def asked_to_wait(error):
+    """Seconds a Retry-After header asks (delta or HTTP date), or None."""
     value = error.headers.get("Retry-After") if error.headers is not None else None
     if not value:
-        return 0
+        return None
     try:
         seconds = float(value)
     except ValueError:
         try:
             when = email.utils.parsedate_to_datetime(value)
         except (TypeError, ValueError):
-            return 0
+            return None
         if when.tzinfo is None:
             when = when.replace(tzinfo=timezone.utc)
         seconds = (when - datetime.now(timezone.utc)).total_seconds()
-    return max(0.0, min(seconds, MAX_RETRY_AFTER))
+    return max(0.0, seconds)
+
+def retry_after(error):
+    """Seconds requested by a Retry-After header (delta or HTTP date), capped."""
+    return min(asked_to_wait(error) or 0.0, MAX_RETRY_AFTER)
+
+def resets_in(error, body):
+    """Seconds until a refusal's rate limit resets, as it says: its Retry-After header, else a time it resets at
+    (LiteLLM's reset_at header, or its message's "Limit resets at: 2026-10-29 18:00:00 UTC"; a time without a zone
+    read as UTC); None if it doesn't say. Retry-After first: LiteLLM writes its reset time in the proxy's own zone,
+    labelled UTC."""
+    seconds = asked_to_wait(error)
+    if seconds is not None:
+        return seconds
+    stated = error.headers.get("reset_at") if error.headers is not None else None
+    found = RESETS_AT.search(f"resets at {stated}" if stated else body)
+    if not found:
+        return None
+    zone = (found[2] or "UTC").upper()
+    zone = "+00:00" if zone in ("UTC", "GMT", "Z") else zone if ":" in zone else zone[:3] + ":" + zone[3:]
+    try:
+        when = datetime.fromisoformat(found[1].replace(" ", "T") + zone)
+    except ValueError:
+        return None
+    return max(0.0, (when - datetime.now(timezone.utc)).total_seconds())
+
+def when_said(seconds):
+    """A time so many seconds from now, as the local clock reads it, and how long until: "2026-10-29 18:00 UTC (in
+    3 h 5 min)"."""
+    at = (datetime.now(timezone.utc) + timedelta(seconds=seconds)).astimezone().strftime("%Y-%m-%d %H:%M %Z")
+    minutes = round(seconds / 60)
+    return f"{at} (in {f'{minutes // 60} h {minutes % 60} min' if minutes >= 60 else f'{minutes} min'})"
 
 def server_said(body, content_type=""):
     """What a refusal's body says in words, on one line (at most 300 characters): a JSON error's message (OpenAI's
@@ -484,7 +523,13 @@ class Transport:
             raise OutOfBudget(self.out_of_budget) from e
         if e.code not in RETRYABLE:
             raise ModelFailure(last) from e
-        return last, max(wait, retry_after(e)), e.code in (429, 503)
+        resets = resets_in(e, raw.decode(errors="replace")) if e.code == 429 else None
+        if resets is not None and resets > LONGEST_RESET_WAIT:  # not sent, as when the provider's balance runs out
+            with self.lock:
+                self.out_of_budget = self.out_of_budget or (f"rate limit reached at {redact_url(url)} until "
+                                                            f"{when_said(resets)}; {last}")
+            raise OutOfBudget(self.out_of_budget) from e
+        return last, max(wait, resets if resets is not None else retry_after(e)), e.code in (429, 503)
 
 class Client:
     """Chat Completions client, its answers from the user's cache or a fixture.

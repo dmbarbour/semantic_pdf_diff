@@ -157,8 +157,8 @@ def attach_ledger(client, options):
     return client
 
 def budget_note(client):
-    """A line saying the run paused, if it did: for budget (the process exits 3), or for requests failing in a row (5:
-    the endpoint's, as a failed `config test` is)."""
+    """A line saying the run paused, if it did: for budget or a rate limit (the process exits 3), or for requests
+    failing in a row (5: the endpoint's, as a failed `config test` is)."""
     reason = getattr(client, 'out_of_budget', None)
     return f"Paused: {reason}. Rerun the same command to resume; finished work is kept." if reason else None
 

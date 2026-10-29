@@ -3,13 +3,14 @@ import io
 import json
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 import pymupdf
 from semantic_pdf_diff.schema import MAX_CLAIMS, Evidence, Extraction, Judgment, PdfLocator
 from semantic_pdf_diff.settings import Settings
 from semantic_pdf_diff.llm import Client, redact_url
-from semantic_pdf_diff.failures import Invalid, ModelFailure
+from semantic_pdf_diff.failures import Invalid, ModelFailure, OutOfBudget
 from semantic_pdf_diff.compare import numeric_check
 from semantic_pdf_diff.jobs import extract_pdf
 from semantic_pdf_diff.segmentation import tiles
@@ -40,6 +41,12 @@ def stub(replies):
         handler.wfile.write(body if isinstance(body, bytes) else json.dumps(body).encode())
     with stubs.serving(post) as url:
         yield url, seen
+
+def limited(at, **headers):
+    """A LiteLLM proxy's 429 for a limit reached, saying when it resets (at, a UTC datetime)."""
+    message = ("Rate limit exceeded for api_key: 5e1f. Limit type: requests. Current limit: 300, Remaining: 0. "
+               f"Limit resets at: {at:%Y-%m-%d %H:%M:%S} UTC")
+    return 429, {'Content-Type': 'application/json', **headers}, {'error': {'message': message, 'code': '429'}}
 
 def reply(content, **extra):
     return (200, {}, {'choices':[{'finish_reason':'stop','message':{'content':content}}], **extra})
@@ -135,6 +142,35 @@ class ResponseShapeTests(unittest.TestCase):
         self.assertTrue(value.complete)
         self.assertEqual(len(seen), 2)
         sleep.assert_called_once_with(5.0)
+
+    def test_a_rate_limit_resetting_later_pauses_at_once_saying_when(self):
+        """The owner, 2026-10-29, of a reranker's limits ("e.g. only 300 requests then resets after a few hours"): "I
+        suppose you should be recognizing a "Limit resets at:" in a 429". Its requests were retried a minute apart
+        until 25 had failed in a row."""
+        later = datetime.now(timezone.utc) + timedelta(hours=3)
+        for said in (limited(later, **{'Retry-After': '10800'}),  # as LiteLLM says it: three ways
+                     limited(later),  # its message alone
+                     (429, {'reset_at': f'{later:%Y-%m-%d %H:%M:%S} UTC'}, b'busy')):  # its header alone
+            with self.subTest(headers=said[1]), stub([said, reply(EMPTY)]) as (url, seen), \
+                    patch('semantic_pdf_diff.llm.time.sleep') as sleep, tempfile.TemporaryDirectory():
+                client = Client(Settings(base_url=url, retries=2), None)
+                with self.assertRaisesRegex(OutOfBudget, rf'^rate limit reached at {url}/chat/completions until '
+                                            r'\d{4}-\d\d-\d\d \d\d:\d\d \S+ \(in (2 h 59|3 h 0) min\); HTTP 429'):
+                    client.ask('x', Extraction)
+                with self.assertRaisesRegex(OutOfBudget, '^rate limit reached'):  # not sent: the run pauses
+                    client.ask('y', Extraction)
+                self.assertEqual(len(seen), 1)
+                sleep.assert_not_called()
+
+    def test_a_rate_limit_resetting_sooner_is_waited_for(self):
+        sooner = datetime.now(timezone.utc) + timedelta(minutes=2)
+        with patch('semantic_pdf_diff.llm.time.sleep') as sleep:
+            value, seen = self.ask([limited(sooner, **{'Retry-After': '120'}), reply(EMPTY)], retries=1)
+        self.assertTrue(value.complete)
+        sleep.assert_called_once_with(120.0)  # beyond the minute another Retry-After is waited at most
+        with patch('semantic_pdf_diff.llm.time.sleep') as sleep:
+            self.ask([(503, {'Retry-After': '120'}, b'busy'), reply(EMPTY)], retries=1)
+        sleep.assert_called_once_with(60)
 
     def test_request_body_options(self):
         _, seen = self.ask([reply(EMPTY)])

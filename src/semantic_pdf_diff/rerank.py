@@ -145,7 +145,7 @@ def ranked(pairs, dispatch, client, mode, label, progress=None):
     if unsent:  # the reranker's doing or not: said apart (the owner, 2026-10-29, on a run that paused before it:
         # "reranker: 13,435 requests, 13,435 failed")
         log.warning(f"The reranker {s.rerank_model}: {len(unsent)} of {len(candidates)} requests not sent "
-                    f"({unsent[0]}); their pairs were judged unranked, and the next run asks again")
+                    f"({unsent[0]}); the next run asks again")
     least = s.rerank_threshold / 100  # the setting's 1-10 are hundredths
     score = lambda p: scores.get((p[1].id, p[2].id), least)
     kept = sorted((p for p in pairs if score(p) >= least), key=lambda p: (-score(p), -p[0], p[1].id, p[2].id))

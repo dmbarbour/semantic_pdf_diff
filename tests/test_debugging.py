@@ -33,6 +33,25 @@ def refusing_reranks(state):
         return serve(handler)
     return post
 
+def limiting_reranks(state):
+    """test_embed's stub endpoint, its /rerank refused as a LiteLLM proxy's rate limit refuses, resetting 3 h later."""
+    serve = endpoint(state)
+
+    def post(handler):
+        if handler.path.endswith("/rerank"):
+            request_body(handler)
+            state["reranks"] = state.get("reranks", 0) + 1
+            message = ("Rate limit exceeded for api_key: 5e1f. Limit type: requests. Current limit: 300, Remaining: 0."
+                       " Limit resets at: 2026-10-29 18:00:00 UTC")
+            handler.send_response(429, "Too Many Requests")
+            handler.send_header("Content-Type", "application/json")
+            handler.send_header("Retry-After", "10800")
+            handler.end_headers()
+            handler.wfile.write(json.dumps({"error": {"message": message, "code": "429"}}).encode())
+            return
+        return serve(handler)
+    return post
+
 def run(*argv):
     with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:
         code = cli.main([str(a) for a in argv])
@@ -77,6 +96,34 @@ class Debug(unittest.TestCase):
         self.assertRegex(out, r"\n  rerank +\d+ +0 +\d+ +\d+\n")
         self.assertIn(f"  rerank        {rerank['failed']:>7}  ModelFailure: HTTP 400: Bad Request: {REFUSED}", out)
         self.assertIn("never answered: not sent, as after sending stopped", out)
+
+    def test_a_reranker_rate_limited_till_later_pauses_the_run_at_once(self):
+        """The owner, 2026-10-29: "This time I received another `paused: 25 requests failed in a row` with HTTP 429s.
+        Apparently the reranker limits are set differently than the chat completion limits, e.g. only 300 requests then
+        resets after a few hours."."""
+        state = {"embedded": [], "names": 0}
+        with tempfile.TemporaryDirectory() as d, serving(limiting_reranks(state)) as url:
+            root = Path(d)
+            for name, power in (("a.md", 10), ("b.md", 12)):
+                (root / name).write_text("# Plant\n\n" + "".join(f"pump{k} | rated power | {power + k} | kW\n\n"
+                                                                  for k in range(8)))
+            config = root / "settings.json"
+            config.write_text(json.dumps({"rerank_model": "BAAI/bge-reranker-v2-m3", "concurrency": 1,
+                                          "search_names": False, "topic_names": False}))
+            code, _, said = run("compare", root / "a.md", root / "b.md", "--store", root / "out", "--base-url", url,
+                                "--config", config, "--no-situate")
+            _, out, _ = run("debug", "--store", root / "out", "--cache", root / "out")
+            _, as_json, _ = run("debug", "--store", root / "out", "--cache", root / "out", "--json")
+        self.assertEqual(code, 3)  # paused, as for the budget: run it again once the limit resets
+        self.assertEqual(state["reranks"], 1)  # not retried, nor asked again: 25 failing in a row before
+        self.assertRegex(said, rf"Paused: rate limit reached at {url}/rerank until \S+ \S+ \S+ \(in 3 h 0 min\); "
+                               r"HTTP 429: Too Many Requests: Rate limit exceeded .* Limit resets at: 2026-10-29 "
+                               r"18:00:00 UTC\. Rerun the same command to resume")
+        found = json.loads(as_json)
+        reranker = found["comparison"]["reranker"]
+        self.assertEqual((reranker["failed"], reranker["not_sent"]), (0, reranker["requests"]))
+        self.assertNotIn("compare", {s["step"] for s in found["steps"] if s["answered"]})  # the judge never asked
+        self.assertIn(f"  paused: rate limit reached at {url}/rerank until ", out)
 
     def test_no_store_yet_says_so_and_makes_none(self):
         with tempfile.TemporaryDirectory() as d:
