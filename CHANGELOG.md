@@ -2,6 +2,17 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.7.0 (2026-10-29)
+
+- **`semantic-pdf-diff analyze SOURCE`** reads one source and reports its claims without comparing. The source can be a file, a folder or zip of documents, or a declared source. Its report opens on every claim, with topics, a file filter and the same search (other names and vectors too). It takes `compare`'s options except the comparing ones, and uses the same store, settings and answers cache. `report`, `search` and `debug` read an analysis as they read a comparison.
+- **Indexes beside every report** (`analyze`'s and `compare`'s), built from what was read with no model requests:
+  - `index.md`: subjects A to Z, each with its properties and every value with where it's said; then properties, and figures and tables.
+  - `index.xlsx`: a sheet per index. Subjects is an outline: each subject's row with its values beneath, collapsing to the subjects. Plain numbers are stored as numbers.
+  - `index/*.csv`: subjects, properties, claims, and figures.
+  - `report.json`'s `index`.
+  - In a comparison, one merged index: the sources' subjects are matched where the findings pair their claims (else by name), and each source's values sit side by side, "—" where one gives none. A subject's properties are one row where they're named alike or the findings pair their claims ("seating capacity" and "rider capacity").
+- **Subjects and Figures views** in report.html. Each value links to its claim's card, and the search box filters them.
+
 ## 0.6.1 (2026-10-29)
 
 - **A rate limit that resets later pauses the run at once, saying when.** A 429 that says when its limit resets (`Retry-After`, or a LiteLLM proxy's `reset_at` header and "Limit resets at:" message) is waited for when that's within 10 minutes. Later than that, sending stops at the first such refusal, and the run pauses (exit 3) with "rate limit reached at URL until TIME (in 3 h 5 min)". Before, each request was retried a minute apart, and the run paused only once 25 in a row had failed, without saying when the limit resets.

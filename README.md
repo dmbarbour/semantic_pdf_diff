@@ -4,7 +4,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.6.1** (2026-10-29; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
+**v0.7.0** (2026-10-29; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
 
 - **Sources** as files, folders and zip archives, declared in a persistent, resumable store
 - **Replay fixtures:** recorded model answers, so runs replay offline
@@ -12,12 +12,14 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 - **The lab** (`lab/`, its own distribution): improvement rounds judged by model panels and people, controlled documents with known facts, eye and page tests
 - **Plain text, Markdown, Word, PowerPoint, Excel, CSV and images** (`.png`, `.jpg`, `.tif` and others; read by vision, as a scanned page is) read as well as PDF: sections from headings (a slide's title, a sheet's name), paragraphs, tables, charts from their data, pictures and speaker notes, claims located by line, paragraph, slide or sheet and cells (Office formats need `pip install 'semantic-pdf-diff[office]'`). Each table in Excel, CSV, Word, PowerPoint or PDF is read as a model, asked once per table, says it should be: by rules applied to every row, row by row, or as a summary (a series, a log, a list) computed from all of them
 - **Revisions aligned before they're judged:** items matched across revisions by their values, equal values settled without a model, and the report showing how it grouped them
+- **One source on its own** (`analyze`): a file or a folder of documents read and reported, its claims browsed and searched without comparing
+- **Indexes beside every report:** subjects, properties, claims, figures and tables, as index.md, an index workbook, CSV and the page's views; a comparison's merged, each subject once with each source's values
 - **Differences explained:** in revisions, each difference named by kind (a value or its conditions changed, renamed, restated, misread, not the same item), value changes listed first
 
 **Status:**
 - Extraction has been measured with one real model (gemma-4-31B, through DeepInfra) on public sample documents and the controlled corpus.
 - It isn't a validated engineering sign-off tool; see [limitations](docs/limitations.md).
-- **Still planned:** more formats (images), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
+- **Still planned:** glossaries, more formats (images), criteria-first comparison of two or more sources, consistency checks and RAG export. See [docs/plans/](docs/plans/README.md).
 
 ## Quick start
 
