@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.4.0 (2026-10-29)
+
+- **Embedding models that can't be cut work.** Every embedding request asked for `embed_dimensions` (256). Five of DeepInfra's 25 embedding models refuse any size with HTTP 400: BAAI/bge-base-en-v1.5, bge-en-icl and bge-large-en-v1.5, intfloat/e5-large-v2, thenlper/gte-large. A refused request is now asked again once with the model and the input alone, and the model answers at its own size. `config test` names the vectors' size, and says when it's the model's own.
+- **A refusal says why.** A failed request said only its status (`HTTP 400: Bad Request`). It now adds what the server said: a JSON error's message, or plain text, on one line.
+- **`-vv` shows what a refused request sent** (images and long texts shortened) and what the server answered. `config test` takes `-q`, `-v`, `-vv` and `--log-file`, as a comparison does.
+
 ## 0.3.0 (2026-10-28)
 
 Everything since 0.2.0 (2026-09-24, about 630 commits), in brief. Each item's decision record has the detail.
