@@ -1,6 +1,6 @@
 # Indexes and glossaries: a source's subjects, figures, claims and terms, alone or merged across a comparison
 
-- **Status:** Active (2026-10-29), beside [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`, a one-source report), which comes first. [Design questions](#design-questions) 1 to 3 answered the same day; 4 and 5 open.
+- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2) next. [Design questions](#design-questions) 1 to 3 answered the same day; 4 and 5 open.
 - **The owner, 2026-10-29:**
   - "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless."
   - "Well, I say "single document" but I really mean "single source" that might be a folder of docs."
@@ -105,6 +105,11 @@ From the tentative row, moved in:
 - **Shown** as views in report.html; a comparison's merged.
 - **Written** as report.json's `index`, index.md, the CSV files and index.xlsx.
 - **One source:** in `analyze`'s report, [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1, built first.
+- **Built 2026-10-29 (0.7.0):**
+  - `indexes.py` and `indexfiles.py`; the page's Subjects and Figures and tables views, each value linked to its claim.
+  - A merged subject's properties are one where they're named alike or the findings pair their claims.
+  - **Two sample slices, analyzed live** (729 claims): 138 subjects, 250 properties, 29 figures and tables (drawing sheets, tables and figures with situating's abouts).
+  - **The coaster revision pair** (a recorded comparison, 62 claims): 13 subjects, 10 matched by the findings. The car's "seating capacity" and "rider capacity" were two rows each blank on the other side until properties were joined by the findings. The 8 one-sided values left come from subjects matched apart (two "lift hill"s), which milestone 3's names would join.
 
 ### 2. The glossary
 
