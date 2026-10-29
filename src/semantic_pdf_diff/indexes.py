@@ -8,8 +8,9 @@ document that would be useful, and it seems deeply related to the problem of com
   claims most often name it, and lists its properties, each with every value given and where.
 - **In a comparison,** the sources' subjects are matched where the findings pair their claims (the most pairs first,
   one to one), else where they're keyed alike, and each is listed once with each source's values beside the others'
-  (the owner: "One merged index"). A property one source gives a subject and another doesn't is left blank there:
-  weak, never a finding.
+  (the owner: "One merged index"). A subject's properties are one where they're named alike or the findings pair
+  their claims ("seating capacity" and "rider capacity"). A property one source gives a subject and another doesn't
+  is left blank there: weak, never a finding.
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
 """
@@ -100,25 +101,43 @@ def built(data):
     for e in data.get("evidence", []):
         claims[where.source.get(e["content"], "")].append(e)
     found = {source: subjects_of(claims[source]) for source in sources}
+    paired = [(f["a"], f["b"]) for f in data.get("findings", []) if f.get("relation") in PAIRING]
     subjects = []
     for group in matched(found, data.get("findings", []), sources):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
-        properties = defaultdict(list)
-        for source, (_, _, cs) in mine:
-            for c in cs:
-                properties[plain(c["attribute"]).casefold()].append(c)
+        properties = joined([c for _, (_, _, cs) in mine for c in cs], paired)
         subjects.append({
             "name": mine[0][1][1], "names": sorted(names, key=lambda n: (-names[n], natural(n))),
             "matched_by": group["matched_by"],
             "claims": {source: [c["id"] for c in cs] for source, (_, _, cs) in mine},
             "properties": [{"name": Counter(plain(c["attribute"]) for c in cs).most_common(1)[0][0],
+                            "names": sorted({plain(c["attribute"]) for c in cs}, key=natural),
                             "values": [{"source": where.source.get(c["content"], ""), "value": c["value"],
                                         "unit": c["unit"], "conditions": c.get("conditions", ""), "claim": c["id"],
                                         "where": where(c)} for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
     return {"sources": sources, "subjects": subjects, "figures": figures(data, where)}
+
+def joined(claims, paired):
+    """A subject's claims by property: {its first name, folded: [claims]}, a property's names one where the findings
+    pair claims of both (paired: [(claim id, claim id)])."""
+    key = {c["id"]: plain(c["attribute"]).casefold() for c in claims}
+    parent = {k: k for k in key.values()}
+    def root(k):
+        while parent[k] != k:
+            parent[k] = parent[parent[k]]
+            k = parent[k]
+        return k
+    for a, b in paired:
+        if a in key and b in key:
+            ra, rb = sorted((root(key[a]), root(key[b])), key=natural)
+            parent[rb] = ra
+    out = defaultdict(list)
+    for c in claims:
+        out[root(key[c["id"]])].append(c)
+    return out
 
 def figures(data, where):
     """The report's figures and tables: situating's figures, and the tables read by rules its figures don't list (by

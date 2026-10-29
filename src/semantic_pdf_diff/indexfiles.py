@@ -53,13 +53,15 @@ def markdown(index):
                          + (f" (matched by {s['matched_by']})" if s["matched_by"] else ""))
         lines.append("")
         for p in s["properties"]:
+            also = [n for n in p.get("names", []) if n.casefold() != p["name"].casefold()]
+            named = f"**{p['name']}**" + (f" (also {', '.join(also)})" if also else "")
             if many:
                 by = {src: [v for v in p["values"] if v["source"] == src] for src in sources}
-                lines.append(f"- **{p['name']}**: " + "; ".join(
+                lines.append(f"- {named}: " + "; ".join(
                     f"{src}: " + (", ".join(f"{said(v)} ({v['where']})" for v in by[src]) if by[src] else "—")
                     for src in sources))
             else:
-                lines.append(f"- **{p['name']}**: " + "; ".join(f"{said(v)} ({v['where']})" for v in p["values"]))
+                lines.append(f"- {named}: " + "; ".join(f"{said(v)} ({v['where']})" for v in p["values"]))
         lines.append("")
     lines += ["## Properties", ""]
     for p in properties(index):

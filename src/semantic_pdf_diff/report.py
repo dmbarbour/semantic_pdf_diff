@@ -649,7 +649,10 @@ def subjects_html(subjects, sources):
              + (f" (matched by {s['matched_by']})" if s['matched_by'] else '')] if many else [])
         heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Values</th>'
         rows = ''.join(
-            f"<tr><td>{esc(p['name'])}</td>"
+            f"<tr><td>{esc(p['name'])}"
+            + ''.join(f"<br><small>{esc(n)}</small>" for n in p.get('names', [])
+                      if n.casefold() != p['name'].casefold())
+            + "</td>"
             + (''.join(f"<td>{values([v for v in p['values'] if v['source'] == src])}</td>" for src in sources)
                if many else f"<td>{values(p['values'])}</td>") + '</tr>' for p in s['properties'])
         words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties'])]).casefold()

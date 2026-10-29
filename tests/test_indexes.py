@@ -64,6 +64,20 @@ class Subjects(unittest.TestCase):
         self.assertIn("- **head**: a: 42 m (a.pdf, page 3); b: —", page)
         self.assertIn("- **rated power**: a: 10 kW (a.pdf, page 1); b: 11 kW (b.pdf, page 1)", page)
 
+    def test_a_subjects_properties_one_where_findings_pair_them(self):
+        """The coaster pair, 2026-10-29: the car's "seating capacity" and "rider capacity", each blank on the other
+        side, though a finding paired their claims."""
+        a = [claim("A-1", "ca", "car", "seating capacity", "4", "riders")]
+        b = [claim("B-1", "cb", "car", "rider capacity", "4", "")]
+        index = indexes.built(report(a + b, [{"a": "A-1", "b": "B-1", "relation": "equivalent"}], ("a", "b")))
+        (car,) = index["subjects"]
+        self.assertEqual([(p["name"], p["names"], [v["claim"] for v in p["values"]]) for p in car["properties"]],
+                         [("seating capacity", ["rider capacity", "seating capacity"], ["A-1", "B-1"])])
+        self.assertIn("- **seating capacity** (also rider capacity): a: 4 riders (a.pdf, page 1); b: 4 (b.pdf, page 1)",
+                      indexfiles.markdown(index))
+        apart = indexes.built(report(a + b, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b")))
+        self.assertEqual(len(apart["subjects"][0]["properties"]), 2)  # unrelated: not one property
+
     def test_figures_and_tables(self):
         situation = {"ca": {"figures": [{"id": "f1", "page": 4, "kind": "figure", "label": "Figure 2",
                                          "caption": "Pump curve", "about": "The pumps' head against flow.",
