@@ -110,9 +110,11 @@
     ['file', file], ['order', order]].filter(([, c]) => c);
   const BOXES = [['fold', same], ['counterparts', paired]].filter(([, c]) => c);  // ticked unless the address says
   const initial = new Map(CONTROLS.map(([key, c]) => [key, c.value]));
-  let view = 'findings', target = null;
+  // the view opened on: the first tab shown (an analysis of one source has its claims alone)
+  const home = (tabs.find((tab) => !tab.hidden) || {dataset: {view: 'findings'}}).dataset.view;
+  let view = home, target = null;
   const hashOf = () => {
-    const q = query.value.trim(), parts = [view === 'claims' ? 'claims' : ''];
+    const q = query.value.trim(), parts = [view === home ? '' : view];
     for (const [key, c] of CONTROLS) {
       if (c.value !== initial.get(key)) parts.push(key + '=' + encodeURIComponent(c.value));
     }
@@ -294,7 +296,8 @@
     const a = address();
     target = a.has('finding') ? {kind: 'finding', id: a.get('finding')}
       : a.has('claim') ? {kind: 'claim', id: a.get('claim')} : null;
-    view = target ? (target.kind === 'claim' ? 'claims' : 'findings') : a.has('claims') ? 'claims' : 'findings';
+    view = target ? (target.kind === 'claim' ? 'claims' : 'findings') : a.has('claims') ? 'claims'
+      : a.has('findings') ? 'findings' : home;
     for (const [key, c] of CONTROLS) {
       c.value = a.has(key) ? a.get(key) : initial.get(key);
       if (c.selectedIndex < 0) c.value = initial.get(key);  // an option this report hasn't

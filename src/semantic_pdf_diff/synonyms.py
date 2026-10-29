@@ -42,9 +42,13 @@ def counted(claims, field):
             out.setdefault(c.get("side", ""), Counter())[name] += 1
     return out
 
+# For one source (an analysis): the names its documents give one thing.
+ONE_SOURCE = PROMPT.replace("names two engineering documents give", "names an engineering source gives").replace(
+    "in the claims of two documents, A and B,", "in the claims of a source (a document, or a set of them),")
+
 def prompt(claims, sides):
     """The request for a set of claims' names: each side's items and properties, the most used first."""
-    lines = [PROMPT]
+    lines = [PROMPT if len(sides) > 1 else ONE_SOURCE]
     for title, field in (("ITEMS", "entity"), ("PROPERTIES", "attribute")):
         names = counted(claims, field)
         lines.append(title + ":")

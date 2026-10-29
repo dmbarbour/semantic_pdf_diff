@@ -146,7 +146,7 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `checkup.py` | `config test` and `config models`: the endpoint, the key and each model checked by asking (an eye-test card among the checks), the endpoint's models listed |
 | `binding.py` | A store's binding to its interpreters: what differs, whether reading again can cost a model call, what it clears and asks again at most, the log's line that says so |
 | `cli.py` | Commands: arguments into settings and run options, exit semantics; the lab's commands by entry point |
-| `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report |
+| `pipeline.py` | A run: bind the store, scan, extract, situate, compare, report; an analysis of one source reports without comparing (`analyze`) |
 | `levers.py` | Settings' declarations, levers as mixins on the platform, configurations |
 | `context.py`, `quotes.py`, `stems.py`, `sections.py`, `tables.py`, `segmentation.py` | Extraction's pieces: the document reader, quote checks, numbered items, sections, tables, page segmentation |
 | `tiling.py` | A page's tiling measured without the model: lines and words cut, text-only, decoration-only and blank tiles, graphics share, lines read twice, overlap, figures not seen whole, graphics missed |

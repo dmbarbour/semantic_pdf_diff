@@ -1,6 +1,7 @@
-"""The pipeline a comparison runs: bind the store, scan the sources, extract, situate, compare, report. Moved out
-of the command line (code review 2026-10-01, A3: scripts built command lines to run it), so scripts call
-compare_paths() with settings and RunOptions, and the CLI only parses arguments into them.
+"""The pipeline a comparison runs: bind the store, scan the sources, extract, situate, compare, report; an analysis
+of one source runs it without comparing (analyze_and_report). Moved out of the command line (code review 2026-10-01,
+A3: scripts built command lines to run it), so scripts call compare_paths() with settings and RunOptions, and the CLI
+only parses arguments into them.
 """
 import json
 import os
@@ -17,7 +18,7 @@ from .schema import EvidenceDocument, Report, Situation, Source, coverage_row
 from .progress import Progress, log
 from .provenance import comparison_interpreter, extraction_interpreter, normalized_extension, triage_interpreter
 from .readings import reconcile
-from .report import SPLIT, report_topics, traced, write_report
+from .report import ONE_SOURCE, SPLIT, report_topics, traced, write_report
 from .scan import ARCHIVES, Limits, read_origin
 from .situate import quality, situate
 from .binding import bind, redone
@@ -200,7 +201,8 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
         read = read_sources(store, client, settings, names, triage)
         document = write_evidence(store, names, read, {'extract': interpreter.model_dump(),
                                                         **({'triage': triage.model_dump()} if triage else {})}, out)
-        code = compare_and_report(options, settings, store, client, names, read, document, out)
+        reported = compare_and_report if len(names) > 1 else analyze_and_report
+        code = reported(options, settings, store, client, names, read, document, out)
         if code == checkup.FAILED and cache is not None:  # requests failed in a row: checked again next time
             checkup.forget(checkup.memory_of(cache.path), settings)
         return code
@@ -324,6 +326,29 @@ def compare_and_report(options, settings, store, client, names, read, document, 
                          for f in data['findings']))
     return saved_and_written(options, settings, store, client, data, out, incomplete)
 
+# What an analysis's report says of itself: a comparison's limitations but those of comparing.
+ANALYSIS_LIMITATIONS = [x for x in LIMITATIONS if not x.startswith(('Retrieval', 'No global'))]
+
+def analyze_and_report(options, settings, store, client, names, read, document, out):
+    """One source's claims reported, with no findings (`semantic-pdf-diff analyze`; single-document analysis,
+    milestone 1; the owner, 2026-10-29: "I say "single document" but I really mean "single source" that might be a
+    folder of docs"): the Claims view, its topics, other names and search, as a comparison's report has them. The
+    exit code: 2 where a task didn't complete or nothing was read."""
+    claims = [e for c in dict.fromkeys(f.content for f in read.files[names[0]]) for e in read.by_content[c]]
+    log.info(f"Reporting {len(claims)} extracted claims of {names[0]}")
+    progress = Progress('report', client, heartbeat=settings.heartbeat_seconds)
+    label = provenance.text_hash(comparison_interpreter(settings).model_dump_json())
+    data = Report(mode=ONE_SOURCE, findings=[], unmatched=[], shared=[], retrieval={},
+        created_at=provenance.now().isoformat(), sources=document.sources, files=document.files,
+        interpreters=document.interpreters, scan_issues=document.scan_issues, file_difference={},
+        sections=document.sections, situation=document.situation, evidence=document.evidence, coverage=read.coverage,
+        records=document.records, settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
+        limitations=ANALYSIS_LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
+    data = searchable(data, settings, client, ONE_SOURCE, label, progress)
+    progress.close()  # its search's requests (topics' names, other names, vectors)
+    incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
+    return saved_and_written(options, settings, store, client, data, out, incomplete)
+
 def searchable(data, settings, client, mode, label, progress):
     """A report's data with what its browsing and search use, each as its lever says: the topics' way and names, the
     other names, the claims' vectors. label: the run's interpreter's, naming its requests."""
@@ -331,7 +356,8 @@ def searchable(data, settings, client, mode, label, progress):
         from .schema import TopicNames
         found, claims = report_topics(data)
         key = ('topics', mode, label)
-        data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key))
+        data['topics'] = topics.named(found, claims, lambda prompt: client.ask(prompt, TopicNames, (), key),
+                                      mode == ONE_SOURCE)
     if settings.names_synonyms():  # the documents' other names for one thing, for the search (synonyms.py)
         data['synonyms'] = other_names(data, client, mode, label, progress)
     if settings.embeds():  # the claims' vectors, for a search by meaning (embed.py)
@@ -359,7 +385,7 @@ def saved_and_written(options, settings, store, client, data, out, incomplete):
     from .retiling import tile_lines
     for line in tile_lines(coverage):  # how the image tiles were cut, and which said their text was
         log.info(line)
-    omitted = data['retrieval']['omitted_by_pair_limit']
+    omitted = data['retrieval'].get('omitted_by_pair_limit')  # (an analysis compares none)
     if omitted:
         print(f"{omitted} of {data['retrieval']['candidate_pairs']} candidate pairs weren't judged: --max-pairs sets "
               f"how many are (now {settings.max_pairs})")

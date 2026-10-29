@@ -57,15 +57,17 @@ class Way:
         m = self.measures
         return m["placed"] * m["even"] * m["both_sides"]
 
-def split(said, sides, k, name=""):
-    """said: each claim's words; sides: each claim's side. Topics of words found on both sides, about k of them."""
+def split(said, sides, k, name="", one=False):
+    """said: each claim's words; sides: each claim's side. Topics of words found on both sides (one: of one source's
+    claims, an analysis's, any words), about k of them."""
     n = len(said)
     by_side = defaultdict(Counter)
     for ws, side in zip(said, sides):
         for w in ws:
             by_side[w][side] += 1
+    each = 1 if one else 2
     usable = sorted(w for w, by in by_side.items()
-                    if len(by) >= 2 and max(3, n * LEAST) <= sum(by.values()) <= n * MOST)
+                    if len(by) >= each and max(3, n * LEAST) <= sum(by.values()) <= n * MOST)
     idf = {w: math.log(n / sum(by_side[w].values())) for w in usable}
     holders = defaultdict(set)
     for i, ws in enumerate(said):
@@ -114,10 +116,10 @@ def split(said, sides, k, name=""):
             if vote:
                 placed[i] = max(sorted(vote), key=lambda t: vote[t])
     way = Way(name, topics, placed)
-    way.measures = measures(way, sides)
+    way.measures = measures(way, sides, one)
     return way
 
-def measures(way, sides):
+def measures(way, sides, one=False):
     """The share of claims placed, how even the topics are (normalised entropy), and the share of topics holding
     claims of both sides."""
     sizes = Counter(t for t in way.placed if t is not None)
@@ -130,17 +132,18 @@ def measures(way, sides):
         if t is not None:
             held[t].add(side)
     both = sum(1 for t in range(len(way.topics)) if len(held[t]) > 1) / len(way.topics) if way.topics else 0.0
+    both = 1.0 if one and way.topics else both  # one source: every topic holds its only side
     return {"placed": round(total / n, 3) if n else 0.0, "even": round(even, 3), "both_sides": round(both, 3)}
 
-def ways(claims, sides):
+def ways(claims, sides, one=False):
     """The candidate ways of splitting claims (dicts with entity and attribute), each side's claims together: by
     subject, by property, by subject coarser; those with two topics or more."""
     k = target(len(claims))
     subject = [words(f"{c['entity']} {c['attribute']}") for c in claims]
-    found = [split(subject, sides, k, "by subject"), split([words(c['attribute']) for c in claims], sides, k,
-                                                           "by property")]
+    found = [split(subject, sides, k, "by subject", one), split([words(c['attribute']) for c in claims], sides, k,
+                                                                "by property", one)]
     if k > 4:
-        found.append(split(subject, sides, max(2, k // 2), "by subject, coarser"))
+        found.append(split(subject, sides, max(2, k // 2), "by subject, coarser", one))
     return [w for w in found if len(w.topics) >= 2]  # one topic splits nothing
 
 def best(found):
@@ -181,9 +184,14 @@ def examples(way, claims, t):
                 chosen.append(q.pop(0))
     return "; ".join(f"{c['entity']} — {c['attribute']}" for c in chosen)
 
-def names_prompt(found, claims):
-    """The model's request: every candidate way, its topics' words, sizes and example claims."""
-    lines = [NAMES]
+# For one source's claims (an analysis) the same request, of one document or set.
+ONE_SOURCE_NAMES = NAMES.replace("a comparison by", "a source's claims by").replace(
+    "The claims of two engineering documents (or two sets of documents)", "The claims of an engineering document (or a "
+    "set of documents)")
+
+def names_prompt(found, claims, one=False):
+    """The model's request: every candidate way, its topics' words, sizes and example claims (one: an analysis's)."""
+    lines = [ONE_SOURCE_NAMES if one else NAMES]
     for i, way in enumerate(found, 1):
         lines.append(f"WAY {i} ({way.name}):")
         sizes = Counter(t for t in way.placed if t is not None)
@@ -191,7 +199,7 @@ def names_prompt(found, claims):
             lines.append(f"  {t}. {', '.join(words_)} ({sizes[t - 1]} claims): {examples(way, claims, t - 1)}")
     return "\n".join(lines) + "\n"
 
-def named(found, claims, ask):
+def named(found, claims, ask, one=False):
     """The model's choice among the ways and its names for that way's topics, as a report keeps them: {"way": its
     name, "topics": its topics' words, "names": [...]}, or {"failed": why} (a failed request, an answer that doesn't
     fit), when the report shows the most even way by its words instead. claims: dicts with entity, attribute and side;
@@ -199,7 +207,7 @@ def named(found, claims, ask):
     if not found:
         return {}
     try:
-        answer = ask(names_prompt(found, claims))
+        answer = ask(names_prompt(found, claims, one))
     except ModelFailure as e:  # a request that failed, timed out, was refused or answered unreadably: words stand
         log.warning("The report's topics are named by their words: the request for names failed (%s)", e)
         return {"failed": "no answer"}  # the same live and replayed: only answers decide what a run writes (0030)

@@ -39,6 +39,18 @@ def tables_read(a, b):
         return None
     return {"a": read_as(ha), "b": read_as(hb)}
 
+# An analysis of one source (`semantic-pdf-diff analyze`): its report's mode. It has no findings; every claim is
+# listed, in the Claims view, and browsed by topic and searched as a comparison's are.
+ONE_SOURCE = "analysis"
+
+def one_source(data):
+    return data.get("mode") == ONE_SOURCE
+
+def listed(data):
+    """The claims a report lists besides its findings' ({"id"} at least): a comparison's without a counterpart, an
+    analysis's every claim."""
+    return [{"id": e["id"]} for e in data["evidence"]] if one_source(data) else data["unmatched"]
+
 def traced(data):
     """The report document with each finding between claims whose tables were read differently marked (tables_read),
     settled before the comparison is saved, so the store keeps what the report shows (code review 2026-10-08, D8:
@@ -235,6 +247,8 @@ def header_html(data, listed=True):
     table lists them: listed=False), the caveats and the run's metadata."""
     counts = Counter(f['relation'] for f in data['findings'])
     issues = [r for r in data['coverage'] if r['status'] != 'complete']
+    if one_source(data):
+        return analysis_header_html(data, issues)
     page = '<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Semantic PDF comparison</h1>'
     page += f"<p>{' ↔ '.join(esc(x['name']) for x in data['sources'])}</p><p>Mode: {esc(data['mode'])}</p>"
     if data.get('paused'):
@@ -272,6 +286,25 @@ def header_html(data, listed=True):
              'Proposal mode treats both symmetrically; neither is ranked.</p>')
     page += ('<details><summary>Run metadata and limitations</summary><p>Every detail is in <code>report.json</code>; '
              'what the page shows elsewhere (groupings, sections, situating, files) is left out here.</p><pre>'
+             + esc(json.dumps({k: v for k, v in data.items() if k not in SHOWN_ELSEWHERE}, indent=2))
+             + '</pre></details></header>')
+    return page
+
+def analysis_header_html(data, issues):
+    """An analysis's header: the source, its files and claims counted, the caveats and the run's metadata."""
+    files = data.get('files', [])
+    page = ('<header><p class="meta">ENGINEERING EVIDENCE REVIEW</p><h1>Source analysis</h1>'
+            f"<p>{esc(data['sources'][0]['name'])}: {len(data['evidence'])} claims read from {len(files)} "
+            f"file{'s' if len(files) != 1 else ''}</p>")
+    if data.get('paused'):
+        page += (f"<p class='warning'>Paused: {esc(data['paused'])}. What the cap cut followed the order answers came "
+                 "in, so this report isn't reproducible: rerun the same command to resume.</p>")
+    if issues:
+        page += f"<p class='warning'>{len(issues)} incomplete, failed or skipped source tasks.</p>"
+    page += ('<p>Model conclusions require review. “Complete” means the extractor reported no local issue, not proof '
+             'of exhaustive coverage.</p>')
+    page += ('<details><summary>Run metadata and limitations</summary><p>Every detail is in <code>report.json</code>; '
+             'what the page shows elsewhere (sections, situating, files) is left out here.</p><pre>'
              + esc(json.dumps({k: v for k, v in data.items() if k not in SHOWN_ELSEWHERE}, indent=2))
              + '</pre></details></header>')
     return page
@@ -389,7 +422,7 @@ def report_page(data, stored, budget, note=''):
         return (f"{where(e['content'])}, {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']}, "
                 f"{loc.get('task', loc.get('region', ''))}: {e['entity']} — {e['attribute']}")
     account = crops.Account(budget, names={f['content']: where(f['content']) for f in data.get('files', [])})
-    account.wanted = crops.wanted({e["id"]: e for e in data["evidence"]}, shown, data['unmatched'],
+    account.wanted = crops.wanted({e["id"]: e for e in data["evidence"]}, shown, listed(data),
                                   data.get('shared', []), label, lambda image: stored(image).exists(),
                                   crop_finder(data))
     mime, encode = crops.encoder()
@@ -429,14 +462,14 @@ def file_index(pairs):
 def report_topics(data):
     """The candidate ways of splitting a report's claims into topics (topics.ways), and the claims, each with its
     side (its source), in the report's order: the findings', the unmatched, the shared."""
-    order = [x for f in data['findings'] for x in (f['a'], f['b'])] + [u['id'] for u in data['unmatched']]
+    order = [x for f in data['findings'] for x in (f['a'], f['b'])] + [u['id'] for u in listed(data)]
     ids = list(dict.fromkeys(order + list(data.get('shared', []))))
     evidence = {e['id']: e for e in data['evidence']}
     side = {}
     for f in data.get('files', []):
         side.setdefault(f['content'], f['source'])
     claims = [{**evidence[x], 'side': side.get(evidence[x]['content'], '')} for x in ids if x in evidence]
-    return (topics.ways(claims, [c['side'] for c in claims]) if claims else []), claims
+    return (topics.ways(claims, [c['side'] for c in claims], one_source(data)) if claims else []), claims
 
 def browsing(data):
     """The topics a report's findings are browsed by, each shown claim's, and their names: (the way, {claim id: its
@@ -483,7 +516,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     crop_of = crop_finder(data)
     card = Cards(data, lambda e: crop_html(e, embedded, stored, crop_of))
     pairs = file_pairs(data)
-    files = file_index(pairs)
+    paths = own_files(data) if one_source(data) else {}  # an analysis's files, each filtered by alone
+    files = file_index(pairs) if not paths else {c: i for i, c in enumerate(paths)}
     page = note + header_html(data, listed=len(pairs) <= 1) + crops_note(account)
     if len(pairs) > 1:
         page += files_html(data, pairs, files, account, card.where)
@@ -498,10 +532,12 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
         record["topics"] = [topic_of.get(f['a'], -1), topic_of.get(f['b'], -1)]
     sides = [s['name'] for s in data['sources']]
     claims = claim_records(data, card, files, topic_of, sides)
+    one = one_source(data)  # an analysis: its claims alone, no findings, no sides or how claims fared
     if way:
         page += topic_coverage_html(claims, names, sides)
-    page += ('<div class="views"><button data-view="findings" class="on">Findings ' + str(len(findings))
-             + '</button><button data-view="claims">Claims ' + str(len(claims)) + '</button></div>')
+    page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
+             + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
+             + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button></div>')
     page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
              + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
              + '</select></label>')
@@ -512,9 +548,12 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     if same:
         page += (f'<label><input type="checkbox" id="same" checked> Fold the {same} equivalent findings whose two '
                  'claims say the same</label>')
-    page += ('</span><span data-for="claims" hidden><label>Side <select id="side"><option value="all">Both sources'
-             '</option>' + ''.join(f'<option value="{i}">{esc(name)}</option>' for i, name in enumerate(sides))
-             + '</select></label><label>Claims <select id="status"><option value="all">However they fared</option>'
+    hide = ' hidden' if one else ''
+    page += ('</span><span data-for="claims" hidden><label' + hide + '>Side <select id="side"><option value="all">'
+             'Both sources</option>'
+             + ''.join(f'<option value="{i}">{esc(name)}</option>' for i, name in enumerate(sides))
+             + '</select></label><label' + hide + '>Claims <select id="status"><option value="all">However they fared'
+             '</option>'
              + ''.join(f'<option value="{k}">{esc(v)}</option>' for k, v in STATUSES.items()
                        if any(c['status'] == k for c in claims))
              + '</select></label><label>Read as <select id="claimkind"><option value="all">Any kind</option>'
@@ -526,14 +565,20 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
         page += ('<label>File <select id="file"><option value="all">All files</option>'
                  + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
                            for kind, a, b in pairs) + '</select></label>')
+    elif len(paths) > 1:
+        page += ('<label>File <select id="file"><option value="all">All files</option>'
+                 + ''.join(f'<option value="{files[c]}">{esc(path)}</option>' for c, path in paths.items())
+                 + '</select></label>')
     page += ('<input id="query" type="search" placeholder="Search: words, &quot;a phrase&quot;, -without, entity:…" '
              'aria-label="Search the findings or claims shown"> <label id="order-box" hidden>Order <select id="order">'
              '<option value="relevance">Most relevant first</option><option value="listed">As listed</option></select>'
              '</label><span id="count" class="meta"></span><div id="also" class="meta" hidden></div>' + SEARCH_HELP)
     if way:
         named = 'named by the model; ' if data.get('topics', {}).get('names') else ''
+        title = (f'({esc(way.name)}{"; named by the model" if named else ""})' if one else
+                 f'found in both sources ({esc(way.name)}; {named}a finding is in its claims\' topics)')
         page += ('<div class="topics"><span class="meta" title="Claims split by the words of what they are about, '
-                 f'found in both sources ({esc(way.name)}; {named}a finding is in its claims\' topics)">Topics:</span>'
+                 f'{title}">Topics:</span>'
                  + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
@@ -569,12 +614,12 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
             'is shown by its script: open it in a browser with JavaScript on.</p></noscript>'
             f'<script type="application/gzip" id="report-data">{packed}</script>'
             f'<script type="application/json" id="report-crops">{images}</script><script>{SCRIPT}</script>')
-    return html_page('Semantic PDF comparison', body, STYLE)
+    return html_page('Source analysis' if one else 'Semantic PDF comparison', body, STYLE)
 
 # How a claim fared in the comparison, as the claims view filters it.
 STATUSES = {"findings": "In findings", "compared": "Compared, no counterpart", "unaligned": "Possibly added or removed",
             "regrouped": "In a split or merge candidate", "ranked_out": "Ranked out before judging",
-            "not_compared": "Not compared", "shared": "In both sources"}
+            "not_compared": "Not compared", "shared": "In both sources", "read": "Read (one source)"}
 
 def claim_records(data, card, files, topic_of, sides):
     """Every claim of both sources, as the claims view lists them (the owner, 2026-10-20: "an easily searchable
@@ -601,7 +646,9 @@ def claim_records(data, card, files, topic_of, sides):
                                                       e['id']))
     for e in ordered:
         eid, compared = e['id'], ''
-        if eid in shared:
+        if len(sides) == 1:  # an analysis: nothing to say of how it fared
+            status, said = 'read', ''
+        elif eid in shared:
             status, said = 'shared', 'In both sources: the same content, not compared'
         elif related[eid]:
             status, said = 'findings', 'In findings: ' + ', '.join(f"{n} {r}" for r, n in sorted(related[eid].items()))
@@ -617,7 +664,8 @@ def claim_records(data, card, files, topic_of, sides):
             status, said = lone[eid]['status'], lone[eid]['note']
         else:
             status, said = 'not_compared', lone.get(eid, {}).get('note', 'Not compared')
-        html = f'<article class="claim"><p class="meta">{esc(said)}</p>{card(eid)}{compared}</article>'
+        said = f'<p class="meta">{esc(said)}</p>' if said else ''
+        html = f'<article class="claim">{said}{card(eid)}{compared}</article>'
         records.append({"card": eid, "side": side.get(e['content'], -1), "kind": e['kind'], "status": status,
                         "files": [files.get(e['content'], -1)], "topics": [topic_of.get(eid, -1)], "html": html})
     return records
@@ -627,15 +675,24 @@ def topic_coverage_html(claims, names, sides):
     is silent."""
     count = Counter((c['topics'][0], c['side'], c['status'] == 'findings') for c in claims)
     rows = ''
+    found = ((lambda t, s: '') if len(sides) == 1  # one source: nothing is in findings
+             else (lambda t, s: f" <small>({count[t, s, True]} in findings)</small>"))
     for t, name in [*enumerate(names), (-1, 'In no topic')]:
-        cells = ''.join(f"<td>{count[t, s, True] + count[t, s, False]} <small>({count[t, s, True]} in findings)</small>"
-                        "</td>" for s in range(len(sides)))
+        cells = ''.join(f"<td>{count[t, s, True] + count[t, s, False]}{found(t, s)}</td>" for s in range(len(sides)))
         if any(count[t, s, x] for s in range(len(sides)) for x in (True, False)):
             rows += (f'<tr><td>{esc(name)}</td>{cells}<td><button class="pick-topic" data-topic="{t}">Claims</button>'
                      '</td></tr>')
     heads = ''.join(f'<th>{esc(name)}</th>' for name in sides)
-    return ('<details class="coverage" open><summary>What each source says, by topic</summary><table><thead><tr>'
+    said = 'What each source says, by topic' if len(sides) > 1 else 'Its claims, by topic'
+    return (f'<details class="coverage" open><summary>{said}</summary><table><thead><tr>'
             f'<th>Topic</th>{heads}<th></th></tr></thead><tbody>{rows}</tbody></table></details>')
+
+def own_files(data):
+    """An analysis's files: {content: its path}, by path (a content at two paths, by the first)."""
+    paths = {}
+    for f in sorted(data.get('files', []), key=lambda f: f['path']):
+        paths.setdefault(f['content'], f['path'])
+    return paths
 
 def file_pairs(data):
     """The compared files in pairs, as the files' difference has them: (kind, the first source's (path, content), the

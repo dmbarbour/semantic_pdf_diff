@@ -1,6 +1,7 @@
-"""Command line: compare two sources, and manage declared sources in a store.
+"""Command line: compare two sources, analyze one, and manage declared sources in a store.
 
     semantic-pdf-diff compare A B [--store DIR]         # files, folders, zips or declared sources' names
+    semantic-pdf-diff analyze SOURCE [--store DIR]      # one source's claims reported: no comparison
     semantic-pdf-diff source add|list|show|update|remove|export|import ...
     semantic-pdf-diff show|gc|report --store DIR ...
     semantic-pdf-diff settings [--config FILE] [--changed]
@@ -73,7 +74,7 @@ def interrupted(argv):
     if not abandon() and sys.stderr.isatty():
         sys.stderr.write("\n")  # past the terminal's "^C"
     sys.stdout.flush()  # what was printed before it, before it (a pipe's buffer)
-    resumes = argv[:1] == ['compare']
+    resumes = argv[:1] in (['compare'], ['analyze'])
     log.warning("Interrupted" + (": rerun the same command to resume; finished work is kept." if resumes else "."))
     logging.shutdown()
     sys.stderr.flush()
@@ -95,6 +96,8 @@ def command(argv, client):
         return source_command(argv[1:])
     if argv[0] == 'compare':
         return compare_command(argv[1:], client)
+    if argv[0] == 'analyze':
+        return analyze_command(argv[1:], client)
     if argv[0] in ('show', 'gc', 'report'):
         return store_command(argv[0], argv[1:])
     if argv[0] == 'settings':
@@ -126,6 +129,7 @@ with no counterpart isn't taken as proof of absence.
 
 Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help COMMAND):
   compare     compare two sources: files, folders or zip archives, or sources declared in a store
+  analyze     report one source's claims, to browse and search: a file, a folder or zip of documents
   source      declare sources in a store and manage them: add, list, show, update, remove, export, import
   show        print a view of a store: its sources, files, evidence, coverage or comparisons
   report      write a store's report again, without model calls
@@ -191,13 +195,17 @@ def add_log_options(parser):
 def start_logging(args):
     setup_logging(getattr(args, 'verbose', 0), getattr(args, 'quiet', False), getattr(args, 'log_file', None))
 
-def add_run_options(parser):
-    reading = parser.add_argument_group('comparing and reading')
-    reading.add_argument('--mode', choices=['proposals', 'revisions'], default=None,
-                         help='Proposals (the default, unless the store\'s mode setting says otherwise): two '
-                              'competing designs, side by side. Revisions: the first '
-                              'source is the earlier revision of one design and the second the later; differences '
-                              'are named as changes (a value or its conditions changed, renamed, restated, moved)')
+def add_run_options(parser, comparing=True):
+    """A run's options: reading, the model, the budget, the store, output, recorded answers; and, comparing,
+    how sources are compared (--mode, --top-k, --rerank, --max-pairs, --split), which an analysis of one source
+    hasn't."""
+    reading = parser.add_argument_group('comparing and reading' if comparing else 'reading')
+    if comparing:
+        reading.add_argument('--mode', choices=['proposals', 'revisions'], default=None,
+                             help='Proposals (the default, unless the store\'s mode setting says otherwise): two '
+                                  'competing designs, side by side. Revisions: the first '
+                                  'source is the earlier revision of one design and the second the later; differences '
+                                  'are named as changes (a value or its conditions changed, renamed, restated, moved)')
     reading.add_argument('--config', type=Path,
                          help='A settings JSON file, e.g. {"concurrency": 6}; `semantic-pdf-diff settings` lists '
                               'every setting. The environment gives defaults, the file overrides them, and these '
@@ -207,19 +215,8 @@ def add_run_options(parser):
                               'what went unread')
     reading.add_argument('--no-situate', action='store_true',
                          help='Skip the figure and section summaries ("about" statements) that place claims')
-    reading.add_argument('--top-k', type=int,
-                         help=f'Claims of the other source each claim is compared with (default: {default("top_k")})')
-    reading.add_argument('--rerank', dest='rerank_model', metavar='MODEL',
-                         help='Proposals mode: score each claim\'s candidates with this reranker before the judge '
-                              '(e.g. Qwen/Qwen3-Reranker-8B), asked at the endpoint\'s /rerank unless rerank_api or '
-                              'rerank_url says otherwise; pairs below --rerank-threshold are not judged, the rest best '
-                              'first')
-    reading.add_argument('--rerank-threshold', type=int, choices=range(1, 11), metavar='1-10',
-                         help=f'With --rerank: the least score a pair is judged with, in hundredths (1-10 for '
-                              f'0.01-0.10; default: {default("rerank_threshold")})')
-    reading.add_argument('--max-pairs', type=int,
-                         help=f'The most candidate pairs the model judges, best first; the report says how many were '
-                              f'left unjudged (default: {default("max_pairs")})')
+    if comparing:
+        add_pairing_options(reading)
     model = parser.add_argument_group('the model')
     model.add_argument('--model', help=f'The model identifier the provider uses (default: the model setting, '
                                        f'`config set [--user] model NAME`, else {default("model")})')
@@ -242,7 +239,7 @@ def add_run_options(parser):
                             'nothing')
     output = parser.add_argument_group('output')
     add_log_options(output)
-    add_report_options(output)
+    add_report_options(output, split=comparing)
     recorded = parser.add_argument_group('recorded answers (testing, and runs without the model)')
     recorded.add_argument('--fixture', type=Path,
                           help="Answers fixture, instead of the answers cache ($SEMANTIC_PDF_DIFF_CACHE): answers "
@@ -261,6 +258,21 @@ def add_run_options(parser):
                           help='A/A control: answer extraction for these regions (e.g. tile,figure,overview) afresh, '
                                'as a second sample of each query')
 
+def add_pairing_options(reading):
+    reading.add_argument('--top-k', type=int,
+                         help=f'Claims of the other source each claim is compared with (default: {default("top_k")})')
+    reading.add_argument('--rerank', dest='rerank_model', metavar='MODEL',
+                         help='Proposals mode: score each claim\'s candidates with this reranker before the judge '
+                              '(e.g. Qwen/Qwen3-Reranker-8B), asked at the endpoint\'s /rerank unless rerank_api or '
+                              'rerank_url says otherwise; pairs below --rerank-threshold are not judged, the rest best '
+                              'first')
+    reading.add_argument('--rerank-threshold', type=int, choices=range(1, 11), metavar='1-10',
+                         help=f'With --rerank: the least score a pair is judged with, in hundredths (1-10 for '
+                              f'0.01-0.10; default: {default("rerank_threshold")})')
+    reading.add_argument('--max-pairs', type=int,
+                         help=f'The most candidate pairs the model judges, best first; the report says how many were '
+                              f'left unjudged (default: {default("max_pairs")})')
+
 def report_size(text):
     """A report's budget in bytes, from "20MB", "500KB", "1.5GB" or a bare number of megabytes."""
     try:
@@ -268,12 +280,13 @@ def report_size(text):
     except ValueError as e:
         raise argparse.ArgumentTypeError(str(e)) from None
 
-def add_report_options(parser):
-    parser.add_argument('--split', action=argparse.BooleanOptionalAction, default=None,
-                        help=f'With more than one pair of files: a report file a pair (its findings, and those '
-                             f'reaching other files) and an index, in {SPLIT}/, a folder to zip and send, each file '
-                             'within --report-budget; for comparisons too large for one file (default: the store\'s '
-                             'split setting, else off)')
+def add_report_options(parser, split=True):
+    if split:
+        parser.add_argument('--split', action=argparse.BooleanOptionalAction, default=None,
+                            help=f'With more than one pair of files: a report file a pair (its findings, and those '
+                                 f'reaching other files) and an index, in {SPLIT}/, a folder to zip and send, each '
+                                 'file within --report-budget; for comparisons too large for one file (default: the '
+                                 'store\'s split setting, else off)')
     parser.add_argument('--report-budget', type=report_size, default=None, metavar='SIZE',
                         help='report.html is one file holding its crops, in order of value (the findings to check, '
                              'and claims read from charts, diagrams and tables, first) until it reaches this size '
@@ -373,6 +386,57 @@ def compare_command(argv, client=None):
         if len(names) != 2:
             raise ValueError(f'compare needs exactly two sources, got {len(names)}')
         return run(options, settings, store, names, args.report or args.store, force_rescan=bool(paths),
+                   client=client)
+
+# --- analyze ---------------------------------------------------------------------------
+
+ANALYZE_HELP = """\
+Read one source and report its claims: no comparison. The source is a file, a folder of documents or a zip archive,
+or the name of a source declared in the store (`semantic-pdf-diff source add`); a declared name is taken before a
+path. The report lists every claim with where it was read, browsed by topic and searched as a comparison's report is.
+"""
+
+ANALYZE_EXAMPLES = """\
+Examples:
+  semantic-pdf-diff analyze spec.pdf --store spec            open spec/report.html
+  semantic-pdf-diff analyze proposal/ --store proposal-a     a folder of documents, one source
+  semantic-pdf-diff analyze team-a --store work              a source declared in work
+"""
+
+def analyze_parser():
+    parser = help_text(Parser(prog='semantic-pdf-diff analyze', usage='%(prog)s SOURCE [--store DIR] [options]'),
+                       ANALYZE_EXAMPLES, ANALYZE_HELP)
+    parser.add_argument('source', metavar='SOURCE',
+                        help="One source: a file, a folder of documents or a zip archive, or a declared source's name")
+    parser.add_argument('--store', type=Path, default=default_store(),
+                        help='The store folder, created if missing (default: $SEMANTIC_PDF_DIFF_STORE, else '
+                             './diff-output). It keeps what was read, and receives the report unless --report names '
+                             'another')
+    parser.add_argument('--report', type=Path, help='Report folder (default: the store folder)')
+    add_run_options(parser, comparing=False)
+    return parser
+
+def analyze_command(argv, client=None):
+    """One source read and reported (pipeline.analyze_and_report), as `compare` reads two: the same settings, store
+    and answers cache (the owner, 2026-10-29, choosing a command of its own)."""
+    from dataclasses import replace
+    from .report import ONE_SOURCE
+    args = analyze_parser().parse_args(argv)
+    start_logging(args)
+    from .settings import user_settings
+    layer = {**user_settings(), **Store.settings_of(args.store)}
+    settings = load_settings(args, layer)
+    options = replace(RunOptions.from_args(args, layer), mode=ONE_SOURCE, split=False)
+    check_fixture(options)  # before the store is changed
+    if client is None and not options.dry_run:
+        require_model(settings, options)
+    with Store(args.store) as store:
+        if client is None and not options.fixture:
+            from .pipeline import cache_of
+            cache_of(store, bind=False)  # a cache other than the store's is refused before its sources change
+        given = named_or_path(store, args.store, args.source)
+        names = declare_paths(store, args.store, [given]) if isinstance(given, Path) else [given]
+        return run(options, settings, store, names, args.report or args.store, force_rescan=isinstance(given, Path),
                    client=client)
 
 def named_or_path(store, folder, given):
