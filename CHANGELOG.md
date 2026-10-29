@@ -2,6 +2,16 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.5.0 (2026-10-29)
+
+- **`semantic-pdf-diff debug`** says what a store's runs asked and what failed, in a few lines to read off a screen. It shows:
+  - the endpoint and models the last comparison used;
+  - the requests by step (extract, compare, rerank, embed, ...): asked, answered, failed, and never answered (not sent, as after sending stopped);
+  - the last comparison's counts;
+  - the errors the answers cache recorded, the most frequent first.
+
+  It asks no model, and prints nothing of the documents but what a server's error quotes. `--errors N` shows more errors; `--json` prints everything as JSON.
+
 ## 0.4.0 (2026-10-29)
 
 - **Embedding models that can't be cut work.** Every embedding request asked for `embed_dimensions` (256). Five of DeepInfra's 25 embedding models refuse any size with HTTP 400: BAAI/bge-base-en-v1.5, bge-en-icl and bge-large-en-v1.5, intfloat/e5-large-v2, thenlper/gte-large. A refused request is now asked again once with the model and the input alone, and the model answers at its own size. `config test` names the vectors' size, and says when it's the model's own.
