@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.11.0 (2026-10-30)
+
+- **The glossary is read before claims are compared** (it was read after), so a comparison can use it. The same requests and the same report.
+- **`align_glossary`** (off by default; revisions, with `align` and `glossary`): alignment takes a meaning written out as its term, so a revision that abbreviates ("an SWD of", "SBs") still pairs its values with the other's "side water depth" and "sedimentation basins". A long meaning's last words count too where no other meaning ends so ("detention time" for "hydraulic detention time"). On a controlled pair abbreviating what its earlier revision spells out, both changed values are now found in every format, where they were listed as unmatched.
+- **`judge_glossary`** (off by default): the judge is shown the terms each claim uses, as its document defines them. Measured no different: the model already reads common abbreviations.
+
 ## 0.10.0 (2026-10-30)
 
 - **A glossary entry's reach.** A symbol on a drawing sheet, drawn or lettered, holds for that sheet ("sheet E-001", from its title block). Everything else holds for its document: abbreviation lists, definitions, prose, and a drawing set's abbreviations, terms and conventions. The index says when a term is one sheet's ("sheet E-201 only"), or that it's consistent where it means the same on two sheets or more ("alike on 3 sheets"). Only terms holding for their documents, and consistent symbols, are taken as other names by the search.
