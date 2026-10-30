@@ -198,7 +198,7 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
         raise
     client = make_client(options, settings, store, cache) if own else client
     try:
-        read = read_sources(store, client, settings, names, triage)
+        read = read_sources(store, client, settings, names, triage, options.mode if len(names) > 1 else ONE_SOURCE)
         document = write_evidence(store, names, read, {'extract': interpreter.model_dump(),
                                                         **({'triage': triage.model_dump()} if triage else {})}, out)
         reported = compare_and_report if len(names) > 1 else analyze_and_report
@@ -230,23 +230,27 @@ def prepare(options, settings, store, names, roles, force_rescan):
 
 @dataclass
 class Read:
-    """What a run read: each source's files, the claims by content, coverage, sections, situating results."""
+    """What a run read: each source's files, the claims by content, coverage, sections, situating results, and its
+    glossary."""
     files: dict
     by_content: dict
     coverage: list
     sections: dict
     situations: dict
     records: dict = None  # {content: {id: ContextRecord}}, as the records lever keeps them
+    glossary: dict = None  # glossary.read's, where the glossary lever reads it
 
-def read_sources(store, client, settings, names, triage):
-    """The sources' content extracted, and situated if the run situates."""
+def read_sources(store, client, settings, names, triage, mode):
+    """The sources' glossaries read (read_glossary), their content extracted, and situated if the run situates. mode:
+    the comparison's, or ONE_SOURCE, naming the glossary's requests."""
     files = {name: store.files(name) for name in names}
     progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
+    glossary = read_glossary(settings, store, client, mode, progress, files)
     by_content, coverage, sections = extract_sources(store, client, names, files, progress)
-    progress.close()
+    progress.close()  # the glossary's requests and the extraction's
     situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
     records = {c: found for c in by_content for found in [store.records(c)] if found}
-    return Read(files, by_content, coverage, sections, situations, records)
+    return Read(files, by_content, coverage, sections, situations, records, glossary)
 
 def write_evidence(store, names, read, interpreters, out):
     """evidence.json, what was read, written before comparing (so it stands if comparing fails); the document."""
@@ -301,7 +305,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
     comparing = comparison_interpreter(settings)
     label = provenance.text_hash(comparing.model_dump_json())
-    found = read_glossary(settings, store, client, options.mode, label, progress, document)
+    found = read.glossary
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
                    label=label, records=read.records, glossary=(found or {}).get('terms'))
     if options.mode == 'revisions':
@@ -321,7 +325,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = searchable({**traced(data), **({'glossary': found} if found is not None else {})}, settings, client,
                       options.mode, label, progress)
-    progress.close()  # the comparison's requests, its glossary's and search's (names, vectors) too
+    progress.close()  # the comparison's requests, its search's (names, vectors) too
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
@@ -340,7 +344,7 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
     log.info(f"Reporting {len(claims)} extracted claims of {names[0]}")
     progress = Progress('report', client, heartbeat=settings.heartbeat_seconds)
     label = provenance.text_hash(comparison_interpreter(settings).model_dump_json())
-    found = read_glossary(settings, store, client, ONE_SOURCE, label, progress, document)
+    found = read.glossary
     data = Report(mode=ONE_SOURCE, findings=[], unmatched=[], shared=[], retrieval={},
         created_at=provenance.now().isoformat(), sources=document.sources, files=document.files,
         interpreters=document.interpreters, scan_issues=document.scan_issues, file_difference={},
@@ -349,18 +353,19 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
         limitations=ANALYSIS_LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = searchable({**data, **({'glossary': found} if found is not None else {})}, settings, client, ONE_SOURCE,
                       label, progress)
-    progress.close()  # its glossary's and search's requests (topics' names, other names, vectors)
+    progress.close()  # its search's requests (topics' names, other names, vectors)
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)
 
-def read_glossary(settings, store, client, mode, label, progress, document):
+def read_glossary(settings, store, client, mode, progress, files):
     """The sources' glossaries (glossary.py), where the glossary lever reads them, from the store's files: read before
-    claims are compared, so the comparison may use them too; else None. label: the run's interpreter's, naming its
-    requests."""
+    their claims, so reading and comparing them may use them too; else None. Its requests are named by the
+    comparison's interpreter, as when it was read after the claims."""
     if not settings.reads_glossary():
         return None
     from . import glossary
-    return glossary.read({'files': document.files, 'sections': document.sections}, store, client, mode, label,
+    label = provenance.text_hash(comparison_interpreter(settings).model_dump_json())
+    return glossary.read({'files': [f.model_dump() for n in files for f in files[n]]}, store, client, mode, label,
                          progress)
 
 def searchable(data, settings, client, mode, label, progress):

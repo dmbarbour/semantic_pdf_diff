@@ -167,8 +167,7 @@ class Pictured(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, serving(post) as url:
             root = Path(d)
             legend_sheet(root / "e-001.pdf")
-            data = {"files": [{"source": "set", "path": "e-001.pdf", "content": "sha256:" + "e" * 64 + ".pdf"}],
-                    "sections": []}
+            data = {"files": [{"source": "set", "path": "e-001.pdf", "content": "sha256:" + "e" * 64 + ".pdf"}]}
             client = Client(Settings(base_url=url, retries=0), None)
             found = glossary.read(data, Store(root / "store", root / "e-001.pdf"), client, "analysis", "x")
             pictures = list((root / "store" / "assets").glob("glossary-*.png"))
@@ -196,8 +195,7 @@ class Pictured(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, serving(post) as url:
             root = Path(d)
             legend_sheet(root / "e-001.pdf")
-            data = {"files": [{"source": "set", "path": "e-001.pdf", "content": "sha256:" + "e" * 64 + ".pdf"}],
-                    "sections": []}
+            data = {"files": [{"source": "set", "path": "e-001.pdf", "content": "sha256:" + "e" * 64 + ".pdf"}]}
             client = Client(Settings(base_url=url, retries=0, vision=False), None)
             glossary.read(data, Store(root / "store", root / "e-001.pdf"), client, "analysis", "x")
         self.assertEqual(asked, [0])

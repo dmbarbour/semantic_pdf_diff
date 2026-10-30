@@ -32,7 +32,6 @@ glossary.").
   terms its words use, as its document defines them (its sheet's on its page).
 """
 import re
-from collections import defaultdict
 
 from .failures import Truncated
 from .progress import NoProgress, log
@@ -357,13 +356,10 @@ def read(data, store, client, mode, label, progress=None):
     files = {}
     for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
         files.setdefault(f["content"], f)
-    sections = defaultdict(list)
-    for s in data.get("sections", []):
-        sections[s["content"]].append(s)
     with Dispatcher(client) as dispatch:
         for content, f in files.items():
             try:
-                found = content_glossary(store, f, sections[content],
+                found = content_glossary(store, f, (client.s.section_depth, client.s.section_pages),
                                          pictures=store.folder / "assets" if client.s.vision else None,
                                          side=client.s.image_side)
             except Exception as e:  # an unreadable file: its glossary left out, said
@@ -457,20 +453,19 @@ def entry(term, meaning, kind, f, where, block, how, sheet=""):
             "where": where, "block": block, "how": how, "reach": reach,
             **({"sheet": sheet} if reach == "sheet" else {})}
 
-def content_glossary(store, f, sections, pictures=None, side=1000):
+def content_glossary(store, f, outline, pictures=None, side=1000):
     """One file's blocks [(heading, text, where in it, table rows, its picture or None, its sheet's name or "")] and
-    its prose definitions
-    [(where, term, meaning)], read from its bytes as the store keeps them. pictures: the folder a drawn legend's
-    picture is drawn into (None: none drawn), its longer side at most side pixels."""
+    its prose definitions [(where, term, meaning)], read from its bytes as the store keeps them. outline: a PDF's
+    sections' depth and pages, as its extraction cuts them (sections.pdf_sections). pictures: the folder a drawn
+    legend's picture is drawn into (None: none drawn), its longer side at most side pixels."""
     from .scan import read_origin
     raw = read_origin(store.origin(f["source"], f["path"]))
     if f["content"].endswith(".pdf"):
         import pymupdf
-        from .schema import Section
+        from .sections import pdf_sections
         with pymupdf.open(stream=raw, filetype="pdf") as doc:
-            kept_sections = [Section.model_validate({k: v for k, v in s.items() if k != "content"}) for s in sections]
             blocks = []
-            for i, (heading, text, a, b, rect) in enumerate(pdf_blocks(doc, kept_sections)):
+            for i, (heading, text, a, b, rect) in enumerate(pdf_blocks(doc, pdf_sections(doc, *outline)[0])):
                 image = None
                 if pictures is not None and rect is not None and DRAWN.search(heading) \
                         and drawn_marks(doc[a - 1], rect) >= MARKS:
