@@ -80,7 +80,8 @@ def place(loc):
 STYLE = '''
 :root{font-family:system-ui,sans-serif}body{max-width:1200px;margin:32px auto;padding:0 24px}
 h1{font-size:36px;letter-spacing:-1px}h2{font-size:20px}h3{font-size:15px;color:var(--accent)}.meta{color:var(--muted)}
-div.subject table{table-layout:fixed}div.subject th:first-child{width:28%}
+div.subject table{table-layout:fixed}div.subject th:first-child{width:28%}div.wide{overflow-x:auto}
+div.wide table{table-layout:auto}
 article,header,details.coverage,div.subject{background:var(--card);border:1px solid var(--line);\
 border-radius:12px;padding:22px;margin:18px 0}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}\
@@ -344,20 +345,18 @@ def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=T
     output = Path(output)
     assets = Path(assets) if assets else output / "assets"
     stored = lambda image: assets / image.split("/", 1)[1] if image.startswith("assets/") else output / image
-    saved = data  # report.json: the comparison as the store keeps it
-    if not data.get('index'):  # one saved before indexes: built for its files and page, report.json as it was
-        from . import indexes
-        data = {**data, 'index': indexes.built(data)}
+    from . import indexes  # built from what was read each time it's written, so `report` brings it up to date
+    data = {**data, 'index': indexes.built(data)}
     if write:  # its indexes beside it: index.md, index.xlsx, index/*.csv
         from . import indexfiles
         indexfiles.written(data['index'], {e['id']: e for e in data['evidence']}, output)
     pairs = file_pairs(data) if split else []
     if len(pairs) > 1:
-        return write_split(data, output, pairs, stored, budget, write, saved)
+        return write_split(data, output, pairs, stored, budget, write)
     page, account = report_page(data, stored, budget)
     if write:
         output.mkdir(exist_ok=True, parents=True)
-        (output/"report.json").write_text(json.dumps(saved, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
         (output/'report.html').write_text(page, encoding='utf-8')
     return account
 
@@ -367,7 +366,7 @@ CARRY = ('<script>document.addEventListener("click", (e) => {const a = e.target.
          'if (a && location.hash && !a.getAttribute("href").includes("#")) a.href = a.getAttribute("href") '
          '+ location.hash;});</script>')
 
-def write_split(data, output, pairs, stored, budget, write, saved=None):
+def write_split(data, output, pairs, stored, budget, write):
     """One report file a pair of files (its findings, those reaching other pairs' files too, and its claims without a
     counterpart), each under the budget, and index.html listing them: a folder to zip and send, for comparisons too
     large for one file (the owner, 2026-10-19: "or distribution with a zip folder"). The account adds up the parts'."""
@@ -394,7 +393,7 @@ def write_split(data, output, pairs, stored, budget, write, saved=None):
     total.size += len(index.encode())
     if write:
         folder.mkdir(exist_ok=True, parents=True)
-        (output/"report.json").write_text(json.dumps(saved or data, indent=2, ensure_ascii=False), encoding="utf-8")
+        (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
         (folder / "index.html").write_text(index, encoding="utf-8")
         for name, page in parts:
             (folder / name).write_text(page, encoding="utf-8")
@@ -450,8 +449,9 @@ def report_page(data, stored, budget, note=''):
 def search_names(data):
     """The names a search takes as one: the model's other names (the search_names lever), and each glossary term
     with its meanings (an abbreviation finds its expansion's claims): {"items": [[names]], "properties": [[names]]}."""
+    from .indexes import terms as glossary_terms
     terms = [[t["term"], *dict.fromkeys(m["meaning"] for m in t["meanings"])]
-             for t in (data.get('index') or {}).get('glossary', []) if len(t["meanings"][0]["meaning"]) <= 80]
+             for t in glossary_terms(data) if len(t["meanings"][0]["meaning"]) <= 80]
     return {k: data.get('synonyms', {}).get(k, []) + terms for k in ('items', 'properties')}
 
 def page_vectors(vectors, cards):
@@ -553,10 +553,12 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
         page += topic_coverage_html(claims, names, sides)
     index = data.get('index') or {}
     subjects, figures, terms = index.get('subjects', []), index.get('figures', []), index.get('glossary', [])
+    kinds = index.get('kinds', [])
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
              + (f'<button data-view="subjects">Subjects {len(subjects)}</button>' if subjects else '')
+             + (f'<button data-view="kinds">Kinds {len(kinds)}</button>' if kinds else '')
              + (f'<button data-view="figures">Figures and tables {len(figures)}</button>' if figures else '')
              + (f'<button data-view="glossary">Glossary {len(terms)}</button>' if terms else '')
              + '</div>')
@@ -604,8 +606,9 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
-    page += (subjects_html(subjects, index.get('sources', [])) + figures_html(figures, len(sides) > 1)
-             + glossary_html(terms, index.get('sources', [])))
+    sources = index.get('sources', [])
+    page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
+             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources))
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -693,6 +696,33 @@ def glossary_html(terms, sources):
             'listed) and from prose ("net positive suction head (NPSH)"); a search for a term finds its meaning\'s '
             f'claims too.</p><table><thead><tr><th>Term</th><th>Kind</th>{heads}</tr></thead><tbody>{rows}</tbody>'
             '</table></section>')
+
+def item_kinds_html(kinds, subjects, sources):
+    """The Kinds view: each kind of item a table of its items by property, the most given first, each value linked
+    to its claim; "—" where an item gives none its siblings do."""
+    if not kinds:
+        return ''
+    many = len(sources) > 1
+    def cell(s, name):
+        values = [v for p in s['properties'] if p['name'].casefold() == name.casefold() for v in p['values']]
+        return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">' + (f'{esc(v["source"])}: ' if many else '')
+                           + f'{esc(said_of(v))}</a>' for v in values) or '—'
+    out = []
+    for k in kinds:
+        items = [subjects[i] for i in k['subjects']]
+        names = [p['name'] for p in k['properties']]
+        words = ' '.join([k['kind'], *(s['name'] for s in items), *names]).casefold()
+        out.append(f'<div class="subject" data-text="{esc(words)}"><h3>{esc(k["kind"])}</h3><p class="meta">'
+                   f'{len(items)} items; given by: ' + esc('; '.join(f"{p['name']} {p['given']} of {len(items)}"
+                                                                      for p in k['properties']))
+                   + '</p><div class="wide"><table><thead><tr><th>Item</th>'
+                   + ''.join(f'<th>{esc(n)}</th>' for n in names) + '</tr></thead><tbody>'
+                   + ''.join(f'<tr><td>{esc(s["name"])}</td>' + ''.join(f'<td>{cell(s, n)}</td>' for n in names)
+                             + '</tr>' for s in items) + '</tbody></table></div></div>')
+    return ('<section data-for="kinds" class="index" hidden><p class="meta">Each kind of item (tagged items by '
+            'their tag\'s letters, items named with a number by the name without it) as a table of its items by '
+            'property: "—" where an item gives none its siblings do (weak: not saying isn\'t evidence of absence).'
+            '</p>' + ''.join(out) + '</section>')
 
 def said_of(v):
     unit = '' if v['unit'] in ('', '-') else v['unit']  # "-": none

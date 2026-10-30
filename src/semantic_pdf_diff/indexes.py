@@ -13,9 +13,14 @@ document that would be useful, and it seems deeply related to the problem of com
   is left blank there: weak, never a finding.
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
+- **Kinds** (the owner, 2026-10-30, of items or kinds: "I think we should have indices for both, where feasible."):
+  tagged items by their tag's letters (P-101 and P-102 are the P items), named by the word their names most share
+  ("pump"); items named with a number by the name without it ("Room 104" and "Room 105": Room); a kind of two items
+  or more, with how many of its items give each property (what one of them leaves out shows: siblings' gaps).
 - **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
   each source's, a term the sources define differently marked.
 """
+import re
 from collections import Counter, defaultdict
 
 from .align import Side
@@ -116,7 +121,49 @@ def built(data):
                                         "where": where(c)} for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
-    return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data)}
+    return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data),
+            "kinds": kinds(subjects)}
+
+# An item named with a number: its kind's name before the number ("Room 104", "blower 3", "Pump No. 2").
+NUMBERED_NAME = re.compile(r"^(.*?[A-Za-z][A-Za-z ./&'-]*?)[\s#-]*(?:no\.?\s*)?\d+[A-Za-z]?$", re.IGNORECASE)
+
+def kind_of(subject):
+    """A subject's kind's key: ("tag", its tag's letters) for a tagged item, ("name", the name without its number)
+    for one named with a number, else None."""
+    from .align import TAG
+    for name in [subject["name"], *subject["names"]]:
+        tag = TAG.search(name)
+        if tag:
+            return "tag", re.match(r"[A-Z]+", tag[0])[0]
+    found = NUMBERED_NAME.match(" ".join(subject["name"].split()))
+    return ("name", found[1].strip(" .#-").casefold()) if found and found[1].strip(" .#-") else None
+
+def kinds(subjects):
+    """The kinds of the subjects (A to Z): {"kind": its name, "subjects": [their indices in subjects], "properties":
+    [{"name", "given": how many of its items give it}], the most given first}, each of two items or more."""
+    from .align import TAG, words
+    by = defaultdict(list)
+    for i, s in enumerate(subjects):
+        key = kind_of(s)
+        if key:
+            by[key].append(i)
+    out = []
+    for (how, key), members in by.items():
+        if len(members) < 2:
+            continue
+        if how == "tag":
+            said = Counter(w for i in members for n in subjects[i]["names"] for w in words(TAG.sub(" ", n))
+                           if not any(c.isdigit() for c in w))
+            name = f"{said.most_common(1)[0][0]} ({key})" if said else f"{key}-"
+        else:
+            name = Counter(NUMBERED_NAME.match(" ".join(subjects[i]["name"].split()))[1].strip(" .#-")
+                           for i in members).most_common(1)[0][0]
+        given = Counter(p["name"].casefold() for i in members for p in subjects[i]["properties"])
+        named = {p["name"].casefold(): p["name"] for i in members for p in subjects[i]["properties"]}
+        out.append({"kind": name, "subjects": members,
+                    "properties": [{"name": named[k], "given": n}
+                                   for k, n in sorted(given.items(), key=lambda x: (-x[1], natural(x[0])))]})
+    return sorted(out, key=lambda k: natural(k["kind"]))
 
 def term_key(term):
     """A term as terms are told apart: case and a closing full stop folded ("TYP." is "typ")."""

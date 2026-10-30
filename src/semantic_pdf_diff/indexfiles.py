@@ -6,6 +6,9 @@ excel workbooks of claims, but not really designed as an indexing model."):
   source's beside the others'); then properties, each with the subjects giving it; then figures and tables; then the
   glossary, each term's meanings and where they're given.
 - **index/*.csv:** subjects, properties, claims, figures, glossary: a row a value (or claim, figure, meaning).
+- **Kinds:** each kind of item (pumps: P-101, P-102) as a table of its items by property, the properties most of
+  them give first (index.md, the workbook's Kinds sheet, kinds.csv): what one item leaves out that its siblings give
+  shows.
 - **index.xlsx:** a sheet per index, its header frozen and filtered. Subjects is an outline: a subject's row, its
   values beneath it, grouped so a subject collapses to its row (Excel's outline, the 1 and 2 at the left). Written
   as OOXML here, the same bytes for the same index (no workbook library: openpyxl is the office extra's, for reading).
@@ -70,6 +73,17 @@ def markdown(index):
         lines.append(f"- **{p['name']}**: " + "; ".join(
             f"{x['subject']} " + ", ".join(said(v) + (f" ({v['source']})" if many else "") for v in x["values"])
             for x in p["subjects"]))
+    lines += ["", "## Kinds", ""]
+    for k in index.get("kinds", []):
+        shown, items = k["properties"][:KIND_COLUMNS], [index["subjects"][i] for i in k["subjects"]]
+        lines += [f"### {k['kind']}: {len(items)} items", "",
+                  "| Item | " + " | ".join(cell_md(p["name"]) for p in shown) + " |",
+                  "|---|" + "---|" * len(shown)]
+        for s in items:
+            lines.append(f"| {cell_md(s['name'])} | " + " | ".join(cell_md(kind_cell(s, p["name"], many))
+                                                                   for p in shown) + " |")
+        lines += ["", "Given by: " + "; ".join(f"{p['name']} {p['given']} of {len(items)}" for p in k["properties"]),
+                  ""]
     lines += ["", "## Figures and tables", ""]
     for f in index["figures"]:
         name = " ".join(x for x in (f["label"], f"“{f['title']}”" if f["title"] else "") if x) or f["kind"]
@@ -89,6 +103,20 @@ def markdown(index):
                      + (" — defined differently" if t.get("differs") else ""))
     return "\n".join(lines).rstrip() + "\n"
 
+KIND_COLUMNS = 8  # a kind's properties shown as columns in index.md, the most given first
+
+def cell_md(text):
+    return str(text).replace("|", "\\|").replace("\n", " ")
+
+def kind_cell(subject, name, many):
+    """An item's values for a property, as a kind's table shows them: "10 kW", or each source's ("a: 10 kW; b:
+    12 kW"); "—" where it gives none."""
+    values = [v for p in subject["properties"] if p["name"].casefold() == name.casefold() for v in p["values"]]
+    if not values:
+        return "—"
+    return "; ".join((f"{v['source']}: " if many else "") + said(v) for v in values[:3]) + (" …" if len(values) > 3
+                                                                                           else "")
+
 # --- the tables: CSV and the workbook's sheets ---------------------------------------------------------------------
 
 def tables(index, evidence):
@@ -106,13 +134,16 @@ def tables(index, evidence):
                 f["about"], len(f["claims"]), f["cited"]] for f in index["figures"]]
     glossary = [[t["term"], t["kind"], m["meaning"], m["source"], m["where"], m["block"], m["how"],
                  "yes" if t.get("differs") else ""] for t in index.get("glossary", []) for m in t["meanings"]]
+    kinds = [[k["kind"], s["name"], p["name"], *value(v)] for k in index.get("kinds", [])
+             for s in (index["subjects"][i] for i in k["subjects"]) for p in s["properties"] for v in p["values"]]
     tail = ["Value", "Unit", "Conditions", "Source", "Where", "Claim"]
     return {"subjects": (["Subject", "Property", *tail], subjects),
             "properties": (["Property", "Subject", *tail], props),
             "claims": (["Claim", "Subject", "Item", "Property", "Value", "Unit", "Conditions", "Read as", "Quote"],
                        claims),
             "figures": (["Source", "File", "Page", "Kind", "Label", "Title", "About", "Claims", "Cited"], figures),
-            "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Block", "How", "Differs"], glossary)}
+            "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Block", "How", "Differs"], glossary),
+            "kinds": (["Kind", "Item", "Property", *tail], kinds)}
 
 def csv_text(header, rows):
     out = io.StringIO()
@@ -149,16 +180,17 @@ def cell(ref, v, style=0):
 
 def sheet(header, rows, outline=None, widths=None):
     """A worksheet's XML: the header bold, frozen and filtered (no header: rows alone). outline: each row's (level,
-    style), a subject's row 0 and its values 1, so a subject collapses to its row."""
+    style[, whole: the style on every cell, not its first]), a subject's row 0 and its values 1, so a subject
+    collapses to its row."""
     widths = widths or [WIDTHS.get(h, 14) for h in header]
     cols = "".join(f'<col min="{i + 1}" max="{i + 1}" width="{w}" customWidth="1"/>' for i, w in enumerate(widths))
     out = ['<row r="1">' + "".join(cell(f"{column(i)}1", h, BOLD) for i, h in enumerate(header)) + "</row>"
            ] if header else []
     first = 2 if header else 1
     for n, row in enumerate(rows, first):
-        level, style = outline[n - first] if outline else (0, 0)
+        level, style, *whole = outline[n - first] if outline else (0, 0)
         attrs = f' outlineLevel="{level}"' if level else ""
-        out.append(f'<row r="{n}"{attrs}>' + "".join(cell(f"{column(i)}{n}", v, style if i == 0 else 0)
+        out.append(f'<row r="{n}"{attrs}>' + "".join(cell(f"{column(i)}{n}", v, style if i == 0 or whole else 0)
                                                      for i, v in enumerate(row) if v != "") + "</row>")
     last = f"{column(len(header) - 1)}{max(1, len(rows) + 1)}" if header else ""
     frozen = ('<sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" '
@@ -184,6 +216,25 @@ STYLES = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
           '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs>'
           '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>')
 
+def kinds_sheet(index):
+    """The Kinds sheet: each kind a table, its title row and its header bold, its items' rows beneath them in the
+    outline (the 1 and 2 at the left collapse them to the kinds)."""
+    many = len(index["sources"]) > 1
+    rows, outline, width = [], [], 2
+    for k in index.get("kinds", []):
+        items = [index["subjects"][i] for i in k["subjects"]]
+        names = [p["name"] for p in k["properties"]]
+        width = max(width, len(names) + 1)
+        rows.append([k["kind"], f"{len(items)} items; given by: "
+                     + "; ".join(f"{p['name']} {p['given']} of {len(items)}" for p in k["properties"])[:500]])
+        outline.append((0, BOLD))
+        rows.append(["Item", *names])
+        outline.append((1, BOLD, True))
+        for s in items:
+            rows.append([s["name"], *(kind_cell(s, n, many) for n in names)])
+            outline.append((1, 0))
+    return sheet([], rows, outline, widths=[32] + [18] * (width - 1))
+
 def workbook(index, evidence):
     """index.xlsx's bytes: About, Subjects (an outline), Properties, Claims and Figures sheets."""
     found = tables(index, evidence)
@@ -203,9 +254,13 @@ def workbook(index, evidence):
     about = [["Index", title(index)], ["Subjects", len(index["subjects"])],
              ["Properties", len(properties(index))], ["Claims", len(evidence)],
              ["Figures and tables", len(index["figures"])], ["Glossary terms", len(index.get("glossary", []))],
+             ["Kinds", len(index.get("kinds", []))],
              ["Subjects sheet", "A subject's row, then its values: the 1 and 2 at the left collapse or open them all"],
+             ["Kinds sheet", "Each kind of item (pumps: P-101, P-102) a table of its items by property; — where an "
+                             "item gives none its siblings do"],
              ["Caution", "Read by a model: check a value against its place (Where) before relying on it"]]
-    sheets = [("About", sheet([], about, widths=[20, 90])), ("Subjects", sheet(header, outlined, outline))]
+    sheets = [("About", sheet([], about, widths=[20, 90])), ("Subjects", sheet(header, outlined, outline)),
+              ("Kinds", kinds_sheet(index))]
     sheets += [(name.title(), sheet(*found[name])) for name in ("properties", "claims", "figures", "glossary")]
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:

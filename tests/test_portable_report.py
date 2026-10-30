@@ -57,8 +57,9 @@ class OneFile(unittest.TestCase):
         shown = unpacked(page)
         self.assertIn('<img class="crop" data-crop="0"', shown)
         self.assertIn("primary pump", shown)
-        self.assertEqual(json.loads((self.root / "reports" / "r1" / "report.json").read_text()),
-                         json.loads(json.dumps(data)))
+        written = json.loads((self.root / "reports" / "r1" / "report.json").read_text())
+        self.assertEqual({k: v for k, v in written.items() if k != "index"}, json.loads(json.dumps(data)))
+        self.assertIn("subjects", written["index"])  # its index, built as it's written
 
     def test_the_same_report_is_written_byte_for_byte(self):
         a = ev("A-1", kind="chart", image=noise(self.assets / "a.png", 40))

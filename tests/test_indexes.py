@@ -78,6 +78,27 @@ class Subjects(unittest.TestCase):
         apart = indexes.built(report(a + b, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b")))
         self.assertEqual(len(apart["subjects"][0]["properties"]), 2)  # unrelated: not one property
 
+    def test_kinds_of_items_tagged_and_numbered(self):
+        """The owner, 2026-10-30, of items or kinds: "I think we should have indices for both, where feasible.\""""
+        evidence = ONE + [claim("A-5", "ca", "P-103 feed pump", "rated power", "9", "kW"),
+                          claim("A-6", "ca", "P-103 feed pump", "NPSH required", "3", "m"),
+                          claim("A-7", "ca", "Room 104", "area", "12", "m2"),
+                          claim("A-8", "ca", "Room 105", "area", "14", "m2"),
+                          claim("A-9", "ca", "rotor", "diameter", "120", "m")]
+        index = indexes.built(report(evidence))
+        found = {k["kind"]: k for k in index["kinds"]}
+        self.assertEqual(list(found), ["pump (P)", "Room"])  # A to Z; the rotor is of no kind
+        pumps = found["pump (P)"]
+        self.assertEqual([index["subjects"][i]["name"] for i in pumps["subjects"]],
+                         ["P-101 feed pump", "P-102 pump", "P-103 feed pump"])
+        self.assertEqual([(p["name"], p["given"]) for p in pumps["properties"]],
+                         [("rated power", 3), ("head", 1), ("NPSH required", 1)])
+        page = indexfiles.markdown(index)
+        self.assertIn("### pump (P): 3 items\n\n| Item | rated power | head | NPSH required |\n|---|---|---|---|\n"
+                      "| P-101 feed pump | 10 kW | 42 m | — |\n| P-102 pump | 12 kW; 12.5 kW | — | — |\n"
+                      "| P-103 feed pump | 9 kW | — | 3 m |", page)
+        self.assertIn("Given by: rated power 3 of 3; head 1 of 3; NPSH required 1 of 3", page)
+
     def test_figures_and_tables(self):
         situation = {"ca": {"figures": [{"id": "f1", "page": 4, "kind": "figure", "label": "Figure 2",
                                          "caption": "Pump curve", "about": "The pumps' head against flow.",
@@ -111,7 +132,7 @@ class Glossary(unittest.TestCase):
         self.assertEqual(rows[0], ["FF", "abbreviation", "far face", "a", "a.pdf, page 2", "ABBREVIATIONS", "model",
                                    "yes"])
         from semantic_pdf_diff.report import search_names
-        self.assertIn(["UNO", "unless noted otherwise"], search_names({"index": index})["properties"])
+        self.assertIn(["UNO", "unless noted otherwise"], search_names({"glossary": found})["properties"])
 
 class Files(unittest.TestCase):
     def test_csv_a_row_a_value(self):
@@ -130,7 +151,8 @@ class Files(unittest.TestCase):
         data = indexfiles.workbook(index, evidence)
         self.assertEqual(data, indexfiles.workbook(index, evidence))  # the same bytes for the same index
         book = openpyxl.load_workbook(io.BytesIO(data))
-        self.assertEqual(book.sheetnames, ["About", "Subjects", "Properties", "Claims", "Figures", "Glossary"])
+        self.assertEqual(book.sheetnames, ["About", "Subjects", "Kinds", "Properties", "Claims", "Figures",
+                                           "Glossary"])
         subjects = book["Subjects"]
         self.assertEqual(subjects.freeze_panes, "A2")
         self.assertEqual(subjects.auto_filter.ref, "A1:H7")  # the header, 2 subjects' rows and their 4 values
@@ -172,7 +194,8 @@ class Written(unittest.TestCase):
             searched = drawn((out / "report.html").as_uri() + "#subjects&q=blower")
         self.assertEqual((code, again), (0, 0))
         self.assertEqual(len(data["index"]["subjects"]), 15)
-        self.assertEqual(files, ["claims.csv", "figures.csv", "glossary.csv", "properties.csv", "subjects.csv"])
+        self.assertEqual(files, ["claims.csv", "figures.csv", "glossary.csv", "kinds.csv", "properties.csv",
+                                 "subjects.csv"])
         self.assertIn("# Index: plant", page)
         self.assertRegex(page, r"### blower0\n\n- \*\*discharge head\*\*: 20 m \(\S*blowers\.md, lines \d+–\d+\)")
         self.assertEqual(page, rewritten)

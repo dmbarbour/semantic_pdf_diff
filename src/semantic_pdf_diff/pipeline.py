@@ -9,7 +9,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import checkup, crops, fixtures, indexes, provenance, topics
+from . import checkup, crops, fixtures, provenance, topics
 from .compare import compare, file_difference
 from .dispatch import Dispatcher
 from .jobs import Job, reader_for, reader_version, run_jobs
@@ -375,7 +375,6 @@ def saved_and_written(options, settings, store, client, data, out, incomplete):
     left out said; the exit code: 0, 2 incomplete, 3 paused for budget or a rate limit, 5 for requests failing in
     a row."""
     coverage = data['coverage']
-    data = {**data, 'index': indexes.built(data)}  # its subjects, properties, figures and tables (indexes.py)
     store.save_comparison(data['created_at'], data)
     account = write_report(data, out, assets=store.folder / 'assets', budget=options.report_budget,
                            split=options.split)
