@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.14.0 (2026-10-30)
+
+- **Search finds a term's meaning anywhere in a claim.** A term the documents' glossaries define finds its meaning's claims, and the meaning finds the term's, wherever their words are in a claim. The model's other names still match only a claim's whole name. They're offered as "The glossary's other names for it" on the page and by `semantic-pdf-diff search` (`--json`: `glossary_names`). They were listed as the model's other names before.
+- **`retrieve_glossary`** (off by default; on recommended): comparing proposals, retrieval takes a meaning written out as its term, so one team's "air handling unit" meets the other's "AHU" among the pairs judged. On a controlled pair where one side abbreviates, one or two more of its 32 or 33 shared facts had their claims paired, in every format, and none were lost.
+- **`topic_glossary`** (off by default; on recommended): the topics count a meaning written out as its term, so "SWD" in one source and "side water depth" in the other make one topic. On the abbreviated pair, the share of claims placed in a topic went from 74% to 97%.
+- **`explain_glossary`** (off by default): the explainer is shown the terms each claim uses. Measured no different.
+
 ## 0.13.0 (2026-10-30)
 
 - **A discipline's abbreviations hold for its sheets.** Where a drawing set has abbreviation lists on sheets of two disciplines or more, each discipline's list (on S-001, E-001, and so on) holds for that discipline's sheets. A general sheet's list (G) still holds for the whole set, as do a set's lists that all belong to one discipline. Where a term is used, the nearest definition holds: the sheet's own, then its discipline's, then the document's. dc's "EF" now means each face on its structural sheets and exhaust fan on its electrical ones. The index says where each meaning holds ("S sheets only"; "page 23; S sheets"), and only flags a term as defined differently where two sources disagree about the same sheets.
