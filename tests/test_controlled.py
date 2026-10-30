@@ -460,7 +460,10 @@ class Revisions(unittest.TestCase):
                     # design notes: two values firmed up and two hedged (a hedge, not a value, changed); one revised
                     "hedges-s1": (1, 0, 0, 0),
                     # the moderator's proposal now the other company's (keyed apart: no fact changed)
-                    "views-echo-s1": (0, 0, 0, 0)}
+                    "views-echo-s1": (0, 0, 0, 0),
+                    # names abbreviated as a list defines them; the rapid mix's detention time and the basins'
+                    # side water depth revised
+                    "wtp-s1-abbreviated": (2, 0, 0, 0)}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
         # depths, the coaster's 5 element heights; and a proposal credited to another company, its value kept
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}

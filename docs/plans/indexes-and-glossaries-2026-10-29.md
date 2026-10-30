@@ -104,7 +104,7 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 
 - **Controlled documents:**
   - the fact sheet's items score subjects' grouping (precision and recall)
-  - knobs to add: an abbreviations block; a term spelled out in one revision and abbreviated in the other
+  - the abbreviated revision pair (built 2026-10-30, `wtp-s1-abbreviated`): the water treatment plant's basins, filters and measures abbreviated in the later revision as an abbreviations list ahead of its sections defines them ("an SWD of", "SBs", eleven terms), two abbreviated values revised; in every format
 - **Real documents:**
   - the drawing sets' ABBREVIATIONS sheets, counted against their lines
   - TS 38.300's abbreviations clause (hundreds of terms), likewise

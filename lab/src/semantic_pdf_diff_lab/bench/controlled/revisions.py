@@ -25,6 +25,10 @@ conditions reworded without changing their meaning.
 And counterfactual pairs (the claim context plan, milestone 4): only a record that gives facts their context restated,
 every value kept: the plan sheet's general note (dimensions to centerline of stud) and the track schedule's lead-in
 (heights above grade).
+
+And a revision abbreviating what its earlier revision spells out (indexes and glossaries, milestone 5): the water
+treatment plant's basins, filters and their measures named by letters an abbreviations list defines ("SWD", "SB"),
+two of the abbreviated values revised, so a comparison needs the list to pair them.
 """
 import re
 from dataclasses import dataclass, replace
@@ -573,6 +577,55 @@ def datum_later(p, d):
                        "entry.", "Element heights are above grade; speeds are design values at the element's entry.",
                     [f.id for f in p.facts if re.match(r"^E\d\.height$", f.id)])
 
+# The abbreviated revision's list: its letters, their meanings, the passages they replace (each printed once in
+# the base) and the facts they name (by id prefix) and how (an entity's or an attribute's).
+ABBREVIATIONS = (
+    ("CCB", "chlorine contact basin", (), (("optB.", "entity"),)),
+    ("DMF", "dual-media filter", (("dual-media filters of", "DMFs of"),), (("filters.", "entity"),)),
+    ("FWT", "finished water turbidity", (("Finished water turbidity shall", "FWT shall"),),
+     (("plant.finished_turbidity", "attribute"),)),
+    ("HDT", "hydraulic detention time", (("provides a detention time of", "provides an HDT of"),
+                                         ("for a total detention time of", "for a total HDT of")),
+     (("mix.detention", "attribute"), ("floc.detention", "attribute"))),
+    ("RMB", "rapid mix basin", (("The rapid mix basin provides", "The RMB provides"),), (("mix.", "entity"),)),
+    ("RWP", "raw water pump", (), (("P-101", "entity"),)),
+    ("SB", "sedimentation basin", (("sedimentation basins, each", "SBs, each"),), (("sed.", "entity"),)),
+    ("SLR", "surface loading rate", (("the surface loading rate is", "the SLR is"),), (("sed.loading", "attribute"),)),
+    ("SWD", "side water depth", (("with a side water depth of", "with an SWD of"),), (("sed.depth", "attribute"),)),
+    ("TDH", "total dynamic head", (), ()),
+    ("VG", "velocity gradient", (("with a velocity gradient of", "with a VG of"),), (("mix.g", "attribute"),)))
+
+def abbreviated_later(p, d):
+    """The water treatment plant's names abbreviated, as an abbreviations list ahead of its sections defines them:
+    its basins, filters and measures by letters ("an SWD of", "SBs"), the pump table titled "RWPs" and its option B
+    column "CCB"; the abbreviated rapid mix basin's detention time and the sedimentation basins' side water depth
+    revised. The facts' names in the key gain their letters."""
+    for _, _, passages, _ in ABBREVIATIONS:
+        for old, new in passages:
+            rewrite(p, old, new)
+    for _, blocks in p.sections:
+        for i, block in enumerate(blocks):
+            if block[0] == "table" and block[1] == "Table 1. Raw water pumps":
+                blocks[i] = ("table", "Table 1. RWPs", *block[2:])
+            elif block[0] == "table" and block[1] == "Table 2. Disinfection options":
+                blocks[i] = ("table", block[1], [c.replace("chlorine contact", "CCB") for c in block[2]], block[3])
+    for letters, meaning, _, names in ABBREVIATIONS:
+        for prefix, part in names:
+            for f in p.facts:
+                if f.id.startswith(prefix):
+                    if part == "entity":  # a pump's by its tag too ("RWP P-101A")
+                        tag = f.id.split(".")[0] if f.id.startswith("P-") else ""
+                        f.aliases += tuple(n for n in (letters, f"{letters}s", *([f"{letters} {tag}"] if tag else []))
+                                           if n not in f.aliases)
+                    else:  # "total HDT" for a total detention time
+                        total = [f"total {letters}"] if f.attribute.startswith("total ") else []
+                        f.synonyms += tuple(n for n in (letters, *total) if n not in f.synonyms)
+    p.sections.insert(0, ("Abbreviations", [("table", "Table A. Abbreviations", ["Abbreviation", "Meaning"],
+                                             [[a, m] for a, m, _, _ in ABBREVIATIONS])]))
+    p.edits.append({"kind": "abbreviated", "terms": {a: m for a, m, _, _ in ABBREVIATIONS}})
+    for fid in ("mix.detention", "sed.depth"):
+        change(p, fid, near(d, p.fact(fid).value))
+
 HEADER_UNIT = re.compile(r"\s*\([^)]*\)$")  # "Height (ft)": the unit a column's header gives
 COASTER_LEAD = "Element heights are above the station platform; speeds are design values at the element's entry."
 
@@ -651,7 +704,10 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          # design notes: two values firmed up, two hedged, every value kept; one value revised
          (PROJECTS["hedges"], None, hedges_later, False, "revised"),
          # the moderator's proposal, a company's words and value, now the other company's
-         (PROJECTS["views-echo"], None, views_echo_later, False, "revised"))
+         (PROJECTS["views-echo"], None, views_echo_later, False, "revised"),
+         # names abbreviated as an abbreviations list defines them, two abbreviated values revised (indexes and
+         # glossaries, milestone 5)
+         (PROJECTS["wtp"], None, abbreviated_later, False, "abbreviated"))
 
 def _base(make, knob, seed):
     p = make(seed)

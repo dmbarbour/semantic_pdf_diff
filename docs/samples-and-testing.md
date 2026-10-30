@@ -145,7 +145,7 @@ A knob draws a document under one difficulty, with the same facts as its clean d
 | Word only (`word.py`) | tracked changes, footnotes, numbered lists, merged cells, nested tables, a layout table, text boxes, comments, Word charts |
 | Slide decks (`slides.py`) | speaker notes |
 
-Bases that are a difficulty in themselves: two sheets told apart only by their title blocks (`lcc-plans`); a link protocol's specification (`spec`: look-alike formats, fields beside their length fields, numbered conditions, values whose state only a lead-in names); data sheets of headerless key-value blocks (`wtp-datasheets`); proposals' summaries whose claims have holders and attitudes (`views`, `views-grouped`, `views-prose`, `views-poll`, `views-echo`); design notes with hedged values (`hedges`). Revision pairs (`revisions.py`) edit a corpus document: values changed in every form, items added, dropped, renamed, moved or split, a superseded value printed beside the new, conditions changed or reworded, a numbered condition inserted, a message inserted, a holder's view or a hedge changed, and context records alone restated.
+Bases that are a difficulty in themselves: two sheets told apart only by their title blocks (`lcc-plans`); a link protocol's specification (`spec`: look-alike formats, fields beside their length fields, numbered conditions, values whose state only a lead-in names); data sheets of headerless key-value blocks (`wtp-datasheets`); proposals' summaries whose claims have holders and attitudes (`views`, `views-grouped`, `views-prose`, `views-poll`, `views-echo`); design notes with hedged values (`hedges`). Revision pairs (`revisions.py`) edit a corpus document: values changed in every form, items added, dropped, renamed, moved or split, a superseded value printed beside the new, conditions changed or reworded, a numbered condition inserted, a message inserted, a holder's view or a hedge changed, context records alone restated, and names abbreviated as an abbreviations list defines them (`wtp-s1-abbreviated`: "an SWD of" for "a side water depth of", two abbreviated values revised).
 
 ### The catalogue of situations
 
@@ -230,7 +230,7 @@ Every situation met in this project's documents, where it was recorded, and the 
 | Conditions lost or mixed in | "during the cool, martensite phase" dropped; attribute and condition run together | r07; s01 | scored in every document |
 | Part stated as the whole | One layer's material as the composition | s01 | – |
 | Quantity roles | Clearance read as depth; an elevation as a length | s01 | – |
-| Abbreviations defined elsewhere, one entity under two names | "PI = proportional-integral"; "baseline blade-pitch controller" | levers; r03 | `traps` (an abbreviation) |
+| Abbreviations defined elsewhere, one entity under two names | "PI = proportional-integral"; "baseline blade-pitch controller" | levers; r03 | `traps` (an abbreviation); the abbreviated revision pair (a revision abbreviating what its earlier one spells out, as its abbreviations list defines) |
 | Quote forms | Elided quotes, line-end hyphenation, Unicode variants, paraphrase | r09 | – |
 | Requirements, negation, ranges, inequalities | "shall not exceed 60 C" as "is 60 C"; "<= 85 dBA" as 85 dBA | extract (guarded); taxonomy examples | `traps` |
 

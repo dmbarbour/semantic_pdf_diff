@@ -1,35 +1,36 @@
 {
  "totals": {
   "inventory": {
-   "claims": 21166,
-   "evidence": 11822,
+   "claims": 21969,
+   "evidence": 12282,
    "frame in conditions": 36,
-   "grounded": 5588,
+   "grounded": 5770,
    "list records": 36,
+   "no content words": 2,
    "note records": 11,
    "numbered in attribute": 164,
    "numbered in conditions": 2,
    "numbered in entity": 378,
    "partly": 64,
-   "partly (image)": 34,
+   "partly (image)": 39,
    "positioned": 124,
-   "printed": 7410,
+   "printed": 7756,
    "sheet records": 11,
-   "table records": 303,
-   "unsupported": 23,
-   "unsupported (image)": 795,
-   "with conditions": 6504,
-   "with records": 6185
+   "table records": 322,
+   "unsupported": 33,
+   "unsupported (image)": 819,
+   "with conditions": 6727,
+   "with records": 6334
   },
   "placed": {
    "bound": {
-    "attribute": 28,
-    "conditions": 12,
-    "nowhere": 41
+    "attribute": 37,
+    "conditions": 20,
+    "nowhere": 51
    },
    "frame": {
-    "attribute": 9,
-    "conditions": 104,
+    "attribute": 10,
+    "conditions": 113,
     "frame": 195,
     "records": 109
    },
@@ -40,8 +41,8 @@
     "conditions": 5
    },
    "scope": {
-    "attribute": 19,
-    "conditions": 1774,
+    "attribute": 24,
+    "conditions": 1814,
     "nowhere": 6
    },
    "sibling": {
@@ -51,25 +52,25 @@
    },
    "subject": {
     "conditions": 72,
-    "entity": 130,
-    "nowhere": 43,
+    "entity": 202,
+    "nowhere": 52,
     "records": 124
    }
   },
   "audit": {
    "bound": {
-    "image only": 2,
-    "shown, not used": 39
+    "image only": 5,
+    "shown, not used": 46
    },
    "frame": {
-    "shown, not used": 9
+    "shown, not used": 10
    },
    "provenance": {
     "in conditions": 5
    },
    "scope": {
     "image only": 4,
-    "shown, not used": 21
+    "shown, not used": 26
    },
    "sibling": {
     "in conditions": 145,
@@ -77,8 +78,8 @@
     "kept out": 876
    },
    "subject": {
-    "image only": 1,
-    "not shown": 15,
+    "image only": 3,
+    "not shown": 22,
     "shown, not used": 27
    }
   },
@@ -107,14 +108,14 @@
      "share": 0.59
     },
     "<0.95": {
-     "readings": 10492,
-     "right": 10344,
+     "readings": 10702,
+     "right": 10554,
      "share": 0.986
     },
     "<=1.0": {
-     "readings": 29166,
-     "right": 26450,
-     "share": 0.907
+     "readings": 30360,
+     "right": 27604,
+     "share": 0.909
     }
    },
    "image": {
@@ -129,15 +130,15 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 20738,
-     "right": 18774,
-     "share": 0.905
+     "readings": 21480,
+     "right": 19490,
+     "share": 0.907
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 10152,
-     "right": 10124,
+     "readings": 10362,
+     "right": 10334,
      "share": 0.997
     }
    },
@@ -158,9 +159,9 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 8428,
-     "right": 7676,
-     "share": 0.911
+     "readings": 8880,
+     "right": 8114,
+     "share": 0.914
     }
    }
   }
@@ -3983,6 +3984,59 @@
     }
    }
   },
+  "lcc-s1-footnotes": {
+   "inventory": {
+    "claims": 48,
+    "grounded": 15,
+    "unsupported": 1,
+    "with conditions": 16,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
+    "evidence": 25,
+    "context_bytes_per_request": 294,
+    "data_bytes_per_request": 818,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
   "lcc-s1-frame": {
    "inventory": {
     "claims": 54,
@@ -4142,6 +4196,60 @@
     }
    }
   },
+  "lcc-s1-initials": {
+   "inventory": {
+    "claims": 49,
+    "grounded": 6,
+    "unsupported": 1,
+    "unsupported (image)": 1,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
+    "evidence": 25,
+    "context_bytes_per_request": 295,
+    "data_bytes_per_request": 750,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
   "lcc-s1-landscape": {
    "inventory": {
     "claims": 75,
@@ -4196,6 +4304,157 @@
     }
    }
   },
+  "lcc-s1-noisy": {
+   "inventory": {
+    "claims": 67,
+    "grounded": 25,
+    "unsupported": 1,
+    "unsupported (image)": 1,
+    "with conditions": 27,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 27,
+    "evidence": 28,
+    "context_bytes_per_request": 184,
+    "data_bytes_per_request": 911,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-ornate": {
+   "inventory": {
+    "claims": 57,
+    "grounded": 6,
+    "unsupported": 1,
+    "unsupported (image)": 1,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
+    "evidence": 25,
+    "context_bytes_per_request": 204,
+    "data_bytes_per_request": 771,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-outlined": {
+   "inventory": {
+    "claims": 50,
+    "unsupported (image)": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "evidence": 31,
+    "context_bytes_per_request": 0,
+    "data_bytes_per_request": 0,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 2,
+      "attribute": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "image only": 2
+     },
+     "subject": {
+      "image only": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: image only": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | ",
+      "roof.snow: wanted 'maximum'; read snow load rating |  / snow load rating | "
+     ],
+     "subject: image only": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
   "lcc-s1-scanned-frame": {
    "inventory": {
     "claims": 45,
@@ -4239,6 +4498,58 @@
     }
    }
   },
+  "lcc-s1-scanned-ocr": {
+   "inventory": {
+    "claims": 56,
+    "partly (image)": 5,
+    "unsupported": 3,
+    "unsupported (image)": 8,
+    "with conditions": 16,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 2,
+    "evidence": 29,
+    "context_bytes_per_request": 367,
+    "data_bytes_per_request": 698,
+    "examples": {
+     "unsupported": [
+      "Option 1 (chilled beams) | peak cooling load | exhibit floor",
+      "Option 1 (chilled beams) | first cost | exhibit floor",
+      "Option 2 (VAV baseline) | first cost | exhibit floor"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "image only": 1
+     },
+     "subject": {
+      "image only": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: image only": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: image only": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
   "lcc-s1-slide": {
    "inventory": {
     "claims": 78,
@@ -4256,6 +4567,113 @@
     "evidence": 25,
     "context_bytes_per_request": 225,
     "data_bytes_per_request": 772,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-small-print": {
+   "inventory": {
+    "claims": 67,
+    "grounded": 11,
+    "unsupported": 1,
+    "with conditions": 12,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 28,
+    "evidence": 33,
+    "context_bytes_per_request": 243,
+    "data_bytes_per_request": 715,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-tinted": {
+   "inventory": {
+    "claims": 49,
+    "grounded": 6,
+    "unsupported": 1,
+    "unsupported (image)": 1,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 24,
+    "evidence": 25,
+    "context_bytes_per_request": 295,
+    "data_bytes_per_request": 749,
     "examples": {
      "unsupported": [
       "existing roof | snow load rating | maximum"
@@ -4764,6 +5182,60 @@
     "context_bytes_per_request": 263,
     "data_bytes_per_request": 843,
     "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-watermark": {
+   "inventory": {
+    "claims": 54,
+    "grounded": 5,
+    "unsupported": 1,
+    "unsupported (image)": 1,
+    "with conditions": 7,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 21,
+    "evidence": 22,
+    "context_bytes_per_request": 262,
+    "data_bytes_per_request": 705,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
    },
    "keyed": {
     "placed": {
@@ -7151,6 +7623,202 @@
     "audit": {},
     "named": {},
     "examples": {}
+   }
+  },
+  "wtp-s1-abbreviated": {
+   "inventory": {
+    "claims": 144,
+    "grounded": 44,
+    "no content words": 2,
+    "with conditions": 46,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 21,
+    "printed": 43,
+    "evidence": 55,
+    "context_bytes_per_request": 192,
+    "data_bytes_per_request": 449,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-abbreviated.docx": {
+   "inventory": {
+    "claims": 43,
+    "grounded": 23,
+    "with conditions": 23,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 24,
+    "printed": 39,
+    "evidence": 43,
+    "context_bytes_per_request": 310,
+    "data_bytes_per_request": 1083,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-abbreviated.md": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 14,
+    "evidence": 33,
+    "context_bytes_per_request": 401,
+    "data_bytes_per_request": 137,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 7,
+      "attribute": 2
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-abbreviated.pptx": {
+   "inventory": {
+    "claims": 43,
+    "grounded": 20,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 24,
+    "printed": 38,
+    "evidence": 43,
+    "context_bytes_per_request": 642,
+    "data_bytes_per_request": 179,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-abbreviated.xlsx": {
+   "inventory": {
+    "claims": 43,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 24,
+    "printed": 38,
+    "evidence": 43,
+    "context_bytes_per_request": 634,
+    "data_bytes_per_request": 180,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
    }
   },
   "wtp-s1-comments.docx": {

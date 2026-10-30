@@ -10366,6 +10366,374 @@
     "period.2": "confirmed"
    }
   },
+  "wtp-s1-abbreviated": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "uncertain": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 37,
+    "unscored": 2
+   },
+   "findings": {
+    "equivalent": 39,
+    "uncertain": 1
+   },
+   "unmatched": 22,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     }
+    }
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "unpaired",
+    "mix.g": "uncertain",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.md": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "29/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 29,
+    "unextracted": 1,
+    "unpaired": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 29
+   },
+   "findings": {
+    "equivalent": 29
+   },
+   "unmatched": 9,
+   "pairs": 3,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "unpaired",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "29/31",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 29,
+    "unextracted": 1,
+    "unpaired": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 29
+   },
+   "findings": {
+    "equivalent": 29
+   },
+   "unmatched": 17,
+   "pairs": 2,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "unpaired",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "record_changes": 2,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 16,
+   "pairs": 10,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 16,
+   "pairs": 1,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -20883,6 +21251,374 @@
     "period.2": "confirmed"
    }
   },
+  "wtp-s1-abbreviated": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "uncertain": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 37,
+    "unscored": 2
+   },
+   "findings": {
+    "equivalent": 39,
+    "uncertain": 1
+   },
+   "unmatched": 22,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     }
+    }
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "unpaired",
+    "mix.g": "uncertain",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.md": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "29/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 29,
+    "unextracted": 1,
+    "unpaired": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 29
+   },
+   "findings": {
+    "equivalent": 29
+   },
+   "unmatched": 9,
+   "pairs": 3,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "unpaired",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "29/31",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 29,
+    "unextracted": 1,
+    "unpaired": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 29
+   },
+   "findings": {
+    "equivalent": 29
+   },
+   "unmatched": 17,
+   "pairs": 2,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "unpaired",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "record_changes": 2,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 16,
+   "pairs": 10,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 16,
+   "pairs": 1,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -29430,6 +30166,300 @@
     "period.2": "confirmed"
    }
   },
+  "wtp-s1-abbreviated": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "uncertain": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 37,
+    "unscored": 2
+   },
+   "findings": {
+    "equivalent": 39,
+    "uncertain": 1
+   },
+   "unmatched": 22,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     }
+    }
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "unpaired",
+    "mix.g": "uncertain",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "29/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 29,
+    "unextracted": 1,
+    "unpaired": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 29,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 7,
+   "pairs": 2,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "unpaired",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -37975,6 +39005,300 @@
     "beams.1": "confirmed",
     "period.1": "confirmed",
     "period.2": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "uncertain": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 37,
+    "unscored": 2
+   },
+   "findings": {
+    "equivalent": 39,
+    "uncertain": 1
+   },
+   "unmatched": 22,
+   "pairs": 4,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     }
+    }
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "unpaired",
+    "mix.g": "uncertain",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.docx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "29/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 29,
+    "unextracted": 1,
+    "unpaired": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 29,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 7,
+   "pairs": 2,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "unpaired",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.pptx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-abbreviated.xlsx": {
+   "facts": {
+    "changed": 2,
+    "conditions": 0,
+    "added": 0,
+    "removed": 0,
+    "unchanged": 31
+   },
+   "changes_found": "0/2",
+   "additions_found": "0/0",
+   "removals_found": "0/0",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {
+    "unpaired": 2
+   },
+   "conditions": {},
+   "added": {},
+   "removed": {},
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "confirmed",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "unpaired",
+    "mix.g": "confirmed",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "confirmed",
+    "sed.count": "confirmed",
+    "sed.depth": "unpaired",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
    }
   },
   "wtp-s1-tracked.docx": {
