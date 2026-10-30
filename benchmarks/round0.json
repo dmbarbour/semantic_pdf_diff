@@ -60,7 +60,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "topic_names", "search_names", "glossary", "embed", "rerank"
+    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "embed", "rerank"
   ],
   "table_rules": null,
   "table_structure": false,
@@ -87,6 +87,8 @@
   "view_attitudes": false,
   "view_rows": false,
   "align_hedges": false,
+  "align_glossary": false,
+  "judge_glossary": false,
   "hedges_apart": false,
   "read_holders": false,
   "hedge_rule": false,

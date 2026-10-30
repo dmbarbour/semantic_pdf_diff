@@ -4,9 +4,10 @@ its reasoning restricted to the pair, revisions aligned first (align.py), and th
 import contextlib
 import json
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from decimal import Decimal, InvalidOperation
 from .explain import explain
+from .terms import Terms
 from .rerank import ranked
 from .dispatch import Dispatcher
 from .progress import NoProgress
@@ -123,15 +124,20 @@ RULINGS = ('\nEach claim\'s "context", where given, is what its document says ar
            "are about the same thing, apply in the same circumstances, and are stated in the same frame, from their "
            "fields and context. Equal values in different frames or scopes are not equivalent.")
 
+# With the judge_glossary lever, where a claim judged uses a term its document defines (terms.Terms).
+TERMS = '\nEach claim\'s "terms", where given, are what its document defines the abbreviations and terms it uses as.'
+
 def instructions(mode):
     """A comparison prompt's instructions (the rest is the two claims and the numeric check)."""
     return COMPARE + MODE_CONTEXT[mode]
 
-def pair_request(s, mode, a, b, output=None, records=None):
+def pair_request(s, mode, a, b, output=None, records=None, defined=None):
     """The judge's request for claims a and b: (prompt, images, the claims' fields as shown, numeric check). The
     claims are shown without their provenance (PROVENANCE_FIELDS), with source images where the settings send them,
     and with what their context records say where the settings show it (records: {content: {id: ContextRecord}};
-    the judge_context lever's, not among the fields returned: the explainer is shown context by its own lever)."""
+    the judge_context lever's, not among the fields returned: the explainer is shown context by its own lever), and
+    the terms they use as their documents define them where the settings show them (defined: {content:
+    terms.Terms}; the judge_glossary lever's, likewise not returned)."""
     images, payload, shown = [], [], []
     for e in (a, b):
         p = e.model_dump(exclude=PROVENANCE_FIELDS)
@@ -140,9 +146,11 @@ def pair_request(s, mode, a, b, output=None, records=None):
             p["source_image"] = len(images) + 1
             images += extra
         payload.append(p)
-        shown.append({**p, **s.judged_context(e, (records or {}).get(e.content, {}))})
+        shown.append({**p, **s.judged_context(e, (records or {}).get(e.content, {})),
+                      **s.judged_terms(e, (defined or {}).get(e.content))})
     calc = numeric_check(a, b)
-    prompt = (instructions(mode) + s.judging()[0] + "\nA=" + json.dumps(shown[0], ensure_ascii=False)
+    terms = TERMS if any("terms" in x for x in shown) else ""
+    prompt = (instructions(mode) + s.judging()[0] + terms + "\nA=" + json.dumps(shown[0], ensure_ascii=False)
               + "\nB=" + json.dumps(shown[1], ensure_ascii=False))
     prompt += "\nNumeric check=" + json.dumps(calc)
     return prompt, images, payload, calc
@@ -173,7 +181,8 @@ def _read_off(claim):
     return bool(claim.approximate) and (getattr(claim, "kind", "") in ("chart", "diagram")
                                         or bool(getattr(claim, "image", None)))
 
-def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label="", records=None):
+def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label="", records=None,
+            glossary=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
@@ -190,6 +199,9 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
 
     records: {content: {id: ContextRecord}}, the context records the claims reference (the records lever's), shown
     to the judge where the settings say (the judge_context lever).
+
+    glossary: the sources' glossary entries (glossary.read's terms), for the alignment (the align_glossary lever) and
+    the judge (judge_glossary) where the settings say.
     """
     # Comparisons aren't bound to a store, so their cache keys carry their own settings.
     settings_key = label  # the comparison interpreter's hash, naming the requests' recipes (labels only)
@@ -212,7 +224,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
                                   ("shared against later own", shared, right)):
         if not a_side or not b_side:
             continue
-        found = client.s.correspondence(a_side, b_side, mode)
+        found = client.s.correspondence(a_side, b_side, mode, glossary)
         for i, j, score in found.judge:
             a, b = a_side[i], b_side[j]
             scored[a.id, b.id] = (max(score, scored.get((a.id, b.id), (0,))[0]), a, b)
@@ -259,6 +271,10 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     own = dispatcher is None
     dispatch = dispatcher or Dispatcher(client)
     schema = client.s.judging()[1]
+    by_content = defaultdict(list)
+    for t in glossary or []:
+        by_content[t["content"]].append(t)
+    defined = {c: Terms(entries) for c, entries in by_content.items()}
     with (dispatch if own else contextlib.nullcontext()):
         if client.s.reranks(mode) and pairs and dispatch.split:  # the reranker's order, its threshold (rerank.py)
             judged_before = {x.id for _, a, b in pairs for x in (a, b)}
@@ -268,7 +284,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
             dispatch.make_room()
             attempted.update((a.id,b.id))
-            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output, records)
+            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output, records, defined)
             payloads[index] = (a, b, payload, images)
             progress.add()
             dispatch.submit(prompt, schema, images, ("compare", mode, settings_key, a.id, b.id),

@@ -11,6 +11,7 @@ from pathlib import Path
 import pymupdf
 
 from semantic_pdf_diff import glossary
+from semantic_pdf_diff.terms import Terms
 from semantic_pdf_diff.schema import GlossaryTerms
 from semantic_pdf_diff.textdocs import parse
 from stubs import chat_answer, prompt_of, request_body, serving
@@ -270,6 +271,79 @@ class Read(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertNotIn("glossary", data)
         self.assertNotIn("asked", state)
+
+def term(t, meaning, content="ca", reach="document", where="a.pdf, page 1"):
+    return {"term": t, "meaning": meaning, "kind": "abbreviation", "source": "a", "content": content, "where": where,
+            "block": "ABBREVIATIONS", "how": "model", "reach": reach}
+
+def evidence(id, entity, attribute, value, content="ca", page=1, conditions=""):
+    from semantic_pdf_diff.schema import Evidence, PdfLocator
+    return Evidence(id=id, content=content, locator=PdfLocator(page=page, bbox=(0, 0, 1, 1), region="text", task="t"),
+                    entity=entity, attribute=attribute, value=value, unit="ft", conditions=conditions, kind="text",
+                    quote="q", confidence=1)
+
+class Used(unittest.TestCase):
+    """Milestone 5: the glossary used by the comparison, its terms looked up in claims' words (terms.Terms)."""
+    def test_the_terms_a_claims_words_use_by_reach(self):
+        terms = Terms([term("SWD", "side water depth"), term("SB", "sedimentation basin"),
+                                term("Clearwell", "treated water storage"), term("A", "area"),
+                                term("[circle]", "manhole"),
+                                {**term("W", "washer"), "reach": "sheet", "sheet": "sheet E-1"},
+                                {**term("WR", "washer receptacle", reach="sheet", where="a.pdf, page 4"),
+                                 "sheet": "sheet E-1"}])
+        self.assertEqual(terms.used(["SBs", "SWD of the basin"]), {"SB": "sedimentation basin",
+                                                                   "SWD": "side water depth"})
+        self.assertEqual(terms.used(["the clearwell", "Option A", "swd", "SWDX", "[circle]"]),
+                         {"Clearwell": "treated water storage"})  # one letter, case, a longer word, a mark: none
+        self.assertEqual(terms.used(["WR outlet"], page=4), {"WR": "washer receptacle"})  # its sheet's page only
+        self.assertEqual(terms.used(["WR outlet"], page=5), {})
+
+    def test_a_meaning_written_out_folded_into_its_term(self):
+        terms = Terms([term("SWD", "side water depth"), term("SB", "sedimentation basin"),
+                                term("HDT", "hydraulic detention time"), term("SDT", "solids detention time"),
+                                term("CT", "contact time"), term("CT", "current transformer", content="cb"),
+                                term("PDCP", "Packet Data Convergence Protocol")])
+        self.assertEqual(terms.abbreviated("Sedimentation  basins"), "SB")
+        self.assertEqual(terms.abbreviated("a side water depth of"), "a SWD of")
+        self.assertEqual(terms.abbreviated("PDCP layer"), "PDCP layer")  # one word either way
+        self.assertEqual(terms.abbreviated("packet data convergence protocol layer"), "PDCP layer")
+        self.assertEqual(terms.abbreviated("contact time"), "contact time")  # CT defined two ways: left as it is
+        self.assertEqual(terms.abbreviated("total hydraulic detention time"), "total HDT")
+        self.assertEqual(terms.abbreviated("data convergence protocol"), "PDCP")  # its tail, its only
+        self.assertEqual(terms.abbreviated("detention time"), "detention time")  # HDT's tail, and SDT's
+
+    def test_alignment_pairs_a_value_changed_under_an_abbreviation(self):
+        from semantic_pdf_diff.settings import Settings
+        left = [evidence("A-1", "Sedimentation basins", "side water depth", "15.1"),
+                evidence("A-2", "Sedimentation basins", "length", "159"),
+                evidence("A-3", "Sedimentation basins", "width", "47")]
+        right = [evidence("B-1", "SBs", "SWD", "13.7", content="cb"),
+                 evidence("B-2", "SBs", "length", "159", content="cb"),
+                 evidence("B-3", "SBs", "width", "47", content="cb")]
+        defined = [term("SWD", "side water depth", "cb"), term("SB", "sedimentation basin", "cb")]
+        judged = lambda s: {(left[i].id, right[j].id) for i, j, _ in  # noqa: E731
+                            s.correspondence(left, right, "revisions", defined).judge}
+        self.assertNotIn(("A-1", "B-1"), judged(Settings()))  # off: "SWD" isn't "side water depth"
+        self.assertEqual(judged(Settings(align_glossary=True)), {("A-1", "B-1")})
+
+    def test_the_judge_shown_the_terms_a_claim_uses_else_the_same_prompt(self):
+        from semantic_pdf_diff.compare import TERMS, pair_request
+        from semantic_pdf_diff.settings import Settings
+        a = evidence("A-1", "Sedimentation basins", "side water depth", "15.1")
+        b = evidence("B-1", "SBs", "SWD", "13.7", content="cb")
+        defined = {"cb": Terms([term("SWD", "side water depth", "cb"),
+                                         term("SB", "sedimentation basin", "cb")])}
+        off = pair_request(Settings(), "revisions", a, b, defined=defined)[0]
+        on = pair_request(Settings(judge_glossary=True), "revisions", a, b, defined=defined)[0]
+        self.assertEqual(off, pair_request(Settings(), "revisions", a, b)[0])
+        self.assertNotIn(TERMS, off)
+        self.assertIn(TERMS, on)
+        shown = json.loads(on.split("\nB=")[1].split("\nNumeric check=")[0])
+        self.assertEqual(shown["terms"], {"SB": "sedimentation basin", "SWD": "side water depth"})
+        self.assertNotIn("terms", json.loads(on.split("\nA=")[1].split("\nB=")[0]))
+        unused = evidence("B-2", "basins", "length", "159", content="cb")  # no term used: the prompt as it was
+        self.assertEqual(pair_request(Settings(judge_glossary=True), "revisions", a, unused, defined=defined)[0],
+                         pair_request(Settings(), "revisions", a, unused)[0])
 
 if __name__ == "__main__":
     unittest.main()

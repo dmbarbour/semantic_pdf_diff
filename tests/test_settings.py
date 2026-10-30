@@ -97,6 +97,10 @@ NOT_EXERCISED = {
                       '(tests/test_records.py)',
     'judge_context': "the stub's judge answers whatever it's shown, so showing context changes no outcome "
                      '(tests/test_records.py)',
+    'judge_glossary': "needs a term a glossary defines used by a claim judged; these documents define none "
+                      '(tests/test_glossary.py)',
+    'align_glossary': 'revisions mode only, with terms a glossary defines; these runs compare proposals '
+                      '(tests/test_glossary.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "
                      "(tests/test_continuation.py)",
     'refine_figures': "only a refined tile mostly one detected figure it holds is looked at again; the documents' "

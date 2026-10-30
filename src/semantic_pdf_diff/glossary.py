@@ -27,6 +27,9 @@ glossary.").
   everything else reaches its document (a file: an abbreviations list, a definitions clause, prose, and a drawing
   set's abbreviations, terms and conventions, which by convention hold for the set). What a sheet's symbols are
   worth beyond it is the index's to say (indexes.terms: the same meaning on two sheets or more, consistent).
+- **Used by the comparison** (milestone 5; terms.Terms): with align_glossary, where alignment weighs names, a meaning
+  written out weighed as its term ("side water depth" as "SWD"); with judge_glossary, each claim judged shown the
+  terms its words use, as its document defines them (its sheet's on its page).
 """
 import re
 from collections import defaultdict

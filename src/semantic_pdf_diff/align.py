@@ -493,14 +493,25 @@ def _regroup(a, b, lone_a, lone_b):
             out.append((kind, [key], parts, evidence) if kind == "split" else (kind, parts, [key], evidence))
     return out
 
-def align(left, right, printed=False, hedges=False):
+def align(left, right, printed=False, hedges=False, names=None):
     """The Correspondence of two revisions' claims (left the earlier, right the later). printed: a claim's name as
     printed (Evidence.printed) stands for its attribute as read, so two readers naming one printed label differently
     still name one property: a name as printed outranks a name as read (docs/plans/claim-context-2026-10-14.md).
-    hedges: a value's two readings differing only by a hedge are a hedge changed, found without a model."""
+    hedges: a value's two readings differing only by a hedge are a hedge changed, found without a model. names: the
+    revisions' glossaries (terms.Terms), a meaning written out weighed as its term (with_names)."""
     if printed:
         left, right = [with_printed(c) for c in left], [with_printed(c) for c in right]
+    if names is not None:
+        left, right = [with_names(c, names) for c in left], [with_names(c, names) for c in right]
     return Alignment(left, right, hedges).correspondence()
+
+def with_names(claim, names):
+    """The claim as alignment weighs it: the meanings its entity, attribute and conditions write out folded into
+    their terms (names: terms.Terms; indexes and glossaries, milestone 5), so one revision's "sedimentation basins"
+    and "side water depth" are the other's "SBs" and "SWD"."""
+    update = {f: names.abbreviated(getattr(claim, f)) for f in ("entity", "attribute", "conditions")}
+    update = {f: v for f, v in update.items() if v != getattr(claim, f)}
+    return claim.model_copy(update=update) if update else claim
 
 def printed_property(printed):
     """The property a table claim's name as printed names: its column header ("P-101A | Rated point > Capacity

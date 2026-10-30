@@ -228,6 +228,7 @@ HELP = {
     "align": Help(_L, "revisions: items are matched across the revisions before any value is judged"),
     "align_printed": Help(_L, "with align: a claim's name as printed weighed beside its attribute"),
     "align_hedges": Help(_L, "with align: a value differing only by a hedge or a status is reported without a model"),
+    "align_glossary": Help(_L, "with align and glossary: a meaning written out weighed as its term"),
     "verify_visuals": Help(_L, "a claim's crop is sent with it when it's judged"),
     "explain_differences": Help(_L, "revisions: each different or uncertain finding is explained by kind"),
     "explain_context": Help(_L, "the explainer is shown each claim's list position and name as printed"),
@@ -235,4 +236,6 @@ HELP = {
     "record_changes": Help(_L, "a context record restated between revisions is reported once, with the claims it "
                                "reaches"),
     "judge_context": Help(_L, "the judge is shown each claim's context records, and rules on subject, scope and frame"),
+    "judge_glossary": Help(_L, "with glossary: the judge is shown the terms each claim uses, as its document defines "
+                               "them"),
 }

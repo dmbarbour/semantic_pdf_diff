@@ -303,7 +303,7 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     label = provenance.text_hash(comparing.model_dump_json())
     found = read_glossary(settings, store, client, options.mode, label, progress, document)
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
-                   label=label, records=read.records)
+                   label=label, records=read.records, glossary=(found or {}).get('terms'))
     if options.mode == 'revisions':
         data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)
         for f in data['findings']:  # a finding whose claims a restated record reaches says so

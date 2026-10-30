@@ -1040,7 +1040,8 @@ class ContinueReading(Lever):
         return self.continuations if region in VISUAL else 0
 
 class Align(Lever):
-    lever_name, stage, off = "align", "comparison", {"align": False, "align_printed": False, "align_hedges": False}
+    lever_name, stage, off = "align", "comparison", {"align": False, "align_printed": False, "align_hedges": False,
+                                                     "align_glossary": False}
     # revisions: decide which items correspond across the two revisions before any value is judged, and settle equal
     # values without a model (align.py; docs/plans/revision-comparison-2026-10-02.md); proposals keep retrieval
     align: Annotated[bool, _selecting(roles=COMPARE)] = True
@@ -1050,12 +1051,19 @@ class Align(Lever):
     # a value's two readings differing only by a hedge or a status ("working assumption" against "agreed"): the value
     # firmed up or hedged, reported without a model (docs/plans/claim-context-2026-10-14.md, milestone 5)
     align_hedges: Annotated[bool, _selecting(roles=COMPARE)] = True
+    # the revisions' glossaries (the glossary lever's) where names are weighed: a meaning written out folded into its
+    # term, so "side water depth" in one revision is the other's "SWD" (terms.Terms; docs/plans/
+    # indexes-and-glossaries-2026-10-29.md, milestone 5; the owner, 2026-10-30: "Will these subject merges extend to
+    # comparisons and analysis later?")
+    align_glossary: Annotated[bool, _selecting(roles=COMPARE)] = False
 
-    def correspondence(self, left, right, mode):
+    def correspondence(self, left, right, mode, glossary=None):
         if not self.align or mode != "revisions":
-            return super().correspondence(left, right, mode)
+            return super().correspondence(left, right, mode, glossary)
         from .align import align
-        return align(left, right, printed=self.align_printed, hedges=self.align_hedges)
+        from .terms import Terms
+        names = Terms(glossary) if self.align_glossary and glossary else None
+        return align(left, right, printed=self.align_printed, hedges=self.align_hedges, names=names)
 
 class VerifyVisuals(Lever):
     lever_name, stage, off = "verify_visuals", "comparison", {"verify_visuals": False}
@@ -1200,6 +1208,21 @@ class JudgeContext(Lever):
         from .schema import RuledJudgment
         return RULINGS, RuledJudgment
 
+class JudgeGlossary(Lever):
+    lever_name, stage, off = "judge_glossary", "comparison", {"judge_glossary": False}
+    # each claim judged shown the abbreviations and terms its words use, as its document defines them (the glossary
+    # lever's, those whose reach covers it: its document's, its sheet's on its page), as a "terms" field; a prompt
+    # whose claims use none is unchanged (terms.Terms; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 5)
+    judge_glossary: Annotated[bool, _shaping(roles=COMPARE)] = False
+
+    def judged_terms(self, evidence, defined):
+        shown = super().judged_terms(evidence, defined)
+        if not self.judge_glossary or defined is None:
+            return shown
+        used = defined.used((evidence.entity, evidence.attribute, evidence.value, evidence.conditions),
+                            evidence.locator.page)
+        return {**shown, **({"terms": used} if used else {})}
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -1225,7 +1248,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
-                 NameTopics, SearchNames, ReadGlossary, Embed, Rerank)
+                 JudgeGlossary, NameTopics, SearchNames, ReadGlossary, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1366,9 +1389,10 @@ class Platform(Composable):
         return candidates(left, right, self)
 
     @chosen
-    def correspondence(self, left, right, mode):
-        """Which claims are compared, and which are settled without a model (align.Correspondence). The platform's:
-        every retrieval candidate judged, none settled; the alignment lever decides otherwise for revisions."""
+    def correspondence(self, left, right, mode, glossary=None):
+        """Which claims are compared, and which are settled without a model (align.Correspondence); glossary: the
+        comparison's glossary entries (glossary.read's terms). The platform's: every retrieval candidate judged, none
+        settled; the alignment lever decides otherwise for revisions."""
         from .align import Correspondence
         return Correspondence(self.candidates(left, right))
 
@@ -1393,6 +1417,12 @@ class Platform(Composable):
     def judged_context(self, evidence, records):
         """What a claim being judged shows besides its own fields ({field: value}); records: its content's {id:
         ContextRecord}: the platform's, nothing."""
+        return {}
+
+    @chained
+    def judged_terms(self, evidence, defined):
+        """The terms a claim being judged uses, as its document defines them ({"terms": {term: meaning}} or nothing);
+        defined: its content's terms.Terms, or None: the platform's, nothing."""
         return {}
 
     @chosen

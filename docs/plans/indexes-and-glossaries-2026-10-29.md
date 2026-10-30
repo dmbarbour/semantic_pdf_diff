@@ -1,6 +1,6 @@
 # Indexes and glossaries: a source's subjects, figures, claims and terms, alone or merged across a comparison
 
-- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2) built 2026-10-30. [Design questions](#design-questions) 1 to 3 answered 2026-10-29, 4 and 5 on 2026-10-30.
+- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2), names merged and kinds (milestone 3), and the glossary used by the comparison (milestone 5) built 2026-10-30. [Design questions](#design-questions) 1 to 3 answered 2026-10-29, 4 and 5 on 2026-10-30.
 - **The owner, 2026-10-29:**
   - "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless."
   - "Well, I say "single document" but I really mean "single source" that might be a folder of docs."
@@ -9,6 +9,7 @@
   - **Files besides report.html:** Markdown, CSV and JSON, and "An excel file is also a good representation for indices. We already output excel workbooks of claims, but not really designed as an indexing model."
   - **In a comparison:** one merged index, each subject or term listed once, with what each source says side by side.
 - **The owner, 2026-10-30:** "Please proceed with the glossary." And, of design questions 4 and 5, in their words below.
+- **The owner, 2026-10-30,** after names merged the index's subjects: "Will these subject merges extend to comparisons and analysis later? Alright, please proceed."
 - **Earlier, the owner on glossaries (2026-10-15):** "Seems we should consider developing a glossary for abbreviations, framings, etc.. not as a set of claims, but as metadata for reports, comparisons, and comprehending claims in context. This would be another plan of its own, IIUC." The tentative row *Document glossaries* is moved in whole ([the glossary](#the-glossary)).
 - **Takes over:**
   - [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 2, subjects found mechanically: the subject index, which is [claim context](claim-context-2026-10-14.md)'s per-document entity register
@@ -156,11 +157,19 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 ### 4. Matching across sources, further
 
 - Proposals' subjects matched beyond the judged pairs (names, other names, the glossary).
+- Revisions' alignment with the glossary's names: built with milestone 5 (`align_glossary`).
 - Conventions compared: a changed one reported once.
 
 ### 5. The glossary given to the reader and the judge
 
 - The terms a span uses shown with it: a lever, off until measured against null arms ([0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)).
+- **Built 2026-10-30** (the owner: "Will these subject merges extend to comparisons and analysis later?"):
+  - **The glossary read before claims are compared** (it was read after), so the comparison can use it; the same requests.
+  - **The controlled pair** ([Measurement](#measurement)): today's comparison finds neither change in any format (0/2): the changed values under "HDT" and "SWD" are never paired with "detention time" and "side water depth", so they're listed unmatched, not changed.
+  - **In alignment** (`align_glossary`, revisions; off, on recommended): a meaning written out folded into its term ("side water depth" weighed as "SWD"), and a long meaning's last words where no other meaning ends so ("detention time" as "HDT"). The pair's changes found 2/2 in every format, nothing else moved; the other 113 controlled comparisons as before (none has a glossary). On TS 38.300's two versions (offline, 324 terms): judge pairs 871 → 844 and settled 5,940 → 5,954, by eye mostly right (the NG-U and Xn-U stacks' layers no longer paired across stacks).
+  - **Spelling terms out instead** (tried first): the pair's changes found too, but on TS 38.300 a tenth of the judge pairs moved, some wrongly ("PDCP layer integrity protection" settled with "PDCP layer ciphering": the spelled-out PDCP four shared words of six). An abbreviation is one word whichever way it's written.
+  - **To the judge** (`judge_glossary`; off, measured no different): each claim judged shown the terms its words use, as its document defines them. 16 of the pair's 31 judged pairs shown terms, no relation moved: the model already reads these letters. Its use would be a project's own letters; no controlled pair has those yet.
+  - **Not yet:** the reader given the terms (a lever idea; about $1 to $3 on the controlled corpus); proposals mode's retrieval and the explainer (lever ideas); the model's other names (search_names) in alignment, which are asked after the comparison, from its claims.
 
 ## Design questions
 
