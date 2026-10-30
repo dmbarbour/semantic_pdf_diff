@@ -222,6 +222,8 @@ def answering(state):
             return serve(handler)
         body = request_body(handler)
         prompt = prompt_of(body["messages"][1]["content"])
+        if "Extract atomic engineering claims" in prompt:
+            state.setdefault("read", []).append(prompt)
         if "Read the terms an engineering document defines" in prompt:
             state["asked"] = state.get("asked", 0) + 1
             text = prompt.split("TEXT:\n", 1)[1]
@@ -235,15 +237,16 @@ def answering(state):
         return serve(handler)
     return post
 
+SPEC = ("# Spec\n\npump | rated power | 10 | kW\n\nThe net positive suction head (NPSH) is checked.\n\n"
+        "## Abbreviations\n\n| Term | Meaning |\n|---|---|\n| TDH | total dynamic head |\n\n"
+        "AFF - above finished floor\n\nTYP - typical\n\n## Pumps\n\nfan | air flow | 3 | cms\n")
+
 class Read(unittest.TestCase):
-    def analyze(self, settings, **given):
+    def analyze(self, settings, text=SPEC, **given):
         state = {"embedded": [], "names": 0, **given}
         with tempfile.TemporaryDirectory() as d, serving(answering(state)) as url:
             root = Path(d)
-            (root / "spec.md").write_text(
-                "# Spec\n\npump | rated power | 10 | kW\n\nThe net positive suction head (NPSH) is checked.\n\n"
-                "## Abbreviations\n\n| Term | Meaning |\n|---|---|\n| TDH | total dynamic head |\n\n"
-                "AFF - above finished floor\n\nTYP - typical\n\n## Pumps\n\nfan | air flow | 3 | cms\n")
+            (root / "spec.md").write_text(text)
             config = root / "settings.json"
             config.write_text(json.dumps({"search_names": False, "topic_names": False, **settings}))
             code, _, _ = run("analyze", root / "spec.md", "--store", root / "out", "--base-url", url, "--config",
@@ -282,6 +285,22 @@ class Read(unittest.TestCase):
         self.assertNotIn("glossary", data)
         self.assertNotIn("asked", state)
 
+    def test_the_reader_shown_the_terms_its_words_use(self):
+        text = SPEC + ("\n## Basins\n\nThe pump's TDH is 30 m, TYP.\n\n" + "The plant runs all year. " * 10
+                       + "\n\n## Checks\n\nThe basin's total dynamic head (TDH) and NPSH are checked.\n")
+        small = {"text_bytes": 200}  # a task a paragraph or two
+        code, data, state = self.analyze({"reader_glossary": True, **small}, text=text)
+        self.assertEqual(code, 0)
+        shown = [line for prompt in state["read"] for line in prompt.splitlines()
+                 if line.startswith("Defined in this document: ")]
+        # read before the claims: the table's term, the model's and prose's; each where its words use it, but where
+        # they spell it out too (the abbreviations table's row, "total dynamic head (TDH)")
+        self.assertIn("Defined in this document: TDH = total dynamic head; TYP = typical", shown)
+        self.assertTrue(all("TDH = " not in line for line in shown if "NPSH" in line))
+        self.assertIn("NPSH = net positive suction head", " ".join(shown))
+        code, data, state = self.analyze(small, text=text)  # off by default: no prompt says so
+        self.assertFalse([p for p in state["read"] if "Defined in this document" in p])
+
 def term(t, meaning, content="ca", reach="document", where="a.pdf, page 1"):
     return {"term": t, "meaning": meaning, "kind": "abbreviation", "source": "a", "content": content, "where": where,
             "block": "ABBREVIATIONS", "how": "model", "reach": reach}
@@ -307,6 +326,16 @@ class Used(unittest.TestCase):
                          {"Clearwell": "treated water storage"})  # one letter, case, a longer word, a mark: none
         self.assertEqual(terms.used(["WR outlet"], page=4), {"WR": "washer receptacle"})  # its sheet's page only
         self.assertEqual(terms.used(["WR outlet"], page=5), {})
+
+    def test_a_reader_shown_the_terms_its_words_use_but_those_they_spell_out(self):
+        terms = Terms([term("SWD", "side water depth"), term("HDT", "hydraulic detention time"),
+                       term("TYP", "typical"), term("Clearwell", "a covered tank storing treated water " * 4),
+                       {**term("WR", "washer receptacle", reach="sheet", where="a.pdf, page 4"), "sheet": "sheet E-1"}])
+        self.assertEqual(terms.shown("HDT 52 min; SWD 13.7 ft, TYP. WR at the clearwell"),
+                         "HDT = hydraulic detention time; SWD = side water depth; TYP = typical")  # a definition: none
+        self.assertEqual(terms.shown("WR at the wall", page=4), "WR = washer receptacle")  # its sheet's
+        self.assertEqual(terms.shown("SWD (side water depth) and HDT"), "HDT = hydraulic detention time")
+        self.assertEqual(terms.shown("nothing defined"), "")
 
     def test_a_term_of_words_found_across_a_line_break(self):
         terms = Terms([term("parent node", "the node above"), term("BH RLC  channel", "backhaul RLC channel")])

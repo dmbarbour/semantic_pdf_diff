@@ -99,6 +99,8 @@ NOT_EXERCISED = {
                      '(tests/test_records.py)',
     'judge_glossary': "needs a term a glossary defines used by a claim judged; these documents define none "
                       '(tests/test_glossary.py)',
+    'reader_glossary': "needs a term a glossary defines used in the text read; these documents define none "
+                       "(tests/test_glossary.py)",
     'align_glossary': 'revisions mode only, with terms a glossary defines; these runs compare proposals '
                       '(tests/test_glossary.py)',
     'continuations': "only an answer incomplete at the claim limit is continued; the stub's never are "

@@ -127,6 +127,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_context` | `400` | shaping | table_context | extract | table |
 | `stem_context` | `true` | shaping | stem_context | extract | table, text |
 | `references` | `false` | shaping | references | extract | table, text |
+| `reader_glossary` | `false` | shaping | reader_glossary | extract | figure, overview, table, text, tile, vision |
 | `tile_locator` | `false` | shaping | tile_locator | extract | figure, overview, tile, vision |
 | `decoration` | `true` | selecting | decoration | extract | figure, overview, tile, vision |
 | `tiling` | `"bands"` | selecting | tiling | extract | figure, overview, tile, vision |

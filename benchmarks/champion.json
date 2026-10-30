@@ -16,6 +16,7 @@
     "table_context",
     "stem_context",
     "references",
+    "reader_glossary",
     "tile_locator",
     "decoration",
     "tiling",

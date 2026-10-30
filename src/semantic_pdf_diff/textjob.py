@@ -44,8 +44,9 @@ def text_sections(doc, depth, pages_per_section):
 class TextReader:
     """The context levers' reader for a text file (extract.Context's methods, in lines rather than points)."""
 
-    def __init__(self, doc, s):
+    def __init__(self, doc, s, terms=None):
         self.doc, self.s = doc, s
+        self.terms = terms  # the document's glossary (terms.Terms), for the reader_glossary lever; None: none read
         self.by_page = defaultdict(list)
         for b in doc.blocks:
             self.by_page[b.page].append(b)
@@ -241,7 +242,7 @@ def text_job(data, job, output, client, dispatch, progress, extension):
         job.state["result"] = ([], core.coverage)
         return
     sections, index = text_sections(doc, s.section_depth, s.section_pages)
-    core.sections, core.reader = index, TextReader(doc, s)
+    core.sections, core.reader = index, TextReader(doc, s, core.terms)
     if job.on_sections:
         job.on_sections(sections)
     signals, kept = {}, []  # kept: the pictures being read, their document open until their tasks are done

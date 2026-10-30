@@ -180,6 +180,8 @@ HELP = {
     "table_context": Help(_L, "characters of text above a table (lead-in, caption) sent with it"),
     "stem_context": Help(_L, "text and table tasks are told the numbered items and headings they're under"),
     "references": Help(_L, "abbreviations defined elsewhere, and cited figures' captions, sent as context"),
+    "reader_glossary": Help(_L, "with glossary: each request reading claims is shown the terms its words use, as its "
+                                "document defines them"),
     "tile_locator": Help(_L, "with each tile, a page thumbnail outlining where it sits"),
     "visual_text_layer": Help(_L, "characters of a region's PDF text sent with its image"),
     "table_cuts": Help(_L, "an image region cutting a table is sent the table's header and the rows it touches"),

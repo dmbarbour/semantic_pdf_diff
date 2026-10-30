@@ -27,6 +27,7 @@ class Job:
     reader: object = None            # the job's generator by format (reader_for); None: a PDF
     label: str = ""                  # its name on a progress bar (its file's); the content's without
     bar: object = None               # its source's bar of files, if it has one
+    terms: object = None             # its content's glossary (terms.Terms), for the reader_glossary lever
 
 def run_jobs(queues, output, client, dispatcher=None, progress=None, labels=()):
     """Run extraction jobs with fair share: one queue per source, pages fed round-robin

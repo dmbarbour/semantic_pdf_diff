@@ -246,7 +246,7 @@ def read_sources(store, client, settings, names, triage, mode):
     files = {name: store.files(name) for name in names}
     progress = Progress('extract', client, heartbeat=settings.heartbeat_seconds)
     glossary = read_glossary(settings, store, client, mode, progress, files)
-    by_content, coverage, sections = extract_sources(store, client, names, files, progress)
+    by_content, coverage, sections = extract_sources(store, client, names, files, progress, glossary)
     progress.close()  # the glossary's requests and the extraction's
     situations = situate_sources(store, client, names, files, by_content, sections, coverage) if triage else {}
     records = {c: found for c in by_content for found in [store.records(c)] if found}
@@ -504,12 +504,17 @@ def fixture_usage(client, given=None):
              f"replayed, {used['recorded']} recorded, {used['missing']} missing")
     return {'cache' if cache else 'fixture': used}
 
-def extract_sources(store, client, names, files, progress):
+def extract_sources(store, client, names, files, progress, glossary=None):
     """Evidence for every content item of the sources: loaded from the store, extracted
-    (all sources' PDFs in one fair-share queue), or none if uninterpretable.
+    (all sources' PDFs in one fair-share queue), or none if uninterpretable. glossary: the sources' (glossary.read's),
+    each content's terms given to its readers (terms.Terms), for the reader_glossary lever.
 
     Returns (evidence by content, coverage rows, sections by content).
     """
+    from .terms import Terms
+    defined = {}
+    for e in (glossary or {}).get('terms', []):
+        defined.setdefault(e['content'], []).append(e)
     by_content, coverage, sections = {}, [], {}
     queues = []
     for name in names:
@@ -538,7 +543,8 @@ def extract_sources(store, client, names, files, progress):
             else:
                 by_content[file.content] = None  # claimed by this source's queue
                 queue.append(pdf_job(store, name, file, by_content, coverage, sections, reader_for(extension),
-                                     reader_version(extension)))
+                                     reader_version(extension),
+                                     Terms(defined[file.content]) if file.content in defined else None))
         queues.append(queue)
     if any(queues):
         log.info(f"Extracting {sum(map(len, queues))} document(s): " + ', '.join(
@@ -599,7 +605,7 @@ def situate_sources(store, client, names, files, by_content, sections, coverage)
     progress.close()
     return situations
 
-def pdf_job(store, source, file, by_content, coverage, sections, reader=None, version="pdf/1"):
+def pdf_job(store, source, file, by_content, coverage, sections, reader=None, version="pdf/1", terms=None):
     def keep_sections(found):
         sections[file.content] = found
         store.record_sections(file.content, found)
@@ -619,7 +625,7 @@ def pdf_job(store, source, file, by_content, coverage, sections, reader=None, ve
         coverage.extend(ledger)
         log.debug(f'Extracted {file.path}: {len(evidence)} claim(s)')
     return Job(file.content, lambda: read_origin(store.origin(source, file.path)), store.record_task, keep_sections,
-               done, reader=reader, label=Path(file.path).name)
+               done, reader=reader, label=Path(file.path).name, terms=terms)
 
 def shortcut_names(paths):
     """Source names from the paths' final components, made unique."""

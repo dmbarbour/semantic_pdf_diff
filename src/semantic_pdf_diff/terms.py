@@ -1,6 +1,6 @@
 """A glossary's terms as words (docs/plans/indexes-and-glossaries-2026-10-29.md): text folded as found, a term that
-describes a mark drawn, and, for the comparison (milestone 5), the terms looked up in claims' words (Terms). Pure:
-the comparison imports it without the glossary's reading (glossary.py), which reaches the store and the scanner.
+describes a mark drawn, and, for the reader and the comparison (milestone 5), the terms looked up in words (Terms).
+Pure: they import it without the glossary's reading (glossary.py), which reaches the store and the scanner.
 """
 import re
 from collections import defaultdict
@@ -15,6 +15,7 @@ def drawn(term):
     return term.startswith("[") and term.endswith("]") and len(term) > 2
 
 PAGE = re.compile(r"\bpage (\d+)$")  # where a sheet's term is defined: "E-001.pdf, page 4"
+SHORT = 80  # characters: a meaning longer than this is a definition, not a name
 
 def _found(terms, flags=0):
     """One pattern finding any of terms as a word, a plural's too ("SBs"), the longest first, its words apart by any
@@ -59,7 +60,7 @@ class Terms:
         for (t, page), ms in self.meanings.items():
             if page is None and len(ms) == 1:
                 m = fold(next(iter(ms)))
-                if len(m) <= 80 and len(m.split()) >= 2:
+                if len(m) <= SHORT and len(m.split()) >= 2:
                     given[m].add(t)
         self.named = {m: next(iter(ts)) for m, ts in given.items() if len(ts) == 1}
         tails = defaultdict(set)
@@ -86,6 +87,18 @@ class Terms:
                 if meanings:
                     out[term] = "; ".join(sorted(meanings, key=lambda m: (fold(m), m)))
         return dict(sorted(out.items()))
+
+    def shown(self, text, page=None):
+        """The terms these words use, as a reader is shown them ("HDT = hydraulic detention time; SWD = side water
+        depth"; "" for none): each with its meanings of at most SHORT characters, " / " between them; a term whose
+        meaning the words spell out too left out (an abbreviations list's row, "side water depth (SWD)")."""
+        words, out = fold(text), []
+        for term in self.used([text], page):
+            defined = self.meanings.get((term, None), set()) | self.meanings.get((term, page), set())
+            meanings = sorted((m for m in defined if len(m) <= SHORT), key=lambda m: (fold(m), m))
+            if meanings and not any(re.search(rf"(?<!\w){re.escape(fold(m))}(?!\w)", words) for m in meanings):
+                out.append(f"{term} = " + " / ".join(meanings))
+        return "; ".join(out)
 
     def abbreviated(self, text):
         """text with each meaning written out as its term ("a side water depth of" as "a SWD of", "detention time"

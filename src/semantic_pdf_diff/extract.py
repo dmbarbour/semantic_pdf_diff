@@ -102,7 +102,7 @@ class PdfReading:
         self.core, self.doc, self.s, self.content, self.assets, self.stem, self.owner = (
             core, doc, s, content, assets, stem, owner)
         self.record = core.record
-        self.context_of = Context(doc, s, assets, stem)  # the task functions read it when they run
+        self.context_of = Context(doc, s, assets, stem, core.terms)  # the task functions read it when they run
         self.context_of.ask = core.dispatch.client.ask  # the tiling question, asked while a page is planned
         self.visuals = Visuals(core, self.context_of, assets, stem, s)
         self.regions = {}  # page -> its image tasks' regions, worked out once (the vision step; tables read as figures)

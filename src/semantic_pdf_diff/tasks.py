@@ -198,6 +198,7 @@ class TaskCore:
         self.reach = {}  # page: the ids of records reaching every claim on it (a sheet's notes)
         self.held, self.releasing = [], False  # rows that may repeat, until the content's pages are read
         self.sections = self.reader = None
+        self.terms = job.terms  # the content's glossary (terms.Terms), which its readers are given
 
     def record(self, row, items=()):
         self.coverage.append(row)

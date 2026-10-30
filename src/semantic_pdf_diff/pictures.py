@@ -69,7 +69,7 @@ class Reading:
         assets = output / "assets"
         assets.mkdir(exist_ok=True, parents=True)
         stem = crop_stem(content)
-        context_of = Context(doc, s, assets, stem)
+        context_of = Context(doc, s, assets, stem, core.terms)
         context_of.text_read = False  # no text task reads a picture's labels
         visuals = Visuals(core, context_of, assets, stem, s)
         drawn_pages = []  # (picture, its name in tags, its page's number)

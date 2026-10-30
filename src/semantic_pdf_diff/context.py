@@ -5,7 +5,7 @@ import re
 
 import pymupdf
 
-from .pages import display_y, lines as _lines, reading_blocks, shown
+from .pages import display_y, lines as _lines, native, reading_blocks, shown
 from .regions import crop_name
 from .segmentation import _graphics
 from .figures import page_figures
@@ -38,8 +38,9 @@ class Context:
     (settings.lever_notes). The reader works on the page as displayed (see pages), so rotated sheets read like upright
     ones."""
 
-    def __init__(self, doc, s, assets=None, stem=""):
+    def __init__(self, doc, s, assets=None, stem="", terms=None):
         self.doc, self.s = doc, s
+        self.terms = terms  # the document's glossary (terms.Terms), for the reader_glossary lever; None: none read
         self.assets, self.stem = assets, stem  # where the locator's images go, and their names' stem
         self.blocks, self.stems, self.cited_by, self.page_lines, self.page_graphics = {}, {}, {}, {}, {}
         self.page_figures, self.page_decoration, self.page_marks = {}, {}, {}
@@ -213,6 +214,10 @@ class Context:
             self.cited_by.update(terms=glossary(self.doc),
                                  figures=[f for n, page in enumerate(self.doc, 1) for f in page_figures(page, n)])
         return references(text, self.cited_by["terms"], self.cited_by["figures"])
+
+    def words_in(self, page, rect):
+        """The text layer within a displayed region (an image task's)."""
+        return page.get_text("text", clip=native(page, rect))
 
     def locator(self, page, rect, tag):
         """The whole page, small, with the region outlined: rendered once into the store, its path returned."""

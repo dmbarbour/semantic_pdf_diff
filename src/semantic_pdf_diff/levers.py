@@ -472,6 +472,35 @@ class References(Lever):
     def table_lines(self, reader, page_no, top, flat):
         return super().table_lines(reader, page_no, top, flat) + self._cited(reader, flat)
 
+DEFINED_NOTE = "Defined in this document: "
+
+class ReaderGlossary(Lever):
+    lever_name, stage, off = "reader_glossary", "context", {"reader_glossary": False}
+    marks = {"reader_glossary": re.compile("^(" + re.escape(DEFINED_NOTE) + ".+)$", re.M)}
+    # the terms a task's words use, as its document's glossary defines them (the glossary lever's, read before the
+    # claims; those whose reach covers its page), as a context line: "Defined in this document: SWD = side water
+    # depth"; a meaning longer than terms.SHORT left out, and a term its words spell out too (terms.Terms.shown;
+    # docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 5; the owner, 2026-10-30: "let's test glossary to
+    # reader")
+    reader_glossary: Annotated[bool, _shaping(TEXTUAL | VISUAL)] = False
+
+    def _defined(self, reader, page_no, text):
+        terms = reader.terms if self.reader_glossary else None
+        shown = terms.shown(text, page_no) if terms is not None else ""
+        return [DEFINED_NOTE + shown] if shown else []
+
+    def text_lines(self, reader, page_no, segments, text):
+        return super().text_lines(reader, page_no, segments, text) + self._defined(reader, page_no, text)
+
+    def table_lines(self, reader, page_no, top, flat):
+        return super().table_lines(reader, page_no, top, flat) + self._defined(reader, page_no, flat)
+
+    def tile_lines(self, reader, page, rect, tag):
+        lines = super().tile_lines(reader, page, rect, tag)
+        if not self.reader_glossary or reader.terms is None:
+            return lines
+        return lines + self._defined(reader, page.number + 1, reader.words_in(page, rect))
+
 class TileLocator(Lever):
     lever_name, stage, parked = "tile_locator", "context", True
     off = {"tile_locator": False}
@@ -1242,7 +1271,8 @@ class DedupeRepeated(Lever):
 # are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
                  ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
-                 LeaveFurniture, TableContext, StemContext, References, TileLocator, Decoration, Tiling, TileCut,
+                 LeaveFurniture, TableContext, StemContext, References, ReaderGlossary, TileLocator, Decoration,
+                 Tiling, TileCut,
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty,
                  SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,

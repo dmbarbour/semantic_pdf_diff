@@ -263,7 +263,7 @@ class Refined(unittest.TestCase):
         from types import SimpleNamespace
         from semantic_pdf_diff.settings import Settings
         from semantic_pdf_diff.tasks import TaskCore
-        job = SimpleNamespace(content="sha256:" + "d" * 64 + ".txt", on_task=None, state={"pending": 0})
+        job = SimpleNamespace(content="sha256:" + "d" * 64 + ".txt", on_task=None, state={"pending": 0}, terms=None)
         client = SimpleNamespace(s=Settings(refinement_depth=1))
         core = TaskCore(job, Path("."), client, None, None, "t", None, {})
         core.reader = SimpleNamespace(for_text=lambda page, segments, text: f"context of {segments[0][1]}")
