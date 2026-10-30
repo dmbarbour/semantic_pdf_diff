@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.15.0 (2026-10-30)
+
+- **`retrieve_glossary` and `topic_glossary` are on by default** (the owner: "Yes, turn on the recommended items."). Comparing proposals, a meaning written out pairs with its term among the pairs judged. The topics count a meaning written out as its term, so "SWD" in one source and "side water depth" in the other make one topic. Where a source defines no terms, nothing changes.
+
 ## 0.14.0 (2026-10-30)
 
 - **Search finds a term's meaning anywhere in a claim.** A term the documents' glossaries define finds its meaning's claims, and the meaning finds the term's, wherever their words are in a claim. The model's other names still match only a claim's whole name. They're offered as "The glossary's other names for it" on the page and by `semantic-pdf-diff search` (`--json`: `glossary_names`). They were listed as the model's other names before.
