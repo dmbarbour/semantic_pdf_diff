@@ -119,6 +119,20 @@ class Blocks(unittest.TestCase):
         self.assertEqual(reach("W", "WASHER", "symbol")["reach"], "document")  # not on a sheet
         self.assertNotIn("sheet", reach("TYP", "typical", "convention", "sheet G-001"))
 
+    def test_a_disciplines_list_reaches_its_sheets_where_another_discipline_has_one(self):
+        self.assertEqual([glossary.discipline(s) for s in ("sheet S-001", "sheet E2.1", "sheet XB-503",
+                                                            "the sheet on page 4", "")], ["S", "E", "X", "", ""])
+        # dc: a general legend and the disciplines' lists, each its own sheets'
+        self.assertEqual(glossary.reaching(["sheet G-001", "sheet S-001", "sheet E-001", "sheet E-001", ""]),
+                         {"sheet S-001": "S", "sheet E-001": "E"})
+        self.assertEqual(glossary.reaching(["sheet A-001", "sheet A-002"]), {})  # one discipline's: the document's
+        self.assertEqual(glossary.reaching(["sheet E-001", "the sheet on page 96"]), {})
+        f = {"source": "set", "content": "c"}
+        read = lambda *a: glossary.entry(*a[:3], f, "set.pdf, page 6", "ABBREVIATIONS", "model", *a[3:])  # noqa: E731
+        ef = read("EF", "EACH FACE", "abbreviation", "sheet S-001", "S")
+        self.assertEqual((ef["reach"], ef["discipline"], ef["sheet"]), ("discipline", "S", "sheet S-001"))
+        self.assertEqual(read("W", "WASHER", "symbol", "sheet S-001", "S")["reach"], "sheet")  # a symbol: its sheet's
+
     def test_a_list_printing_each_meaning_first_turned_round(self):
         f = {"source": "set", "content": "c"}
         read = lambda t, m: glossary.entry(t, m, "abbreviation", f, "set.pdf, page 6", "ABBREVIATIONS",  # noqa: E731
@@ -336,6 +350,24 @@ class Used(unittest.TestCase):
         self.assertEqual(terms.shown("WR at the wall", page=4), "WR = washer receptacle")  # its sheet's
         self.assertEqual(terms.shown("SWD (side water depth) and HDT"), "HDT = hydraulic detention time")
         self.assertEqual(terms.shown("nothing defined"), "")
+
+    def test_the_nearest_definition_holds_a_sheets_then_its_disciplines_then_the_documents(self):
+        s = lambda t, m, where: {**term(t, m, where=where), "reach": "discipline", "discipline": "S",  # noqa: E731
+                                 "sheet": "sheet S-001"}
+        terms = Terms([term("EF", "exhaust fan"), s("EF", "each face", "a.pdf, page 2"),
+                       s("B.O.D.", "bottom of deck", "a.pdf, page 2"),
+                       {**term("EF", "elevated floor", reach="sheet", where="a.pdf, page 7"), "sheet": "sheet S-104"}],
+                      disciplines={"2": "S", "4": "S", "7": "S", "5": "A"})
+        self.assertEqual([terms.used(["EF"], page).get("EF") for page in (4, 5, None, 7)],
+                         ["each face", "exhaust fan", "exhaust fan", "elevated floor"])
+        self.assertEqual((terms.used(["B.O.D."], 4), terms.used(["B.O.D."], 5)), ({"B.O.D.": "bottom of deck"}, {}))
+        self.assertEqual(terms.abbreviated("the bottom of deck"), "the B.O.D.")  # one meaning: still a name
+
+    def test_a_common_word_a_term_only_in_capitals_apart_from_capitals(self):
+        terms = Terms([term("OF", "outside face"), term("NO.", "number")])
+        self.assertEqual(terms.used(["TOP OF STEEL", "the face of the wall", "BOLT NO. 3"]), {})  # the words
+        self.assertEqual(terms.used(["1 in. from the OF line"]), {"OF": "outside face"})
+        self.assertEqual(terms.used(["OF"]), {"OF": "outside face"})  # alone, as a cell
 
     def test_a_term_of_words_found_across_a_line_break(self):
         terms = Terms([term("parent node", "the node above"), term("BH RLC  channel", "backhaul RLC channel")])

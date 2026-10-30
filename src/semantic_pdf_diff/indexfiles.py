@@ -19,7 +19,7 @@ import re
 import zipfile
 from xml.sax.saxutils import escape
 
-from .indexes import properties, reach_said
+from .indexes import properties, reach_said, where_said
 
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # every member's, so the same index gives the same bytes
 # A value printed as a plain number, stored as one so it sorts and filters as one; not one with a leading zero (a
@@ -95,10 +95,10 @@ def markdown(index):
     for t in index.get("glossary", []):
         if many:
             by = {src: [m for m in t["meanings"] if m["source"] == src] for src in sources}
-            said_by = "; ".join(f"{src}: " + (", ".join(f"{m['meaning']} ({m['where']})" for m in by[src])
+            said_by = "; ".join(f"{src}: " + (", ".join(f"{m['meaning']} ({where_said(m)})" for m in by[src])
                                                if by[src] else "—") for src in sources)
         else:
-            said_by = "; ".join(f"{m['meaning']} ({m['where']})" for m in t["meanings"])
+            said_by = "; ".join(f"{m['meaning']} ({where_said(m)})" for m in t["meanings"])
         lines.append(f"- **{t['term']}** ({t['kind']}): {said_by}"
                      + (" — defined differently" if t.get("differs") else "")
                      + (f" — {reach_said(t)}" if reach_said(t) else ""))
@@ -133,7 +133,8 @@ def tables(index, evidence):
                e.get("conditions", ""), e["kind"], e.get("quote", "")] for e in evidence.values()]
     figures = [[f["source"], f["file"], f["page"] if f["page"] is not None else "", f["kind"], f["label"], f["title"],
                 f["about"], len(f["claims"]), f["cited"]] for f in index["figures"]]
-    glossary = [[t["term"], t["kind"], m["meaning"], m["source"], m["where"], m.get("sheet") or "document",
+    glossary = [[t["term"], t["kind"], m["meaning"], m["source"], m["where"],
+                 f"{m['discipline']} sheets" if m.get("reach") == "discipline" else m.get("sheet") or "document",
                  m["block"], m["how"], "yes" if t.get("differs") else "", t.get("consistent", "")]
                 for t in index.get("glossary", []) for m in t["meanings"]]
     kinds = [[k["kind"], s["name"], p["name"], *value(v)] for k in index.get("kinds", [])

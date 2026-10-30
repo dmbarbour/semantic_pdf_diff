@@ -72,9 +72,12 @@ def subjects_of(claims):
 def alias_key(name):
     return fold(name).rstrip(".")
 
+NAMES = ("document", "discipline")  # the reaches a glossary term is another name at: not a sheet's symbol alone
+
 def aliases(data):
-    """The names one thing goes by, as the run found them: each glossary term reaching its document with its meaning
-    (a mark described, or a meaning of more than 80 characters, isn't a name), and the model's other names (the
+    """The names one thing goes by, as the run found them: each glossary term reaching its document (or a
+    discipline's sheets) with its meaning (a mark described, or a meaning of more than 80 characters, isn't a name),
+    and the model's other names (the
     search_names lever's groups). A function giving a name its group's first name (folded, the least A to Z), or None
     for a name in no group."""
     from .terms import drawn
@@ -91,7 +94,7 @@ def aliases(data):
         ra, rb = sorted((root(a), root(b)), key=natural)
         parent[rb] = ra
     for t in (data.get("glossary") or {}).get("terms", []):
-        if t.get("reach", "document") == "document" and not drawn(t["term"]) and len(t["meaning"]) <= 80:
+        if t.get("reach", "document") in NAMES and not drawn(t["term"]) and len(t["meaning"]) <= 80:
             join(alias_key(t["term"]), alias_key(t["meaning"]))
     for kind in ("items", "properties"):
         for group in (data.get("synonyms") or {}).get(kind, []):
@@ -227,43 +230,53 @@ def term_key(term):
 
 def terms(data):
     """The glossary index: each term once, A to Z: {"term", "kind", "reach", "meanings": [{source, meaning, where,
-    how, block, reach[, sheet]}], "differs" where two sources' meanings reaching their documents share none,
-    "consistent": n where a sheet's term means the same on n sheets (two or more)}. A term reaches its document if
-    any of its meanings does, else its sheets: a sheet's symbol says little beyond it unless it's consistent (the
-    owner, 2026-10-30: "a legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually
-    consistent")."""
+    how, block, reach[, sheet][, discipline]}], "differs" where two sources' meanings reaching their documents (or the
+    same discipline's sheets) share none, "consistent": n where a sheet's term means the same on n sheets (two or
+    more)}. A term reaches its document if any of its meanings does, else its disciplines' sheets, else its sheets: a
+    sheet's symbol says little beyond it unless it's consistent (the owner, 2026-10-30: "a legend that is `[red
+    square] = Foo` isn't much useful beyond that diagram unless unusually consistent")."""
     by = defaultdict(list)
     for t in (data.get("glossary") or {}).get("terms", []):
         by[term_key(t["term"])].append(t)
     out = []
     for _, ts in sorted(by.items(), key=lambda x: natural(x[0])):
-        said = defaultdict(set)
+        said = defaultdict(lambda: defaultdict(set))  # its scope (None: the document): source: meanings
         for t in ts:
-            if t.get("reach", "document") == "document":
-                said[t["source"]].add(fold(t["meaning"]).rstrip("."))
-        differs = len(said) > 1 and not set.intersection(*said.values())
+            if t.get("reach", "document") in NAMES:
+                said[t.get("discipline")][t["source"]].add(fold(t["meaning"]).rstrip("."))
+        differs = any(len(by) > 1 and not set.intersection(*by.values()) for by in said.values())
         sheets = defaultdict(set)
         for t in ts:
             if t.get("reach") == "sheet":
                 sheets[fold(t["meaning"]).rstrip(".")].add((t["content"], t["where"]))
         alike = max(map(len, sheets.values()), default=0)
-        reach = "document" if any(t.get("reach", "document") == "document" for t in ts) else "sheet"
+        reaches = {t.get("reach", "document") for t in ts}
+        reach = next(r for r in ("document", "discipline", "sheet") if r in reaches)
         out.append({"term": Counter(t["term"] for t in ts).most_common(1)[0][0],
                     "kind": Counter(t["kind"] for t in ts).most_common(1)[0][0], "reach": reach,
-                    "meanings": [{k: t[k] for k in ("source", "meaning", "where", "how", "block", "reach", "sheet")
+                    "meanings": [{k: t[k] for k in ("source", "meaning", "where", "how", "block", "reach", "sheet",
+                                                    "discipline")
                                   if k in t} | {"reach": t.get("reach", "document")} for t in ts],
                     **({"differs": True} if differs else {}),
                     **({"consistent": alike} if reach == "sheet" and alike >= 2 else {})})
     return out
 
 def reach_said(t):
-    """Where a term holds, in words, beside its meanings: "" for its document; "alike on 3 sheets"; "sheet E-201
-    only"."""
+    """Where a term holds, in words, beside its meanings: "" for its document; "S sheets only"; "alike on 3 sheets";
+    "sheet E-201 only"."""
     if t.get("reach", "document") == "document":
         return ""
+    if t["reach"] == "discipline":
+        return ", ".join(dict.fromkeys(f"{m['discipline']} sheets" for m in t["meanings"] if m.get("discipline"))) \
+            + " only"
     if t.get("consistent"):
         return f"alike on {t['consistent']} sheets"
     return ", ".join(dict.fromkeys(m.get("sheet", "") for m in t["meanings"])) + " only"
+
+def where_said(m):
+    """Where a meaning is given, and the sheets it holds for where that's its discipline's: "set.pdf, page 23; S
+    sheets"."""
+    return m["where"] + (f"; {m['discipline']} sheets" if m.get("reach") == "discipline" else "")
 
 def joined(claims, paired, alias=lambda name: None):
     """A subject's claims by property: {its first name, folded: [claims]}, a property's names one where the findings

@@ -451,10 +451,11 @@ def search_names(data):
     with its meanings (an abbreviation finds its expansion's claims): {"items": [[names]], "properties": [[names]]}."""
     from .terms import drawn
     from .indexes import terms as glossary_terms
-    # only terms reaching their documents, or a sheet's consistent on two or more: a sheet's symbol isn't a name
+    # only terms reaching their documents or a discipline's sheets, or a sheet's consistent on two or more: a sheet's
+    # symbol isn't a name
     terms = [[t["term"], *dict.fromkeys(m["meaning"] for m in t["meanings"])]
              for t in glossary_terms(data) if len(t["meanings"][0]["meaning"]) <= 80 and not drawn(t["term"])
-             and (t.get("reach", "document") == "document" or t.get("consistent"))]
+             and (t.get("reach", "document") in ("document", "discipline") or t.get("consistent"))]
     return {k: data.get('synonyms', {}).get(k, []) + terms for k in ('items', 'properties')}
 
 def page_vectors(vectors, cards):
@@ -683,6 +684,10 @@ def reach_said(t):
     from .indexes import reach_said as said
     return said(t)
 
+def where_said(m):
+    from .indexes import where_said as said
+    return said(m)
+
 def glossary_html(terms, sources):
     """The Glossary view: each term, its kind and meanings, where each is given; in a comparison a column a source,
     "—" where one defines it not, and a term the sources define differently marked."""
@@ -690,7 +695,7 @@ def glossary_html(terms, sources):
         return ''
     many = len(sources) > 1
     def meanings(ms):
-        return '<br>'.join(f'{esc(m["meaning"])} <small>{esc(m["where"])}</small>' for m in ms) or '—'
+        return '<br>'.join(f'{esc(m["meaning"])} <small>{esc(where_said(m))}</small>' for m in ms) or '—'
     rows = ''.join(
         f'<tr data-text="{esc(" ".join([t["term"], *(m["meaning"] for m in t["meanings"])]).casefold())}">'
         f'<td><b>{esc(t["term"])}</b>' + (' <small class="warning">defined differently</small>' if t.get('differs')

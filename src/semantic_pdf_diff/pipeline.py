@@ -307,7 +307,8 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     label = provenance.text_hash(comparing.model_dump_json())
     found = read.glossary
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
-                   label=label, records=read.records, glossary=(found or {}).get('terms'))
+                   label=label, records=read.records, glossary=(found or {}).get('terms'),
+                   disciplines=(found or {}).get('disciplines'))
     if options.mode == 'revisions':
         data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)
         for f in data['findings']:  # a finding whose claims a restated record reaches says so
@@ -512,7 +513,7 @@ def extract_sources(store, client, names, files, progress, glossary=None):
     Returns (evidence by content, coverage rows, sections by content).
     """
     from .terms import Terms
-    defined = {}
+    defined, disciplines = {}, (glossary or {}).get('disciplines', {})
     for e in (glossary or {}).get('terms', []):
         defined.setdefault(e['content'], []).append(e)
     by_content, coverage, sections = {}, [], {}
@@ -544,7 +545,8 @@ def extract_sources(store, client, names, files, progress, glossary=None):
                 by_content[file.content] = None  # claimed by this source's queue
                 queue.append(pdf_job(store, name, file, by_content, coverage, sections, reader_for(extension),
                                      reader_version(extension),
-                                     Terms(defined[file.content]) if file.content in defined else None))
+                                     Terms(defined[file.content], disciplines.get(file.content))
+                                     if file.content in defined else None))
         queues.append(queue)
     if any(queues):
         log.info(f"Extracting {sum(map(len, queues))} document(s): " + ', '.join(

@@ -198,6 +198,23 @@ class Reach(unittest.TestCase):
         named = search_names({"glossary": found})["items"]
         self.assertEqual(named, [["TYP", "typical"]])  # not a sheet's letter, nor a mark described
 
+    def test_a_disciplines_list_holds_on_its_sheets(self):
+        def entry(meaning, source, reach="discipline", where="set.pdf, page 23"):
+            return {"term": "EF", "meaning": meaning, "kind": "abbreviation", "source": source, "content": "c" + source,
+                    "where": where, "block": "ABBREVIATIONS", "how": "model", "reach": reach,
+                    **({"discipline": "S", "sheet": "sheet S-001"} if reach == "discipline" else {})}
+        one = {"terms": [entry("EACH FACE", "a")]}
+        index = indexes.built(report([], sources=("a",), glossary=one))
+        (ef,) = index["glossary"]
+        self.assertEqual((ef["reach"], indexes.reach_said(ef)), ("discipline", "S sheets only"))
+        self.assertIn("EACH FACE (set.pdf, page 23; S sheets)", indexfiles.markdown(index))
+        self.assertEqual(indexes.aliases({"glossary": one})("EF"), indexes.aliases({"glossary": one})("each face"))
+        # a discipline's and the document's meanings in one source differ by design; two sources' S sheets don't agree
+        mixed = {"terms": [entry("EACH FACE", "a"), entry("EXHAUST FAN", "a", "document", "set.pdf, page 2")]}
+        self.assertNotIn("differs", indexes.built(report([], sources=("a",), glossary=mixed))["glossary"][0])
+        two = {"terms": [entry("EACH FACE", "a"), entry("END FRAME", "b")]}
+        self.assertTrue(indexes.built(report([], sources=("a", "b"), glossary=two))["glossary"][0]["differs"])
+
 class Files(unittest.TestCase):
     def test_csv_a_row_a_value(self):
         index = indexes.built(report(ONE))

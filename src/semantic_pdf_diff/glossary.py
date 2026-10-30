@@ -24,12 +24,16 @@ glossary.").
 - **Its reach** (the owner, 2026-10-30: "think on how much provenance or context should be tracked in the glossary,
   e.g. a legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually consistent"):
   a symbol on a drawing sheet, drawn or lettered, reaches that sheet ("sheet E-201": {"reach": "sheet", "sheet"});
-  everything else reaches its document (a file: an abbreviations list, a definitions clause, prose, and a drawing
-  set's abbreviations, terms and conventions, which by convention hold for the set). What a sheet's symbols are
-  worth beyond it is the index's to say (indexes.terms: the same meaning on two sheets or more, consistent).
+  a drawing set's list on a discipline's sheet reaches that discipline's sheets where the set has lists on sheets of
+  two disciplines or more ({"reach": "discipline", "discipline": "S", "sheet"}: dc's S-001 says "EF" is each face,
+  its E-001 exhaust fan; reaching); everything else reaches its document (a file: an abbreviations list, a
+  definitions clause, prose, a general sheet's list, and a set's only lists). The pages' disciplines come with the
+  glossary ({"disciplines": {content: {page: "S"}}}). What a sheet's symbols are worth beyond it is the index's to
+  say (indexes.terms: the same meaning on two sheets or more, consistent).
 - **Used by the comparison** (milestone 5; terms.Terms): with align_glossary, where alignment weighs names, a meaning
   written out weighed as its term ("side water depth" as "SWD"); with judge_glossary, each claim judged shown the
-  terms its words use, as its document defines them (its sheet's on its page).
+  terms its words use, as defined where it is (its sheet's, its discipline's, its document's); with reader_glossary,
+  each extraction request likewise.
 """
 import re
 
@@ -352,7 +356,7 @@ def read(data, store, client, mode, label, progress=None):
     and asked again by the next run)."""
     from .dispatch import Dispatcher
     progress = progress or NoProgress()
-    entries, counts = [], {"blocks": 0, "dropped": 0, "failed": 0}
+    entries, counts, disciplines = [], {"blocks": 0, "dropped": 0, "failed": 0}, {}
     files = {}
     for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
         files.setdefault(f["content"], f)
@@ -366,17 +370,20 @@ def read(data, store, client, mode, label, progress=None):
                 log.warning(f"Glossary: {f['path']} wasn't read ({type(e).__name__}: {e})")
                 continue
             where = lambda at, f=f: f"{f['path']}, {at}"
+            if found.get("pages"):
+                disciplines[content] = {str(n): d for n, d in sorted(found["pages"].items())}
             for heading, text, at, rows, image, sheet in found["blocks"]:
                 counts["blocks"] += 1
+                d = found.get("reaching", {}).get(sheet, "")  # its discipline's sheets, where its list reaches them
                 for row in rows:
                     term, meaning = " ".join(str(row[0]).split()), " ".join(" ".join(map(str, row[1:])).split())
                     if term and meaning:
-                        entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table", sheet))
+                        entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table", sheet, d))
                 listed = tabbed(text)
                 for term, meaning in listed or []:
-                    entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table", sheet))
+                    entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table", sheet, d))
                 def ask_pictured(image, heading=heading, text=text, at=at, f=f, where=where, content=content,
-                                 sheet=sheet):
+                                 sheet=sheet, d=d):
                     def done(answer, error):
                         progress.finish("failed" if error is not None else "complete")
                         if error is not None:  # (cut short: its words are read anyway)
@@ -384,13 +391,14 @@ def read(data, store, client, mode, label, progress=None):
                             return
                         terms, dropped = kept_pictured(answer, text)
                         counts["dropped"] += dropped
-                        entries.extend(entry(t, m, k, f, where(at), heading, "picture", sheet) for t, m, k in terms)
+                        entries.extend(entry(t, m, k, f, where(at), heading, "picture", sheet, d)
+                                       for t, m, k in terms)
                     dispatch.make_room()
                     progress.add()
                     dispatch.submit(pictured_prompt(heading, text), GlossaryTerms, (image,),
                                     ("glossary", mode, label, content, f"{heading}:{at}:picture"), done)
 
-                def ask(part, name, heading=heading, at=at, f=f, where=where, content=content, sheet=sheet):
+                def ask(part, name, heading=heading, at=at, f=f, where=where, content=content, sheet=sheet, d=d):
                     def done(answer, error):
                         progress.finish("failed" if error is not None else "complete")
                         lines = part.split("\n")
@@ -404,7 +412,8 @@ def read(data, store, client, mode, label, progress=None):
                             return
                         terms, dropped = kept(answer, part)
                         counts["dropped"] += dropped
-                        entries.extend(entry(t, m, k, f, where(at), heading, "model", sheet) for t, m, k in terms)
+                        entries.extend(entry(t, m, k, f, where(at), heading, "model", sheet, d)
+                                       for t, m, k in terms)
                     dispatch.make_room()
                     progress.add()
                     dispatch.submit(prompt(heading, part), GlossaryTerms, (), ("glossary", mode, label, content,
@@ -424,7 +433,27 @@ def read(data, store, client, mode, label, progress=None):
         once.setdefault((e["content"], fold(e["term"]), fold(e["meaning"])), e)
     terms = sorted(once.values(), key=lambda e: (natural(e["term"]), e["source"], natural(e["where"]),
                                                  fold(e["meaning"]), e["how"]))
-    return {"terms": terms, **counts}
+    return {"terms": terms, **counts, **({"disciplines": disciplines} if disciplines else {})}
+
+DISCIPLINE = re.compile(r"^sheet ([A-Z])[A-Z]?[-. ]?\d")  # a sheet's number's first letter: "sheet S-001", "sheet E2.1"
+GENERAL = "G"  # the general sheets' letter (cover, index, the set's own abbreviations): their lists reach every sheet
+
+def discipline(sheet):
+    """The discipline a sheet's number names ("S" for "sheet S-001", as the US National CAD Standard letters them),
+    "" for none ("the sheet on page 4")."""
+    found = DISCIPLINE.match(sheet or "")
+    return found.group(1) if found else ""
+
+def reaching(sheets):
+    """{sheet: its discipline's letter} for the sheets whose lists reach their discipline's sheets only, of the
+    drawing sheets a document's blocks are on: where its lists are on sheets of two disciplines or more (the general
+    sheets' one of them), each list but the general sheets' (dc's S-001, P-001, M-001 and E-001 each define their
+    own letters, "EF" each face on S-001, exhaust fan on E-001); a document's lists all on one discipline's sheets
+    reach the document."""
+    letters = {s: discipline(s) for s in sheets if discipline(s)}
+    if len(set(letters.values())) < 2:
+        return {}
+    return {s: d for s, d in letters.items() if d != GENERAL}
 
 def sheet_name(page, number):
     """A drawing sheet's name as its title block gives it ("sheet E-201"), else its page's ("the sheet on page 4");
@@ -456,18 +485,21 @@ def ordered(term, meaning):
     rest = iter(long)
     return (meaning, term) if all(c in rest for c in short) else (term, meaning)
 
-def entry(term, meaning, kind, f, where, block, how, sheet=""):
+def entry(term, meaning, kind, f, where, block, how, sheet="", discipline=""):
     """A glossary entry, its term and meaning in order (ordered); sheet: the drawing sheet its block is on, if it is
-    ("sheet E-201"), where a symbol reaches that sheet only."""
+    ("sheet E-201"), where a symbol reaches that sheet only; discipline: the letter of the sheets its list reaches
+    (reaching), "" for its document."""
     term, meaning = ordered(term, meaning)
-    reach = "sheet" if sheet and (kind == "symbol" or drawn(term)) else "document"
+    reach = "sheet" if sheet and (kind == "symbol" or drawn(term)) else "discipline" if discipline else "document"
     return {"term": term, "meaning": meaning, "kind": kind, "source": f["source"], "content": f["content"],
             "where": where, "block": block, "how": how, "reach": reach,
-            **({"sheet": sheet} if reach == "sheet" else {})}
+            **({"sheet": sheet} if reach != "document" else {}),
+            **({"discipline": discipline} if reach == "discipline" else {})}
 
 def content_glossary(store, f, outline, pictures=None, side=1000):
     """One file's blocks [(heading, text, where in it, table rows, its picture or None, its sheet's name or "")] and
-    its prose definitions [(where, term, meaning)], read from its bytes as the store keeps them. outline: a PDF's
+    its prose definitions [(where, term, meaning)], read from its bytes as the store keeps them; a drawing set's
+    "reaching" (reaching) and each of its pages' discipline ("pages": {page: "S"}). outline: a PDF's
     sections' depth and pages, as its extraction cuts them (sections.pdf_sections). pictures: the folder a drawn
     legend's picture is drawn into (None: none drawn), its longer side at most side pixels."""
     from .scan import read_origin
@@ -486,7 +518,10 @@ def content_glossary(store, f, outline, pictures=None, side=1000):
                                sheet_name(doc[a - 1], a) if a == b else ""))
             found = [(f"page {n}", t, m) for n, page in enumerate(doc, 1)
                      for t, m in prose(" ".join(page.get_text().split()))]
-        return {"blocks": blocks, "prose": found}
+            reach = reaching([b[5] for b in blocks])
+            pages = {n: d for n, page in enumerate(doc, 1) for d in [discipline(sheet_name(page, n))] if d} \
+                if reach else {}
+        return {"blocks": blocks, "prose": found, "reaching": reach, "pages": pages}
     from .jobs import TEXT_EXTENSIONS
     from .textjob import read_text
     extension = next((x for x in TEXT_EXTENSIONS if f["content"].endswith(x)), None)

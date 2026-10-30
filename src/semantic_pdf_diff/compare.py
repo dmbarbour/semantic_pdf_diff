@@ -182,7 +182,7 @@ def _read_off(claim):
                                         or bool(getattr(claim, "image", None)))
 
 def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label="", records=None,
-            glossary=None):
+            glossary=None, disciplines=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
@@ -201,7 +201,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     to the judge where the settings say (the judge_context lever).
 
     glossary: the sources' glossary entries (glossary.read's terms), for the alignment (the align_glossary lever) and
-    the judge (judge_glossary) where the settings say.
+    the judge (judge_glossary) where the settings say; disciplines: {content: {page: its discipline}} (glossary.read's),
+    where a drawing set's lists reach their disciplines' sheets.
     """
     # Comparisons aren't bound to a store, so their cache keys carry their own settings.
     settings_key = label  # the comparison interpreter's hash, naming the requests' recipes (labels only)
@@ -274,7 +275,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
     by_content = defaultdict(list)
     for t in glossary or []:
         by_content[t["content"]].append(t)
-    defined = {c: Terms(entries) for c, entries in by_content.items()}
+    defined = {c: Terms(entries, (disciplines or {}).get(c)) for c, entries in by_content.items()}
     with (dispatch if own else contextlib.nullcontext()):
         if client.s.reranks(mode) and pairs and dispatch.split:  # the reranker's order, its threshold (rerank.py)
             judged_before = {x.id for _, a, b in pairs for x in (a, b)}
