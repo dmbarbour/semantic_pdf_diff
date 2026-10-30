@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.9.0 (2026-10-30)
+
+- **Kinds of items in the index.** Tagged items group by their tag's letters (P-101, P-102 and P-103 as "pump (P)"), and items named with a number by the name without it ("Room 104", "Room 105" as "Room"). Each kind is a table of its items by property, the properties most of them give first, with "—" where an item gives none its siblings do. It appears in index.md, the workbook's Kinds sheet (an outline collapsing to the kinds), `index/kinds.csv` and the page's Kinds view.
+- **A glossary list that runs past its page** in a PDF without an outline is read on over the next pages, up to the next heading. The calg manual's DEFINITIONS are read over four pages.
+- **A drawn legend's symbols:** a drawing's Symbols or Legend block is read from its words as before, and its picture is asked for its symbols (with vision on). A drawn symbol is described in square brackets, such as "[circle with M] = MOTOR". On calg's legend this took the glossary from 25 terms to 49.
+- **Indexes are built whenever a report is written,** so `semantic-pdf-diff report` brings an older comparison's index up to date.
+
 ## 0.8.0 (2026-10-30)
 
 - **Glossaries.** After a comparison or analysis, each source's abbreviations, defined terms, symbols and conventions are read (the `glossary` setting, on by default):
