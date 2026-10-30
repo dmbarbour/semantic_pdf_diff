@@ -132,6 +132,8 @@ From the tentative row, moved in:
 
 - Other names and the glossary join a subject's names; the model asked only for what's left.
 - **Kinds** ([design question 4](#design-questions), answered: "indices for both, where feasible"): each kind of subject (pumps, rooms) with its items under it, where the items' names say the kind.
+  - **Built 2026-10-30:** tagged items by their tag's letters, named by the word their names most share ("pump (P)"); items named with a number by the name without it ("Room"); a kind of two items or more, a table of its items by property, the most given first, "—" where an item gives none its siblings do (index.md, the workbook's Kinds sheet, kinds.csv, the page's Kinds view). On the two live slices: "Beam ID 4 opening" (openings 1, 3, 5), "dimension" (1 to 3), "drawing (A)" (A1, A6).
+  - **The index built whenever a report is written** (not kept in the store), so `report` brings an older comparison's index up to date.
 - Measured against the controlled keys.
 
 ### 4. Matching across sources, further
