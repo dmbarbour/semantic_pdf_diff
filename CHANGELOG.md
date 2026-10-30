@@ -2,6 +2,14 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.8.0 (2026-10-30)
+
+- **Glossaries.** After a comparison or analysis, each source's abbreviations, defined terms, symbols and conventions are read (the `glossary` setting, on by default):
+  - from the parts headed Abbreviations, Definitions, Symbols, Legend and the like. The model reads them a part at a time, and a term is kept only where the text holds both it and its meaning. A Word or Markdown table there, or a list of tabbed lines, is taken as it is, with no request.
+  - from definitions in prose, such as "net positive suction head (NPSH)".
+  - A drawing sheet's abbreviations are read as rows of words by position, so each term stays beside its meaning even where the text layer lists the columns apart.
+- **The glossary in the index:** a Glossary section in index.md, `index/glossary.csv`, a Glossary sheet in the workbook, and a Glossary view in the page. In a comparison each term is listed once with each source's meanings, and a term the sources define differently is marked. A search for a term also finds the claims under its meaning.
+
 ## 0.7.0 (2026-10-29)
 
 - **`semantic-pdf-diff analyze SOURCE`** reads one source and reports its claims without comparing. The source can be a file, a folder or zip of documents, or a declared source. Its report opens on every claim, with topics, a file filter and the same search (other names and vectors too). It takes `compare`'s options except the comparing ones, and uses the same store, settings and answers cache. `report`, `search` and `debug` read an analysis as they read a comparison.
