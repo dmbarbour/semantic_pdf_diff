@@ -300,8 +300,10 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     progress = Progress('compare', client, heartbeat=settings.heartbeat_seconds)
     headings = {(c, x.id): " > ".join(x.heading_path) for c, items in sections.items() for x in items}
     comparing = comparison_interpreter(settings)
+    label = provenance.text_hash(comparing.model_dump_json())
+    found = read_glossary(settings, store, client, options.mode, label, progress, document)
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
-                   label=provenance.text_hash(comparing.model_dump_json()), records=read.records)
+                   label=label, records=read.records)
     if options.mode == 'revisions':
         data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)
         for f in data['findings']:  # a finding whose claims a restated record reaches says so
@@ -317,9 +319,9 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         records=document.records,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
-    data = searchable(traced(data), settings, client, options.mode, provenance.text_hash(comparing.model_dump_json()),
-                      progress, store)
-    progress.close()  # the comparison's requests, its search's (names, vectors) too
+    data = searchable({**traced(data), **({'glossary': found} if found is not None else {})}, settings, client,
+                      options.mode, label, progress)
+    progress.close()  # the comparison's requests, its glossary's and search's (names, vectors) too
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
@@ -338,24 +340,32 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
     log.info(f"Reporting {len(claims)} extracted claims of {names[0]}")
     progress = Progress('report', client, heartbeat=settings.heartbeat_seconds)
     label = provenance.text_hash(comparison_interpreter(settings).model_dump_json())
+    found = read_glossary(settings, store, client, ONE_SOURCE, label, progress, document)
     data = Report(mode=ONE_SOURCE, findings=[], unmatched=[], shared=[], retrieval={},
         created_at=provenance.now().isoformat(), sources=document.sources, files=document.files,
         interpreters=document.interpreters, scan_issues=document.scan_issues, file_difference={},
         sections=document.sections, situation=document.situation, evidence=document.evidence, coverage=read.coverage,
         records=document.records, settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         limitations=ANALYSIS_LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
-    data = searchable(data, settings, client, ONE_SOURCE, label, progress, store)
-    progress.close()  # its search's requests (topics' names, other names, vectors)
+    data = searchable({**data, **({'glossary': found} if found is not None else {})}, settings, client, ONE_SOURCE,
+                      label, progress)
+    progress.close()  # its glossary's and search's requests (topics' names, other names, vectors)
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)
 
-def searchable(data, settings, client, mode, label, progress, store=None):
-    """A report's data with what its browsing and search use, each as its lever says: the sources' glossaries (read
-    from the store's files), the topics' way and names, the other names, the claims' vectors. label: the run's
-    interpreter's, naming its requests."""
-    if settings.reads_glossary() and store is not None:  # (glossary.py)
-        from . import glossary
-        data['glossary'] = glossary.read(data, store, client, mode, label, progress)
+def read_glossary(settings, store, client, mode, label, progress, document):
+    """The sources' glossaries (glossary.py), where the glossary lever reads them, from the store's files: read before
+    claims are compared, so the comparison may use them too; else None. label: the run's interpreter's, naming its
+    requests."""
+    if not settings.reads_glossary():
+        return None
+    from . import glossary
+    return glossary.read({'files': document.files, 'sections': document.sections}, store, client, mode, label,
+                         progress)
+
+def searchable(data, settings, client, mode, label, progress):
+    """A report's data with what its browsing and search use, each as its lever says: the topics' way and names, the
+    other names, the claims' vectors. label: the run's interpreter's, naming its requests."""
     if settings.names_topics():  # the model's choice among the topics' ways, and its names (topics.py)
         from .schema import TopicNames
         found, claims = report_topics(data)

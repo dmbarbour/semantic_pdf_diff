@@ -1132,7 +1132,7 @@ class SearchNames(Lever):
 
 class ReadGlossary(Lever):
     lever_name, stage, off = "glossary", "comparison", {"glossary": False}
-    # the sources' glossaries read after the comparison or analysis: their abbreviations, defined terms, symbols and
+    # the sources' glossaries read before claims are compared: their abbreviations, defined terms, symbols and
     # conventions, from the blocks defining them (the model, a request a block's part) and from prose (by pattern),
     # for the index and the search (glossary.py; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 2; the
     # owner, 2026-10-30: "Please proceed with the glossary."). On by default, for the owner to confirm
@@ -1427,8 +1427,8 @@ class Platform(Composable):
 
     @chosen
     def reads_glossary(self):
-        """Whether the sources' glossaries are read after the comparison (glossary.py): the platform's, never; the
-        glossary lever's, when on."""
+        """Whether the sources' glossaries are read, before claims are compared (glossary.py): the platform's, never;
+        the glossary lever's, when on."""
         return False
 
     @chosen

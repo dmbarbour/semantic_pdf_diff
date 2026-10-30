@@ -68,8 +68,8 @@ NOT_EXERCISED = {
                     "an embedding model's endpoint, which the stub model doesn't serve (tests/test_embed.py)"),
     'search_names': "asks the model after the comparison, for the report's search; the stub answers no other names "
                     '(tests/test_search.py)',
-    'glossary': "reads the parts headed Abbreviations, Definitions and the like, after the comparison; these documents "
-                "have none (tests/test_glossary.py)",
+    'glossary': "reads the parts headed Abbreviations, Definitions and the like, before claims are compared; these "
+                "documents have none (tests/test_glossary.py)",
     'topic_names': "needs claims of both sides splitting into two topics or more; the stub's documents make "
                    'one (tests/test_topics.py)',
     'section_pages': 'sections come from page ranges only without an outline; the documents have one',
