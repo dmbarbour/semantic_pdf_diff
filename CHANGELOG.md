@@ -2,6 +2,14 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.10.0 (2026-10-30)
+
+- **A glossary entry's reach.** A symbol on a drawing sheet, drawn or lettered, holds for that sheet ("sheet E-001", from its title block). Everything else holds for its document: abbreviation lists, definitions, prose, and a drawing set's abbreviations, terms and conventions. The index says when a term is one sheet's ("sheet E-201 only"), or that it's consistent where it means the same on two sheets or more ("alike on 3 sheets"). Only terms holding for their documents, and consistent symbols, are taken as other names by the search.
+- **Other names join the index's subjects.** A glossary term and its meaning ("AHU" and "air handling unit"), or names the model grouped as one thing's, now act as one name:
+  - one source's subjects under such names are joined;
+  - subjects of two sources that the findings left apart are matched by them ("matched by other names");
+  - a subject's properties under such names become one row ("NPSH" and "net positive suction head").
+
 ## 0.9.0 (2026-10-30)
 
 - **Kinds of items in the index.** Tagged items group by their tag's letters (P-101, P-102 and P-103 as "pump (P)"), and items named with a number by the name without it ("Room 104", "Room 105" as "Room"). Each kind is a table of its items by property, the properties most of them give first, with "—" where an item gives none its siblings do. It appears in index.md, the workbook's Kinds sheet (an outline collapsing to the kinds), `index/kinds.csv` and the page's Kinds view.
