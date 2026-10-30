@@ -183,7 +183,8 @@
       if (!x.hidden) n += 1;
     }
     for (const tab of tabs) tab.textContent = labels.get(tab);
-    $('count').textContent = `${n} of ${items.length} ${view === 'figures' ? 'figures and tables' : view}`;
+    const what = {figures: 'figures and tables', glossary: 'terms'}[view] || view;
+    $('count').textContent = `${n} of ${items.length} ${what}`;
     main.textContent = '';
     listed = [];
     remember(step);

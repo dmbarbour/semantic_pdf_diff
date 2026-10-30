@@ -3,8 +3,9 @@ choosing Markdown, CSV and JSON, and "An excel file is also a good representatio
 excel workbooks of claims, but not really designed as an indexing model."):
 
 - **index.md:** subjects A to Z, each with its properties and every value with where it's said (in a comparison, each
-  source's beside the others'); then properties, each with the subjects giving it; then figures and tables.
-- **index/*.csv:** subjects, properties, claims, figures: a row a value (or claim, or figure), for filtering.
+  source's beside the others'); then properties, each with the subjects giving it; then figures and tables; then the
+  glossary, each term's meanings and where they're given.
+- **index/*.csv:** subjects, properties, claims, figures, glossary: a row a value (or claim, figure, meaning).
 - **index.xlsx:** a sheet per index, its header frozen and filtered. Subjects is an outline: a subject's row, its
   values beneath it, grouped so a subject collapses to its row (Excel's outline, the 1 and 2 at the left). Written
   as OOXML here, the same bytes for the same index (no workbook library: openpyxl is the office extra's, for reading).
@@ -42,9 +43,10 @@ def markdown(index):
     lines = [f"# Index: {title(index)}", "",
              f"{len(index['subjects'])} subjects, {len(properties(index))} properties, "
              f"{sum(len(c) for s in index['subjects'] for c in s['claims'].values())} claims, "
-             f"{len(index['figures'])} figures and tables. Read by a model: check a value against its place before "
-             "relying on it." + (" A source giving nothing for a subject or property another gives is marked “—”: "
-                                 "not saying isn't evidence of absence." if many else ""), "", "## Subjects", ""]
+             f"{len(index['figures'])} figures and tables, {len(index.get('glossary', []))} glossary terms. Read by a "
+             "model: check a value against its place before relying on it."
+             + (" A source giving nothing for a subject or property another gives is marked “—”: not saying isn't "
+                "evidence of absence." if many else ""), "", "## Subjects", ""]
     for s in index["subjects"]:
         names = [n for n in s["names"] if n.casefold() != s["name"].casefold()]
         lines.append(f"### {s['name']}" + (f" (also {', '.join(names[:5])})" if names else ""))
@@ -75,6 +77,16 @@ def markdown(index):
         lines.append(f"- **{name}** ({place})" + (f": {f['about'].rstrip('.')}" if f["about"] else "")
                      + (f"; {counted(len(f['claims']), 'claim')}" if f["claims"] else "")
                      + ("; cited once" if f["cited"] == 1 else f"; cited {f['cited']} times" if f["cited"] else ""))
+    lines += ["", "## Glossary", ""]
+    for t in index.get("glossary", []):
+        if many:
+            by = {src: [m for m in t["meanings"] if m["source"] == src] for src in sources}
+            said_by = "; ".join(f"{src}: " + (", ".join(f"{m['meaning']} ({m['where']})" for m in by[src])
+                                               if by[src] else "—") for src in sources)
+        else:
+            said_by = "; ".join(f"{m['meaning']} ({m['where']})" for m in t["meanings"])
+        lines.append(f"- **{t['term']}** ({t['kind']}): {said_by}"
+                     + (" — defined differently" if t.get("differs") else ""))
     return "\n".join(lines).rstrip() + "\n"
 
 # --- the tables: CSV and the workbook's sheets ---------------------------------------------------------------------
@@ -92,12 +104,15 @@ def tables(index, evidence):
                e.get("conditions", ""), e["kind"], e.get("quote", "")] for e in evidence.values()]
     figures = [[f["source"], f["file"], f["page"] if f["page"] is not None else "", f["kind"], f["label"], f["title"],
                 f["about"], len(f["claims"]), f["cited"]] for f in index["figures"]]
+    glossary = [[t["term"], t["kind"], m["meaning"], m["source"], m["where"], m["block"], m["how"],
+                 "yes" if t.get("differs") else ""] for t in index.get("glossary", []) for m in t["meanings"]]
     tail = ["Value", "Unit", "Conditions", "Source", "Where", "Claim"]
     return {"subjects": (["Subject", "Property", *tail], subjects),
             "properties": (["Property", "Subject", *tail], props),
             "claims": (["Claim", "Subject", "Item", "Property", "Value", "Unit", "Conditions", "Read as", "Quote"],
                        claims),
-            "figures": (["Source", "File", "Page", "Kind", "Label", "Title", "About", "Claims", "Cited"], figures)}
+            "figures": (["Source", "File", "Page", "Kind", "Label", "Title", "About", "Claims", "Cited"], figures),
+            "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Block", "How", "Differs"], glossary)}
 
 def csv_text(header, rows):
     out = io.StringIO()
@@ -108,7 +123,8 @@ def csv_text(header, rows):
 
 # --- index.xlsx ----------------------------------------------------------------------------------------------------
 
-WIDTHS = {"Subject": 32, "Property": 28, "Value": 14, "Unit": 9, "Conditions": 24, "Source": 14, "Where": 30,
+WIDTHS = {"Term": 16, "Meaning": 50, "Block": 20, "How": 8, "Differs": 8,
+          "Subject": 32, "Property": 28, "Value": 14, "Unit": 9, "Conditions": 24, "Source": 14, "Where": 30,
           "Claim": 14, "Item": 28, "Read as": 9, "Quote": 50, "File": 30, "Page": 6, "Kind": 8, "Label": 16,
           "Title": 40, "About": 60, "Claims": 8, "Cited": 7}
 BOLD, MUTED = 1, 2  # the styles' indexes (STYLES)
@@ -185,12 +201,12 @@ def workbook(index, evidence):
                                  v["where"], v["claim"]])
                 outline.append((1, MUTED))
     about = [["Index", title(index)], ["Subjects", len(index["subjects"])],
-             ["Properties", len(properties(index))], ["Claims", len(evidence)], ["Figures and tables",
-                                                                                 len(index["figures"])],
+             ["Properties", len(properties(index))], ["Claims", len(evidence)],
+             ["Figures and tables", len(index["figures"])], ["Glossary terms", len(index.get("glossary", []))],
              ["Subjects sheet", "A subject's row, then its values: the 1 and 2 at the left collapse or open them all"],
              ["Caution", "Read by a model: check a value against its place (Where) before relying on it"]]
     sheets = [("About", sheet([], about, widths=[20, 90])), ("Subjects", sheet(header, outlined, outline))]
-    sheets += [(name.title(), sheet(*found[name])) for name in ("properties", "claims", "figures")]
+    sheets += [(name.title(), sheet(*found[name])) for name in ("properties", "claims", "figures", "glossary")]
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         def put(name, text):

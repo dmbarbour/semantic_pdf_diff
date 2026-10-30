@@ -474,8 +474,9 @@ def report_items(data, index, prefix=""):
                  "finding": f} for f in ordered(data["findings"]) if f["relation"] != "unrelated"]
     sides = [s["name"] for s in data["sources"]]
     claims = claim_records(data, card, file_index(file_pairs(data)), {}, sides)
-    for kind in ("items", "properties"):  # the model's other names (the search_names lever), every report's
-        index.synonyms.setdefault(kind, []).extend(data.get("synonyms", {}).get(kind, []))
+    from .report import search_names
+    for kind, groups in search_names(data).items():  # the model's other names and the glossary's, every report's
+        index.synonyms.setdefault(kind, []).extend(groups)
     vectors = data.get("vectors") or {}
     for claim, i in (vectors.get("of") or {}).items():  # the claims' vectors (the embed lever)
         from .embed import unpacked

@@ -13,11 +13,13 @@ document that would be useful, and it seems deeply related to the problem of com
   is left blank there: weak, never a finding.
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
+- **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
+  each source's, a term the sources define differently marked.
 """
-import re
 from collections import Counter, defaultdict
 
 from .align import Side
+from .glossary import fold, natural
 from .schema import Evidence
 
 # The relations a finding pairs two claims of one subject by: unrelated pairs say they aren't.
@@ -29,10 +31,6 @@ PLACES = {"pdf": lambda loc: f"page {loc['page']}",
           "pptx": lambda loc: f"slide {loc['page']}",
           "xlsx": lambda loc: f"sheet {loc['sheet']}, cells {loc['cells']}",
           "csv": lambda loc: f"lines {loc['file_lines'][0]}–{loc['file_lines'][1]}"}
-
-def natural(text):
-    """A sort key reading numbers as numbers: P-2 before P-10."""
-    return [(0, int(x), "") if x.isdigit() else (1, 0, x) for x in re.split(r"(\d+)", str(text).casefold()) if x]
 
 def plain(text):
     return " ".join(str(text).split())
@@ -118,7 +116,29 @@ def built(data):
                                         "where": where(c)} for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
-    return {"sources": sources, "subjects": subjects, "figures": figures(data, where)}
+    return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data)}
+
+def term_key(term):
+    """A term as terms are told apart: case and a closing full stop folded ("TYP." is "typ")."""
+    return " ".join(term.split()).casefold().rstrip(".")
+
+def terms(data):
+    """The glossary index: each term once, A to Z: {"term", "kind", "meanings": [{source, meaning, where, how,
+    block}], "differs" where two sources' meanings share none}."""
+    by = defaultdict(list)
+    for t in (data.get("glossary") or {}).get("terms", []):
+        by[term_key(t["term"])].append(t)
+    out = []
+    for _, ts in sorted(by.items(), key=lambda x: natural(x[0])):
+        said = defaultdict(set)
+        for t in ts:
+            said[t["source"]].add(fold(t["meaning"]).rstrip("."))
+        differs = len(said) > 1 and not set.intersection(*said.values())
+        out.append({"term": Counter(t["term"] for t in ts).most_common(1)[0][0],
+                    "kind": Counter(t["kind"] for t in ts).most_common(1)[0][0],
+                    "meanings": [{k: t[k] for k in ("source", "meaning", "where", "how", "block")} for t in ts],
+                    **({"differs": True} if differs else {})})
+    return out
 
 def joined(claims, paired):
     """A subject's claims by property: {its first name, folded: [claims]}, a property's names one where the findings

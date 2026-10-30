@@ -129,6 +129,8 @@ class Read(unittest.TestCase):
             code, _, _ = run("analyze", root / "spec.md", "--store", root / "out", "--base-url", url, "--config",
                              config, "--no-situate")
             data = json.loads((root / "out" / "report.json").read_text())
+            self.page = (root / "out" / "report.html").read_text()
+            self.index = (root / "out" / "index.md").read_text()
         return code, data, state
 
     def test_an_analysis_reads_its_sources_glossary(self):
@@ -143,6 +145,10 @@ class Read(unittest.TestCase):
         aff = found["terms"][0]
         self.assertEqual((aff["block"], aff["source"], aff["kind"]), ("Abbreviations", "spec.md", "abbreviation"))
         self.assertRegex(aff["where"], r"spec\.md, lines \d+–\d+")
+        from semantic_pdf_diff.report import unpacked
+        self.assertIn('<button data-view="glossary">Glossary 4</button>', unpacked(self.page))  # shown, and listed
+        self.assertRegex(self.index,
+                         r"- \*\*NPSH\*\* \(abbreviation\): net positive suction head \(\S*spec\.md, line \d+\)")
 
     def test_a_part_cut_short_asked_again_in_halves(self):
         code, data, state = self.analyze({}, short=True)

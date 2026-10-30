@@ -447,6 +447,13 @@ def report_page(data, stored, budget, note=''):
         chosen.pop()
     return page, account
 
+def search_names(data):
+    """The names a search takes as one: the model's other names (the search_names lever), and each glossary term
+    with its meanings (an abbreviation finds its expansion's claims): {"items": [[names]], "properties": [[names]]}."""
+    terms = [[t["term"], *dict.fromkeys(m["meaning"] for m in t["meanings"])]
+             for t in (data.get('index') or {}).get('glossary', []) if len(t["meanings"][0]["meaning"]) <= 80]
+    return {k: data.get('synonyms', {}).get(k, []) + terms for k in ('items', 'properties')}
+
 def page_vectors(vectors, cards):
     """The claims' vectors a page's search reads (the embed lever's): {"dimensions", "vectors", "of": {card: index}},
     only those of its cards; none without them."""
@@ -545,12 +552,13 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     if way:
         page += topic_coverage_html(claims, names, sides)
     index = data.get('index') or {}
-    subjects, figures = index.get('subjects', []), index.get('figures', [])
+    subjects, figures, terms = index.get('subjects', []), index.get('figures', []), index.get('glossary', [])
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
              + (f'<button data-view="subjects">Subjects {len(subjects)}</button>' if subjects else '')
              + (f'<button data-view="figures">Figures and tables {len(figures)}</button>' if figures else '')
+             + (f'<button data-view="glossary">Glossary {len(terms)}</button>' if terms else '')
              + '</div>')
     page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
              + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
@@ -573,8 +581,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              + '</select></label><label>Read as <select id="claimkind"><option value="all">Any kind</option>'
              + ''.join(f'<option>{k}</option>' for k in ('text', 'table', 'chart', 'diagram'))
              + '</select></label><label id="counterparts-box" hidden><input type="checkbox" id="counterparts" checked> '
-             + ('and their counterparts and other names' if data.get('synonyms', {}).get('items')
-                or data.get('synonyms', {}).get('properties') else 'and their counterparts') + '</label></span>')
+             + ('and their counterparts and other names' if any(search_names(data).values())
+                else 'and their counterparts') + '</label></span>')
     if len(pairs) > 1:
         page += ('<label>File <select id="file"><option value="all">All files</option>'
                  + ''.join(f'<option value="{pair_key(a, b, files)}">{esc(pair_name(kind, a, b))}</option>'
@@ -596,7 +604,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
-    page += subjects_html(subjects, index.get('sources', [])) + figures_html(figures, len(sides) > 1)
+    page += (subjects_html(subjects, index.get('sources', [])) + figures_html(figures, len(sides) > 1)
+             + glossary_html(terms, index.get('sources', [])))
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -620,7 +629,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     values = {eid: v for eid in card.html if (v := claim_value(card.evidence[eid])) is not None}
     parts = {"page": page, "findings": findings, "claims": claims, "cards": card.html, "said": list(card.said),
              "values": values, "units": units, "folded": folded, "kinds": kinds,
-             "synonyms": {k: data.get('synonyms', {}).get(k, []) for k in ('items', 'properties')},
+             "synonyms": search_names(data),
              "vectors": page_vectors(data.get('vectors'), card.html)}
     packed = json.dumps(parts, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
     packed = base64.b64encode(gzip.compress(packed, 9, mtime=0)).decode("ascii")  # mtime=0: the same bytes each time
@@ -663,6 +672,27 @@ def subjects_html(subjects, sources):
             '(a tag, else its words), its properties and every value given, each linked to its claim'
             + ('; a source giving nothing for one is marked “—”: not saying isn\'t evidence of absence' if many else '')
             + '. Also in index.md and index.xlsx, beside this page.</p>' + ''.join(out) + '</section>')
+
+def glossary_html(terms, sources):
+    """The Glossary view: each term, its kind and meanings, where each is given; in a comparison a column a source,
+    "—" where one defines it not, and a term the sources define differently marked."""
+    if not terms:
+        return ''
+    many = len(sources) > 1
+    def meanings(ms):
+        return '<br>'.join(f'{esc(m["meaning"])} <small>{esc(m["where"])}</small>' for m in ms) or '—'
+    rows = ''.join(
+        f'<tr data-text="{esc(" ".join([t["term"], *(m["meaning"] for m in t["meanings"])]).casefold())}">'
+        f'<td><b>{esc(t["term"])}</b>' + (' <small class="warning">defined differently</small>' if t.get('differs')
+                                          else '') + f'</td><td>{esc(t["kind"])}</td>'
+        + (''.join(f'<td>{meanings([m for m in t["meanings"] if m["source"] == src])}</td>' for src in sources)
+           if many else f'<td>{meanings(t["meanings"])}</td>') + '</tr>' for t in terms)
+    heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Meaning</th>'
+    return ('<section data-for="glossary" class="index" hidden><p class="meta">The abbreviations, defined terms, '
+            'symbols and conventions the documents define, from their parts headed so (read by the model, or as '
+            'listed) and from prose ("net positive suction head (NPSH)"); a search for a term finds its meaning\'s '
+            f'claims too.</p><table><thead><tr><th>Term</th><th>Kind</th>{heads}</tr></thead><tbody>{rows}</tbody>'
+            '</table></section>')
 
 def said_of(v):
     unit = '' if v['unit'] in ('', '-') else v['unit']  # "-": none

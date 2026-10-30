@@ -93,6 +93,26 @@ class Subjects(unittest.TestCase):
         self.assertIn('- **Figure 2 “Pump curve”** (a.pdf, page 4): The pumps\' head against flow; 1 claim; cited once',
                       indexfiles.markdown(index))
 
+class Glossary(unittest.TestCase):
+    def test_terms_merged_across_sources_and_marked_where_defined_differently(self):
+        def term(t, meaning, source, page=2):
+            return {"term": t, "meaning": meaning, "kind": "abbreviation", "source": source, "content": f"c{source}",
+                    "where": f"{source}.pdf, page {page}", "block": "ABBREVIATIONS", "how": "model"}
+        found = {"terms": [term("TYP", "typical", "a"), term("TYP.", "Typical", "b"), term("FF", "far face", "a"),
+                           term("FF", "finished floor", "b"), term("UNO", "unless noted otherwise", "b")]}
+        index = indexes.built(report([], sources=("a", "b"), glossary=found))
+        self.assertEqual([(t["term"], len(t["meanings"]), t.get("differs", False)) for t in index["glossary"]],
+                         [("FF", 2, True), ("TYP", 2, False), ("UNO", 1, False)])
+        page = indexfiles.markdown(index)
+        self.assertIn("- **FF** (abbreviation): a: far face (a.pdf, page 2); b: finished floor (b.pdf, page 2) — "
+                      "defined differently", page)
+        self.assertIn("- **UNO** (abbreviation): a: —; b: unless noted otherwise (b.pdf, page 2)", page)
+        header, rows = indexfiles.tables(index, {})["glossary"]
+        self.assertEqual(rows[0], ["FF", "abbreviation", "far face", "a", "a.pdf, page 2", "ABBREVIATIONS", "model",
+                                   "yes"])
+        from semantic_pdf_diff.report import search_names
+        self.assertIn(["UNO", "unless noted otherwise"], search_names({"index": index})["properties"])
+
 class Files(unittest.TestCase):
     def test_csv_a_row_a_value(self):
         index = indexes.built(report(ONE))
@@ -110,7 +130,7 @@ class Files(unittest.TestCase):
         data = indexfiles.workbook(index, evidence)
         self.assertEqual(data, indexfiles.workbook(index, evidence))  # the same bytes for the same index
         book = openpyxl.load_workbook(io.BytesIO(data))
-        self.assertEqual(book.sheetnames, ["About", "Subjects", "Properties", "Claims", "Figures"])
+        self.assertEqual(book.sheetnames, ["About", "Subjects", "Properties", "Claims", "Figures", "Glossary"])
         subjects = book["Subjects"]
         self.assertEqual(subjects.freeze_panes, "A2")
         self.assertEqual(subjects.auto_filter.ref, "A1:H7")  # the header, 2 subjects' rows and their 4 values
@@ -152,7 +172,7 @@ class Written(unittest.TestCase):
             searched = drawn((out / "report.html").as_uri() + "#subjects&q=blower")
         self.assertEqual((code, again), (0, 0))
         self.assertEqual(len(data["index"]["subjects"]), 15)
-        self.assertEqual(files, ["claims.csv", "figures.csv", "properties.csv", "subjects.csv"])
+        self.assertEqual(files, ["claims.csv", "figures.csv", "glossary.csv", "properties.csv", "subjects.csv"])
         self.assertIn("# Index: plant", page)
         self.assertRegex(page, r"### blower0\n\n- \*\*discharge head\*\*: 20 m \(\S*blowers\.md, lines \d+–\d+\)")
         self.assertEqual(page, rewritten)

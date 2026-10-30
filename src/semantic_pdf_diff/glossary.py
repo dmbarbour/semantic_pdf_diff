@@ -50,6 +50,10 @@ Leave out what it doesn't define: page furniture, notes that define nothing.
 Return JSON {"terms": [{"term": "...", "meaning": "...", "kind": "abbreviation"}]}; [] where it defines none.
 '''
 
+def natural(text):
+    """A sort key reading numbers as numbers: P-2 before P-10, page 2 before page 10."""
+    return [(0, int(x), "") if x.isdigit() else (1, 0, x) for x in re.split(r"(\d+)", str(text).casefold()) if x]
+
 def fold(text):
     """Text as found: case, spacing, dashes and quotes folded."""
     text = str(text).casefold().translate(str.maketrans("–—‐‑’‘“”", "----''\"\""))
@@ -239,7 +243,6 @@ def read(data, store, client, mode, label, progress=None):
     is cut short (too many terms) is asked again in halves; a request failing leaves its part's terms out (counted,
     and asked again by the next run)."""
     from .dispatch import Dispatcher
-    from .indexes import natural
     progress = progress or NoProgress()
     entries, counts = [], {"blocks": 0, "dropped": 0, "failed": 0}
     files = {}
