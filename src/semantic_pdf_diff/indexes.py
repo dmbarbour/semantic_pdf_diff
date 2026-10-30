@@ -13,6 +13,10 @@ document that would be useful, and it seems deeply related to the problem of com
   is left blank there: weak, never a finding.
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
+- **Other names** (milestone 3): the names one thing goes by, as the run found them (a glossary term reaching its
+  document and its meaning, "AHU" and "air handling unit"; the model's other names, search_names), join a source's
+  subjects so named, match subjects across sources the findings left apart, and join a subject's properties
+  ("NPSH" and "net positive suction head").
 - **Kinds** (the owner, 2026-10-30, of items or kinds: "I think we should have indices for both, where feasible."):
   tagged items by their tag's letters (P-101 and P-102 are the P items), named by the word their names most share
   ("pump"); items named with a number by the name without it ("Room 104" and "Room 105": Room); a kind of two items
@@ -64,10 +68,55 @@ def subjects_of(claims):
     side = Side([Evidence.model_validate(c) for c in claims])
     return [(key, side.display(key), [claims[i] for i in idx]) for key, idx in side.items.items()]
 
-def matched(found, findings, sources):
+def alias_key(name):
+    return fold(name).rstrip(".")
+
+def aliases(data):
+    """The names one thing goes by, as the run found them: each glossary term reaching its document with its meaning
+    (a mark described, or a meaning of more than 80 characters, isn't a name), and the model's other names (the
+    search_names lever's groups). A function giving a name its group's first name (folded, the least A to Z), or None
+    for a name in no group."""
+    from .glossary import drawn
+    parent = {}
+
+    def root(x):
+        parent.setdefault(x, x)
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    def join(a, b):
+        ra, rb = sorted((root(a), root(b)), key=natural)
+        parent[rb] = ra
+    for t in (data.get("glossary") or {}).get("terms", []):
+        if t.get("reach", "document") == "document" and not drawn(t["term"]) and len(t["meaning"]) <= 80:
+            join(alias_key(t["term"]), alias_key(t["meaning"]))
+    for kind in ("items", "properties"):
+        for group in (data.get("synonyms") or {}).get(kind, []):
+            for name in group[1:]:
+                join(alias_key(group[0]), alias_key(name))
+    return lambda name: root(alias_key(name)) if alias_key(name) in parent else None
+
+def renamed(subjects, alias):
+    """One source's subjects, those named as other names of one thing joined (the first's key and name, their claims
+    together)."""
+    out, at = [], {}
+    for key, name, cs in subjects:
+        a = alias(name) or next((alias(c["entity"]) for c in cs if alias(c["entity"])), None)
+        if a is not None and a in at:
+            k, n, prior = out[at[a]]
+            out[at[a]] = (k, n, prior + cs)
+            continue
+        if a is not None:
+            at[a] = len(out)
+        out.append((key, name, cs))
+    return out
+
+def matched(found, findings, sources, alias=lambda name: None):
     """The sources' subjects matched across them: [{source: (key, name, claims)}], each subject once. Two sources'
     subjects are one where the findings pair their claims, the most pairs first and one to one; else where they're
-    keyed alike (a tag, or the same words); the rest alone."""
+    keyed alike (a tag, or the same words), or named as other names of one thing (alias); the rest alone."""
     of = {c["id"]: (source, key) for source in sources for key, _, claims in found[source] for c in claims}
     by = {(source, key): (key, name, claims) for source in sources for key, name, claims in found[source]}
     links = Counter()
@@ -84,14 +133,19 @@ def matched(found, findings, sources):
         merged.append(group)
     keyed = defaultdict(list)
     for source in sources:
-        for key, _, _ in found[source]:
+        for key, name, _ in found[source]:
             if (source, key) not in joined:
-                keyed[key].append((source, key))
-    for key, members in keyed.items():
-        group = {"matched_by": "name" if len({s for s, _ in members}) > 1 else ""}
-        for source, k in members:  # (a source's items are keyed once each: Side)
-            group[source] = by[(source, k)]
-        merged.append(group)
+                keyed[alias(name) or key].append((source, key))
+    for members in keyed.values():
+        apart = []
+        group = {"matched_by": ("name" if len({k for _, k in members}) == 1 else "other names")
+                 if len({s for s, _ in members}) > 1 else ""}
+        for source, k in members:  # one a source: a second one alike stands apart (named alike, or other names)
+            if source in group:
+                apart.append({source: by[(source, k)], "matched_by": ""})
+            else:
+                group[source] = by[(source, k)]
+        merged += [group, *apart]
     return merged
 
 def built(data):
@@ -103,13 +157,14 @@ def built(data):
     claims = defaultdict(list)
     for e in data.get("evidence", []):
         claims[where.source.get(e["content"], "")].append(e)
-    found = {source: subjects_of(claims[source]) for source in sources}
+    alias = aliases(data)
+    found = {source: renamed(subjects_of(claims[source]), alias) for source in sources}
     paired = [(f["a"], f["b"]) for f in data.get("findings", []) if f.get("relation") in PAIRING]
     subjects = []
-    for group in matched(found, data.get("findings", []), sources):
+    for group in matched(found, data.get("findings", []), sources, alias):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
-        properties = joined([c for _, (_, _, cs) in mine for c in cs], paired)
+        properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)
         subjects.append({
             "name": mine[0][1][1], "names": sorted(names, key=lambda n: (-names[n], natural(n))),
             "matched_by": group["matched_by"],
@@ -209,9 +264,9 @@ def reach_said(t):
         return f"alike on {t['consistent']} sheets"
     return ", ".join(dict.fromkeys(m.get("sheet", "") for m in t["meanings"])) + " only"
 
-def joined(claims, paired):
+def joined(claims, paired, alias=lambda name: None):
     """A subject's claims by property: {its first name, folded: [claims]}, a property's names one where the findings
-    pair claims of both (paired: [(claim id, claim id)])."""
+    pair claims of both (paired: [(claim id, claim id)]), or where they're other names of one thing (alias)."""
     key = {c["id"]: plain(c["attribute"]).casefold() for c in claims}
     parent = {k: k for k in key.values()}
     def root(k):
@@ -219,10 +274,17 @@ def joined(claims, paired):
             parent[k] = parent[parent[k]]
             k = parent[k]
         return k
+    def join(a, b):
+        ra, rb = sorted((root(a), root(b)), key=natural)
+        parent[rb] = ra
     for a, b in paired:
         if a in key and b in key:
-            ra, rb = sorted((root(key[a]), root(key[b])), key=natural)
-            parent[rb] = ra
+            join(key[a], key[b])
+    named = {}  # a group of other names: the first property so named
+    for c in claims:
+        a = alias(c["attribute"])
+        if a is not None:
+            join(named.setdefault(a, key[c["id"]]), key[c["id"]])
     out = defaultdict(list)
     for c in claims:
         out[root(key[c["id"]])].append(c)

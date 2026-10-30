@@ -134,6 +134,43 @@ class Glossary(unittest.TestCase):
         from semantic_pdf_diff.report import search_names
         self.assertIn(["UNO", "unless noted otherwise"], search_names({"glossary": found})["properties"])
 
+class OtherNames(unittest.TestCase):
+    """Milestone 3: the names one thing goes by join its subjects, match them across sources and join properties."""
+    @staticmethod
+    def term(t, meaning, source="a"):
+        return {"term": t, "meaning": meaning, "kind": "abbreviation", "source": source, "content": f"c{source}",
+                "where": f"{source}.pdf, page 2", "block": "ABBREVIATIONS", "how": "model", "reach": "document"}
+
+    def test_a_sources_subjects_named_as_one_things_names_joined(self):
+        evidence = [claim("A-1", "ca", "AHU", "airflow", "3", "m3/s"),
+                    claim("A-2", "ca", "air handling unit", "rated power", "5", "kW"),
+                    claim("A-3", "ca", "air handling unit", "NPSH", "2", "m"),
+                    claim("A-4", "ca", "air handling unit", "net positive suction head", "2.1", "m")]
+        glossary = {"terms": [self.term("AHU", "air handling unit"), self.term("NPSH", "net positive suction head")]}
+        (ahu,) = indexes.built(report(evidence, glossary=glossary))["subjects"]
+        self.assertEqual(sorted(ahu["names"]), ["AHU", "air handling unit"])
+        self.assertEqual([(p["name"], len(p["values"])) for p in ahu["properties"]],
+                         [("airflow", 1), ("NPSH", 2), ("rated power", 1)])  # NPSH, its meaning: one property
+
+    def test_subjects_matched_across_sources_by_other_names(self):
+        evidence = [claim("A-1", "ca", "fan coil unit", "airflow", "3", "m3/s"),
+                    claim("B-1", "cb", "FCU", "airflow", "4", "m3/s"),
+                    claim("A-2", "ca", "feed pump", "head", "40", "m"),
+                    claim("B-2", "cb", "boiler feed pump", "head", "42", "m")]
+        data = report(evidence, sources=("a", "b"), glossary={"terms": [self.term("FCU", "fan coil unit", "b")]},
+                      synonyms={"items": [["feed pump", "boiler feed pump"]], "properties": []})
+        by = {s["name"]: s for s in indexes.built(data)["subjects"]}
+        self.assertEqual((by["fan coil unit"]["matched_by"], by["fan coil unit"]["claims"]),
+                         ("other names", {"a": ["A-1"], "b": ["B-1"]}))
+        self.assertEqual(by["feed pump"]["claims"], {"a": ["A-2"], "b": ["B-2"]})
+        self.assertEqual(len(by), 2)
+
+    def test_a_sheets_symbol_isnt_a_name(self):
+        sym = {**self.term("W", "washer"), "kind": "symbol", "reach": "sheet", "sheet": "sheet E-1"}
+        alias = indexes.aliases({"glossary": {"terms": [sym, self.term("[square]", "washer")]}})
+        self.assertIsNone(alias("W"))
+        self.assertIsNone(alias("washer"))
+
 class Reach(unittest.TestCase):
     """The owner, 2026-10-30: "think on how much provenance or context should be tracked in the glossary, e.g. a
     legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually consistent.\""""
