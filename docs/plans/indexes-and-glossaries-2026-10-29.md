@@ -1,6 +1,6 @@
 # Indexes and glossaries: a source's subjects, figures, claims and terms, alone or merged across a comparison
 
-- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2) next. [Design questions](#design-questions) 1 to 3 answered the same day; 4 and 5 open.
+- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2) built 2026-10-30. [Design questions](#design-questions) 1 to 3 answered 2026-10-29, 4 and 5 on 2026-10-30.
 - **The owner, 2026-10-29:**
   - "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless."
   - "Well, I say "single document" but I really mean "single source" that might be a folder of docs."
@@ -8,6 +8,7 @@
   - **The command:** a new one, `analyze`, for one source; `compare` stays for two or more.
   - **Files besides report.html:** Markdown, CSV and JSON, and "An excel file is also a good representation for indices. We already output excel workbooks of claims, but not really designed as an indexing model."
   - **In a comparison:** one merged index, each subject or term listed once, with what each source says side by side.
+- **The owner, 2026-10-30:** "Please proceed with the glossary." And, of design questions 4 and 5, in their words below.
 - **Earlier, the owner on glossaries (2026-10-15):** "Seems we should consider developing a glossary for abbreviations, framings, etc.. not as a set of claims, but as metadata for reports, comparisons, and comprehending claims in context. This would be another plan of its own, IIUC." The tentative row *Document glossaries* is moved in whole ([the glossary](#the-glossary)).
 - **Takes over:**
   - [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 2, subjects found mechanically: the subject index, which is [claim context](claim-context-2026-10-14.md)'s per-document entity register
@@ -116,10 +117,20 @@ From the tentative row, moved in:
 - Blocks found and read; definitions in prose; checked.
 - Shown, exported, and given to search (an abbreviation finds its expansion's claims).
 - Merged by term in a comparison.
+- **Built 2026-10-30** (`glossary.py`; the `glossary` lever, on by default for the owner to confirm):
+  - **Blocks:** a PDF's outline sections so headed; on a page, headings side by side (a sheet's SYMBOLS and ABBREVIATIONS) as one block, the band around them read as rows of words by position, since a sheet's text layer often lists a table's columns apart (the dc set's did: terms and meanings in separate runs); a text file's heading and its lines, a heading holding others so headed left to them (TS 38.300's 3 to its 3.1 and 3.2).
+  - **As they are:** a text file's tables under the heading, and lists of tabbed lines (TS 38.300's 264 abbreviations, with no request).
+  - **The model:** the rest, a part of 3,000 characters a request (one cut short: halves); a term kept only where its term and its meaning are in the part.
+  - **Prose:** "net positive suction head (NPSH)" and "NPSH (net positive suction head)", the letters the words' initials.
+  - **End to end** ($0.033): scical's ABBREVIATIONS sheet analyzed alone, 177 terms read, 1 dropped, 175 in the index; two slices re-run, two definitions in prose (CFD, PSF).
+  - **By eye on real blocks** ($0.008): the dc set's SYMBOLS / ABBREVIATIONS 81 of 82 and 53 of 53 kept, correctly paired; scical's ABBREVIATIONS 99 of 100 and 77 of 77; a manual's DEFINITIONS 2 of 2; calg's SYMBOL LEGEND 25 of 27; TS 38.300's 3.2 Definitions 44 of 44.
+  - **Shown:** index.md's Glossary, glossary.csv, the workbook's Glossary sheet, the page's Glossary view; in a comparison each term once with each source's meanings, one defined differently marked; each term and its meanings searched as one name.
+  - **Not yet:** a drawn legend's symbols (by vision); a definition running past a page with no outline.
 
-### 3. Names merged
+### 3. Names merged, and kinds
 
 - Other names and the glossary join a subject's names; the model asked only for what's left.
+- **Kinds** ([design question 4](#design-questions), answered: "indices for both, where feasible"): each kind of subject (pumps, rooms) with its items under it, where the items' names say the kind.
 - Measured against the controlled keys.
 
 ### 4. Matching across sources, further
@@ -136,8 +147,7 @@ From the tentative row, moved in:
 1. **The command:** answered 2026-10-29, `analyze`.
 2. **The files written:** answered 2026-10-29: Markdown, CSV, JSON and an Excel workbook designed as an index.
 3. **In a comparison:** answered 2026-10-29, one merged index.
-4. **A subject's grain:** an item (P-101B) or a kind (pumps)?
-   - **I'd index items,** with a kind's items listed under it where an entity names the kind ("pump P-101", "pump P-102" under "pump").
+4. **A subject's grain:** an item (P-101B) or a kind (pumps)? Answered 2026-10-30: "I think we should have indices for both, where feasible."
+   - So both: items, as built, and kinds, each with its items under it where an entity names the kind ("pump P-101", "pump P-102" under "pump"). Kinds are milestone 3's, with the names.
    - These are single-document analysis's siblings, whose gaps it finds.
-5. **Which files by default:** index.md, index.xlsx and the CSV files on every run, or only when asked (`--index md,xlsx,csv`)?
-   - **I'd write them on every run.** They're small, and `report` writes them again.
+5. **Which files by default:** index.md, index.xlsx and the CSV files on every run, or only when asked? Answered 2026-10-30: "Keep every run."
