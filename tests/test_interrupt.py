@@ -89,6 +89,13 @@ def run(root, url, store, cache, on_terminal=True, group=None):
         else:
             written.append(process.communicate(timeout=120)[0])
             code = process.returncode
+    except subprocess.TimeoutExpired as e:  # what it said, and its log, kept for the failure (it timed out twice
+        # beside other work, 2026-10-29 and 30, and passed alone)
+        process.kill()
+        said = b''.join(written).decode(errors='replace') + (e.output or b'').decode(errors='replace')
+        log = Path(str(store) + '.log')
+        raise AssertionError(f"the run didn't end within 120 s; it said: {said[-1500:]}\nits log: "
+                             + (log.read_text()[-1500:] if log.exists() else "none")) from None
     finally:
         if process.poll() is None:
             process.kill()
