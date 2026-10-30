@@ -481,6 +481,15 @@ class TopicNames(DropsUnknown):
     way: int = Field(ge=1)
     names: list[Annotated[str, Field(min_length=1, max_length=60)]] = Field(min_length=1)
 
+class GlossaryTerm(DropsUnknown):
+    term: str = Field(min_length=1, max_length=120)
+    meaning: str = Field(min_length=1, max_length=1000)
+    kind: str = "term"  # abbreviation, term, symbol or convention (glossary.KINDS; another read as a term)
+
+class GlossaryTerms(DropsUnknown):
+    """The terms a part of a document defines, as the model read them (the glossary lever; glossary.py)."""
+    terms: list[GlossaryTerm] = Field(default_factory=list)
+
 class OtherNames(DropsUnknown):
     """The names two documents give one thing, grouped: items' and properties' (the search_names lever;
     synonyms.py)."""

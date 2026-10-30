@@ -140,6 +140,10 @@ HELP = {
                              "(Qwen3-Embedding) answers any; most can't be, and some servers refuse the size for them "
                              "(a LiteLLM proxy; then it's asked again without it). A byte a dimension a claim in the "
                              "report.", "256"),
+    "glossary": Help("comparing", "each source's abbreviations, defined terms, symbols and conventions, read for the "
+                     "index and the search", "From the parts headed Abbreviations, Definitions, Symbols, Legend and "
+                     "the like (the model, a request a part of about 100 lines; a text file's tables as they are), "
+                     "and from prose (\"net positive suction head (NPSH)\"). off: none read.", basic=True),
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),
     # --- report

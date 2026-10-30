@@ -60,7 +60,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "topic_names", "search_names", "embed", "rerank"
+    "judge_context", "topic_names", "search_names", "glossary", "embed", "rerank"
   ],
   "table_rules": null,
   "table_structure": false,
@@ -101,5 +101,6 @@
   "repeated_text": "keep",
   "lone_rows": false,
   "topic_names": false,
-  "search_names": false
+  "search_names": false,
+  "glossary": false
 }

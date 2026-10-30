@@ -178,6 +178,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `topic_names` | `true` | selecting | topic_names | compare | - |
 | `search_names` | `true` | selecting | search_names | compare | - |
+| `glossary` | `true` | selecting | glossary | compare | - |
 | `embed_model` | `null` | selecting | embed | compare | - |
 | `embed_url` | `null` | endpoint | embed | - | - |
 | `embed_dimensions` | `null` | selecting | embed | compare | - |

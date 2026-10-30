@@ -1130,6 +1130,17 @@ class SearchNames(Lever):
     def names_synonyms(self):
         return self.search_names
 
+class ReadGlossary(Lever):
+    lever_name, stage, off = "glossary", "comparison", {"glossary": False}
+    # the sources' glossaries read after the comparison or analysis: their abbreviations, defined terms, symbols and
+    # conventions, from the blocks defining them (the model, a request a block's part) and from prose (by pattern),
+    # for the index and the search (glossary.py; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 2; the
+    # owner, 2026-10-30: "Please proceed with the glossary."). On by default, for the owner to confirm
+    glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
+
+    def reads_glossary(self):
+        return self.glossary
+
 class Embed(Lever):
     lever_name, stage, off = "embed", "comparison", {"embed_model": None, "embed_url": None, "embed_dimensions": None}
     # the claims embedded after the comparison, each distinct sentence once, for a search by meaning: near:ID (the
@@ -1214,7 +1225,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
-                 NameTopics, SearchNames, Embed, Rerank)
+                 NameTopics, SearchNames, ReadGlossary, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1412,6 +1423,12 @@ class Platform(Composable):
     def names_synonyms(self):
         """Whether the model groups the documents' other names for one thing, for the report's search (synonyms.py):
         the platform's, never; the search_names lever's, when on."""
+        return False
+
+    @chosen
+    def reads_glossary(self):
+        """Whether the sources' glossaries are read after the comparison (glossary.py): the platform's, never; the
+        glossary lever's, when on."""
         return False
 
     @chosen
