@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.13.0 (2026-10-30)
+
+- **A discipline's abbreviations hold for its sheets.** Where a drawing set has abbreviation lists on sheets of two disciplines or more, each discipline's list (on S-001, E-001, and so on) holds for that discipline's sheets. A general sheet's list (G) still holds for the whole set, as do a set's lists that all belong to one discipline. Where a term is used, the nearest definition holds: the sheet's own, then its discipline's, then the document's. dc's "EF" now means each face on its structural sheets and exhaust fan on its electrical ones. The index says where each meaning holds ("S sheets only"; "page 23; S sheets"), and only flags a term as defined differently where two sources disagree about the same sheets.
+- **A common word that a list defines** ("OF" for outside face, "IF", "NO.") counts as the term only where it's printed in capitals and the words beside it aren't, so "TOP OF STEEL" keeps its word. This narrows what `judge_glossary` and `reader_glossary` (both off) are shown.
+
 ## 0.12.0 (2026-10-30)
 
 - **`align_glossary` is on by default** (the owner: "Yes, let's add align_glossary as a default"): comparing revisions, a meaning written out pairs with its term, so a revision that abbreviates still has its values compared with the other's.
