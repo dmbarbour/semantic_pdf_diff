@@ -445,9 +445,21 @@ def picture(page, rect, path, side):
     page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=rect & page.rect, alpha=False).save(path)
     return path
 
+def ordered(term, meaning):
+    """(term, meaning), turned round where a list printed each meaning before its abbreviation and was read so
+    ("ADDITIONAL" meaning "ADD."; scical's structural sheet, 171 entries): the meaning a single word, shorter, its
+    letters the term's in order from its first."""
+    short = [c.casefold() for c in meaning if c.isalnum()]
+    long = [c.casefold() for c in term if c.isalnum()]
+    if " " in meaning or len(meaning) >= len(term) or not short or len(long) < 3 or short[0] != long[0]:
+        return term, meaning
+    rest = iter(long)
+    return (meaning, term) if all(c in rest for c in short) else (term, meaning)
+
 def entry(term, meaning, kind, f, where, block, how, sheet=""):
-    """A glossary entry; sheet: the drawing sheet its block is on, if it is ("sheet E-201"), where a symbol reaches
-    that sheet only."""
+    """A glossary entry, its term and meaning in order (ordered); sheet: the drawing sheet its block is on, if it is
+    ("sheet E-201"), where a symbol reaches that sheet only."""
+    term, meaning = ordered(term, meaning)
     reach = "sheet" if sheet and (kind == "symbol" or drawn(term)) else "document"
     return {"term": term, "meaning": meaning, "kind": kind, "source": f["source"], "content": f["content"],
             "where": where, "block": block, "how": how, "reach": reach,

@@ -119,6 +119,18 @@ class Blocks(unittest.TestCase):
         self.assertEqual(reach("W", "WASHER", "symbol")["reach"], "document")  # not on a sheet
         self.assertNotIn("sheet", reach("TYP", "typical", "convention", "sheet G-001"))
 
+    def test_a_list_printing_each_meaning_first_turned_round(self):
+        f = {"source": "set", "content": "c"}
+        read = lambda t, m: glossary.entry(t, m, "abbreviation", f, "set.pdf, page 6", "ABBREVIATIONS",  # noqa: E731
+                                           "model")
+        self.assertEqual((read("ADDITIONAL", "ADD.")["term"], read("ADDITIONAL", "ADD.")["meaning"]),
+                         ("ADD.", "ADDITIONAL"))  # scical's structural sheet lists the meanings first
+        self.assertEqual(read("BOTTOM OF DECK", "B.O.D.")["term"], "B.O.D.")
+        self.assertEqual(read("EXISTING", "(E)")["term"], "(E)")
+        for term, meaning in (("AFF", "above finished floor"), ("ANGLE", "L"), ("[circle with M]", "MOTOR"),
+                              ("Clearwell", "treated water storage")):  # as read: not a meaning abbreviating its term
+            self.assertEqual(read(term, meaning)["term"], term)
+
     def test_a_long_block_in_parts_at_line_ends(self):
         text = "\n".join(f"T{k} term number {k} of the list" for k in range(400))
         found = glossary.parts(text)
