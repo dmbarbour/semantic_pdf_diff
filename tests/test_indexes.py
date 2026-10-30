@@ -129,10 +129,37 @@ class Glossary(unittest.TestCase):
                       "defined differently", page)
         self.assertIn("- **UNO** (abbreviation): a: —; b: unless noted otherwise (b.pdf, page 2)", page)
         header, rows = indexfiles.tables(index, {})["glossary"]
-        self.assertEqual(rows[0], ["FF", "abbreviation", "far face", "a", "a.pdf, page 2", "ABBREVIATIONS", "model",
-                                   "yes"])
+        self.assertEqual(rows[0], ["FF", "abbreviation", "far face", "a", "a.pdf, page 2", "document", "ABBREVIATIONS",
+                                   "model", "yes", ""])
         from semantic_pdf_diff.report import search_names
         self.assertIn(["UNO", "unless noted otherwise"], search_names({"glossary": found})["properties"])
+
+class Reach(unittest.TestCase):
+    """The owner, 2026-10-30: "think on how much provenance or context should be tracked in the glossary, e.g. a
+    legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually consistent.\""""
+    def test_a_sheets_symbols_reach_that_sheet_unless_alike_on_others(self):
+        def sym(term, meaning, page, sheet):
+            return {"term": term, "meaning": meaning, "kind": "symbol", "source": "set", "content": "cset",
+                    "where": f"set.pdf, page {page}", "block": "LEGEND", "how": "picture", "reach": "sheet",
+                    "sheet": sheet}
+        found = {"terms": [sym("[red square]", "FOO", 3, "sheet E-201"),
+                           sym("[circle with M]", "MOTOR", 4, "sheet E-202"),
+                           sym("[circle with M]", "MOTOR", 5, "sheet E-203"),
+                           sym("W", "WASHER RECEPTACLE", 4, "sheet E-202"),
+                           {"term": "TYP", "meaning": "typical", "kind": "convention", "source": "set",
+                            "content": "cset", "where": "set.pdf, page 2", "block": "ABBREVIATIONS", "how": "model",
+                            "reach": "document"}]}
+        index = indexes.built(report([], sources=("set",), glossary=found))
+        by = {t["term"]: t for t in index["glossary"]}
+        self.assertEqual((by["[red square]"]["reach"], by["[red square]"].get("consistent")), ("sheet", None))
+        self.assertEqual(by["[circle with M]"]["consistent"], 2)
+        self.assertEqual(by["TYP"]["reach"], "document")
+        page = indexfiles.markdown(index)
+        self.assertIn("- **[red square]** (symbol): FOO (set.pdf, page 3) — sheet E-201 only", page)
+        self.assertIn("— alike on 2 sheets", page)
+        from semantic_pdf_diff.report import search_names
+        named = search_names({"glossary": found})["items"]
+        self.assertEqual(named, [["TYP", "typical"]])  # not a sheet's letter, nor a mark described
 
 class Files(unittest.TestCase):
     def test_csv_a_row_a_value(self):

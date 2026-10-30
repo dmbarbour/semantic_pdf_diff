@@ -170,8 +170,12 @@ def term_key(term):
     return " ".join(term.split()).casefold().rstrip(".")
 
 def terms(data):
-    """The glossary index: each term once, A to Z: {"term", "kind", "meanings": [{source, meaning, where, how,
-    block}], "differs" where two sources' meanings share none}."""
+    """The glossary index: each term once, A to Z: {"term", "kind", "reach", "meanings": [{source, meaning, where,
+    how, block, reach[, sheet]}], "differs" where two sources' meanings reaching their documents share none,
+    "consistent": n where a sheet's term means the same on n sheets (two or more)}. A term reaches its document if
+    any of its meanings does, else its sheets: a sheet's symbol says little beyond it unless it's consistent (the
+    owner, 2026-10-30: "a legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually
+    consistent")."""
     by = defaultdict(list)
     for t in (data.get("glossary") or {}).get("terms", []):
         by[term_key(t["term"])].append(t)
@@ -179,13 +183,31 @@ def terms(data):
     for _, ts in sorted(by.items(), key=lambda x: natural(x[0])):
         said = defaultdict(set)
         for t in ts:
-            said[t["source"]].add(fold(t["meaning"]).rstrip("."))
+            if t.get("reach", "document") == "document":
+                said[t["source"]].add(fold(t["meaning"]).rstrip("."))
         differs = len(said) > 1 and not set.intersection(*said.values())
+        sheets = defaultdict(set)
+        for t in ts:
+            if t.get("reach") == "sheet":
+                sheets[fold(t["meaning"]).rstrip(".")].add((t["content"], t["where"]))
+        alike = max(map(len, sheets.values()), default=0)
+        reach = "document" if any(t.get("reach", "document") == "document" for t in ts) else "sheet"
         out.append({"term": Counter(t["term"] for t in ts).most_common(1)[0][0],
-                    "kind": Counter(t["kind"] for t in ts).most_common(1)[0][0],
-                    "meanings": [{k: t[k] for k in ("source", "meaning", "where", "how", "block")} for t in ts],
-                    **({"differs": True} if differs else {})})
+                    "kind": Counter(t["kind"] for t in ts).most_common(1)[0][0], "reach": reach,
+                    "meanings": [{k: t[k] for k in ("source", "meaning", "where", "how", "block", "reach", "sheet")
+                                  if k in t} | {"reach": t.get("reach", "document")} for t in ts],
+                    **({"differs": True} if differs else {}),
+                    **({"consistent": alike} if reach == "sheet" and alike >= 2 else {})})
     return out
+
+def reach_said(t):
+    """Where a term holds, in words, beside its meanings: "" for its document; "alike on 3 sheets"; "sheet E-201
+    only"."""
+    if t.get("reach", "document") == "document":
+        return ""
+    if t.get("consistent"):
+        return f"alike on {t['consistent']} sheets"
+    return ", ".join(dict.fromkeys(m.get("sheet", "") for m in t["meanings"])) + " only"
 
 def joined(claims, paired):
     """A subject's claims by property: {its first name, folded: [claims]}, a property's names one where the findings

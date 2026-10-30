@@ -19,7 +19,7 @@ import re
 import zipfile
 from xml.sax.saxutils import escape
 
-from .indexes import properties
+from .indexes import properties, reach_said
 
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # every member's, so the same index gives the same bytes
 # A value printed as a plain number, stored as one so it sorts and filters as one; not one with a leading zero (a
@@ -100,7 +100,8 @@ def markdown(index):
         else:
             said_by = "; ".join(f"{m['meaning']} ({m['where']})" for m in t["meanings"])
         lines.append(f"- **{t['term']}** ({t['kind']}): {said_by}"
-                     + (" — defined differently" if t.get("differs") else ""))
+                     + (" — defined differently" if t.get("differs") else "")
+                     + (f" — {reach_said(t)}" if reach_said(t) else ""))
     return "\n".join(lines).rstrip() + "\n"
 
 KIND_COLUMNS = 8  # a kind's properties shown as columns in index.md, the most given first
@@ -132,8 +133,9 @@ def tables(index, evidence):
                e.get("conditions", ""), e["kind"], e.get("quote", "")] for e in evidence.values()]
     figures = [[f["source"], f["file"], f["page"] if f["page"] is not None else "", f["kind"], f["label"], f["title"],
                 f["about"], len(f["claims"]), f["cited"]] for f in index["figures"]]
-    glossary = [[t["term"], t["kind"], m["meaning"], m["source"], m["where"], m["block"], m["how"],
-                 "yes" if t.get("differs") else ""] for t in index.get("glossary", []) for m in t["meanings"]]
+    glossary = [[t["term"], t["kind"], m["meaning"], m["source"], m["where"], m.get("sheet") or "document",
+                 m["block"], m["how"], "yes" if t.get("differs") else "", t.get("consistent", "")]
+                for t in index.get("glossary", []) for m in t["meanings"]]
     kinds = [[k["kind"], s["name"], p["name"], *value(v)] for k in index.get("kinds", [])
              for s in (index["subjects"][i] for i in k["subjects"]) for p in s["properties"] for v in p["values"]]
     tail = ["Value", "Unit", "Conditions", "Source", "Where", "Claim"]
@@ -142,7 +144,8 @@ def tables(index, evidence):
             "claims": (["Claim", "Subject", "Item", "Property", "Value", "Unit", "Conditions", "Read as", "Quote"],
                        claims),
             "figures": (["Source", "File", "Page", "Kind", "Label", "Title", "About", "Claims", "Cited"], figures),
-            "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Block", "How", "Differs"], glossary),
+            "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Reach", "Block", "How", "Differs",
+                          "Alike on sheets"], glossary),
             "kinds": (["Kind", "Item", "Property", *tail], kinds)}
 
 def csv_text(header, rows):
@@ -154,7 +157,7 @@ def csv_text(header, rows):
 
 # --- index.xlsx ----------------------------------------------------------------------------------------------------
 
-WIDTHS = {"Term": 16, "Meaning": 50, "Block": 20, "How": 8, "Differs": 8,
+WIDTHS = {"Term": 16, "Meaning": 50, "Block": 20, "How": 8, "Differs": 8, "Reach": 16, "Alike on sheets": 10,
           "Subject": 32, "Property": 28, "Value": 14, "Unit": 9, "Conditions": 24, "Source": 14, "Where": 30,
           "Claim": 14, "Item": 28, "Read as": 9, "Quote": 50, "File": 30, "Page": 6, "Kind": 8, "Label": 16,
           "Title": 40, "About": 60, "Claims": 8, "Cited": 7}

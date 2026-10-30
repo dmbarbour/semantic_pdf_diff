@@ -61,6 +61,22 @@ From the tentative row, moved in:
   - controlled counterfactual pairs: a term abbreviated in one revision, spelled out in the other
 - **What was in the way:** reading a real legend into pairs by geometry (dc's paired wrongly, ken's not at all, calg's is drawn). The model reading a block's text answers the first two; calg's needs vision.
 
+### Reach and provenance
+
+The owner, 2026-10-30: "Also think on how much provenance or context should be tracked in the glossary, e.g. a legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually consistent."
+
+- **What an entry keeps** (provenance): its source and file, where it's defined (page or lines), the block's heading (or prose), how it was read (as listed, by the model from words, from a picture, from prose), and its reach. The request that read it is in the store's query log and the answers cache, so it's traced and reproduced as claims are.
+- **Its reach** (built 2026-10-30): how far a definition holds.
+  - **The document** (a file): an abbreviations list or definitions clause ("for the purposes of the present document"), prose definitions, and a drawing set's abbreviations, terms and conventions, which by convention hold for the set.
+  - **One sheet:** a symbol on a drawing sheet, drawn or lettered ("[circle with M] = MOTOR" on sheet E-001; "W = WASHER RECEPTACLE"). A legend explains its own drawing.
+  - **Consistent:** a sheet's symbol meaning the same on two sheets or more is said so ("alike on 3 sheets"); then it's worth more than one sheet's.
+- **What reach decides:**
+  - **Search:** only terms reaching their documents, and consistent symbols, are other names; a mark described in brackets never is.
+  - **Comparisons:** "defined differently" weighs the meanings reaching their documents; a letter meaning one thing on one sheet and another elsewhere isn't a conflict.
+  - **Display:** a sheet's term says so ("sheet E-201 only"), in index.md, the CSV and workbook (a Reach column) and the page.
+  - **Later** (milestone 5): the reader and the judge given only the terms whose reach covers the span they read.
+- **Not tracked yet:** a section's reach (a definition holding for one section of a document), and a set's reach across files (a folder source whose general sheet G-001 defines terms for its other files): both need a source's files read as one set.
+
 ### In a comparison: one merged index (answered)
 
 - **Subjects matched across sources:**

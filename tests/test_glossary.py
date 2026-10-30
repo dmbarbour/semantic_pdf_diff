@@ -108,6 +108,16 @@ class Blocks(unittest.TestCase):
                     "## 3.2 Definitions\n\nPump: a machine.\n\n# 4 Pumps\n\nText.\n", True)
         self.assertEqual([b[0] for b in glossary.text_blocks(doc)], ["3.1 Abbreviations", "3.2 Definitions"])
 
+    def test_a_symbol_on_a_sheet_reaches_that_sheet_its_abbreviations_the_document(self):
+        f = {"source": "set", "content": "c"}
+        reach = lambda *a: glossary.entry(*a[:3], f, "set.pdf, page 4", "LEGEND", "model", *a[3:])  # noqa: E731
+        self.assertEqual(reach("W", "WASHER", "symbol", "sheet E-201")["reach"], "sheet")
+        self.assertEqual(reach("W", "WASHER", "symbol", "sheet E-201")["sheet"], "sheet E-201")
+        self.assertEqual(reach("[circle]", "MOTOR", "term", "sheet E-201")["reach"], "sheet")  # drawn
+        self.assertEqual(reach("TYP", "typical", "convention", "sheet G-001")["reach"], "document")  # set-wide
+        self.assertEqual(reach("W", "WASHER", "symbol")["reach"], "document")  # not on a sheet
+        self.assertNotIn("sheet", reach("TYP", "typical", "convention", "sheet G-001"))
+
     def test_a_long_block_in_parts_at_line_ends(self):
         text = "\n".join(f"T{k} term number {k} of the list" for k in range(400))
         found = glossary.parts(text)

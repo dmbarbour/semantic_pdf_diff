@@ -20,7 +20,13 @@ glossary.").
 - **Definitions in prose,** by pattern in all the text: "net positive suction head (NPSH)" and "NPSH (net positive
   suction head)", where the abbreviation's letters are the words' initials, in order.
 - **An entry:** {term, meaning, kind, source, content, where, block (its heading, or "" in prose), how ("table",
-  "model", "prose")}; one term and meaning once a content, a block's before prose's.
+  "model", "picture", "prose"), reach}; one term and meaning once a content, a block's before prose's.
+- **Its reach** (the owner, 2026-10-30: "think on how much provenance or context should be tracked in the glossary,
+  e.g. a legend that is `[red square] = Foo` isn't much useful beyond that diagram unless unusually consistent"):
+  a symbol on a drawing sheet, drawn or lettered, reaches that sheet ("sheet E-201": {"reach": "sheet", "sheet"});
+  everything else reaches its document (a file: an abbreviations list, a definitions clause, prose, and a drawing
+  set's abbreviations, terms and conventions, which by convention hold for the set). What a sheet's symbols are
+  worth beyond it is the index's to say (indexes.terms: the same meaning on two sheets or more, consistent).
 """
 import re
 from collections import defaultdict
@@ -317,8 +323,7 @@ def kept_pictured(answer, text):
     for t in answer.terms:
         term, meaning = " ".join(t.term.split()), " ".join(t.meaning.split())
         found = fold(meaning) if len(meaning) <= 60 else fold(meaning)[:40]
-        drawn = term.startswith("[") and term.endswith("]") and len(term) > 2
-        if term and meaning and found in said and (drawn or fold(term) in said):
+        if term and meaning and found in said and (drawn(term) or fold(term) in said):
             out.append((term, meaning, "symbol"))
         else:
             dropped += 1
@@ -366,16 +371,17 @@ def read(data, store, client, mode, label, progress=None):
                 log.warning(f"Glossary: {f['path']} wasn't read ({type(e).__name__}: {e})")
                 continue
             where = lambda at, f=f: f"{f['path']}, {at}"
-            for heading, text, at, rows, image in found["blocks"]:
+            for heading, text, at, rows, image, sheet in found["blocks"]:
                 counts["blocks"] += 1
                 for row in rows:
                     term, meaning = " ".join(str(row[0]).split()), " ".join(" ".join(map(str, row[1:])).split())
                     if term and meaning:
-                        entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table"))
+                        entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table", sheet))
                 listed = tabbed(text)
                 for term, meaning in listed or []:
-                    entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table"))
-                def ask_pictured(image, heading=heading, text=text, at=at, f=f, where=where, content=content):
+                    entries.append(entry(term, meaning, "abbreviation", f, where(at), heading, "table", sheet))
+                def ask_pictured(image, heading=heading, text=text, at=at, f=f, where=where, content=content,
+                                 sheet=sheet):
                     def done(answer, error):
                         progress.finish("failed" if error is not None else "complete")
                         if error is not None:  # (cut short: its words are read anyway)
@@ -383,13 +389,13 @@ def read(data, store, client, mode, label, progress=None):
                             return
                         terms, dropped = kept_pictured(answer, text)
                         counts["dropped"] += dropped
-                        entries.extend(entry(t, m, k, f, where(at), heading, "picture") for t, m, k in terms)
+                        entries.extend(entry(t, m, k, f, where(at), heading, "picture", sheet) for t, m, k in terms)
                     dispatch.make_room()
                     progress.add()
                     dispatch.submit(pictured_prompt(heading, text), GlossaryTerms, (image,),
                                     ("glossary", mode, label, content, f"{heading}:{at}:picture"), done)
 
-                def ask(part, name, heading=heading, at=at, f=f, where=where, content=content):
+                def ask(part, name, heading=heading, at=at, f=f, where=where, content=content, sheet=sheet):
                     def done(answer, error):
                         progress.finish("failed" if error is not None else "complete")
                         lines = part.split("\n")
@@ -403,7 +409,7 @@ def read(data, store, client, mode, label, progress=None):
                             return
                         terms, dropped = kept(answer, part)
                         counts["dropped"] += dropped
-                        entries.extend(entry(t, m, k, f, where(at), heading, "model") for t, m, k in terms)
+                        entries.extend(entry(t, m, k, f, where(at), heading, "model", sheet) for t, m, k in terms)
                     dispatch.make_room()
                     progress.add()
                     dispatch.submit(prompt(heading, part), GlossaryTerms, (), ("glossary", mode, label, content,
@@ -425,6 +431,16 @@ def read(data, store, client, mode, label, progress=None):
                                                  fold(e["meaning"]), e["how"]))
     return {"terms": terms, **counts}
 
+def sheet_name(page, number):
+    """A drawing sheet's name as its title block gives it ("sheet E-201"), else its page's ("the sheet on page 4");
+    "" for a page that isn't a sheet (SHEET)."""
+    if page.rect.width < SHEET:
+        return ""
+    from .figures import title_block
+    label, _ = title_block(page)  # its label says "sheet" already: "sheet E-001"
+    return (label if label.casefold().startswith("sheet") else f"sheet {label}") if label else \
+        f"the sheet on page {number}"
+
 def picture(page, rect, path, side):
     """A displayed region of a page drawn into path (PNG), its longer side at most side pixels (2.5 times its points at
     most), as situating draws a figure's."""
@@ -434,12 +450,21 @@ def picture(page, rect, path, side):
     page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=rect & page.rect, alpha=False).save(path)
     return path
 
-def entry(term, meaning, kind, f, where, block, how):
+def drawn(term):
+    """Whether a term describes a mark drawn ("[circle with M]"), not a name printed."""
+    return term.startswith("[") and term.endswith("]") and len(term) > 2
+
+def entry(term, meaning, kind, f, where, block, how, sheet=""):
+    """A glossary entry; sheet: the drawing sheet its block is on, if it is ("sheet E-201"), where a symbol reaches
+    that sheet only."""
+    reach = "sheet" if sheet and (kind == "symbol" or drawn(term)) else "document"
     return {"term": term, "meaning": meaning, "kind": kind, "source": f["source"], "content": f["content"],
-            "where": where, "block": block, "how": how}
+            "where": where, "block": block, "how": how, "reach": reach,
+            **({"sheet": sheet} if reach == "sheet" else {})}
 
 def content_glossary(store, f, sections, pictures=None, side=1000):
-    """One file's blocks [(heading, text, where in it, table rows, its picture or None)] and its prose definitions
+    """One file's blocks [(heading, text, where in it, table rows, its picture or None, its sheet's name or "")] and
+    its prose definitions
     [(where, term, meaning)], read from its bytes as the store keeps them. pictures: the folder a drawn legend's
     picture is drawn into (None: none drawn), its longer side at most side pixels."""
     from .scan import read_origin
@@ -455,7 +480,8 @@ def content_glossary(store, f, sections, pictures=None, side=1000):
                 if pictures is not None and rect is not None and DRAWN.search(heading) \
                         and drawn_marks(doc[a - 1], rect) >= MARKS:
                     image = picture(doc[a - 1], rect, pictures / f"glossary-{f['content'][7:23]}-p{a}-{i}.png", side)
-                blocks.append((heading, text, f"page {a}" if a == b else f"pages {a}–{b}", [], image))
+                blocks.append((heading, text, f"page {a}" if a == b else f"pages {a}–{b}", [], image,
+                               sheet_name(doc[a - 1], a) if a == b else ""))
             found = [(f"page {n}", t, m) for n, page in enumerate(doc, 1)
                      for t, m in prose(" ".join(page.get_text().split()))]
         return {"blocks": blocks, "prose": found}
@@ -465,6 +491,6 @@ def content_glossary(store, f, sections, pictures=None, side=1000):
     if extension is None:
         return {"blocks": [], "prose": []}
     doc = read_text(raw, extension)
-    blocks = [(heading, text, f"lines {a}–{b}", rows, None) for heading, text, (a, b), rows in text_blocks(doc)]
+    blocks = [(heading, text, f"lines {a}–{b}", rows, None, "") for heading, text, (a, b), rows in text_blocks(doc)]
     found = [(f"line {n}", t, m) for n, (_, line) in enumerate(doc.lines, 1) for t, m in prose(line)]
     return {"blocks": blocks, "prose": found}

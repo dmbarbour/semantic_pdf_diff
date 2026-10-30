@@ -449,9 +449,12 @@ def report_page(data, stored, budget, note=''):
 def search_names(data):
     """The names a search takes as one: the model's other names (the search_names lever), and each glossary term
     with its meanings (an abbreviation finds its expansion's claims): {"items": [[names]], "properties": [[names]]}."""
+    from .glossary import drawn
     from .indexes import terms as glossary_terms
+    # only terms reaching their documents, or a sheet's consistent on two or more: a sheet's symbol isn't a name
     terms = [[t["term"], *dict.fromkeys(m["meaning"] for m in t["meanings"])]
-             for t in glossary_terms(data) if len(t["meanings"][0]["meaning"]) <= 80]
+             for t in glossary_terms(data) if len(t["meanings"][0]["meaning"]) <= 80 and not drawn(t["term"])
+             and (t.get("reach", "document") == "document" or t.get("consistent"))]
     return {k: data.get('synonyms', {}).get(k, []) + terms for k in ('items', 'properties')}
 
 def page_vectors(vectors, cards):
@@ -676,6 +679,10 @@ def subjects_html(subjects, sources):
             + ('; a source giving nothing for one is marked “—”: not saying isn\'t evidence of absence' if many else '')
             + '. Also in index.md and index.xlsx, beside this page.</p>' + ''.join(out) + '</section>')
 
+def reach_said(t):
+    from .indexes import reach_said as said
+    return said(t)
+
 def glossary_html(terms, sources):
     """The Glossary view: each term, its kind and meanings, where each is given; in a comparison a column a source,
     "—" where one defines it not, and a term the sources define differently marked."""
@@ -687,7 +694,8 @@ def glossary_html(terms, sources):
     rows = ''.join(
         f'<tr data-text="{esc(" ".join([t["term"], *(m["meaning"] for m in t["meanings"])]).casefold())}">'
         f'<td><b>{esc(t["term"])}</b>' + (' <small class="warning">defined differently</small>' if t.get('differs')
-                                          else '') + f'</td><td>{esc(t["kind"])}</td>'
+                                          else '')
+        + (f' <small>{esc(reach_said(t))}</small>' if reach_said(t) else '') + f'</td><td>{esc(t["kind"])}</td>'
         + (''.join(f'<td>{meanings([m for m in t["meanings"] if m["source"] == src])}</td>' for src in sources)
            if many else f'<td>{meanings(t["meanings"])}</td>') + '</tr>' for t in terms)
     heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Meaning</th>'
