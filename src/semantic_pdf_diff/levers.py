@@ -1100,8 +1100,9 @@ class RetrieveGlossary(Lever):
     # retrieval (proposals; revisions without align) takes a meaning written out as its term, as align_glossary does
     # for alignment, so one team's "air handling unit" meets the other's "AHU" among the candidate pairs
     # (terms.Terms.abbreviated; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 4; the owner, 2026-10-30:
-    # "please use the glossary for candidates when comparing propsals")
-    retrieve_glossary: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # "please use the glossary for candidates when comparing propsals"). A default since 2026-10-30 (the owner: "Yes,
+    # turn on the recommended items.")
+    retrieve_glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def retrieval_names(self, glossary):
         if not self.retrieve_glossary or not glossary:
@@ -1175,8 +1176,8 @@ class NameTopics(Lever):
     # the topics count a meaning written out as its glossary term, one word, so "SWD" in one source and "side water
     # depth" in the other make one topic word of both sides (report.topic_terms; the owner, 2026-10-30: "I also
     # suspect we could leverage the glossary in some manner for combining terms when deciding how to split subjects
-    # for browsing")
-    topic_glossary: Annotated[bool, _shaping(roles=COMPARE)] = False
+    # for browsing"). A default since 2026-10-30 (the owner: "Yes, turn on the recommended items.")
+    topic_glossary: Annotated[bool, _shaping(roles=COMPARE)] = True
 
     def names_topics(self):
         return self.topic_names
