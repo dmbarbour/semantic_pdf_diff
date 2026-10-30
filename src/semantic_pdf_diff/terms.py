@@ -37,7 +37,8 @@ class Terms:
     def __init__(self, entries):
         self.meanings = defaultdict(set)  # (term, its page, or None for its document's): meanings
         for e in entries:
-            if len(e["term"]) < 2 or drawn(e["term"]):
+            term = " ".join(e["term"].split())  # its words one space apart, as they're looked up
+            if len(term) < 2 or drawn(term):
                 continue
             page = None
             if e.get("reach", "document") != "document":
@@ -45,7 +46,7 @@ class Terms:
                 if at is None:
                     continue
                 page = int(at.group(1))
-            self.meanings[e["term"], page].add(e["meaning"])
+            self.meanings[term, page].add(e["meaning"])
         terms = {t for t, _ in self.meanings}
         exact = {t for t in terms if any(c.isupper() for c in t[1:])}
         self.by_fold = {t.casefold(): t for t in sorted(terms - exact, reverse=True)}
@@ -72,7 +73,8 @@ class Terms:
     def _terms(self, text):
         for pattern, folded in self.patterns:
             for m in pattern.finditer(text):
-                yield m, (folded[m.group(1).casefold()] if folded else m.group(1))
+                found = " ".join(m.group(1).split())  # found across a line break too ("parent \nnode")
+                yield m, (folded[found.casefold()] if folded else found)
 
     def used(self, texts, page=None):
         """{term: its meanings, "; " between}: the terms these words use (texts), as defined for their document or

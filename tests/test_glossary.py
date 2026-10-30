@@ -296,6 +296,11 @@ class Used(unittest.TestCase):
         self.assertEqual(terms.used(["WR outlet"], page=4), {"WR": "washer receptacle"})  # its sheet's page only
         self.assertEqual(terms.used(["WR outlet"], page=5), {})
 
+    def test_a_term_of_words_found_across_a_line_break(self):
+        terms = Terms([term("parent node", "the node above"), term("BH RLC  channel", "backhaul RLC channel")])
+        self.assertEqual(terms.used(["the parent \nnode of an IAB-node, its BH RLC\nchannel"]),
+                         {"BH RLC channel": "backhaul RLC channel", "parent node": "the node above"})
+
     def test_a_meaning_written_out_folded_into_its_term(self):
         terms = Terms([term("SWD", "side water depth"), term("SB", "sedimentation basin"),
                                 term("HDT", "hydraulic detention time"), term("SDT", "solids detention time"),
