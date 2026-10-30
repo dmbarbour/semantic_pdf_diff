@@ -321,8 +321,8 @@ class Used(unittest.TestCase):
         defined = [term("SWD", "side water depth", "cb"), term("SB", "sedimentation basin", "cb")]
         judged = lambda s: {(left[i].id, right[j].id) for i, j, _ in  # noqa: E731
                             s.correspondence(left, right, "revisions", defined).judge}
-        self.assertNotIn(("A-1", "B-1"), judged(Settings()))  # off: "SWD" isn't "side water depth"
-        self.assertEqual(judged(Settings(align_glossary=True)), {("A-1", "B-1")})
+        self.assertNotIn(("A-1", "B-1"), judged(Settings(align_glossary=False)))  # "SWD" isn't "side water depth"
+        self.assertEqual(judged(Settings()), {("A-1", "B-1")})  # on by default
 
     def test_the_judge_shown_the_terms_a_claim_uses_else_the_same_prompt(self):
         from semantic_pdf_diff.compare import TERMS, pair_request

@@ -170,7 +170,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `align` | `true` | selecting | align | compare | - |
 | `align_printed` | `false` | selecting | align | compare | - |
 | `align_hedges` | `true` | selecting | align | compare | - |
-| `align_glossary` | `false` | selecting | align | compare | - |
+| `align_glossary` | `true` | selecting | align | compare | - |
 | `verify_visuals` | `true` | selecting | verify_visuals | compare | - |
 | `explain_differences` | `true` | selecting | explain_differences | compare | - |
 | `explain_context` | `false` | shaping | explain_differences | compare | - |

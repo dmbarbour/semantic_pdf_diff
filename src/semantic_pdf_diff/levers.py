@@ -1054,8 +1054,9 @@ class Align(Lever):
     # the revisions' glossaries (the glossary lever's) where names are weighed: a meaning written out folded into its
     # term, so "side water depth" in one revision is the other's "SWD" (terms.Terms; docs/plans/
     # indexes-and-glossaries-2026-10-29.md, milestone 5; the owner, 2026-10-30: "Will these subject merges extend to
-    # comparisons and analysis later?")
-    align_glossary: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # comparisons and analysis later?"). A default since 2026-10-30 (the owner: "Yes, let's add align_glossary as a
+    # default")
+    align_glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def correspondence(self, left, right, mode, glossary=None):
         if not self.align or mode != "revisions":
