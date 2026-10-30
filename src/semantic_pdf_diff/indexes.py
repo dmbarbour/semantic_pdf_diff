@@ -28,7 +28,8 @@ import re
 from collections import Counter, defaultdict
 
 from .align import Side
-from .glossary import fold, natural
+from .glossary import natural
+from .terms import fold
 from .schema import Evidence
 
 # The relations a finding pairs two claims of one subject by: unrelated pairs say they aren't.
@@ -76,7 +77,7 @@ def aliases(data):
     (a mark described, or a meaning of more than 80 characters, isn't a name), and the model's other names (the
     search_names lever's groups). A function giving a name its group's first name (folded, the least A to Z), or None
     for a name in no group."""
-    from .glossary import drawn
+    from .terms import drawn
     parent = {}
 
     def root(x):

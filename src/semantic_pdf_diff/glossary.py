@@ -34,6 +34,7 @@ from collections import defaultdict
 from .failures import Truncated
 from .progress import NoProgress, log
 from .schema import GlossaryTerms
+from .terms import drawn, fold
 
 HEADING = re.compile(r"^\s*(?:(?:\d+(?:\.\d+)*|[A-Z]\.|appendix\s+\w+)\.?\s*[-–:]?\s+)?(?:list\s+of\s+)?(?:"
                      r"abbreviations?(?:\s+and\s+(?:acronyms|symbols|definitions))?|acronyms(?:\s+and\s+abbreviations)?|"
@@ -69,11 +70,6 @@ Return JSON {"terms": [{"term": "...", "meaning": "...", "kind": "abbreviation"}
 def natural(text):
     """A sort key reading numbers as numbers: P-2 before P-10, page 2 before page 10."""
     return [(0, int(x), "") if x.isdigit() else (1, 0, x) for x in re.split(r"(\d+)", str(text).casefold()) if x]
-
-def fold(text):
-    """Text as found: case, spacing, dashes and quotes folded."""
-    text = str(text).casefold().translate(str.maketrans("–—‐‑’‘“”", "----''\"\""))
-    return " ".join(text.split())
 
 # --- blocks -------------------------------------------------------------------------------------------------------
 
@@ -449,10 +445,6 @@ def picture(page, rect, path, side):
     scale = min(2.5, side / max(rect.width, rect.height, 1))
     page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), clip=rect & page.rect, alpha=False).save(path)
     return path
-
-def drawn(term):
-    """Whether a term describes a mark drawn ("[circle with M]"), not a name printed."""
-    return term.startswith("[") and term.endswith("]") and len(term) > 2
 
 def entry(term, meaning, kind, f, where, block, how, sheet=""):
     """A glossary entry; sheet: the drawing sheet its block is on, if it is ("sheet E-201"), where a symbol reaches

@@ -449,7 +449,7 @@ def report_page(data, stored, budget, note=''):
 def search_names(data):
     """The names a search takes as one: the model's other names (the search_names lever), and each glossary term
     with its meanings (an abbreviation finds its expansion's claims): {"items": [[names]], "properties": [[names]]}."""
-    from .glossary import drawn
+    from .terms import drawn
     from .indexes import terms as glossary_terms
     # only terms reaching their documents, or a sheet's consistent on two or more: a sheet's symbol isn't a name
     terms = [[t["term"], *dict.fromkeys(m["meaning"] for m in t["meanings"])]
