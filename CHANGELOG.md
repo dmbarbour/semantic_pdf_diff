@@ -2,6 +2,14 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.12.0 (2026-10-30)
+
+- **`align_glossary` is on by default** (the owner: "Yes, let's add align_glossary as a default"): comparing revisions, a meaning written out pairs with its term, so a revision that abbreviates still has its values compared with the other's.
+- **The glossary is read before the claims** (it was read before they were compared), so the reader can use it too. The same requests and the same report.
+- **`reader_glossary`** (off by default): each request reading claims is shown the terms its words use, as its document defines them ("Defined in this document: SWD = side water depth"). Measured against a null arm on the controlled corpus, TS 38.300 and a drawing set: no different.
+- **Fixed:** a list that prints each meaning before its abbreviation ("ADDITIONAL", then "ADD.") was read reversed, so the index showed it backwards. Such an entry is now turned round where the meaning is one word abbreviating the term.
+- **Fixed:** with `judge_glossary` or `reader_glossary` on, a defined term of several words printed across a line break ("parent node") stopped the run.
+
 ## 0.11.0 (2026-10-30)
 
 - **The glossary is read before claims are compared** (it was read after), so a comparison can use it. The same requests and the same report.
