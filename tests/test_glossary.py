@@ -39,12 +39,35 @@ class Blocks(unittest.TestCase):
         page.insert_text((700, 130), "BEAM B-1 W12X26", fontsize=9)  # another column: not the block's
         page.insert_text((60, 400), "GENERAL NOTES", fontsize=12)  # a gap and another heading: not the block's
         page.insert_text((60, 420), "1. ALL DIMENSIONS TO FACE OF FINISH", fontsize=9)
-        (heading, text), = glossary.page_blocks(page)
+        (heading, text, band, region), = glossary.page_blocks(page)
+        self.assertIsNone(band)  # a sheet's block doesn't run on
         self.assertEqual(heading, "ABBREVIATIONS")
         self.assertIn("AFF ABOVE FINISHED FLOOR", text)
         self.assertIn("UNO UNLESS NOTED OTHERWISE", text)
         self.assertNotIn("W12X26", text)
         self.assertNotIn("DIMENSIONS", text)
+
+    def test_a_list_running_past_its_page_read_on_to_the_next_heading(self):
+        doc = pymupdf.open()
+        page = doc.new_page(width=612, height=792)
+        page.insert_text((72, 80), "2 References", fontsize=12)
+        page.insert_text((72, 100), "Some text about the references, at length.", fontsize=10)
+        page.insert_text((72, 600), "3.1 Abbreviations", fontsize=12)
+        for k in range(8):
+            page.insert_text((72, 622 + 14 * k), f"T{k} term number {k}", fontsize=10)
+        page.insert_text((290, 770), "Page 1", fontsize=8)  # its footer: not the list's end
+        page = doc.new_page(width=612, height=792)
+        page.insert_text((290, 30), "TS 99.999", fontsize=8)  # its header
+        for k in range(8, 12):
+            page.insert_text((72, 72 + 14 * (k - 8)), f"T{k} term number {k}", fontsize=10)
+        page.insert_text((72, 160), "4 Architecture", fontsize=12)
+        page.insert_text((72, 180), "The system has parts.", fontsize=10)
+        (heading, text, first_page, last_page, region), = glossary.pdf_blocks(doc, [])
+        self.assertEqual((heading, first_page, last_page, region), ("3.1 Abbreviations", 1, 2, None))
+        self.assertIn("T0 term number 0", text)
+        self.assertIn("T11 term number 11", text)
+        for left_out in ("Page 1", "TS 99.999", "Architecture", "has parts", "References"):
+            self.assertNotIn(left_out, text)
 
     def test_headings_that_define_terms(self):
         for title in ("Abbreviations", "3.2 Abbreviations", "ABBREVIATIONS:", "Definitions and abbreviations",
@@ -91,6 +114,82 @@ class Blocks(unittest.TestCase):
         self.assertGreater(len(found), 2)
         self.assertTrue(all(len(p) <= glossary.PART_CHARS for p in found))
         self.assertEqual("\n".join(found), text)
+
+def legend_sheet(path):
+    """A drawing sheet whose SYMBOL LEGEND has two marks drawn and one lettered, each beside its meaning."""
+    doc = pymupdf.open()
+    page = doc.new_page(width=1200, height=800)
+    page.insert_text((60, 100), "SYMBOL LEGEND", fontsize=12)
+    page.draw_circle((70, 126), 6)
+    page.draw_line((70, 120), (70, 132))
+    page.insert_text((100, 130), "JUNCTION BOX", fontsize=9)
+    page.draw_rect((64, 142, 76, 152))
+    page.draw_line((64, 142), (76, 152))
+    page.draw_line((64, 152), (76, 142))
+    page.insert_text((100, 150), "DISCONNECT SWITCH", fontsize=9)
+    page.insert_text((66, 170), "W", fontsize=9)
+    page.insert_text((100, 170), "WASHER RECEPTACLE", fontsize=9)
+    doc.save(path)
+
+class Store:
+    """As much of a store as glossary.read asks: a file's origin, and its folder."""
+    def __init__(self, folder, path):
+        self.folder, self.path = folder, path
+
+    def origin(self, source, path):
+        return (str(self.path),)
+
+class Pictured(unittest.TestCase):
+    def test_a_drawn_legend_read_from_its_picture_and_its_words(self):
+        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.settings import Settings
+        asked = []
+
+        def post(handler):
+            body = request_body(handler)
+            parts = body["messages"][1]["content"]
+            asked.append((prompt_of(parts), sum(1 for p in parts if p.get("type") == "image_url")))
+            return chat_answer(handler, {"terms": [
+                {"term": "[circle with a line through it]", "meaning": "JUNCTION BOX", "kind": "symbol"},
+                {"term": "W", "meaning": "WASHER RECEPTACLE", "kind": "symbol"},
+                {"term": "[square]", "meaning": "MOTOR STARTER", "kind": "symbol"}]})  # not in its words
+        with tempfile.TemporaryDirectory() as d, serving(post) as url:
+            root = Path(d)
+            legend_sheet(root / "e-001.pdf")
+            data = {"files": [{"source": "set", "path": "e-001.pdf", "content": "sha256:" + "e" * 64 + ".pdf"}],
+                    "sections": []}
+            client = Client(Settings(base_url=url, retries=0), None)
+            found = glossary.read(data, Store(root / "store", root / "e-001.pdf"), client, "analysis", "x")
+            pictures = list((root / "store" / "assets").glob("glossary-*.png"))
+        asked.sort(key=lambda a: a[1])
+        (words, none), (prompt, images) = asked  # its words read as any block's, and its picture asked
+        self.assertIn("Read the terms an engineering document defines", words)
+        self.assertIn("Read the symbols a drawing's legend defines", prompt)
+        self.assertIn("JUNCTION BOX", prompt)
+        self.assertEqual((none, images, len(pictures)), (0, 1, 1))
+        self.assertEqual([(t["term"], t["meaning"], t["how"]) for t in found["terms"]],
+                         [("[circle with a line through it]", "JUNCTION BOX", "picture"),
+                          ("W", "WASHER RECEPTACLE", "model")])  # the words' reading kept before the picture's
+        self.assertEqual(found["dropped"], 3)  # the picture's made-up square, and the words' two in brackets
+
+    def test_without_vision_its_words_alone(self):
+        from semantic_pdf_diff.llm import Client
+        from semantic_pdf_diff.settings import Settings
+        asked = []
+
+        def post(handler):
+            body = request_body(handler)
+            parts = body["messages"][1]["content"]
+            asked.append(sum(1 for p in parts if isinstance(p, dict) and p.get("type") == "image_url"))
+            return chat_answer(handler, {"terms": []})
+        with tempfile.TemporaryDirectory() as d, serving(post) as url:
+            root = Path(d)
+            legend_sheet(root / "e-001.pdf")
+            data = {"files": [{"source": "set", "path": "e-001.pdf", "content": "sha256:" + "e" * 64 + ".pdf"}],
+                    "sections": []}
+            client = Client(Settings(base_url=url, retries=0, vision=False), None)
+            glossary.read(data, Store(root / "store", root / "e-001.pdf"), client, "analysis", "x")
+        self.assertEqual(asked, [0])
 
 def answering(state):
     """test_embed's stub endpoint, a glossary's request answered with each "TERM - meaning" line of its text, and one
