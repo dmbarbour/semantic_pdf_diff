@@ -410,16 +410,20 @@ def names(groups, text):
     terms = [t for terms in _asked(groups) for t in terms]
     return bool(ws) and covers(groups, text) and all(any(asks(w, b) for t in terms for b in t["words"]) for w in ws)
 
+GLOSSARY = "glossary"  # the other names' kind that's the glossary's: each term with its meanings (report.search_names)
+
 def other_names(groups, synonyms):
-    """The model's other names for what a query names (synonyms: {"items", "properties"}, groups of names), each
-    with the query finding it: [(name, groups)], claims whose item (or property) is that name, all of it and as
-    written (not "diameter" in "rotor diameter"), with the query's exclusions and its terms that aren't words (values,
-    pages); none for like:."""
+    """The other names for what a query names (synonyms: {"items", "properties"}, the model's groups of names, the
+    search_names lever; and "glossary", each glossary term with its meanings), each with the query finding it and its
+    kind: [(name, groups, kind)]. The model's find claims whose item (or property) is that name, all of it and as
+    written (not "diameter" in "rotor diameter"); the glossary's, its words anywhere in a claim (an abbreviation is
+    the same words: "side water depth" finds "at an SWD of"). With the query's exclusions and its terms that aren't
+    words (values, pages); none for like:."""
     out = []
     if not synonyms or any("like" in t or "near" in t for g in groups for t in g["terms"]):
         return out
     kept = [g for g in groups if g["not"] or not any("words" in t for t in g["terms"])]
-    for kind, field in (("items", ENTITY), ("properties", ATTRIBUTE)):
+    for kind, field in (("items", ENTITY), ("properties", ATTRIBUTE), (GLOSSARY, None)):
         for group in synonyms.get(kind) or []:
             if not any(names(groups, n) for n in group):
                 continue
@@ -427,7 +431,8 @@ def other_names(groups, synonyms):
                 ws = words(name)
                 if not ws or names(groups, name) or any(o[0] == name for o in out):
                     continue
-                out.append((name, [{"not": False, "terms": [{"words": ws, "field": field, "whole": True}]}] + kept))
+                term = {"words": ws, "field": field} if field is None else {"words": ws, "field": field, "whole": True}
+                out.append((name, [{"not": False, "terms": [term]}] + kept, kind))
     return out
 
 OTHER_NAME_SHARE = 0.5  # a claim found by another name scores half (the page's)
@@ -492,7 +497,8 @@ def report_items(data, index, prefix=""):
 
 def search(index, groups, claims, findings, view="claims", paired=True, side=None):
     """What a query finds in one view, as the page shows it: ([(item's index, score, how)], the other source's names
-    for it, the model's other names), the most relevant first (ties as listed). how: "" (the query found it),
+    for it, the other names [(name, kind)]: the model's and the glossary's, other_names), the most relevant first (ties
+    as listed). how: "" (the query found it),
     "counterpart", or the other name that found it ("name:drive"); counterparts and other names only when paired."""
     among = index.find(groups)
     found = {"claims": among(claims), "findings": among(findings)}
@@ -504,7 +510,7 @@ def search(index, groups, claims, findings, view="claims", paired=True, side=Non
             found["claims"][i] = score
             how["claims"][i] = "counterpart"
     others = other_names(groups, index.synonyms)
-    for name, query in others if paired else ():
+    for name, query, _ in others if paired else ():
         alike = index.find(query)
         for key, items in (("claims", claims), ("findings", findings)):
             for i, score in alike(items).items():
@@ -515,4 +521,4 @@ def search(index, groups, claims, findings, view="claims", paired=True, side=Non
     kept = [i for i in hits if view == "findings" or side is None or claims[i]["side"] == side]
     kept.sort()  # as listed, then by score: a stable sort keeps the listed order among equals
     kept.sort(key=lambda i: -hits[i])
-    return [(i, hits[i], how[view].get(i, "")) for i in kept], offered, [name for name, _ in others]
+    return [(i, hits[i], how[view].get(i, "")) for i in kept], offered, [(name, kind) for name, _, kind in others]

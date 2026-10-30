@@ -69,10 +69,22 @@ class Engine(unittest.TestCase):
         index = search.Index()
         claims, findings = search.report_items(data, index)
         hits, _, others = search.search(index, search.parse("speed"), claims, findings, paired=True)
-        self.assertEqual(([claims[i]["card"] for i, _, _ in hits], others), (["A-motor"], ["flow"]))
+        self.assertEqual(([claims[i]["card"] for i, _, _ in hits], others), (["A-motor"], [("flow", "properties")]))
         hits, _, _ = search.search(index, search.parse("shaft power"), claims, findings, paired=True)
         self.assertEqual([(claims[i]["card"], how) for i, _, how in hits],
                          [("B-drive", ""), ("A-blower", "name:air flow")])
+
+    def test_the_glossarys_other_names_anywhere_in_a_claim(self):
+        # a glossary term's meaning is the same words: found anywhere, not only as a claim's whole name
+        data = search_report()
+        data["glossary"] = {"terms": [{"term": "SPD", "meaning": "motor speed", "kind": "abbreviation",
+                                       "source": "A", "content": "ca", "where": "a.pdf, page 1", "block": "",
+                                       "how": "prose", "reach": "document"}]}
+        index = search.Index()
+        claims, findings = search.report_items(data, index)
+        hits, _, others = search.search(index, search.parse("SPD"), claims, findings, paired=True)
+        self.assertEqual(([(claims[i]["card"], how) for i, _, how in hits], others),
+                         ([("A-motor", "name:motor speed")], [("motor speed", "glossary")]))  # its quote's words
 
     def test_counterparts_names_and_like(self):
         self.assertEqual(found("output", paired=True), ["B-pump", "A-pump"])
@@ -101,7 +113,8 @@ class SameAsThePage(unittest.TestCase):
                 index = search.Index()
                 claims, findings = search.report_items(search_report(), index)
                 _, names, others = search.search(index, search.parse(q), claims, findings)
-                self.assertEqual([f'"{name}"' for name, _ in names] + [f'"{name}"' for name in others], result["also"])
+                self.assertEqual([f'"{name}"' for name, _ in names] + [f'"{name}"' for name, _ in others],
+                                 result["also"])
 
 class Values(unittest.TestCase):
     """A claim's value and a search's units (values.py): what milestone 3 compares."""

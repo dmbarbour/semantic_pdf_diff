@@ -135,12 +135,20 @@ def measures(way, sides, one=False):
     both = 1.0 if one and way.topics else both  # one source: every topic holds its only side
     return {"placed": round(total / n, 3) if n else 0.0, "even": round(even, 3), "both_sides": round(both, 3)}
 
-def ways(claims, sides, one=False):
+def termed(text, names):
+    """A text's words as topics count them, a meaning written out taken as its term, one word ("side water depth" as
+    "swd"), and each term a word however short ("SB")."""
+    folded = names.abbreviated(text)
+    return words(folded) | {fold for term in names.used([folded]) for fold in [term.casefold().rstrip(".")]}
+
+def ways(claims, sides, one=False, names=None):
     """The candidate ways of splitting claims (dicts with entity and attribute), each side's claims together: by
-    subject, by property, by subject coarser; those with two topics or more."""
+    subject, by property, by subject coarser; those with two topics or more. names: the glossary's terms (terms.Terms)
+    a meaning written out is counted as (the topic_glossary setting), or None."""
     k = target(len(claims))
-    subject = [words(f"{c['entity']} {c['attribute']}") for c in claims]
-    found = [split(subject, sides, k, "by subject", one), split([words(c['attribute']) for c in claims], sides, k,
+    said = (lambda text: termed(text, names)) if names is not None else words
+    subject = [said(f"{c['entity']} {c['attribute']}") for c in claims]
+    found = [split(subject, sides, k, "by subject", one), split([said(c['attribute']) for c in claims], sides, k,
                                                                 "by property", one)]
     if k > 4:
         found.append(split(subject, sides, max(2, k // 2), "by subject, coarser", one))

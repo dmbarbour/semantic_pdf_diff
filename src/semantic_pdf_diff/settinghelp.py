@@ -144,6 +144,7 @@ HELP = {
                      "index and the search", "From the parts headed Abbreviations, Definitions, Symbols, Legend and "
                      "the like (the model, a request a part of about 100 lines; a text file's tables as they are), "
                      "and from prose (\"net positive suction head (NPSH)\"). off: none read.", basic=True),
+    "topic_glossary": Help(_L, "with glossary: the topics count a meaning written out as its term, one word"),
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),
     # --- report
@@ -231,9 +232,13 @@ HELP = {
     "align_printed": Help(_L, "with align: a claim's name as printed weighed beside its attribute"),
     "align_hedges": Help(_L, "with align: a value differing only by a hedge or a status is reported without a model"),
     "align_glossary": Help(_L, "with align and glossary: a meaning written out weighed as its term"),
+    "retrieve_glossary": Help(_L, "with glossary: retrieval takes a meaning written out as its term, so one source's "
+                                  "abbreviation meets the other's words among the candidate pairs"),
     "verify_visuals": Help(_L, "a claim's crop is sent with it when it's judged"),
     "explain_differences": Help(_L, "revisions: each different or uncertain finding is explained by kind"),
     "explain_context": Help(_L, "the explainer is shown each claim's list position and name as printed"),
+    "explain_glossary": Help(_L, "with glossary: the explainer is shown the terms each claim uses, as its document "
+                                 "defines them"),
     "editorial": Help(_L, "a claim equivalent at another place in its list is reported as renumbered"),
     "record_changes": Help(_L, "a context record restated between revisions is reported once, with the claims it "
                                "reaches"),

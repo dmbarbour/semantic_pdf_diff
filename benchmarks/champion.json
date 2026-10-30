@@ -57,6 +57,7 @@
     "dedupe_repeated",
     "continue_reading",
     "align",
+    "retrieve_glossary",
     "verify_visuals",
     "explain_differences",
     "editorial",

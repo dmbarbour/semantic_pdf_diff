@@ -53,7 +53,7 @@ From the tentative row, moved in:
   - **A drawn legend's symbols:** from its crop, by vision, after the text blocks.
   - **Checked mechanically:** each term and its meaning are found in the block's text.
 - **What uses it:**
-  - **Reports:** a term's meaning beside the claims using it; search finds the claims of a term's expansion.
+  - **Reports:** a term's meaning beside the claims using it; search finds the claims of a term's expansion, its words anywhere in them, and offers the glossary's other names apart from the model's (2026-10-30; the owner: "Related, the report search function could also have glossary access."); the topics may count a meaning as its term (`topic_glossary`, below).
   - **Comparisons:** an abbreviation and its expansion as one name; two sources' conventions compared, a changed one reported once.
   - **Comprehension:** the reader and the judge given the terms a span uses (a lever, milestone 5).
 - **Where to test:**
@@ -160,6 +160,7 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 
 - Proposals' subjects matched beyond the judged pairs (names, other names, the glossary).
 - Revisions' alignment with the glossary's names: built with milestone 5 (`align_glossary`).
+- Proposals' retrieval with the glossary's names (built 2026-10-30, `retrieve_glossary`, off, on recommended; the owner: "Yes, please use the glossary for candidates when comparing propsals, and experiment with showing terms to the step that explains differences. I also suspect we could leverage the glossary in some manner for combining terms when deciding how to split subjects for browsing."): a meaning written out taken as its term before a claim's words are counted. On the abbreviated pair compared as proposals (offline), keyed facts whose claims meet among the candidates 31 → 33 (PDF) and 31 → 32 (the other formats), none lost, about as many candidates.
 - Conventions compared: a changed one reported once.
 
 ### 5. The glossary given to the reader and the judge
@@ -173,7 +174,9 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
   - **Spelling terms out instead** (tried first): the pair's changes found too, but on TS 38.300 a tenth of the judge pairs moved, some wrongly ("PDCP layer integrity protection" settled with "PDCP layer ciphering": the spelled-out PDCP four shared words of six). An abbreviation is one word whichever way it's written.
   - **To the judge** (`judge_glossary`; off, measured no different): each claim judged shown the terms its words use, as its document defines them. 16 of the pair's 31 judged pairs shown terms, no relation moved: the model already reads these letters. Its use would be a project's own letters; no controlled pair has those yet.
   - **To the reader** (`reader_glossary`; off, measured against a null arm: no different; the owner, 2026-10-30: "let's test glossary to reader"): each extraction request shown the terms its words use, as its document defines them ("Defined in this document: SWD = side water depth"), a long meaning and a term the words spell out left out. The null: the same line, its terms without their meanings. On the controlled corpus, TS 38.300's clauses 1 to 8 and 9 of scical's sheets, the lever moved what the null moved: rewording the requests reads again what was read two ways (TS's unmatched 75 → 32, the null 38), and where only one revision defines terms, only its reader is reworded (the abbreviated pair's workbook, unchanged confirmed 30 → 25 of 31, the null the same). On drawings the glossary's own mistakes reach every request: a capitalized word as a term ("OF"), one discipline's letters on another's sheets ("TS"). Found and fixed on the way: a list printing meanings first read reversed; a term of words across a line break stopped the run. $1.39 in all.
-  - **Not yet:** proposals mode's retrieval and the explainer, and a discipline's reach (lever ideas); the model's other names (search_names) in alignment, which are asked after the comparison, from its claims.
+  - **To the explainer** (`explain_glossary`; off, measured against a null arm: no different): each claim explained shown its terms; on the wtp-s1 pairs 12 of 54 explanations shown terms, none moved; TS 38.300's 9 "not the same item" in every arm.
+  - **In the topics** (`topic_glossary`; off, on recommended): a meaning written out counted as its term, one word, so one source's "SWD" and the other's "side water depth" make a topic of both. Offline, the abbreviated pair's claims in a topic 0.74 → 0.97; TS 38.300's and scical's about as before.
+  - **Not yet:** the model's other names (search_names) in alignment, which are asked after the comparison, from its claims.
 
 ## Design questions
 

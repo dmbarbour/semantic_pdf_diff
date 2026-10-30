@@ -542,7 +542,8 @@ store's latest comparison (--comparison picks another, for one store).
 The most relevant first. After the claims found come their counterparts (the claims the comparison paired with
 them; --alone leaves them out), and where a counterpart names what was searched otherwise, its name is offered.
 Where the model was asked the documents' other names for one thing (search_names), a search for one name finds the
-others' claims too, after the rest, each marked.
+others' claims too, after the rest, each marked. A term the documents' glossaries define finds its meaning's claims,
+and its meaning the term's, wherever their words are, and the glossary's other names are said.
 
 Quote a query holding a word to leave out, or anything else the shell reads: semantic-pdf-diff search 'pump -gearbox'.
 
@@ -682,7 +683,9 @@ def search_command(argv):
         print(json.dumps({'query': query, 'view': view, 'found': len(hits),
                           'counterparts': sum(1 for h in hits if h[2] == 'counterpart'),
                           'by_other_names': sum(1 for h in hits if h[2].startswith('name:')),
-                          'names': [n for n, _ in names], 'other_names': others, 'items': items},
+                          'names': [n for n, _ in names],
+                          'other_names': [n for n, kind in others if kind != finder.GLOSSARY],
+                          'glossary_names': [n for n, kind in others if kind == finder.GLOSSARY], 'items': items},
                          indent=1, ensure_ascii=False))
         return 0
     via, named = (sum(1 for h in hits if h[2] == 'counterpart'), sum(1 for h in hits if h[2].startswith('name:')))
@@ -699,8 +702,10 @@ def search_command(argv):
     print(line)
     if names:
         print("The other source's names for it: " + ', '.join(f'"{name}" ({n})' for name, n in names))
-    if others:
-        print("The model's other names for it: " + ', '.join(f'"{name}"' for name in others))
+    for title, glossary in (("The model's other names for it: ", False), ("The glossary's other names for it: ", True)):
+        said = [name for name, kind in others if (kind == finder.GLOSSARY) == glossary]
+        if said:
+            print(title + ', '.join(f'"{name}"' for name in said))
     at = {c['card']: k for k, c in enumerate(claims)}
     marks = lambda how: ('  [counterpart]' if how == 'counterpart' else  # noqa: E731
                          f'  [named otherwise: {how[5:]}]' if how.startswith('name:') else '')

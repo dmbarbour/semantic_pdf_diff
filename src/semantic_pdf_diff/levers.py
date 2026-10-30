@@ -1095,6 +1095,20 @@ class Align(Lever):
         names = Terms(glossary) if self.align_glossary and glossary else None
         return align(left, right, printed=self.align_printed, hedges=self.align_hedges, names=names)
 
+class RetrieveGlossary(Lever):
+    lever_name, stage, off = "retrieve_glossary", "comparison", {"retrieve_glossary": False}
+    # retrieval (proposals; revisions without align) takes a meaning written out as its term, as align_glossary does
+    # for alignment, so one team's "air handling unit" meets the other's "AHU" among the candidate pairs
+    # (terms.Terms.abbreviated; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 4; the owner, 2026-10-30:
+    # "please use the glossary for candidates when comparing propsals")
+    retrieve_glossary: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def retrieval_names(self, glossary):
+        if not self.retrieve_glossary or not glossary:
+            return None
+        from .terms import Terms
+        return Terms(glossary)
+
 class VerifyVisuals(Lever):
     lever_name, stage, off = "verify_visuals", "comparison", {"verify_visuals": False}
     # send a claim's crop with it when it's compared, so the judgment can check the reading
@@ -1106,13 +1120,19 @@ class VerifyVisuals(Lever):
 
 class ExplainDifferences(Lever):
     lever_name, stage, off = "explain_differences", "comparison", {"explain_differences": False,
-                                                                   "explain_context": False}
+                                                                   "explain_context": False,
+                                                                   "explain_glossary": False}
     # revisions: ask why each "different" or "uncertain" finding differs (a change, a renaming, not the same item...),
     # with the claims' items around them (explain.py; docs/plans/revision-comparison-2026-10-02.md, milestone 4)
     explain_differences: Annotated[bool, _selecting(roles=COMPARE)] = True
     # each claim's list position and name as printed shown to the explainer (the records lever's; docs/plans/
     # claim-context-2026-10-14.md, milestone 3), so "renumbered" or "renamed" rests on the source's own labels
     explain_context: Annotated[bool, _shaping(roles=COMPARE)] = False
+    # each claim's terms shown to the explainer, as its document defines them where it is (terms.Terms.used), as
+    # judge_glossary shows the judge, so a value under a term spelled out in one revision and abbreviated in the other
+    # is told "restated" from "changed" (docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 5; the owner,
+    # 2026-10-30: "experiment with showing terms to the step that explains differences")
+    explain_glossary: Annotated[bool, _shaping(roles=COMPARE)] = False
 
     def explains(self, mode):
         return self.explain_differences and mode == "revisions"
@@ -1145,13 +1165,18 @@ class RecordChanges(Lever):
         return changed_records(earlier, later, left, right)
 
 class NameTopics(Lever):
-    lever_name, stage, off = "topic_names", "comparison", {"topic_names": False}
+    lever_name, stage, off = "topic_names", "comparison", {"topic_names": False, "topic_glossary": False}
     # the report's topics (topics.py) chosen among the candidate ways and named by the model, in a request a
     # comparison; without it, or when it fails, the most even way by its words (the owner, 2026-10-19: "let an LLM
     # model select heuristically between candidates based on what would better fit the human intuition, and name the
     # divisions"; docs/plans/portable-reports-2026-10-19.md, milestone 3). A default since 2026-10-20 (the owner: "Yes,
     # turn `topic_names` on by default.")
     topic_names: Annotated[bool, _selecting(roles=COMPARE)] = True
+    # the topics count a meaning written out as its glossary term, one word, so "SWD" in one source and "side water
+    # depth" in the other make one topic word of both sides (report.topic_terms; the owner, 2026-10-30: "I also
+    # suspect we could leverage the glossary in some manner for combining terms when deciding how to split subjects
+    # for browsing")
+    topic_glossary: Annotated[bool, _shaping(roles=COMPARE)] = False
 
     def names_topics(self):
         return self.topic_names
@@ -1278,8 +1303,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
-                 ContinueReading, Align, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges, JudgeContext,
-                 JudgeGlossary, NameTopics, SearchNames, ReadGlossary, Embed, Rerank)
+                 ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
+                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1413,11 +1438,18 @@ class Platform(Composable):
     # --- comparison: which claims are compared, and what a comparison is sent
 
     @chosen
-    def candidates(self, left, right):
+    def candidates(self, left, right, names=None):
         """Pairs worth comparing, [(i, j, score)]: the platform's are a sparse TF-IDF bidirectional top-k union
-        (retrieval.candidates); another retrieval (BM25, a reranker) would be a lever choosing otherwise."""
+        (retrieval.candidates); another retrieval (BM25, a reranker) would be a lever choosing otherwise. names: the
+        glossary's terms retrieval takes a meaning written out as (retrieval_names), or None."""
         from .retrieval import candidates
-        return candidates(left, right, self)
+        return candidates(left, right, self, names)
+
+    @chosen
+    def retrieval_names(self, glossary):
+        """The glossary's terms (terms.Terms) retrieval takes a meaning written out as, from the comparison's
+        glossary entries, or None: the platform's, none."""
+        return None
 
     @chosen
     def correspondence(self, left, right, mode, glossary=None):
@@ -1425,7 +1457,7 @@ class Platform(Composable):
         comparison's glossary entries (glossary.read's terms). The platform's: every retrieval candidate judged, none
         settled; the alignment lever decides otherwise for revisions."""
         from .align import Correspondence
-        return Correspondence(self.candidates(left, right))
+        return Correspondence(self.candidates(left, right, self.retrieval_names(glossary)))
 
     @chained
     def comparison_images(self, evidence, output):

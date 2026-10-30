@@ -11,10 +11,12 @@ def words(text, aliases):
         text = re.sub(r"(?<!\w)" + re.escape(alias.casefold()) + r"(?!\w)", canonical.casefold(), text)
     return re.findall(r"[^\W_]+", text, re.UNICODE)
 
-def candidates(left, right, settings):
-    """Bidirectional top-k union; supports one-to-many and many-to-one, no page alignment."""
+def candidates(left, right, settings, names=None):
+    """Bidirectional top-k union; supports one-to-many and many-to-one, no page alignment. names: the glossary's
+    terms (terms.Terms), a meaning written out taken as its term ("air handling unit" as "AHU"), or None."""
     all_e = left + right
-    docs = [Counter(words(f"{e.entity} {e.entity} {e.attribute} {e.attribute} {e.conditions} {e.value}",
+    fold = names.abbreviated if names is not None else str
+    docs = [Counter(words(fold(f"{e.entity} {e.entity} {e.attribute} {e.attribute} {e.conditions} {e.value}"),
                           settings.aliases)) for e in all_e]
     df = Counter(t for d in docs for t in d)
     vectors = []

@@ -14,6 +14,7 @@ const Search = (() => {
   // the words like:ID looks for: what a claim is about, and its value's words ("UE — performs = resuming from
   // RRC_INACTIVE" is about its value), not its numbers
   const ABOUT = new Set([ENTITY, ATTRIBUTE, CONDITIONS, VALUE]);
+  const GLOSSARY = 'glossary';  // the other names' kind that's the glossary's: each term with its meanings
   const STOP = new Set(('a an and are as at be by for from in into is it its of on or per than that the this to '
     + 'with').split(' '));
   const K1 = 1.2, B = 0.75;
@@ -384,21 +385,24 @@ const Search = (() => {
     const ws = words(text).filter((w) => !STOP.has(w)), terms = asked(groups).flat();
     return ws.length > 0 && covers(groups, text) && ws.every((w) => terms.some((t) => t.words.some((b) => asks(w, b))));
   };
-  // the model's other names for what a query names (synonyms: {items, properties}, groups of names; the search_names
-  // lever), each with the query finding it: claims whose item (or property) is that name, all of it and as written
-  // (not "diameter" in "rotor diameter"), with the query's exclusions and its terms that aren't words (values,
-  // pages); none for like:
+  // the other names for what a query names (synonyms: {items, properties}, the model's groups of names, the
+  // search_names lever; and glossary, each glossary term with its meanings), each with the query finding it and its
+  // kind: the model's find claims whose item (or property) is that name, all of it and as written (not "diameter" in
+  // "rotor diameter"); the glossary's, its words anywhere in a claim (an abbreviation is the same words: "side water
+  // depth" finds "at an SWD of"); with the query's exclusions and its terms that aren't words (values, pages); none
+  // for like:
   const otherNames = (groups, synonyms) => {
     const out = [];
     if (!synonyms || groups.some((g) => g.terms.some((t) => t.like !== undefined || t.near !== undefined))) return out;
     const kept = groups.filter((g) => g.not || !g.terms.some((t) => t.words));
-    for (const [kind, field] of [['items', ENTITY], ['properties', ATTRIBUTE]]) {
+    for (const [kind, field] of [['items', ENTITY], ['properties', ATTRIBUTE], [GLOSSARY, null]]) {
       for (const group of synonyms[kind] || []) {
         if (!group.some((n) => names(groups, n))) continue;
         for (const name of group) {
           const ws = words(name);
           if (!ws.length || names(groups, name) || out.some((o) => o.name === name)) continue;
-          out.push({name, groups: [{not: false, terms: [{words: ws, field, whole: true}]}, ...kept]});
+          const term = field === null ? {words: ws, field} : {words: ws, field, whole: true};
+          out.push({name, groups: [{not: false, terms: [term]}, ...kept], kind});
         }
       }
     }
@@ -459,5 +463,5 @@ const Search = (() => {
     };
   };
 
-  return {index, parse, marker, covers, touches, names, otherNames, unknown, words};
+  return {index, parse, marker, covers, touches, names, otherNames, unknown, words, GLOSSARY};
 })();

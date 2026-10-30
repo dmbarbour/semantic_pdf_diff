@@ -132,7 +132,7 @@ class Glossary(unittest.TestCase):
         self.assertEqual(rows[0], ["FF", "abbreviation", "far face", "a", "a.pdf, page 2", "document", "ABBREVIATIONS",
                                    "model", "yes", ""])
         from semantic_pdf_diff.report import search_names
-        self.assertIn(["UNO", "unless noted otherwise"], search_names({"glossary": found})["properties"])
+        self.assertIn(["UNO", "unless noted otherwise"], search_names({"glossary": found})["glossary"])
 
 class OtherNames(unittest.TestCase):
     """Milestone 3: the names one thing goes by join its subjects, match them across sources and join properties."""
@@ -195,7 +195,7 @@ class Reach(unittest.TestCase):
         self.assertIn("- **[red square]** (symbol): FOO (set.pdf, page 3) — sheet E-201 only", page)
         self.assertIn("— alike on 2 sheets", page)
         from semantic_pdf_diff.report import search_names
-        named = search_names({"glossary": found})["items"]
+        named = search_names({"glossary": found})["glossary"]
         self.assertEqual(named, [["TYP", "typical"]])  # not a sheet's letter, nor a mark described
 
     def test_a_disciplines_list_holds_on_its_sheets(self):

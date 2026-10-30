@@ -229,7 +229,9 @@
       }
     };
     offer('The other source\'s names for it: ', extra.names.map(({name, n}) => [name, n]));
-    offer('The model\'s other names for it: ', others.map((o) => [o.name, 0]));
+    const of = (glossary) => others.filter((o) => (o.kind === Search.GLOSSARY) === glossary).map((o) => [o.name, 0]);
+    offer('The model\'s other names for it: ', of(false));
+    offer('The glossary\'s other names for it: ', of(true));
     const found = searched && searched[view];
     for (const tab of tabs) {
       if (tab.dataset.view !== 'findings' && tab.dataset.view !== 'claims') continue;

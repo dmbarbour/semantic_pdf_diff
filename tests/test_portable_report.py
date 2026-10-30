@@ -503,6 +503,11 @@ def search_report():
     data["sections"] = [{"content": a[0].content, "id": "s1", "heading_path": ["Plant", "Feed system"]}]
     # the model's other names (the search plan's milestone 4: the search_names lever): A's motor is B's drive
     data["synonyms"] = {"items": [["drive", "pump motor"]], "properties": []}
+    # a glossary term (indexes and glossaries; the owner, 2026-10-30: "the report search function could also have
+    # glossary access"): its meaning's words found anywhere in a claim
+    data["glossary"] = {"terms": [{"term": "NL", "meaning": "noise limit", "kind": "abbreviation", "source": "B",
+                                   "content": b[0].content, "where": "b.pdf, page 2", "block": "ABBREVIATIONS",
+                                   "how": "model", "reach": "document"}], "blocks": 1, "dropped": 0, "failed": 0}
     # the claims' vectors (milestone 5: the embed lever), by a toy embedding
     data["vectors"] = toy_vectors(data["evidence"])
     return data
@@ -543,7 +548,7 @@ HARNESS = """<script>(async () => {
     items: [...document.querySelectorAll('main article')].map((a) => [...a.querySelectorAll('section small')]
       .map((s) => s.textContent.split(' · ')[0])),
     marks: [...new Set([...document.querySelectorAll('main mark')].map((m) => m.textContent))].sort(),
-    also: [...document.querySelectorAll('#also button')].map((b) => b.dataset.q),
+    also: [...document.querySelectorAll('#also button')].map((b) => b.dataset.q), said: $('also').textContent,
     via: [...document.querySelectorAll('main article')].filter((a) => a.textContent.includes('The counterpart of'))
       .map((a) => a.querySelector('section small').textContent.split(' · ')[0])});
   out.push(drawn($('query').value, 'opened'));
@@ -672,7 +677,7 @@ class SearchInABrowser(unittest.TestCase):
                                          "value:2.5GN.m2", "drive")]
         cases += [("claims", "near:A-pump"), ("claims", "near:A-heater"), ("claims", "pump feed", True),
                   ("claims", 'meaning:"pumps"'), ("findings", "pump"), ("claims", "drive", True),
-                  ("claims", "output", True)]
+                  ("claims", "NL", True), ("claims", "NL"), ("claims", "output", True)]
         with tempfile.TemporaryDirectory() as d:
             write_report(search_report(), Path(d))
             page = Path(d) / "report.html"
@@ -769,6 +774,13 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(renamed["count"], "2 of 13 claims (1 by other names): 1 in A; 1 in B")
         self.assertIn('"pump motor"', renamed["also"])
         self.assertEqual(self.ids("drive"), ["B-drive"])  # without them
+
+    def test_the_glossarys_names_find_their_claims_too(self):
+        named = self.got("NL +counterparts")
+        self.assertEqual(self.ids("NL +counterparts"), ["B-limit"])  # its meaning's words, the noise limit's
+        self.assertEqual(named["also"], ['"noise limit"'])
+        self.assertIn("The glossary's other names for it", named["said"])
+        self.assertEqual(self.ids("NL"), [])  # without them
 
     def test_claims_near_a_claim_in_meaning(self):
         # the search plan, milestone 5: the toy embedding puts the pumps together, and the heaters

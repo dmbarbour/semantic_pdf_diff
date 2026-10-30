@@ -13,6 +13,10 @@ from .schema import Explanation
 # 4: the source's numbering is position; identical quotes name conditions only when the conditions were replaced
 EXPLAIN_VERSION = 4
 
+# With the explain_glossary lever, where a claim explained uses a term its document defines (terms.Terms); a prompt
+# whose claims use none is as it was.
+TERMS = 'Each claim\'s "terms", where given, are what its document defines the abbreviations and terms it uses as.'
+
 # Why a revisions finding differs (docs/plans/revision-comparison-2026-10-02.md, design item 3): the kinds, and a
 # checklist of the confounders seen in the controlled and real pairs (list members, numbered conditions, two of a
 # kind, a field and its length, a misreading, readers' own conditions and numbering).
@@ -121,7 +125,7 @@ def explanation_prompt(a, b, finding, payload, revisions):
     dump = lambda x: json.dumps(x, ensure_ascii=False)
     lean = lambda p: {k: v for k, v in p.items() if v not in ("", None, False, "unknown")}
     fold = lambda q: " ".join(q.split()).casefold()
-    lines = [EXPLAIN + f"v{EXPLAIN_VERSION}",
+    lines = [EXPLAIN + f"v{EXPLAIN_VERSION}", *([TERMS] if any("terms" in p for p in payload) else []),
              "A=" + dump(lean(payload[0])), "B=" + dump(lean(payload[1])),
              "Quotes=" + ("the same text" if fold(a.quote) == fold(b.quote) else "different text"),
              "Comparison=" + dump({"relation": finding["relation"], "rationale": finding["rationale"]}),
@@ -140,11 +144,19 @@ def context_fields(e):
     position as printed and its name as printed, where it has them."""
     return {**({"position": e.position.label} if e.position else {}), **({"printed": e.printed} if e.printed else {})}
 
-def explain(results, payloads, earlier, later, headings, dispatch, progress, key, context=False):
+def glossary_fields(e, defined):
+    """A claim's terms as the explainer sees them (the explain_glossary setting): {"terms": {term: meanings}} where
+    its words use a term its document defines, as defined where it is; {} otherwise."""
+    terms = (defined or {}).get(e.content)
+    used = terms.used((e.entity, e.attribute, e.value, e.conditions), e.locator.page) if terms is not None else {}
+    return {"terms": used} if used else {}
+
+def explain(results, payloads, earlier, later, headings, dispatch, progress, key, context=False, defined=None):
     """Each "different" or "uncertain" finding in results ({index: finding}) explained in place: its
     "explanation" ({kind, rationale, confidence}), from a second call (EXPLAIN). payloads: {index: (A, B, the
     claims as the judge saw them, the images sent)}; earlier and later: each revision's claims. context: each claim's
-    position and name as printed shown too (context_fields)."""
+    position and name as printed shown too (context_fields). defined: {content: terms.Terms}, each claim's terms shown
+    too (glossary_fields), or None."""
     chosen = [i for i in sorted(results)
               if results[i]["relation"] in EXPLAINED and not results[i].get("processing_error")]
     if not chosen:
@@ -164,7 +176,8 @@ def explain(results, payloads, earlier, later, headings, dispatch, progress, key
         dispatch.make_room()
         a, b, payload, images = payloads[index]  # A is always the earlier revision's
         shown = [{**p, **({"section": headings[e.content, e.section]} if (e.content, e.section) in headings else {}),
-                  **(context_fields(e) if context else {})} for p, e in zip(payload, (a, b))]
+                  **(context_fields(e) if context else {}), **glossary_fields(e, defined)}
+                 for p, e in zip(payload, (a, b))]
         prompt = explanation_prompt(a, b, results[index], shown, revisions)
         progress.add()
         dispatch.submit(prompt, Explanation, images, key + (a.id, b.id), explained(index))

@@ -139,7 +139,9 @@ SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul
                'counterparts. Where a counterpart names what was searched otherwise (<i>nominal power</i> for '
                '<i>rated output</i>), its name is offered as a search. Where the model was asked the documents\' '
                'other names for one thing (<code>search_names</code>), a search for one name finds the others\' '
-               'claims too, after the rest, each marked.</li>'
+               'claims too, after the rest, each marked. A term the documents\' glossaries define finds its '
+               'meaning\'s claims, and its meaning the term\'s, wherever their words are, and the glossary\'s other '
+               'names are offered.</li>'
                '<li>Found items come most relevant first: words in what a claim is about count most, then its value, '
                'conditions and section, then its quote. The page\'s address keeps the search, to bookmark or send.'
                '</li></ul></details>')
@@ -448,7 +450,8 @@ def report_page(data, stored, budget, note=''):
 
 def search_names(data):
     """The names a search takes as one: the model's other names (the search_names lever), and each glossary term
-    with its meanings (an abbreviation finds its expansion's claims): {"items": [[names]], "properties": [[names]]}."""
+    with its meanings (an abbreviation finds its expansion's claims, its words anywhere in them): {"items": [[names]],
+    "properties": [[names]], "glossary": [[term, meanings...]]}."""
     from .terms import drawn
     from .indexes import terms as glossary_terms
     # only terms reaching their documents or a discipline's sheets, or a sheet's consistent on two or more: a sheet's
@@ -456,7 +459,7 @@ def search_names(data):
     terms = [[t["term"], *dict.fromkeys(m["meaning"] for m in t["meanings"])]
              for t in glossary_terms(data) if len(t["meanings"][0]["meaning"]) <= 80 and not drawn(t["term"])
              and (t.get("reach", "document") in ("document", "discipline") or t.get("consistent"))]
-    return {k: data.get('synonyms', {}).get(k, []) + terms for k in ('items', 'properties')}
+    return {**{k: data.get('synonyms', {}).get(k, []) for k in ('items', 'properties')}, 'glossary': terms}
 
 def page_vectors(vectors, cards):
     """The claims' vectors a page's search reads (the embed lever's): {"dimensions", "vectors", "of": {card: index}},
@@ -489,7 +492,17 @@ def report_topics(data):
     for f in data.get('files', []):
         side.setdefault(f['content'], f['source'])
     claims = [{**evidence[x], 'side': side.get(evidence[x]['content'], '')} for x in ids if x in evidence]
-    return (topics.ways(claims, [c['side'] for c in claims], one_source(data)) if claims else []), claims
+    return (topics.ways(claims, [c['side'] for c in claims], one_source(data), topic_terms(data)) if claims
+            else []), claims
+
+def topic_terms(data):
+    """The glossary's terms the topics count a meaning written out as (terms.Terms), where the run's settings said so
+    (topic_glossary), else None: a report written again splits as its run did."""
+    entries = (data.get('glossary') or {}).get('terms')
+    if not entries or not (data.get('settings') or {}).get('topic_glossary'):
+        return None
+    from .terms import Terms
+    return Terms(entries)
 
 def browsing(data):
     """The topics a report's findings are browsed by, each shown claim's, and their names: (the way, {claim id: its

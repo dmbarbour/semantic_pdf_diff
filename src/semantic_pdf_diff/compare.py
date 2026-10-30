@@ -293,7 +293,8 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         dispatch.drain()
         if client.s.explains(mode):
             explain(results, payloads, left + shared, right + shared, headings or {}, dispatch, progress,
-                    ("explain", mode, settings_key), context=client.s.explain_context)
+                    ("explain", mode, settings_key), context=client.s.explain_context,
+                    defined=defined if client.s.explain_glossary else None)
     # Findings keep the order of their pairs, however requests complete; settled ones follow.
     findings.extend(results[i] for i in sorted(results))
     for (aid, bid), (score, a, b) in sorted(settled.items()):

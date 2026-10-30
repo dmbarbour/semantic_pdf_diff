@@ -421,5 +421,50 @@ class Used(unittest.TestCase):
         self.assertEqual(pair_request(Settings(judge_glossary=True), "revisions", a, unused, defined=defined)[0],
                          pair_request(Settings(), "revisions", a, unused)[0])
 
+class Elsewhere(unittest.TestCase):
+    """The glossary in retrieval, the explainer and the topics (the owner, 2026-10-30: "please use the glossary for
+    candidates when comparing propsals, and experiment with showing terms to the step that explains differences. I
+    also suspect we could leverage the glossary in some manner for combining terms when deciding how to split
+    subjects for browsing.")."""
+    def test_retrieval_meets_a_meaning_written_out_with_its_term(self):
+        from semantic_pdf_diff.settings import Settings
+        left = [evidence("A-1", "Sedimentation basins", "side water depth", "15.1")]
+        right = [evidence("B-1", "SBs", "SWD", "13.7", content="cb"), evidence("B-2", "pumps", "head", "50", "cb")]
+        defined = [term("SWD", "side water depth", "cb"), term("SB", "sedimentation basin", "cb")]
+        pairs = lambda s: {(left[i].id, right[j].id) for i, j, _ in  # noqa: E731
+                           s.correspondence(left, right, "proposals", defined).judge}
+        self.assertEqual(pairs(Settings()), set())  # no word shared
+        self.assertEqual(pairs(Settings(retrieve_glossary=True)), {("A-1", "B-1")})
+
+    def test_the_explainer_shown_the_terms_a_claim_uses_else_the_same_prompt(self):
+        from semantic_pdf_diff import explain
+        a = evidence("A-1", "Sedimentation basins", "side water depth", "15.1")
+        b = evidence("B-1", "SBs", "SWD", "13.7", content="cb")
+        defined = {"cb": Terms([term("SWD", "side water depth", "cb"), term("SB", "sedimentation basin", "cb")])}
+        self.assertEqual(explain.glossary_fields(b, defined),
+                         {"terms": {"SB": "sedimentation basin", "SWD": "side water depth"}})
+        self.assertEqual((explain.glossary_fields(a, defined), explain.glossary_fields(b, None)), ({}, {}))
+        revisions = explain.Revisions([a], [b])
+        finding = {"relation": "different", "rationale": "r"}
+        plain = explain.explanation_prompt(a, b, finding, [{"value": "15.1"}, {"value": "13.7"}], revisions)
+        shown = explain.explanation_prompt(a, b, finding, [{"value": "15.1"},
+                                                           {"value": "13.7", **explain.glossary_fields(b, defined)}],
+                                           revisions)
+        self.assertNotIn(explain.TERMS, plain)
+        self.assertIn(explain.TERMS, shown)
+
+    def test_the_topics_count_a_meaning_written_out_as_its_term(self):
+        from semantic_pdf_diff import topics
+        claims = ([{"entity": "sedimentation basin", "attribute": f"side water depth {i}"} for i in range(4)]
+                  + [{"entity": "SB", "attribute": f"SWD {i}"} for i in range(4)]
+                  + [{"entity": "feed pump", "attribute": f"rated power {i}"} for i in range(8)]
+                  + [{"entity": "filter", "attribute": f"media depth {i}"} for i in range(8)])
+        sides = ["a"] * 4 + ["b"] * 4 + ["a", "b"] * 8
+        names = Terms([term("SWD", "side water depth"), term("SB", "sedimentation basin")])
+        said = lambda ways: {w for way in ways for t in way.topics for w in t}  # noqa: E731
+        self.assertNotIn("swd", said(topics.ways(claims, sides)))  # one side's word: no topic
+        self.assertIn("swd", said(topics.ways(claims, sides, names=names)))
+        self.assertEqual(topics.termed("the SBs", names), {"sbs", "sb"})  # a term however short
+
 if __name__ == "__main__":
     unittest.main()

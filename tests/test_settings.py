@@ -91,6 +91,10 @@ NOT_EXERCISED = {
     'align_printed': 'revisions mode only, with names as printed (the records lever); these runs compare proposals '
                      '(tests/test_records.py)',
     'explain_context': 'revisions mode only; these runs compare proposals (tests/test_explain.py)',
+    'explain_glossary': "revisions mode only, with terms a glossary defines; these runs compare proposals "
+                        "(tests/test_glossary.py)",
+    'retrieve_glossary': "needs a term a glossary defines; these documents define none (tests/test_glossary.py)",
+    'topic_glossary': "needs a term a glossary defines; these documents define none (tests/test_glossary.py)",
     'align_hedges': 'revisions mode only, with hedges in conditions; these runs compare proposals '
                     '(tests/test_align.py)',
     'record_changes': 'revisions mode only, with context records restated; these runs compare proposals '
