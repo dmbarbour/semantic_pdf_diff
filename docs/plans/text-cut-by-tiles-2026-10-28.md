@@ -210,6 +210,8 @@ Each item is a lever, judged against null arms on the controlled corpus ([0037](
 
 ### 5. Fish-eye and foveated tiles
 
+Deferred 2026-10-31 (the owner, 2026-10-31: "Let's defer lens effects for the moment. I expect a lot of tests would be needed.").
+
 - **Foveated:** the tile at full detail, with its surroundings at reduced scale in a frame around it. The cut lines run on into the frame, readable or not, and their words come from the text layer.
 - **Fish-eye:** a radial lens, detail falling off smoothly from the middle.
   - Text lines bend under it, so it's tried after the frame.
@@ -228,8 +230,10 @@ What 0029 left unsettled, with the rest of [*Tile selection, further*](#moved-in
 
 1. **Which pages:** answered 2026-10-28: ordinary report pages ([above](#report-pages-what-the-owner-sees-and-what-was-checked)). Milestone 1's noisy pages and tile paths measure them first, and milestone 2's levers are judged on report pages first.
 2. **Fish-eye or foveated:** I'd try the foveated frame first: a radial lens bends lines, and the model reads straight text best. Does "fish-eye" mean something more specific to you?
+   - **Deferred 2026-10-31** (the owner, 2026-10-31: "Let's defer lens effects for the moment. I expect a lot of tests would be needed."), with milestone 5.
 3. **Whether to pull in [*Progressive disclosure*](README.md#tentative)** (the model asking for close-ups) once milestones 2 and 4 report, or keep it apart.
    - Its page test found gemma-4 finds small text when told it's there, but rarely asks for a close-up on its own.
+   - The owner, 2026-10-31: "I wouldn't mind moving on progressive disclosure, but I don't want to stray too far from the current targets: single document analysis, single source outputs, low-hanging fruit." Still open.
 
 ## Moved in: *Tile selection, further*
 
