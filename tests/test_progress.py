@@ -440,6 +440,16 @@ class InFlight(unittest.TestCase):
         self.assertEqual(max(flying for flying, _ in counts), 2)
         self.assertGreater(max(queued for _, queued in counts), 0)  # what "waiting" counted besides
 
+    def test_a_request_the_stage_didnt_count_is_in_flight_too(self):
+        # a page planned asks the tiling question itself, never added to the stage's count: at the endpoint all the
+        # same (2026-10-29: a page waiting minutes on one read "0 in flight, 0 queued")
+        from types import SimpleNamespace
+        client = SimpleNamespace(gate=SimpleNamespace(active=1), calls=0, cache_hits=0, usage={}, cost=0.0)
+        stage = Progress('extract', client, bar=False, heartbeat=1e9)
+        self.assertEqual(stage.requests(), '0 answered, 1 in flight, 0 queued')
+        stage.add(3)
+        self.assertEqual(stage.requests(), '0 answered, 1 in flight, 2 queued')
+
 class Heartbeats(unittest.TestCase):
     def setUp(self):
         setup_logging()

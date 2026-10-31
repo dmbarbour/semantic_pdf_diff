@@ -368,11 +368,13 @@ class Progress:
         not yet answered, at most `concurrency` (the client's gate counts them). Queued: asked and not yet sent, the
         dispatcher holding up to twice as many. Until 2026-10-21 both were "waiting", which read as more than
         `concurrency` at the server (the owner: "I regularly seem to have "7 waiting" when I configure concurrency at
-        2")."""
+        2"). In flight is the gate's count as it is: a page planned asks some questions itself (the tiling question,
+        its tiles' labels), never counted here, and capped by what was counted, a page waiting minutes on one read "0
+        in flight, 0 queued" (2026-10-29)."""
         cached = f" ({self.cached:,} from cache)" if self.cached else ""
         waiting = self.total - self.done
-        flying = min(waiting, getattr(getattr(self.client, "gate", None), "active", 0) or 0)
-        return (f"{self.done:,} answered{cached}, {flying:,} in flight, {waiting - flying:,} queued"
+        flying = getattr(getattr(self.client, "gate", None), "active", 0) or 0
+        return (f"{self.done:,} answered{cached}, {flying:,} in flight, {max(0, waiting - flying):,} queued"
                 + (f", {self.failed:,} failed" if self.failed else ""))
 
     def status(self):
