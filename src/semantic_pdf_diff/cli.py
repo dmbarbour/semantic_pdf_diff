@@ -1337,8 +1337,11 @@ def store_parser(command):
         from .export import CHUNK
         parser.description = ('A saved report\'s claims as Markdown chunks for a RAG system\'s ingest, without model '
                               'calls: a chunk a section (or a part of one), each saying in its own words where it came '
-                              'from; a chunk a topic the report is browsed by; a comparison\'s findings by what was '
-                              'found, and each side\'s claims with no counterpart; then chunks for finding things '
+                              'from; a chunk a subject of two claims or more, everything said about it and what it '
+                              'doesn\'t give; a chunk a kind, its items by property as a table; the second pass\'s '
+                              'notes under the claims they\'re about; a chunk a topic the report is browsed by; a '
+                              'comparison\'s findings by what was found, and each side\'s claims with no '
+                              'counterpart; then chunks for finding things '
                               '(subjects A to Z, figures and tables, the glossary, gaps), and index.md listing them. '
                               'Each chunk is named by its text\'s hash, so an unchanged chunk keeps its name from one '
                               'export to the next; nothing is deleted.')

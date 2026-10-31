@@ -11,6 +11,12 @@ feature 2, milestone 2): `semantic-pdf-diff export`. The target ingest tool keep
 - **A comparison's findings:** a chunk of findings at a time, by what was found (they differ, uncertain, they
   complement each other, they agree), each with both claims and where each is read, the judge's reason and the
   explanation; then each source's claims with no counterpart in the other.
+- **A chunk a subject** of two claims or more (or a part of one; the owner, 2026-10-31: "Your recommended path seems
+  reasonable"): everything the source says about it, from every file and section, by property, and what it doesn't
+  give; **a chunk a kind**, its items by property as a Markdown table (the index's kinds).
+- **The second pass's notes** (dossiers.py) under each claim they're about, in its section's and its subject's
+  chunks (a topic's leave them to those): what it's restated or contradicted by, suspected, inferred, and what its
+  place gave read again; ours, and said so.
 - **Discovery chunks:** the subjects A to Z, the figures and tables, the glossary, what the source doesn't give and,
   where the second pass found any, its inconsistencies, each pointing to the chunks holding what it names.
 - **Named by content:** each file's name is its text's hash, so an unchanged chunk keeps its name from one export to
@@ -21,6 +27,8 @@ feature 2, milestone 2): `semantic-pdf-diff export`. The target ingest tool keep
 import hashlib
 import json
 from collections import defaultdict
+
+from .indexfiles import GAP_TITLES, KIND_COLUMNS, cell_md, kind_cell
 
 CHUNK = 1600     # characters of a chunk's claims, about (~400 tokens; the ingest tool cuts 512 with 128 overlapping)
 EXCERPT = 120    # characters of a claim's quote shown, at most
@@ -58,9 +66,10 @@ def span(claims):
         return ""
     return f"{one} {found[0]}" if found[0] == found[-1] else f"{many} {found[0]}–{found[-1]}"
 
-def claim_line(e, where=None):
+def claim_line(e, where=None, notes=()):
     """A claim as a chunk says it: its property and value, its qualifiers, where it's read (where: as given, its
-    files named where a chunk holds several files' claims; "" for none), a short excerpt."""
+    files named where a chunk holds several files' claims; "" for none), a short excerpt; then the second pass's notes
+    about it, one below it each."""
     unit = e["unit"] if e.get("unit") not in ("", "-", None) else ""
     said = f"{e['attribute']}: {e['value']}" + (f" {unit}" if unit else "")
     qualifiers = [x for x in (e.get("conditions"), f"basis: {e['basis']}" if e.get("basis") not in (None, "", "unknown")
@@ -72,7 +81,46 @@ def claim_line(e, where=None):
         quote.casefold() not in said.casefold() else ""  # a quote that only says its value again: none
     at = span([e]) if where is None else where
     return (f"- {said}" + (f" ({'; '.join(qualifiers)})" if qualifiers else "") + (f" [{at}]" if at else "")
-            + (f" — “{excerpt}”" if excerpt else ""))
+            + (f" — “{excerpt}”" if excerpt else "") + "".join(f"\n  - {n}" for n in notes))
+
+NOTED = ("Notes under a claim, read together or read again, are a second reading's: ours, not the document's; check "
+         "them against the places named.")
+
+QUIET = ("restates", "corroborates")  # relations whose reason a chunk leaves out
+
+def value_said(e):
+    unit = e["unit"] if e.get("unit") not in ("", "-", None) else ""
+    return " ".join(x for x in (str(e["value"]), unit) if x)
+
+def notes_of(data, files):
+    """{claim id: [lines]}: what the second pass said about each claim (dossiers.py), as a chunk says it under the
+    claim: the cards' notes (report.Cards.noted) in words; a restatement's or corroboration's reason, and a re-read's
+    where it's as read, left out (QUIET), since they only say the values agree."""
+    from .dossiers import reread_said
+    from .report import RELATION_SAID, SUSPICION_SAID
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+    out = defaultdict(list)
+    for c in (data.get("commentary") or {}).get("entries", []):
+        why = " ".join(str(c.get("why") or "").split())
+        for eid in c["claims"]:
+            others = [evidence[x] for x in c["claims"] if x != eid and x in evidence]
+            if c["kind"] == "context":
+                line = f"Read together, {c['adds']}: {c['text']} — “{c['quote']}”"
+            elif c["kind"] == "relation" and others and c.get("relation") in RELATION_SAID:
+                said = RELATION_SAID[c["relation"]][0 if c["claims"][0] == eid else 1].lower()
+                line = (f"Read together, {said} {value_said(others[0])} ({place(others[0], files)})"
+                        + (f": {why}" if why and c["relation"] not in QUIET else ""))
+            elif c["kind"] == "suspicion" and c.get("relation") in SUSPICION_SAID:
+                line = f"Read together, suspected {SUSPICION_SAID[c['relation']]}" + (f": {why}" if why else "")
+            elif c["kind"] == "inference":
+                line = f"Read together, inferred: {c['text']}"
+            elif c["kind"] == "reread":
+                line = (f"Read again from its place: {reread_said(c)}"
+                        + (f" ({why})" if why and c.get("relation") != "as_claimed" else ""))
+            else:
+                continue
+            out[eid].append(line)
+    return out
 
 def sections_of(data):
     """[(file, section or None, [claims])] in the files' and their pages' order, each section's claims together."""
@@ -88,8 +136,10 @@ def sections_of(data):
     return [(files[c], sections.get((c, sid)), sorted(claims, key=order))
             for (c, sid), claims in sorted(grouped.items(), key=lambda x: first(x[0])) if c in files]
 
-def detail_chunks(data, size=CHUNK):
+def detail_chunks(data, size=CHUNK, notes=None):
     """[(title, text, [subjects in it])]: a chunk a section's part."""
+    notes = notes or {}
+    line = lambda e: claim_line(e, notes=notes.get(e["id"], ()))  # noqa: E731
     out = []
     for f, section, claims in sections_of(data):
         heading = " > ".join(section["heading_path"]) if section and section.get("heading_path") else ""
@@ -101,12 +151,12 @@ def detail_chunks(data, size=CHUNK):
         for subject, es in by_subject.items():
             current = []
             for e in es:
-                if current and sum(len(claim_line(x)) + 1 for x in current) + len(claim_line(e)) > size:
+                if current and sum(len(line(x)) + 1 for x in current) + len(line(e)) > size:
                     blocks.append((subject, current))
                     current = []
                 current.append(e)
             blocks.append((subject, current))
-        blocks = [(subject, f"### {subject}\n\n" + "\n".join(claim_line(e) for e in es) + "\n", es)
+        blocks = [(subject, f"### {subject}\n\n" + "\n".join(line(e) for e in es) + "\n", es)
                   for subject, es in blocks]
         parts, current = [], []
         for block in blocks:
@@ -122,8 +172,10 @@ def detail_chunks(data, size=CHUNK):
             named = f["path"] if f["source"] == f["path"] else f"{f['source']} / {f['path']}"
             where = (f"Source: {named}" + (f", {pages}" if pages else "") + "."
                      + (f" Section: {heading}." if heading else "") + f" Content {f['content'][:23]}…")
+            noted = any(notes.get(e["id"]) for _, _, es in part for e in es)
             text = (front(title=f"{title} — {f['path']}" + (f", {pages}" if pages else ""), source=f["source"],
-                          file=f["path"], pages=pages) + f"# {title}\n\n{where}\n\n"
+                          file=f["path"], pages=pages) + f"# {title}\n\n{where}" + (f" {NOTED}" if noted else "")
+                    + "\n\n"
                     + (f"{about}\n\n" if about and k == 1 else "") + "\n".join(b for _, b, _ in part))
             out.append((title, text, [s for s, _, _ in part]))
     return out
@@ -148,15 +200,24 @@ def cut(blocks, size):
         parts.append(current)
     return parts
 
+def said_lines(claims, files, notes):
+    """Claims' lines, a claim said alike in several places (two revisions) one line naming every place, its claims'
+    notes under it."""
+    lines = {}  # a line said (its places apart): the claim, its places and its claims' notes
+    for e in claims:
+        said = lines.setdefault(claim_line(e, ""), (e, [], []))
+        said[1].append(place(e, files))
+        said[2].extend(n for n in notes.get(e["id"], ()) if n not in said[2])
+    return [claim_line(e, "; ".join(places), noted) for e, places, noted in lines.values()]
+
 def by_subject(claims, files, size=CHUNK):
     """Claims as blocks, a block a subject's ("### name" and its lines), in their files' and places' order; a
     subject of more than a chunk's claims cut into several."""
-    grouped = defaultdict(dict)  # a subject's: a line said (its places apart): the claim and its places
+    grouped = defaultdict(list)
     for e in sorted(claims, key=lambda e: (files[e["content"]]["path"] if e["content"] in files else "", order(e))):
-        said = grouped[" ".join(e["entity"].split())].setdefault(claim_line(e, ""), (e, []))
-        said[1].append(place(e, files))  # said alike in several places (two revisions): one line, every place
-    return [f"### {subject}\n\n" + "\n".join(part) + "\n" for subject, lines in grouped.items()
-            for part in cut([claim_line(e, "; ".join(places)) for e, places in lines.values()], size)]
+        grouped[" ".join(e["entity"].split())].append(e)
+    return [f"### {subject}\n\n" + "\n".join(part) + "\n" for subject, es in grouped.items()
+            for part in cut(said_lines(es, files, {}), size)]
 
 def titled(title, lead, parts, **fields):
     """[(title, text)]: a list's parts as chunks, each titled (k of n) and led alike."""
@@ -184,6 +245,59 @@ def topic_chunks(data, files, size=CHUNK):
             out += titled(f"Topic: {name}", f"Claims on {name}, as the report's browsing groups them, from every file "
                           "and section; each says where it's read.", cut(by_subject(claims[t], files, size), size),
                           topic=name)
+    return out
+
+def subject_chunks(data, index, files, size=CHUNK, notes=None):
+    """[(title, text, subject's name)]: a chunk a subject of two claims or more (the index's subjects, its names
+    joined), or a part of one: its claims by property from every file and section, each saying where it's read
+    (and, in a comparison, by which source), its notes under it; then what it doesn't give (the index's gaps)."""
+    notes = notes or {}
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+    many = len(index.get("sources", [])) > 1
+    out = []
+    for s in index.get("subjects", []):
+        ids = [c for p in s["properties"] for c in dict.fromkeys(v["claim"] for v in p["values"]) if c in evidence]
+        if len(ids) < 2:
+            continue
+        lines = []
+        for p in s["properties"]:
+            for source in index["sources"]:
+                mine = [evidence[v["claim"]] for v in p["values"] if v["source"] == source and v["claim"] in evidence]
+                mine.sort(key=lambda e: (files[e["content"]]["path"] if e["content"] in files else "", order(e)))
+                lines += [(f"- {source}: " + x[2:]) if many else x for x in said_lines(mine, files, notes)]
+        named = {n.casefold() for n in (s["name"], *s["names"])}
+        missing = [g for g in index.get("gaps", []) if g["subject"].casefold() in named]
+        if missing:  # one block, so a part never ends on its heading
+            lines.append("\n".join(["What it doesn't give (weak: it may be said elsewhere, or missed by the reader):"]
+                                   + [f"- {(g['source'] + ': ') if many else ''}{GAP_TITLES[g['kind']]}"
+                                      + (f": {g['property']}" if g["property"] else "") + f" ({g['where']}"
+                                      + (f"; {g['why']}" if g["why"] else "") + ")" for g in missing]))
+        also = [n for n in s["names"] if n.casefold() != s["name"].casefold()]
+        noted = any(notes.get(c) for c in ids)
+        lead = (f"What {' and '.join(index['sources'])} {'say' if many else 'says'} about {s['name']}"
+                + (f" (also {', '.join(also[:5])})" if also else "")
+                + ", from every file and section, by property; each says where it's read."
+                + (f" {NOTED}" if noted else ""))
+        out += [(title, text, s["name"]) for title, text in
+                titled(f"Subject: {s['name']}", lead, cut(lines, size), subject=s["name"])]
+    return out
+
+def kind_chunks(index, size=CHUNK):
+    """[(title, text)]: a chunk a kind of the index's (two items or more of one kind: "pump (P)"), or a part of
+    one: its items by property as a Markdown table, the properties most given first (KIND_COLUMNS of them), "—" where
+    an item gives none; a part's rows under the table's header again."""
+    many = len(index.get("sources", [])) > 1
+    out = []
+    for k in index.get("kinds", []):
+        shown, items = k["properties"][:KIND_COLUMNS], [index["subjects"][i] for i in k["subjects"]]
+        header = ("| Item | " + " | ".join(cell_md(p["name"]) for p in shown) + " |\n|---|" + "---|" * len(shown))
+        rows = [f"| {cell_md(s['name'])} | " + " | ".join(cell_md(kind_cell(s, p["name"], many)) for p in shown) + " |"
+                for s in items]
+        rest = k["properties"][KIND_COLUMNS:]
+        lead = (f"The {len(items)} items of the kind {k['kind']}, by property, the most given first; “—” where an "
+                "item gives none. Given by: " + "; ".join(f"{p['name']} {p['given']} of {len(items)}" for p in shown)
+                + "." + (f" Also given, by fewer: {', '.join(p['name'] for p in rest)}." if rest else ""))
+        out += titled(f"Kind: {k['kind']}", lead, [[header, *part] for part in cut(rows, size)], kind=k["kind"])
     return out
 
 FINDINGS = ("different", "uncertain", "complementary", "equivalent")
@@ -283,17 +397,27 @@ def exported(data, index, version="", size=CHUNK):
     files = {}
     located = defaultdict(list)
     titles = []
-    for title, text, subjects in detail_chunks(data, size):
+    files_of = {}
+    for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
+        files_of.setdefault(f["content"], f)
+    notes = notes_of(data, files_of)
+    for title, text, subjects in detail_chunks(data, size, notes):
         name = name_of(text)
         files[name] = text
         titles.append((name, title))
         for s in subjects:
             located[s].append(name)
-    files_of = {}
-    for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
-        files_of.setdefault(f["content"], f)
     found, same = finding_chunks(data, files_of, size)
-    for title, text in topic_chunks(data, files_of, size) + found + discovery_chunks(index, located, size):
+    mine = defaultdict(list)  # a subject's own chunks, first among those its line in Subjects A to Z points to
+    for title, text, subject in subject_chunks(data, index, files_of, size, notes):
+        name = name_of(text)
+        files[name] = text
+        titles.append((name, title))
+        mine[subject].append(name)
+    for subject, names in mine.items():
+        located[subject] = names + [n for n in located[subject] if n not in names]
+    for title, text in (topic_chunks(data, files_of, size) + found + kind_chunks(index, size)
+                        + discovery_chunks(index, located, size)):
         name = name_of(text)
         files[name] = text
         titles.append((name, title))

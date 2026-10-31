@@ -39,8 +39,9 @@ class Chunks(unittest.TestCase):
         self.assertIn("- Made by semantic-pdf-diff 0.18.0 from the report of 2026-10-31T00:00:00", files["index.md"])
         self.assertIn("- [Subjects A to Z](", files["index.md"])
         subjects = next(t for t in files.values() if t.startswith('---\ntitle: "Subjects A to Z"'))
-        self.assertIn(f"- **P-101 pump**: head, rated power — in {[n for n in names if files[n] == detail][0]}",
-                      subjects)  # each subject pointing to the chunk holding its claims
+        own = next(n for n in names if files[n].startswith('---\ntitle: "Subject: P-101 pump"'))
+        self.assertIn(f"- **P-101 pump**: head, rated power — in {own}, {[n for n in names if files[n] == detail][0]}",
+                      subjects)  # each subject pointing to its own chunk, then the chunks holding its claims
 
     def test_a_long_section_in_parts_each_saying_where(self):
         data = pumps(9)
@@ -76,6 +77,54 @@ class Chunks(unittest.TestCase):
                       "- They differ (confidence 0.9): The head rose.\n- Why it differs: changed: Revised.", differ)
         (only,) = [t for t in files.values() if t.startswith('---\ntitle: "Only in b: a against b"')]
         self.assertIn("### P-102 pump\n\n- head: 40 m [b.pdf, page 4]", only)
+
+    def test_a_subject_its_claims_from_every_place_and_what_it_doesnt_give(self):
+        data = pumps(4)
+        data["evidence"] = [e for e in data["evidence"] if (e["entity"], e["attribute"]) != ("P-104 pump", "head")]
+        data["files"].append({"source": "a", "path": "b.pdf", "content": "cb"})
+        data["evidence"].append(claim("B-1", "cb", "P-104 pump", "speed", "1480", "rpm", page=2))
+        files = export.exported(data, indexes.built(data), "")
+        (p104,) = [t for t in files.values() if t.startswith('---\ntitle: "Subject: P-104 pump"')]
+        self.assertIn('subject: "P-104 pump"', p104)
+        self.assertIn("What a says about P-104 pump, from every file and section, by property", p104)
+        self.assertIn("- rated power: 74 kW [a.pdf, page 4]\n- speed: 1480 rpm [b.pdf, page 2]\n"
+                      "What it doesn't give (weak: it may be said elsewhere, or missed by the reader):\n"
+                      "- Missing among siblings: head (", p104)
+        self.assertNotIn("Read together", p104)  # no second pass: no notes, nor the line saying what they are
+
+    def test_the_second_passs_notes_under_the_claims_they_are_about(self):
+        data = pumps(2)
+        data["evidence"].append(claim("A-15", "ca", "P-101 pump", "head", "45", "m", page=5))
+        data["evidence"][-1]["section"] = "s1"
+        data["commentary"] = {"entries": [
+            {"kind": "relation", "source": "a", "subject": "P-101 pump", "claims": ["A-11", "A-15"],
+             "relation": "contradicts", "why": "the datasheet gives another head", "key": []},
+            {"kind": "reread", "source": "a", "subject": "P-101 pump", "claims": ["A-15"], "relation": "otherwise",
+             "text": "44 m", "key": []}]}
+        files = export.exported(data, indexes.built(data), "")
+        (detail,) = [t for t in files.values() if "Source: " in t]
+        self.assertIn(export.NOTED, detail)
+        self.assertIn("- head: 41 m [page 1]\n  - Read together, contradicts 45 m (a.pdf, page 5): the datasheet "
+                      "gives another head\n", detail)
+        self.assertIn("- head: 45 m [page 5]\n  - Read together, contradicts 41 m (a.pdf, page 1): the datasheet "
+                      "gives another head\n  - Read again from its place: it gives 44 m", detail)
+        (p101,) = [t for t in files.values() if t.startswith('---\ntitle: "Subject: P-101 pump"')]
+        self.assertIn("- head: 45 m [a.pdf, page 5]\n  - Read together, contradicts 41 m (a.pdf, page 1)", p101)
+        (p102,) = [t for t in files.values() if t.startswith('---\ntitle: "Subject: P-102 pump"')]
+        self.assertNotIn(export.NOTED, p102)  # said only where a chunk has notes
+
+    def test_a_kind_its_items_by_property_as_a_table(self):
+        data = pumps(3)
+        files = export.exported(data, indexes.built(data), "")
+        (kind,) = [t for t in files.values() if t.startswith('---\ntitle: "Kind: pump (P)"')]
+        self.assertIn("The 3 items of the kind pump (P), by property, the most given first; “—” where an item gives "
+                      "none. Given by: head 3 of 3; rated power 3 of 3.", kind)
+        self.assertIn("| Item | head | rated power |\n|---|---|---|\n| P-101 pump | 41 m | 71 kW |\n"
+                      "| P-102 pump | 42 m | 72 kW |", kind)
+        parts = [t for t in export.exported(data, indexes.built(data), "", size=40).values()
+                 if t.startswith('---\ntitle: "Kind: pump (P) (')]
+        self.assertEqual(len(parts), 3)  # a row a part at this size, each under the table's header again
+        self.assertTrue(all("| Item | head | rated power |\n|---|---|---|\n| P-10" in t for t in parts))
 
 class Command(unittest.TestCase):
     def test_an_analysis_exported_beside_its_store(self):

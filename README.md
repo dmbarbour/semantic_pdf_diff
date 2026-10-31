@@ -14,7 +14,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 - **Revisions aligned before they're judged:** items matched across revisions by their values, equal values settled without a model, and the report showing how it grouped them
 - **One source on its own** (`analyze`): a file or a folder of documents read and reported, its claims browsed and searched without comparing. Each subject's claims are also read together (`second_pass`, on by default; a request a subject): what's restated, refined or contradicted, likely misreads, and likely gaps, noted beside the claims and in an Inconsistencies view, never changing them; the claims it doubts are read again from their place
 - **Indexes beside every report:** subjects and their kinds, properties, claims, figures and tables, and a glossary, as index.md, an index workbook, CSV and the page's views; a comparison's merged, each subject once with each source's values
-- **RAG export** (`export`): a report as Markdown chunks, by section, by topic and, for a comparison, by finding, each saying where it came from, with chunks for finding things and an index
+- **RAG export** (`export`): a report as Markdown chunks, by section, by subject (with what it doesn't give), by kind (a table of its items), by topic and, for a comparison, by finding, each saying where it came from, the second pass's notes under the claims they're about, with chunks for finding things and an index
 - **Differences explained:** in revisions, each difference named by kind (a value or its conditions changed, renamed, restated, misread, not the same item), value changes listed first
 
 **Status:**
