@@ -98,7 +98,7 @@ def command(argv, client):
         return compare_command(argv[1:], client)
     if argv[0] == 'analyze':
         return analyze_command(argv[1:], client)
-    if argv[0] in ('show', 'gc', 'report'):
+    if argv[0] in ('show', 'gc', 'report', 'export'):
         return store_command(argv[0], argv[1:])
     if argv[0] == 'settings':
         return settings_command(argv[1:])
@@ -133,6 +133,7 @@ Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help C
   source      declare sources in a store and manage them: add, list, show, update, remove, export, import
   show        print a view of a store: its sources, files, evidence, coverage or comparisons
   report      write a store's report again, without model calls
+  export      a store's report as Markdown chunks for a RAG system's ingest, without model calls
   search      search a store's claims, or several stores', as a report's search box does
   gc          delete content no declared source uses any more
   config      the user's and a store's settings: show, find, help, set, unset, export, import
@@ -1316,6 +1317,18 @@ def store_parser(command):
         parser.add_argument('--dry-run', action='store_true', help='Report what would be removed, change nothing')
         parser.add_argument('--orphaned-sources', action='store_true',
                             help='Also remove sources whose linked manifest file no longer exists')
+    elif command == 'export':
+        from .export import CHUNK
+        parser.description = ('A saved report\'s claims as Markdown chunks for a RAG system\'s ingest, without model '
+                              'calls: a chunk a section (or a part of one), each saying in its own words where it came '
+                              'from, then chunks for finding things (subjects A to Z, figures and tables, the '
+                              'glossary, gaps), and index.md listing them. Each chunk is named by its text\'s hash, so '
+                              'an unchanged chunk keeps its name from one export to the next; nothing is deleted.')
+        parser.add_argument('--comparison', type=int, help='Report id (see: show comparisons); default: latest')
+        parser.add_argument('--out', type=Path, help='The folder written into (default: the store\'s export/)')
+        parser.add_argument('--chunk-chars', type=int, default=CHUNK,
+                            help=f'Characters of claims a chunk holds, about (default {CHUNK}: some 400 tokens, '
+                                 'under an ingest tool\'s 512)')
     else:
         parser.description = 'Regenerate a report from a saved comparison, without model calls.'
         parser.add_argument('--comparison', type=int, help='Comparison id (see: show comparisons); default: latest')
@@ -1337,6 +1350,15 @@ def store_command(command, argv):
             print_rows(store.view(args.view), args.format)
         elif command == 'gc':
             print(json.dumps(store.gc(dry_run=args.dry_run, orphaned_sources=args.orphaned_sources), indent=2))
+        elif command == 'export':
+            from . import __version__, export, indexes
+            data = store.comparison(args.comparison)
+            out = args.out or args.store / 'export'
+            out.mkdir(parents=True, exist_ok=True)
+            files = export.exported(data, indexes.built(data), __version__, args.chunk_chars)
+            for name, text in files.items():
+                (out / name).write_text(text, encoding='utf-8')
+            print(f"Export: {out} ({len(files) - 1} chunks and index.md)")
         else:
             out = args.out or args.store
             from .settings import user_settings
