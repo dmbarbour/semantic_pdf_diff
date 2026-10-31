@@ -1310,8 +1310,9 @@ class ReadTogether(Lever):
     # analyses: each subject's claims read together, a request a subject, what's learnt kept as a log of commentary
     # beside the claims (context added, relations, suspicions, inferences, what's likely missing; dossiers.py;
     # docs/plans/single-document-analysis-2026-10-28.md, milestone 3; the owner, 2026-10-31: "Agree with all
-    # second-pass recommendations": a stage, in comparisons once measured). Off until measured
-    second_pass: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # second-pass recommendations": a stage, in comparisons once measured). On in analyses since 2026-10-31 (the
+    # owner: "Yes, turn `second_pass` on."); comparisons don't run it yet
+    second_pass: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def reads_together(self, mode):
         return self.second_pass and mode == "analysis"

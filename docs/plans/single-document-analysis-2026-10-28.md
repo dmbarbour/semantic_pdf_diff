@@ -172,6 +172,7 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
     - **Planted reports** (scored: a planted contradiction's claims are right "as claimed", the document saying both; a claim whose property was named by a value right "otherwise"): first 10 of 11 and 14 of 22; the model checked only that a value sat in its item's row, so "as claimed" now needs the property as the claim names it: 10 of 11 and 20 of 22; with regions sized in points, 10 of 11 and 21 of 22 ($0.005 a run, less).
     - **scical's 9 sheets** (by eye; $0.092 with dossiers asked again, then $0.005): 64 claims read again, 35 as claimed, 22 otherwise, 7 not shown. The sheet index's merged rows caught ("A-102 A-201": "two rows with their own names"), dimensions bound to a label the drawing doesn't give them, relations between parts the sheet doesn't state. One wrong at first ("6" O/C" read "6' O/C" from a third of the page at about a pixel a point), right once regions were sized in points around the claim's mark.
     - **Ours, not the document's:** a re-read can err as the reading did; it's shown beside the claim, never instead of it.
+  - **On by default** in analyses since 2026-10-31 (the owner: "Yes, turn `second_pass` on.").
   - **Not yet:** in comparisons (milestone 6).
 
 ### 4. Inconsistencies (`check`)
