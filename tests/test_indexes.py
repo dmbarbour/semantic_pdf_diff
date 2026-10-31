@@ -165,6 +165,27 @@ class OtherNames(unittest.TestCase):
         self.assertEqual(by["feed pump"]["claims"], {"a": ["A-2"], "b": ["B-2"]})
         self.assertEqual(len(by), 2)
 
+    def test_the_models_other_names_join_properties_that_can_be_one(self):
+        """Planted reports: the model gave "Pressure", "Maximum transient pressure" and "Minimum transient pressure" as
+        other names of one property, and the index joined the maximum and the minimum."""
+        evidence = [claim("A-1", "ca", "force main", "maximum transient pressure", "174", "psi"),
+                    claim("A-2", "ca", "force main", "minimum transient pressure", "2.9", "psi"),
+                    claim("A-3", "ca", "force main", "SIZE W", "8", "in"),
+                    claim("A-4", "ca", "force main", "size width", "8", "in"),
+                    claim("A-5", "ca", "force main", "rated output", "40", "hp"),
+                    claim("A-6", "ca", "force main", "nominal power", "40", "hp")]
+        data = report(evidence, synonyms={"items": [], "properties": [
+            ["Pressure", "maximum transient pressure", "minimum transient pressure"], ["SIZE W", "size width"],
+            ["rated output", "nominal power"]]})
+        (main,) = indexes.built(data)["subjects"]
+        self.assertEqual(sorted(sorted(p["names"]) for p in main["properties"]),
+                         [["SIZE W", "size width"], ["maximum transient pressure"], ["minimum transient pressure"],
+                          ["nominal power", "rated output"]])
+        self.assertFalse(indexes.kin("DRB connection target", "SRB connection target"))
+        self.assertFalse(indexes.kin("volume", "working volume"))  # a name and a more general one
+        self.assertTrue(indexes.kin("uplink transmit timing", "uplink transmission timing"))
+        self.assertTrue(indexes.kin("dimension", "dimensions"))
+
     def test_a_sheets_symbol_isnt_a_name(self):
         sym = {**self.term("W", "washer"), "kind": "symbol", "reach": "sheet", "sheet": "sheet E-1"}
         alias = indexes.aliases({"glossary": {"terms": [sym, self.term("[square]", "washer")]}})

@@ -31,6 +31,7 @@ document that would be useful, and it seems deeply related to the problem of com
 - **Inconsistencies** (milestone 4): two claims of one subject the second pass says contradict each other (other
   values for the same thing under the same conditions), each with both claims and its reason.
 """
+import os
 import re
 from collections import Counter, defaultdict
 
@@ -38,6 +39,7 @@ from .align import Side
 from .glossary import natural
 from .terms import fold
 from .schema import Evidence
+from .values import singular
 
 # The relations a finding pairs two claims of one subject by: unrelated pairs say they aren't.
 PAIRING = ("different", "equivalent", "complementary", "uncertain")
@@ -84,11 +86,11 @@ NAMES = ("document", "discipline")  # the reaches a glossary term is another nam
 def aliases(data):
     """The names one thing goes by, as the run found them: each glossary term reaching its document (or a
     discipline's sheets) with its meaning (a mark described, or a meaning of more than 80 characters, isn't a name),
-    and the model's other names (the
-    search_names lever's groups). A function giving a name its group's first name (folded, the least A to Z), or None
-    for a name in no group."""
+    and the model's other names (the search_names lever's groups), a property's joined only where every two of the
+    names joined can be one property (kin). A function giving a name its group's first name (folded, the least A to
+    Z), or None for a name in no group."""
     from .terms import drawn
-    parent = {}
+    parent, members = {}, {}
 
     def root(x):
         parent.setdefault(x, x)
@@ -97,17 +99,39 @@ def aliases(data):
             x = parent[x]
         return x
 
-    def join(a, b):
+    def join(a, b, may=None):
         ra, rb = sorted((root(a), root(b)), key=natural)
+        if ra == rb or may and not all(may(x, y) for x in members.get(ra, {ra}) for y in members.get(rb, {rb})):
+            return
         parent[rb] = ra
+        members[ra] = members.get(ra, {ra}) | members.pop(rb, {rb})
     for t in (data.get("glossary") or {}).get("terms", []):
         if t.get("reach", "document") in NAMES and not drawn(t["term"]) and len(t["meaning"]) <= 80:
             join(alias_key(t["term"]), alias_key(t["meaning"]))
     for kind in ("items", "properties"):
         for group in (data.get("synonyms") or {}).get(kind, []):
             for name in group[1:]:
-                join(alias_key(group[0]), alias_key(name))
+                join(alias_key(group[0]), alias_key(name), kin if kind == "properties" else None)
     return lambda name: root(alias_key(name)) if alias_key(name) in parent else None
+
+def words_of(name):
+    return {singular(w) for w in re.findall(r"[a-z0-9]+", fold(name))}
+
+def kin(a, b):
+    """Whether two property names the model gave as other names can be one property: names in other words ("rated
+    output", "nominal power"), or the same words written otherwise ("SIZE W", "size width"; "transmit timing",
+    "transmission timing"); not a name and a more general one ("pressure", "maximum transient pressure"), nor two
+    adding words of their own to those they share ("maximum transient pressure", "minimum transient pressure"; "DRB
+    connection target", "SRB connection target"), though the model is asked for neither (synonyms.PROMPT): joined,
+    planted reports' maximum and minimum pressures were one property whose values differed."""
+    x, y = words_of(a), words_of(b)
+    mine, theirs = x - y, y - x
+    if not x & y or not mine and not theirs:
+        return True
+    if not mine or not theirs or len(mine) != len(theirs):
+        return False
+    stem = lambda p, q: p.startswith(q) or q.startswith(p) or len(os.path.commonprefix([p, q])) >= 5  # noqa: E731
+    return all(any(stem(p, q) for q in theirs) for p in mine)
 
 def renamed(subjects, alias):
     """One source's subjects, those named as other names of one thing joined (the first's key and name, their claims
