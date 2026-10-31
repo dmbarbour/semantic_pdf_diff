@@ -336,6 +336,16 @@ class ContextRecord(Strict):
     page: int | None = None                          # where it sits (None: the whole content)
     bbox: tuple[float, float, float, float] | None = None
     parent: str = ""                                 # the record it sits in, if any
+    # a table's cells as read (records.table_record): its header's, then a row's each, a section's label a row of its
+    # own; for the export's tables and the gaps of a cell left blank
+    cells: list[list[str]] = Field(default_factory=list)
+
+    @model_serializer(mode="wrap")
+    def _without_absent_cells(self, handler):
+        out = handler(self)  # no cells, no key: records written before tables kept them stay as they were
+        if isinstance(out, dict) and not out.get("cells"):
+            out.pop("cells", None)
+        return out
 
 class Position(Strict):
     """Where a claim sits in a sequence the source numbers (docs/plans/claim-context-2026-10-14.md, milestone 1): the

@@ -117,8 +117,8 @@ def placed(x, k):
     return x["where"][k] + (f"; read again: {again}" if again else "")
 
 # The gaps' kinds, as index.md, the workbook and the page head them
-GAP_TITLES = {"siblings": "Missing among siblings", "reference": "Cited, not found", "placeholder": "Placeholders",
-              "likely": "Likely missing, read together"}
+GAP_TITLES = {"siblings": "Missing among siblings", "blank": "Left blank in a table", "reference": "Cited, not found",
+              "placeholder": "Placeholders", "likely": "Likely missing, read together"}
 INCONSISTENCIES_NOTE = ("Two claims of one subject that the second pass, reading its claims together, says contradict "
                         "each other: other values for the same thing under the same conditions. Ours, not the "
                         "document's: check both against their places.")

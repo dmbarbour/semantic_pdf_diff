@@ -927,8 +927,10 @@ class Planted(unittest.TestCase):
         self.assertEqual(got["contradictions"]["false pairs"], ["P-301.capacity / P-301.capacity_50"])
         self.assertEqual(got["contradictions"]["said"]["wetwell.volume / wetwell.volume_said"], ["refines"])
         self.assertEqual((got["condition"]["pairs"], got["condition"]["contradicts"]), (2, 1))  # a trap taken
-        self.assertEqual(got["gaps"]["sibling"], {"planted": 2, "by code": 1, "read together": 1})  # P-303's NPSHr
-        self.assertEqual(got["gaps"]["reference"], {"planted": 2, "by code": 1, "read together": 0})
+        self.assertEqual(got["gaps"]["sibling"], {"planted": 2, "by code": 1, "as a blank cell": 0,
+                                                    "read together": 1})  # P-303's NPSHr
+        self.assertEqual(got["gaps"]["reference"], {"planted": 2, "by code": 1, "as a blank cell": 0,
+                                                      "read together": 0})
         self.assertEqual(got["implied"], {"planted": 1, "found": 1, "inferences": 1})
         self.assertEqual(got["suspicions"], {"misread": {"planted contradiction": 1}})
         self.assertEqual(got["log"], {"subjects": 3, "kinds": 0, "dropped": 1, "failed": 0})

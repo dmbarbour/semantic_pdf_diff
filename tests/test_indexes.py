@@ -284,6 +284,20 @@ class Gaps(unittest.TestCase):
                          [("P-105 pump", "given", "a.pdf, page 4: it gives 45 m"),
                           ("P-104 pump", "no_place", "a.pdf, page 4: no place for it there")])
 
+    def test_a_tables_cell_left_blank_where_most_rows_fill_its_column(self):
+        """A table's cells as read (its record's): a cell left blank in a column most of its rows fill (the owner,
+        2026-10-31: "Proceed with items 3, 4 and 5")."""
+        cells = [["Tag", "Duty", "Capacity (gpm)", "Notes"], ["Raw water pumps", "", "", ""],
+                 ["P-301", "Duty", "1,318", ""], ["P-302", "Duty", "1,898", "VFD"], ["P-303", "Standby", "", ""],
+                 ["", "", "1,449", ""]]  # no name: a merged cell's continuation, likely
+        data = report([], records=[{"content": "ca", "id": "table:p2:0", "kind": "table", "label": "Pump schedule",
+                                    "page": 2, "cells": cells}])
+        gaps = [(g["kind"], g["subject"], g["property"], g["where"], g["why"]) for g in indexes.built(data)["gaps"]]
+        self.assertEqual(gaps, [("blank", "P-303", "Capacity (gpm)", "a.pdf, page 2, “Pump schedule”",
+                                 "left blank in its table: 2 of its 3 rows give it")])  # Notes: 1 of 3 isn't most
+        self.assertEqual(indexes.table_place({"content": "ca", "label": "page 2, table 3", "page": 2},
+                                             {"path": "a.pdf"}), "a.pdf, page 2, table 3")
+
     def test_more_than_half_must_give_it_of_three_at_least(self):
         two = [claim("A-1", "ca", "P-101", "head", "40", "m"), claim("A-2", "ca", "P-101", "flow", "5", "L/s"),
                claim("A-3", "ca", "P-102", "flow", "6", "L/s")]

@@ -257,11 +257,12 @@ def scored(key, data):
     out["gaps"] = {}
     for kind in ("sibling", "placeholder", "reference"):
         mine = [p for p in key["planted"] if p["kind"] == kind]
-        found = {"planted": len(mine), "by code": 0, "read together": 0}
+        found = {"planted": len(mine), "by code": 0, "as a blank cell": 0, "read together": 0}
         for p in mine:
             hits = [k for k, g in enumerate(gaps) if gap_matches(g, p)]
             matched.update(hits)
             found["by code"] += any(gaps[k]["kind"] != "likely" for k in hits)
+            found["as a blank cell"] += any(gaps[k]["kind"] == "blank" for k in hits)  # a table's (indexes.blanks)
             found["read together"] += any(gaps[k]["kind"] == "likely" for k in hits)
         out["gaps"][kind] = found
     unplanted = defaultdict(int)
@@ -337,7 +338,8 @@ def totals(results):
             "documents": len(mine),
             "contradictions": {k: add("contradictions", k) for k in ("planted", "found", "false")},
             **{kind: {k: add(kind, k) for k in ("pairs", "contradicts")} for kind in ("condition", "restatement")},
-            "gaps": {**{kind: {k: add("gaps", kind, k) for k in ("planted", "by code", "read together")}
+            "gaps": {**{kind: {k: add("gaps", kind, k) for k in ("planted", "by code", "as a blank cell",
+                                                                  "read together")}
                         for kind in ("sibling", "placeholder", "reference")},
                      "unplanted": dict(sorted(Counter(k for r in mine for k, n in r["gaps"]["unplanted"].items()
                                                       for _ in range(n)).items()))},

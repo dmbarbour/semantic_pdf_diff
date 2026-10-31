@@ -132,6 +132,22 @@ class Chunks(unittest.TestCase):
         self.assertTrue(all("| Item | head | rated power |\n|---|---|---|\n| P-10" in t for t in parts))
 
 class Command(unittest.TestCase):
+    def test_a_document_table_as_a_markdown_table_its_parts_under_its_header(self):
+        """A table read by rules, from its record's cells (the owner, 2026-10-31: "Proceed with items 3, 4 and 5")."""
+        found = pumps(3)
+        found["records"] = [{"content": "ca", "id": "table:p2:0", "kind": "table", "label": "Pump schedule", "page": 2,
+                             "cells": [["Tag", "Capacity | gpm"], *[[f"P-{k}", f"{k},318"] for k in range(300, 340)]]}]
+        files = export.exported(found, indexes.built(found), size=400)
+        tables = sorted((t for t in files.values() if t.startswith("---\ntitle: \"Table: ")), key=lambda t: int(
+            re.search(r"\((\d+) of", t).group(1)))
+        self.assertGreater(len(tables), 1)  # a long table in parts
+        first = tables[0]
+        self.assertIn("# Table: a.pdf, page 2, “Pump schedule” (1 of", first)
+        self.assertIn("A table of 40 rows, from a.pdf, page 2, “Pump schedule”", first)
+        self.assertIn("| Tag | Capacity \\| gpm |\n|---|---|\n| P-300 | 300,318 |", first)
+        self.assertTrue(all("| Tag | Capacity \\| gpm |\n|---|---|\n" in t for t in tables))  # its header again
+        self.assertIn("source: \"a\"", first)
+
     def test_an_export_replaces_the_last_one_in_its_folder(self):
         """Each made fresh (the owner, 2026-10-31: "Each export or report should be logically fresh from the
         sources, not history-dependent.")."""

@@ -261,14 +261,16 @@ SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most 
 # A value that holds a place for one not given ("N/A" says it doesn't apply, not that it's missing)
 PLACEHOLDER = re.compile(r"^\W*(?:TBD|TBC|TBA|TBV|TBR|to be (?:determined|confirmed|provided|advised|verified|decided|"
                          r"agreed|supplied|issued))\b", re.IGNORECASE)
-GAP_KINDS = ("siblings", "reference", "placeholder", "likely")
+GAP_KINDS = ("siblings", "blank", "reference", "placeholder", "likely")
+BLANK_ROWS = 3  # a table's rows, at least, for a cell left blank to say anything
 # a gap looked for, in a kind: the reader's misses first, then what the place leaves blank, those not looked for,
 # and last those the place has no place for or doesn't show (dossiers.looks)
 LOOKED = {"given": 0, "not_given": 1, "no_place": 3, "not_shown": 4}
 
 def gaps(data, subjects, found_kinds, where):
     """What the sources don't give, found by code (single-document analysis, milestone 5): [{"kind": "siblings",
-    "reference" or "placeholder", "source", "subject", "property", "where": where it was expected, "why", "claims"}].
+    "blank", "reference", "placeholder" or "likely", "source", "subject", "property", "where": where it was expected,
+    "why", "claims"}]. A table's cell left blank: blanks.
     A sibling's gap is each source's own: of a kind's items in it (SIBLINGS or more), a property more than half of
     them give and this one doesn't; where expected, where its other values are. Each is weak: saying nothing isn't
     evidence of absence, and the reader may have missed what's there. A gap looked for where it would be
@@ -309,6 +311,8 @@ def gaps(data, subjects, found_kinds, where):
                         "property": "", "where": (f["path"] if f else content) + f", page {u['page']}",
                         "why": "cited, not found in the document: “" + " ".join(u.get("text", "").split())[:120]
                                + "”", "claims": list(u.get("evidence") or [])})
+    for r in data.get("records", []):
+        out += blanks(r, files.get(r["content"]))
     first = {}  # (source, subject): where its first value is given
     for s in subjects:
         for p in s["properties"]:
@@ -333,6 +337,37 @@ def gaps(data, subjects, found_kinds, where):
                         "claims": [e["id"]]})
     return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), LOOKED.get(g.get("look"), 2), g["source"],
                                       natural(g["subject"]), natural(g["property"]), natural(g["where"])))
+
+def table_place(r, f):
+    """Where a table is (its record; f its file), in words a reader finds it by: "a.pdf, page 2, table 3", "a.pdf,
+    page 2, “Pump schedule”", "spec.docx, “Table 4 Timers”"."""
+    from .records import UNTITLED
+    path = f["path"] if f else r["content"]
+    label = " ".join(str(r.get("label", "")).split())
+    page = f", page {r['page']}" if path.lower().endswith(".pdf") and r.get("page") else ""
+    return f"{path}, {label}" if UNTITLED.match(label) else f"{path}{page}" + (f", “{label}”" if label else "")
+
+def blanks(r, f):
+    """A table's cells left blank, from its record's cells (records.table_record): of BLANK_ROWS rows or more, in a
+    named column more than half of them fill, each row leaving it empty, the row named by its first cell. A row of one
+    cell (a section's label, a note) and one without a name (a merged cell's continuation, likely) aren't counted;
+    a cell merged across reads as blank too, so each is weak."""
+    cells = r.get("cells") or []
+    rows = [row for row in cells[1:] if row and row[0].strip() and sum(1 for c in row if c.strip()) >= 2]
+    if r.get("kind") != "table" or len(rows) < BLANK_ROWS:
+        return []
+    where = table_place(r, f)
+    out = []
+    for k, head in enumerate(cells[0]):
+        given = sum(1 for row in rows if k < len(row) and row[k].strip())
+        if k == 0 or not head.strip() or not len(rows) < 2 * given < 2 * len(rows):
+            continue
+        for row in rows:
+            if k >= len(row) or not row[k].strip():
+                out.append({"kind": "blank", "source": f["source"] if f else "", "subject": row[0].strip(),
+                            "property": " ".join(head.split()), "where": where,
+                            "why": f"left blank in its table: {given} of its {len(rows)} rows give it", "claims": []})
+    return out
 
 def inconsistencies(data, where):
     """Two claims of one subject the second pass says contradict each other (dossiers.py): [{"source", "subject",

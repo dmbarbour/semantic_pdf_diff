@@ -92,14 +92,26 @@ def sheet_record(page_no, figure):
                          label=figure.label[:200], text=figure.title[:TEXT_CHARS], page=page_no,
                          bbox=tuple(figure.bbox))
 
+CELL_CHARS = 200  # of a table's cell kept in its record
+
 def table_record(page_no, task, grid, context, box):
     """A table read by rules, as a record: its title as its label, its headers as its items, the context its rows
-    are given as its text; named by the rules task ("rules:p2:0" is "table:p2:0")."""
+    are given as its text, its cells as read (its header's, then a row's each, a section's label a row of its own
+    where it changes); named by the rules task ("rules:p2:0" is "table:p2:0")."""
     where = task.split(":", 1)[1] if task.startswith("rules:") else task
     text = " ".join(context.replace(CONTEXT_NOTE, "").split())[:TEXT_CHARS]
+    width = len(grid.labels)
+    cells, section = [[str(label)[:CELL_CHARS] for label in grid.labels]], ""
+    for i, row in enumerate(grid.rows):
+        here = grid.sections[i] if i < len(grid.sections) else ""
+        if here and here != section:
+            cells.append([here[:CELL_CHARS]] + [""] * (width - 1))
+        section = here
+        cells.append([str(c)[:CELL_CHARS] for c in row])
     return ContextRecord(id=f"table:{where}"[:120], kind="table", gives=["subject"] + (["scope"] if text else []),
                          label=(grid.title or grid.place)[:200], text=text,
-                         items=[label[:200] for label in grid.labels if label], page=page_no, bbox=tuple(box))
+                         items=[label[:200] for label in grid.labels if label], page=page_no, bbox=tuple(box),
+                         cells=cells)
 
 # Words that link a name to its value ("the timer is 709 ms", "a limit of 21"): trimmed from a name's end; articles
 # from its start.

@@ -373,7 +373,8 @@ def score_analyses(out, write=True):
         print(f"{twin} ({t['documents']} documents): contradictions {c['found']}/{c['planted']} found, {c['false']} "
               f"false; under another condition {t['condition']['contradicts']}/{t['condition']['pairs']} said to "
               f"contradict, restated {t['restatement']['contradicts']}/{t['restatement']['pairs']}")
-        print("  gaps: " + ", ".join(f"{kind} {g[kind]['by code']}/{g[kind]['planted']} by code, "
+        print("  gaps: " + ", ".join(f"{kind} {g[kind]['by code']}/{g[kind]['planted']} by code ("
+                                     f"{g[kind].get('as a blank cell', 0)} as a blank cell), "
                                      f"{g[kind]['read together']} read together"
                                      for kind in ("sibling", "placeholder", "reference"))
               + f"; not planted {g['unplanted']}")

@@ -313,6 +313,29 @@ def subject_chunks(data, index, files, size=CHUNK, notes=None):
                 titled(f"Subject: {s['name']}", lead, cut(lines, size), subject=s["name"])]
     return out
 
+def table_chunks(data, files, size=CHUNK):
+    """[(title, text)]: a chunk a table read by rules (its record's cells: records.table_record), or a part of a
+    long one, its rows under the table's header again, a section's label a row of its own. A table read from a picture
+    keeps no record: its claims are in its section's chunks."""
+    from .indexes import table_place
+    out = []
+    for r in data.get("records", []):
+        cells = r.get("cells") or []
+        if r.get("kind") != "table" or len(cells) < 2:
+            continue
+        f = files.get(r["content"])
+        width = max(len(row) for row in cells)
+        line = lambda row, width=width: (  # noqa: E731
+            "| " + " | ".join(cell_md(c) for c in row + [""] * (width - len(row))) + " |")
+        header = line(cells[0]) + "\n|" + "---|" * width
+        where = table_place(r, f)
+        lead = (f"A table of {len(cells) - 1} rows, from {where}: its cells as the reader took them from the source; "
+                "check a value against its place.")
+        fields = {"source": f["source"], "file": f["path"]} if f else {}
+        out += titled(f"Table: {where}", lead, [[header, *part] for part in cut([line(x) for x in cells[1:]], size)],
+                      **fields)
+    return out
+
 def kind_chunks(index, size=CHUNK):
     """[(title, text)]: a chunk a kind of the index's (two items or more of one kind: "pump (P)"), or a part of
     one: its items by property as a Markdown table, the properties most given first (KIND_COLUMNS of them), "—" where
@@ -449,7 +472,7 @@ def exported(data, index, version="", size=CHUNK):
     for subject, names in mine.items():
         located[subject] = names + [n for n in located[subject] if n not in names]
     for title, text in (topic_chunks(data, files_of, size) + found + kind_chunks(index, size)
-                        + discovery_chunks(index, located, size)):
+                        + table_chunks(data, files_of, size) + discovery_chunks(index, located, size)):
         name = name_of(text)
         files[name] = text
         titles.append((name, title))

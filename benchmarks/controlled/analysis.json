@@ -19,19 +19,23 @@
     "sibling": {
      "planted": 4,
      "by code": 4,
+     "as a blank cell": 2,
      "read together": 4
     },
     "placeholder": {
      "planted": 4,
      "by code": 4,
+     "as a blank cell": 0,
      "read together": 0
     },
     "reference": {
      "planted": 4,
      "by code": 4,
+     "as a blank cell": 0,
      "read together": 0
     },
     "unplanted": {
+     "blank (named by a value)": 2,
      "siblings (named by a value)": 12
     }
    },
@@ -95,16 +99,19 @@
     "sibling": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "placeholder": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "reference": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "unplanted": {}
@@ -167,16 +174,19 @@
     "sibling": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "placeholder": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "reference": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "unplanted": {}
@@ -253,19 +263,23 @@
     "sibling": {
      "planted": 2,
      "by code": 2,
+     "as a blank cell": 1,
      "read together": 2
     },
     "placeholder": {
      "planted": 2,
      "by code": 2,
+     "as a blank cell": 0,
      "read together": 0
     },
     "reference": {
      "planted": 2,
      "by code": 2,
+     "as a blank cell": 0,
      "read together": 0
     },
     "unplanted": {
+     "blank (named by a value)": 1,
      "siblings (named by a value)": 6
     }
    },
@@ -358,16 +372,19 @@
     "sibling": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "placeholder": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "reference": {
      "planted": 0,
      "by code": 0,
+     "as a blank cell": 0,
      "read together": 0
     },
     "unplanted": {}
@@ -445,19 +462,23 @@
     "sibling": {
      "planted": 2,
      "by code": 2,
+     "as a blank cell": 1,
      "read together": 2
     },
     "placeholder": {
      "planted": 2,
      "by code": 2,
+     "as a blank cell": 0,
      "read together": 0
     },
     "reference": {
      "planted": 2,
      "by code": 2,
+     "as a blank cell": 0,
      "read together": 0
     },
     "unplanted": {
+     "blank (named by a value)": 1,
      "siblings (named by a value)": 6
     }
    },

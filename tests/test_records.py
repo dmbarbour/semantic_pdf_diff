@@ -66,12 +66,19 @@ class Sheets(unittest.TestCase):
 
 class Tables(unittest.TestCase):
     def test_a_table_record_is_named_by_its_rules_task(self):
-        grid = SimpleNamespace(title="Table 1. Pumps", place="page 2, table 1", labels=["Tag", "Capacity (gpm)"])
+        grid = SimpleNamespace(title="Table 1. Pumps", place="page 2, table 1", labels=["Tag", "Capacity (gpm)"],
+                               rows=[["P-101", "1,318"], ["P-102", "1,898"], ["P-103", ""]],
+                               sections=["Raw water pumps", "Raw water pumps", "Spare"])
         r = table_record(2, "rules:p2:0", grid, "CONTEXT (for reference only: do not extract claims from it):\n"
                                                 "Above the table: ...at their rated points.", (0, 0, 9, 9))
         self.assertEqual((r.id, r.label, r.items, r.text), ("table:p2:0", "Table 1. Pumps",
                                                              ["Tag", "Capacity (gpm)"],
                                                              "Above the table: ...at their rated points."))
+        # its cells as read, for the export's tables and a cell left blank (a section's label a row of its own)
+        self.assertEqual(r.cells, [["Tag", "Capacity (gpm)"], ["Raw water pumps", ""], ["P-101", "1,318"],
+                                   ["P-102", "1,898"], ["Spare", ""], ["P-103", ""]])
+        from semantic_pdf_diff.schema import ContextRecord
+        self.assertNotIn("cells", ContextRecord(id="note:p1:0", kind="note").model_dump())  # stored as before
 
     def test_a_rule_claims_name_as_printed(self):
         from semantic_pdf_diff.tablerules import printed_name
