@@ -2,6 +2,20 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.19.0 (2026-10-31)
+
+- **The second pass (`second_pass`, still off) is scored on planted reports.** Pump station design reports, each written twice, planted and clean. The planted copy holds values said otherwise in another section, blank schedule cells, "TBD"s and references to a figure and a table it lacks; both copies hold values restated under another condition.
+  - It finds 5 of 6 planted contradictions and calls nothing else a contradiction.
+  - The gaps found by code (siblings, placeholders, references) are all found, and none in the clean copies.
+- **Fewer false gaps from the second pass.** Its "likely missing" now asks only about the subject's own properties. A PDF without an outline no longer hands every subject the whole document's summary. On the planted reports, gaps that weren't planted fell from 27 to none.
+- **Doubted claims are read again from their place** (with `second_pass`): each claim the second pass suspects misread, and both claims of each contradiction, are rendered closer from the PDF and asked again. Each card says what its place gives ("as read", "it gives 16D"), and so does the Inconsistencies view (also index.md and the workbook), so a reader's error is told from the document's own. On the planted reports 31 of 33 re-reads are right; on 9 drawing sheets they catch the sheet index's merged rows. A re-read can err too, so it's shown beside the claim, never instead of it.
+- **`export` chunks per topic and per finding:**
+  - one chunk per topic the report is browsed by, each claim naming its file and place; a claim said alike in several places (two revisions) is one line naming each place;
+  - a comparison's findings by what was found (they differ, uncertain, they complement each other, they agree), each with both claims, the judge's reason and the explanation;
+  - each source's claims with no counterpart in the other;
+  - agreements whose two claims say the same word for word are left out and counted in index.md.
+- **Fixed:** Ctrl+C landing while PyMuPDF's C code ran printed a traceback and exited 1. It now ends as an interrupt, with the resume note and exit 130.
+
 ## 0.18.0 (2026-10-31)
 
 - **`second_pass`** (off by default): an analysis reads each subject's claims together, one request per subject of two claims or more. Each request is shown the subject's claims, the passages they came from, their sections and what the subject's siblings give. What it finds is kept as notes beside the claims, never changing them: context a claim lacks, what restates, refines or contradicts what, suspected misreads, inferences, and what's likely missing.
