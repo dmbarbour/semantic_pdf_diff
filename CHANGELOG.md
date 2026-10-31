@@ -6,7 +6,7 @@ Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product
 
 - **Wide pages are no longer sliced by default** (`skip_text_only: wide_pages`, now the default; the owner: "I think we should turn it on. We should also do the fallback."). On a page too wide for bands, such as a 16:9 slide, image tiles holding only text aren't sent; the text tasks read that text whole. Tiles holding a chart or picture are still sent.
 - **The fallback:** those tiles are held back, not dropped. If the page's text tasks end without a single claim kept (on two slides of tables every quote was rejected), the held tiles are sent as before, and their coverage rows say so (`held`).
-  - On two real 16:9 decks, 1,828 of 1,849 distinct values are kept, with 535 tiles instead of 589. The 14 values still lost are on pages whose text gave some claims but missed a table.
+  - On two real 16:9 decks, 1,828 of 1,849 distinct values are kept, with 535 tiles instead of 589. The 14 values first counted as lost are the same numbers read with other units or none (corrected in 0.22.0): by number alone, none is lost.
 - To go back to sending every tile: `semantic-pdf-diff config set skip_text_only false`.
 - Stores read before read their documents' image tasks again once, with no new requests: every answer comes from the answers cache.
 
