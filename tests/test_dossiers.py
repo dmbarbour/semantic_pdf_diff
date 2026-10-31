@@ -46,6 +46,34 @@ class Dossier(unittest.TestCase):
         self.assertEqual(dossier["siblings"], {"kind": "pump (P)", "items": 3, "they give, it doesn't": ["NPSH"]})
         self.assertIn("Read one subject's claims from an engineering source together", dossiers.prompt(dossier))
 
+    def test_a_kinds_items_read_together_with_their_passages(self):
+        """A kind's items in one request (the owner, 2026-10-31: "Your recommended path seems reasonable"): what
+        siblings give together, and those that should agree and don't, out of a subject's dossier's reach."""
+        d = data()
+        made = dossiers.kind_dossiers(d, indexes.built(d))
+        self.assertEqual([(source, kind, len(named)) for source, kind, named, _ in made], [("a", "pump (P)", 6)])
+        dossier = made[0][3]
+        self.assertEqual([(i["item"], [c["value"] for c in i["claims"]]) for i in dossier["items"]],
+                         [("P-101 pump", ["42", "75", "45"]), ("P-102 pump", ["40", "3"]), ("P-103 pump", ["4"])])
+        self.assertEqual(dossier["items"][0]["claims"][0], {"name": "C1", "attribute": "head", "value": "42",
+                                                            "unit": "m"})
+        self.assertEqual(dossier["passages"], [d["evidence"][0]["snippet"]])  # each once
+        self.assertIn("Read the items of one kind", dossiers.kind_prompt(dossier))
+        # what a kind's answer may say: relations it allows, misreads, inferences; the rest dropped
+        answer = SecondPass.model_validate({
+            "relations": [{"a": "C1", "b": "C4", "relation": "contradicts", "why": "identical pumps"},
+                          {"a": "C1", "b": "C4", "relation": "restates", "why": "?"}],
+            "inferences": [{"text": "together 87 m", "claims": ["C1", "C4"]}],
+            "missing": [{"property": "speed", "why": "?"}]})
+        entries, _ = dossiers.logged(answer, "a", "pump (P)", made[0][2], dossier, ("kind",))
+        self.assertEqual([e["kind"] for e in entries], ["relation", "relation", "inference", "missing"])
+        kept = dossiers.kind_entries(entries, made[0][2], dossier)
+        self.assertEqual([(e["kind"], e["claims"]) for e in kept],
+                         [("relation", ["A-1", "A-4"]), ("inference", ["A-1", "A-4"])])  # two items' contradiction
+        within = SecondPass.model_validate({"relations": [{"a": "C1", "b": "C3", "relation": "contradicts"}]})
+        entries, _ = dossiers.logged(within, "a", "pump (P)", made[0][2], dossier, ("kind",))
+        self.assertEqual(dossiers.kind_entries(entries, made[0][2], dossier), [])  # one item's: its own dossier's
+
     def test_a_headless_sections_about_is_the_documents_not_the_subjects(self):
         d = data()
         d["sections"][0]["heading_path"] = []  # no outline: the whole document one section, its about all it covers

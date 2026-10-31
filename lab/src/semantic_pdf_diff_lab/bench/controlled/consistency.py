@@ -269,7 +269,8 @@ def scored(key, data):
         if k not in matched:  # a property named by a value: a misread table's, not the gap finder's
             unplanted[g["kind"] + (" (named by a value)" if VALUE_NAMED.match(g["property"]) else "")] += 1
     out["gaps"]["unplanted"] = dict(sorted(unplanted.items()))
-    inferences = [fold(e.get("text", "")) for e in entries if e["kind"] == "inference"]
+    inferences = [fold(e.get("text", "") + " " + e.get("sum", "")) for e in entries  # as shown: the sum by code too
+                  if e["kind"] == "inference"]
     out["implied"] = {"planted": len(key["implied"]),
                       "found": sum(any(any(v in text for v in i["values"]) for text in inferences)
                                    for i in key["implied"]),
@@ -303,7 +304,7 @@ def scored(key, data):
                               else ": not planted")][found] += 1
     out["looked"] = {k: dict(sorted(v.items())) for k, v in sorted(seen.items())}
     out["claims"] = {"claims": len(classes), "classes": dict(sorted(Counter(classes.values()).items()))}
-    out["log"] = {k: (data.get("commentary") or {}).get(k, 0) for k in ("subjects", "dropped", "failed")}
+    out["log"] = {k: (data.get("commentary") or {}).get(k, 0) for k in ("subjects", "kinds", "dropped", "failed")}
     return out
 
 def gap_matches(gap, plant):
@@ -347,7 +348,7 @@ def totals(results):
             **{part: {kind: dict(sorted(Counter(c for r in mine for c, n in r.get(part, {}).get(kind, {}).items()
                                                 for _ in range(n)).items()))
                       for kind in sorted({k for r in mine for k in r.get(part, {})})} for part in ("reread", "looked")},
-            "log": {k: add("log", k) for k in ("subjects", "dropped", "failed")}}
+            "log": {k: add("log", k) for k in ("subjects", "kinds", "dropped", "failed")}}
     return out
 
 def _at(data, path):

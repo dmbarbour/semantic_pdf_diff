@@ -96,7 +96,7 @@ def notes_of(data, files):
     """{claim id: [lines]}: what the second pass said about each claim (dossiers.py), as a chunk says it under the
     claim: the cards' notes (report.Cards.noted) in words; a restatement's or corroboration's reason, and a re-read's
     where it's as read, left out (QUIET), since they only say the values agree."""
-    from .dossiers import reread_said
+    from .dossiers import reread_said, sum_said
     from .report import RELATION_SAID, SUSPICION_SAID
     evidence = {e["id"]: e for e in data.get("evidence", [])}
     out = defaultdict(list)
@@ -113,7 +113,7 @@ def notes_of(data, files):
             elif c["kind"] == "suspicion" and c.get("relation") in SUSPICION_SAID:
                 line = f"Read together, suspected {SUSPICION_SAID[c['relation']]}" + (f": {why}" if why else "")
             elif c["kind"] == "inference":
-                line = f"Read together, inferred: {c['text']}"
+                line = f"Read together, inferred: {c['text']}{sum_said(c)}"
             elif c["kind"] == "reread":
                 line = (f"Read again from its place: {reread_said(c)}"
                         + (f" ({why})" if why and c.get("relation") != "as_claimed" else ""))

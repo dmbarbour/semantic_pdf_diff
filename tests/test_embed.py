@@ -186,6 +186,8 @@ def endpoint(state):
         if "Find the names" in prompt:
             state["names"] += 1
             return chat_answer(handler, {"items": [["pump", "impeller"]], "properties": []})
+        if "SOURCE DATA:\n" not in prompt:  # a request it doesn't stub (a kind's items read together): nothing said
+            return chat_answer(handler, {})
         claims = [{"entity": e, "attribute": a, "value": v, "unit": u, "kind": "text", "quote": m.group(0),
                    "confidence": .9}
                   for m in LINE.finditer(source_data(prompt)) for e, a, v, u in [m.groups()]]

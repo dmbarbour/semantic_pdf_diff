@@ -189,7 +189,8 @@ class Cards:
                 lines.append(f"Suspected {SUSPICION_SAID[c['relation']]}" + (f": {esc(c['why'])}" if c.get("why")
                                                                              else ""))
             elif c["kind"] == "inference":
-                lines.append(f"Inferred: {esc(c['text'])}")
+                from .dossiers import sum_said
+                lines.append(f"Inferred: {esc(c['text'])}{esc(sum_said(c))}")
             elif c["kind"] == "reread":
                 from .dossiers import reread_said
                 lines.append(f"Read again from its place: {esc(reread_said(c))}"

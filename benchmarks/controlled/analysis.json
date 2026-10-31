@@ -37,12 +37,13 @@
    },
    "implied": {
     "planted": 2,
-    "found": 0,
-    "inferences": 0
+    "found": 2,
+    "inferences": 2
    },
    "suspicions": {
     "misread": {
-     "named by a value": 22
+     "named by a value": 22,
+     "planted contradiction": 1
     }
    },
    "reread": {
@@ -69,6 +70,7 @@
    },
    "log": {
     "subjects": 30,
+    "kinds": 4,
     "dropped": 0,
     "failed": 0
    }
@@ -108,14 +110,15 @@
    },
    "implied": {
     "planted": 2,
-    "found": 0,
-    "inferences": 2
+    "found": 2,
+    "inferences": 4
    },
    "suspicions": {},
    "reread": {},
    "looked": {},
    "log": {
     "subjects": 30,
+    "kinds": 4,
     "dropped": 0,
     "failed": 0
    }
@@ -178,8 +181,8 @@
    },
    "implied": {
     "planted": 1,
-    "found": 0,
-    "inferences": 1
+    "found": 1,
+    "inferences": 2
    },
    "suspicions": {},
    "reread": {},
@@ -195,6 +198,7 @@
    },
    "log": {
     "subjects": 15,
+    "kinds": 2,
     "dropped": 0,
     "failed": 0
    }
@@ -264,12 +268,13 @@
    },
    "implied": {
     "planted": 1,
-    "found": 0,
-    "inferences": 0
+    "found": 1,
+    "inferences": 1
    },
    "suspicions": {
     "misread": {
-     "named by a value": 11
+     "named by a value": 11,
+     "planted contradiction": 1
     }
    },
    "reread": {
@@ -302,6 +307,7 @@
    },
    "log": {
     "subjects": 15,
+    "kinds": 2,
     "dropped": 0,
     "failed": 0
    }
@@ -364,8 +370,8 @@
    },
    "implied": {
     "planted": 1,
-    "found": 0,
-    "inferences": 1
+    "found": 1,
+    "inferences": 2
    },
    "suspicions": {},
    "reread": {},
@@ -381,6 +387,7 @@
    },
    "log": {
     "subjects": 15,
+    "kinds": 2,
     "dropped": 0,
     "failed": 0
    }
@@ -451,8 +458,8 @@
    },
    "implied": {
     "planted": 1,
-    "found": 0,
-    "inferences": 0
+    "found": 1,
+    "inferences": 1
    },
    "suspicions": {
     "misread": {
@@ -491,6 +498,7 @@
    },
    "log": {
     "subjects": 15,
+    "kinds": 2,
     "dropped": 0,
     "failed": 0
    }

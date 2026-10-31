@@ -931,7 +931,7 @@ class Planted(unittest.TestCase):
         self.assertEqual(got["gaps"]["reference"], {"planted": 2, "by code": 1, "read together": 0})
         self.assertEqual(got["implied"], {"planted": 1, "found": 1, "inferences": 1})
         self.assertEqual(got["suspicions"], {"misread": {"planted contradiction": 1}})
-        self.assertEqual(got["log"], {"subjects": 3, "dropped": 1, "failed": 0})
+        self.assertEqual(got["log"], {"subjects": 3, "kinds": 0, "dropped": 1, "failed": 0})
         totals = consistency.totals({project.id: got})
         self.assertEqual(totals["planted"]["contradictions"], {"planted": 3, "found": 1, "false": 1})
         self.assertNotIn("clean", totals)
