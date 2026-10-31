@@ -570,7 +570,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
         page += topic_coverage_html(claims, names, sides)
     index = data.get('index') or {}
     subjects, figures, terms = index.get('subjects', []), index.get('figures', []), index.get('glossary', [])
-    kinds = index.get('kinds', [])
+    kinds, gaps = index.get('kinds', []), index.get('gaps', [])
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
@@ -578,6 +578,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              + (f'<button data-view="kinds">Kinds {len(kinds)}</button>' if kinds else '')
              + (f'<button data-view="figures">Figures and tables {len(figures)}</button>' if figures else '')
              + (f'<button data-view="glossary">Glossary {len(terms)}</button>' if terms else '')
+             + (f'<button data-view="gaps">What it doesn\'t give {len(gaps)}</button>' if gaps else '')
              + '</div>')
     page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
              + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
@@ -625,7 +626,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
     sources = index.get('sources', [])
     page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
-             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources))
+             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources) + gaps_html(gaps, sources))
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -722,6 +723,24 @@ def glossary_html(terms, sources):
             'listed) and from prose ("net positive suction head (NPSH)"); a search for a term finds its meaning\'s '
             f'claims too.</p><table><thead><tr><th>Term</th><th>Kind</th>{heads}</tr></thead><tbody>{rows}</tbody>'
             '</table></section>')
+
+def gaps_html(gaps, sources):
+    """The view "What it doesn't give" (indexes.gaps): each gap found by code, by kind, where it was expected and why,
+    linked to a claim of its subject where it has one; weak, as its note says."""
+    if not gaps:
+        return ''
+    from .indexfiles import GAP_TITLES, GAPS_NOTE
+    many = len(sources) > 1
+    rows = ''.join(
+        f'<tr data-text="{esc(" ".join([g["subject"], g["property"], g["why"], g["where"]]).casefold())}">'
+        f'<td>{esc(GAP_TITLES[g["kind"]])}</td>' + (f'<td>{esc(g["source"])}</td>' if many else '')
+        + '<td>' + (f'<a href="#claim={esc(g["claims"][0])}">{esc(g["subject"])}</a>' if g['claims']
+                    else esc(g['subject'])) + f'</td><td>{esc(g["property"])}</td><td>{esc(g["where"])}</td>'
+        f'<td>{esc(g["why"])}</td></tr>' for g in gaps)
+    heads = ('<th>Gap</th>' + ('<th>Source</th>' if many else '')
+             + '<th>Item</th><th>Property</th><th>Where</th><th>Why</th>')
+    return (f'<section data-for="gaps" class="index" hidden><p class="meta">{esc(GAPS_NOTE)}</p><div class="wide">'
+            f'<table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div></section>')
 
 def item_kinds_html(kinds, subjects, sources):
     """The Kinds view: each kind of item a table of its items by property, the most given first, each value linked

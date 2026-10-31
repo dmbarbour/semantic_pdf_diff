@@ -46,7 +46,8 @@ def markdown(index):
     lines = [f"# Index: {title(index)}", "",
              f"{len(index['subjects'])} subjects, {len(properties(index))} properties, "
              f"{sum(len(c) for s in index['subjects'] for c in s['claims'].values())} claims, "
-             f"{len(index['figures'])} figures and tables, {len(index.get('glossary', []))} glossary terms. Read by a "
+             f"{len(index['figures'])} figures and tables, {len(index.get('glossary', []))} glossary terms, "
+             f"{len(index.get('gaps', []))} gaps. Read by a "
              "model: check a value against its place before relying on it."
              + (" A source giving nothing for a subject or property another gives is marked “—”: not saying isn't "
                 "evidence of absence." if many else ""), "", "## Subjects", ""]
@@ -102,7 +103,30 @@ def markdown(index):
         lines.append(f"- **{t['term']}** ({t['kind']}): {said_by}"
                      + (" — defined differently" if t.get("differs") else "")
                      + (f" — {reach_said(t)}" if reach_said(t) else ""))
+    lines += gaps_md(index.get("gaps", []), many)
     return "\n".join(lines).rstrip() + "\n"
+
+# The gaps' kinds, as index.md, the workbook and the page head them
+GAP_TITLES = {"siblings": "Missing among siblings", "reference": "Cited, not found", "placeholder": "Placeholders"}
+GAPS_NOTE = ("Found by code, each weak: where it was expected and why. A document may say it elsewhere, in other "
+             "words, and a reader may have missed what's there; never a finding.")
+
+def gap_said(g, many=False):
+    """A gap in a line: "P-103: head (page 12; 2 of its 3 pump (P) items give it: P-101, P-102)"."""
+    what = g["subject"] + (f": {g['property']}" if g["property"] else "")
+    return ((f"{g['source']}: " if many else "") + f"**{what}** ({g['where']}" + (f"; {g['why']}" if g["why"] else "")
+            + ")")
+
+def gaps_md(gaps, many):
+    """index.md's section "What it doesn't give" (indexes.gaps): the gaps by kind."""
+    if not gaps:
+        return []
+    lines = ["", "## What it doesn't give", "", GAPS_NOTE]
+    for kind, title in GAP_TITLES.items():
+        mine = [g for g in gaps if g["kind"] == kind]
+        if mine:
+            lines += ["", f"### {title}", ""] + [f"- {gap_said(g, many)}" for g in mine]
+    return lines
 
 KIND_COLUMNS = 8  # a kind's properties shown as columns in index.md, the most given first
 
@@ -147,7 +171,10 @@ def tables(index, evidence):
             "figures": (["Source", "File", "Page", "Kind", "Label", "Title", "About", "Claims", "Cited"], figures),
             "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Reach", "Block", "How", "Differs",
                           "Alike on sheets"], glossary),
-            "kinds": (["Kind", "Item", "Property", *tail], kinds)}
+            "kinds": (["Kind", "Item", "Property", *tail], kinds),
+            "gaps": (["Gap", "Source", "Subject", "Property", "Where", "Why", "Claims"],
+                     [[GAP_TITLES[g["kind"]], g["source"], g["subject"], g["property"], g["where"], g["why"],
+                       " ".join(g["claims"])] for g in index.get("gaps", [])])}
 
 def csv_text(header, rows):
     out = io.StringIO()
@@ -258,14 +285,15 @@ def workbook(index, evidence):
     about = [["Index", title(index)], ["Subjects", len(index["subjects"])],
              ["Properties", len(properties(index))], ["Claims", len(evidence)],
              ["Figures and tables", len(index["figures"])], ["Glossary terms", len(index.get("glossary", []))],
-             ["Kinds", len(index.get("kinds", []))],
+             ["Kinds", len(index.get("kinds", []))], ["Gaps", len(index.get("gaps", []))],
              ["Subjects sheet", "A subject's row, then its values: the 1 and 2 at the left collapse or open them all"],
              ["Kinds sheet", "Each kind of item (pumps: P-101, P-102) a table of its items by property; — where an "
                              "item gives none its siblings do"],
+             ["Gaps sheet", GAPS_NOTE],
              ["Caution", "Read by a model: check a value against its place (Where) before relying on it"]]
     sheets = [("About", sheet([], about, widths=[20, 90])), ("Subjects", sheet(header, outlined, outline)),
               ("Kinds", kinds_sheet(index))]
-    sheets += [(name.title(), sheet(*found[name])) for name in ("properties", "claims", "figures", "glossary")]
+    sheets += [(name.title(), sheet(*found[name])) for name in ("properties", "claims", "figures", "glossary", "gaps")]
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         def put(name, text):

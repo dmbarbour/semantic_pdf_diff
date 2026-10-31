@@ -170,6 +170,13 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
 - **By code first:** missing among siblings, and declared but not given.
 - **Then the second pass:** what its dossier suggests is missing, and what can be inferred (entries of their own).
 - **Reported** in a view, "What it doesn't give", each gap with where it was expected and why, labelled weak.
+- **Built 2026-10-31, by code** (the owner: "Please proceed in recommended order"; `indexes.gaps`, no requests):
+  - **Missing among siblings:** of a kind's items in one source (three or more), a property more than half of them give and one doesn't; where expected, where its other values are.
+  - **Cited, not found:** situating's unresolved references (a figure, table or sheet cited and not in the document).
+  - **Placeholders:** a value given as "TBD", "TBC", "to be confirmed" and the like ("N/A" isn't one: it says the value doesn't apply).
+  - In the page (a view, "What it doesn't give"), index.md, the workbook's Gaps sheet and `index/gaps.csv`, each source's own in a comparison.
+  - **By eye** (offline): 9 of scical's sheets, 19 siblings' gaps and 2 sheets cited and not in the set (it's a subset); TS 38.300's clauses 1 to 8, 10 siblings' gaps, each version's own: PUCCH formats 0 and 1 give no "UCI payload" where 2 to 4 do, 2 and 3 no "UE multiplexing capacity". Several of scical's are sheet-list rows the kinds group loosely ("connection (A)"): weak, as labelled.
+  - **Not yet:** a table's empty cells (needs its rows as read, not its claims); the controlled knobs (a sibling missing an attribute, a dangling reference, a placeholder) to score them; the second pass's likely gaps.
 
 ### 6. Context for comparisons
 

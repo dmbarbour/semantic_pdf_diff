@@ -23,6 +23,10 @@ document that would be useful, and it seems deeply related to the problem of com
   or more, with how many of its items give each property (what one of them leaves out shows: siblings' gaps).
 - **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
   each source's, a term the sources define differently marked.
+- **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): a property
+  most of an item's siblings give that it doesn't (each source's own); a figure, table or sheet cited and not found
+  (situating's unresolved references); a value given as a placeholder ("TBD", "to be confirmed"). Each weak: where
+  it was expected and why, never a finding.
 """
 import re
 from collections import Counter, defaultdict
@@ -180,8 +184,9 @@ def built(data):
                                         "where": where(c)} for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
+    found_kinds = kinds(subjects)
     return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data),
-            "kinds": kinds(subjects)}
+            "kinds": found_kinds, "gaps": gaps(data, subjects, found_kinds, where)}
 
 # An item named with a number: its kind's name before the number ("Room 104", "blower 3", "Pump No. 2").
 NUMBERED_NAME = re.compile(r"^(.*?[A-Za-z][A-Za-z ./&'-]*?)[\s#-]*(?:no\.?\s*)?\d+[A-Za-z]?$", re.IGNORECASE)
@@ -223,6 +228,64 @@ def kinds(subjects):
                     "properties": [{"name": named[k], "given": n}
                                    for k, n in sorted(given.items(), key=lambda x: (-x[1], natural(x[0])))]})
     return sorted(out, key=lambda k: natural(k["kind"]))
+
+SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most of them give to be a gap
+# A value that holds a place for one not given ("N/A" says it doesn't apply, not that it's missing)
+PLACEHOLDER = re.compile(r"^\W*(?:TBD|TBC|TBA|TBV|TBR|to be (?:determined|confirmed|provided|advised|verified|decided|"
+                         r"agreed|supplied|issued))\b", re.IGNORECASE)
+GAP_KINDS = ("siblings", "reference", "placeholder")
+
+def gaps(data, subjects, found_kinds, where):
+    """What the sources don't give, found by code (single-document analysis, milestone 5): [{"kind": "siblings",
+    "reference" or "placeholder", "source", "subject", "property", "where": where it was expected, "why", "claims"}].
+    A sibling's gap is each source's own: of a kind's items in it (SIBLINGS or more), a property more than half of
+    them give and this one doesn't; where expected, where its other values are. Each is weak: saying nothing isn't
+    evidence of absence, and the reader may have missed what's there."""
+    out = []
+    for k in found_kinds:
+        for source in data_sources(data):
+            members = [i for i in k["subjects"] if subjects[i]["claims"].get(source)]
+            if len(members) < SIBLINGS:
+                continue
+            gives, named = {}, {}
+            for i in members:
+                mine = [p for p in subjects[i]["properties"] if any(v["source"] == source for v in p["values"])]
+                gives[i] = {p["name"].casefold() for p in mine}
+                named.update({p["name"].casefold(): p["name"] for p in mine})
+            given = Counter(name for names in gives.values() for name in names)
+            for name, n in sorted(given.items(), key=lambda x: natural(x[0])):
+                if not n * 2 > len(members) or n == len(members):
+                    continue
+                others = [subjects[i]["name"] for i in members if name in gives[i]]
+                for i in members:
+                    if name in gives[i]:
+                        continue
+                    at = [v for p in subjects[i]["properties"] for v in p["values"] if v["source"] == source]
+                    out.append({"kind": "siblings", "source": source, "subject": subjects[i]["name"],
+                                "property": named[name], "where": at[0]["where"] if at else "",
+                                "why": f"{n} of its {len(members)} {k['kind']} items give it: "
+                                       + ", ".join(others[:4]) + (", …" if len(others) > 4 else ""),
+                                "claims": [v["claim"] for v in at[:1]]})
+    files = {}
+    for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
+        files.setdefault(f["content"], f)
+    for content, s in sorted((data.get("situation") or {}).items()):
+        f = files.get(content)
+        for u in s.get("unresolved", []):
+            out.append({"kind": "reference", "source": f["source"] if f else "", "subject": u.get("label", ""),
+                        "property": "", "where": (f["path"] if f else content) + f", page {u['page']}",
+                        "why": "cited, not found in the document: “" + " ".join(u.get("text", "").split())[:120]
+                               + "”", "claims": list(u.get("evidence") or [])})
+    for e in data.get("evidence", []):
+        if PLACEHOLDER.match(str(e["value"])):
+            out.append({"kind": "placeholder", "source": where.source.get(e["content"], ""), "subject": e["entity"],
+                        "property": e["attribute"], "where": where(e), "why": f"given as “{e['value']}”",
+                        "claims": [e["id"]]})
+    return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), g["source"], natural(g["subject"]),
+                                      natural(g["property"]), natural(g["where"])))
+
+def data_sources(data):
+    return [s["name"] for s in data.get("sources", [])]
 
 def term_key(term):
     """A term as terms are told apart: case and a closing full stop folded ("TYP." is "typ")."""

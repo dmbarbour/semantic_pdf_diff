@@ -215,6 +215,37 @@ class Reach(unittest.TestCase):
         two = {"terms": [entry("EACH FACE", "a"), entry("END FRAME", "b")]}
         self.assertTrue(indexes.built(report([], sources=("a", "b"), glossary=two))["glossary"][0]["differs"])
 
+class Gaps(unittest.TestCase):
+    """What a source doesn't give, found by code (single-document analysis, milestone 5): weak, each with where it was
+    expected and why."""
+    def test_a_sibling_lacking_what_most_give_a_reference_not_found_and_a_placeholder(self):
+        pumps = [claim(f"A-{n}{k}", "ca", f"P-10{n} pump", attribute, value, unit, page=n)
+                 for n in (1, 2, 3) for k, (attribute, value, unit) in enumerate([("rated power", f"1{n}", "kW"),
+                                                                                  ("head", f"4{n}", "m")])]
+        pumps.append(claim("A-9", "ca", "P-104 pump", "rated power", "TBD", "", page=4))  # no head: 3 of 4 give it
+        data = report(pumps, situation={"ca": {"unresolved": [{"page": 2, "label": "Table 5", "evidence": [],
+                                                                "text": "as given in Table 5"}]}})
+        index = indexes.built(data)
+        said = [(g["kind"], g["subject"], g["property"], g["where"]) for g in index["gaps"]]
+        self.assertEqual(said, [("siblings", "P-104 pump", "head", "a.pdf, page 4"),
+                                ("reference", "Table 5", "", "a.pdf, page 2"),
+                                ("placeholder", "P-104 pump", "rated power", "a.pdf, page 4")])
+        self.assertEqual(index["gaps"][0]["why"],
+                         "3 of its 4 pump (P) items give it: P-101 pump, P-102 pump, P-103 pump")
+        page = indexfiles.markdown(index)
+        self.assertIn("## What it doesn't give", page)
+        self.assertIn("- **Table 5** (a.pdf, page 2; cited, not found in the document: “as given in Table 5”)", page)
+        self.assertEqual(indexfiles.tables(index, {e["id"]: e for e in pumps})["gaps"][0],
+                         ["Gap", "Source", "Subject", "Property", "Where", "Why", "Claims"])
+
+    def test_more_than_half_must_give_it_of_three_at_least(self):
+        two = [claim("A-1", "ca", "P-101", "head", "40", "m"), claim("A-2", "ca", "P-101", "flow", "5", "L/s"),
+               claim("A-3", "ca", "P-102", "flow", "6", "L/s")]
+        self.assertEqual(indexes.built(report(two))["gaps"], [])  # two items: no siblings' gap
+        half = two + [claim("A-4", "ca", "P-103", "flow", "7", "L/s"), claim("A-5", "ca", "P-104", "flow", "8", "L/s"),
+                      claim("A-6", "ca", "P-104", "head", "41", "m")]
+        self.assertEqual(indexes.built(report(half))["gaps"], [])  # head 2 of 4: half isn't most
+
 class Files(unittest.TestCase):
     def test_csv_a_row_a_value(self):
         index = indexes.built(report(ONE))
@@ -233,7 +264,7 @@ class Files(unittest.TestCase):
         self.assertEqual(data, indexfiles.workbook(index, evidence))  # the same bytes for the same index
         book = openpyxl.load_workbook(io.BytesIO(data))
         self.assertEqual(book.sheetnames, ["About", "Subjects", "Kinds", "Properties", "Claims", "Figures",
-                                           "Glossary"])
+                                           "Glossary", "Gaps"])
         subjects = book["Subjects"]
         self.assertEqual(subjects.freeze_panes, "A2")
         self.assertEqual(subjects.auto_filter.ref, "A1:H7")  # the header, 2 subjects' rows and their 4 values
@@ -275,8 +306,8 @@ class Written(unittest.TestCase):
             searched = drawn((out / "report.html").as_uri() + "#subjects&q=blower")
         self.assertEqual((code, again), (0, 0))
         self.assertEqual(len(data["index"]["subjects"]), 15)
-        self.assertEqual(files, ["claims.csv", "figures.csv", "glossary.csv", "kinds.csv", "properties.csv",
-                                 "subjects.csv"])
+        self.assertEqual(files, ["claims.csv", "figures.csv", "gaps.csv", "glossary.csv", "kinds.csv",
+                                 "properties.csv", "subjects.csv"])
         self.assertIn("# Index: plant", page)
         self.assertRegex(page, r"### blower0\n\n- \*\*discharge head\*\*: 20 m \(\S*blowers\.md, lines \d+–\d+\)")
         self.assertEqual(page, rewritten)
