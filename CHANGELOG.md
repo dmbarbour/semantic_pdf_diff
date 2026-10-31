@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.22.1 (2026-10-31)
+
+- **Exports and reports are made fresh** (the owner: "Each export or report should be logically fresh from the sources, not history-dependent.").
+  - **`export`** left an earlier export's chunks in its folder beside its own, so ingesting the folder took both. The folder now holds one export alone. An earlier export's chunks it doesn't hold are removed, and the command says how many. A folder holding a file no export writes is refused, and nothing is written. Hidden files are left alone.
+  - **A report's index files:** `index/inconsistencies.csv` from an earlier report is removed when this one finds none.
+  - **A report's pages:** a split report no longer leaves an earlier `report.html` beside it. An unsplit report, or one split into fewer parts, no longer leaves an earlier split's parts in `report-split/`.
+
 ## 0.22.0 (2026-10-31)
 
 - **The second pass is on by default** in `analyze` (`second_pass`; the owner: "Yes, turn `second_pass` on."). Comparisons don't run it yet. To turn it off: `semantic-pdf-diff config set second_pass false`.
