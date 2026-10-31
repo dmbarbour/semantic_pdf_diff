@@ -24,8 +24,8 @@ MONTHS = ("January|February|March|April|May|June|July|August|September|October|N
 KINDS = [
     (rf"^(?:{MONTHS})$|^(?:cooling )?season$|^year$", "scope"),
     (r"^at (?:design|peak) flow$|^(?:average|maximum) day$|^with (?:all filters in service|one filter out of "
-     r"service)$|^link (?:congested|idle|lightly loaded)$|^guide mode$|^chilled beam design$|^runout point$",
-     "scope"),
+     r"service)$|^link (?:congested|idle|lightly loaded)$|^guide mode$|^chilled beam design$|^runout point$"
+     r"|^at runout$|^at 50 Hz on the standby generator$", "scope"),
     (r"^3-second gust$|^9[59]th percentile$|^in 95% of monthly samples$", "frame"),
     (r"^(?:maximum|minimum)$", "bound"),
     (r"^Hall C$|^across the four halls$", "subject"),

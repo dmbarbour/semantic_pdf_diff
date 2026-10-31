@@ -1,0 +1,429 @@
+{
+ "totals": {
+  "planted": {
+   "documents": 2,
+   "contradictions": {
+    "planted": 6,
+    "found": 5,
+    "false": 0
+   },
+   "condition": {
+    "pairs": 4,
+    "contradicts": 0
+   },
+   "restatement": {
+    "pairs": 6,
+    "contradicts": 0
+   },
+   "gaps": {
+    "sibling": {
+     "planted": 4,
+     "by code": 4,
+     "read together": 4
+    },
+    "placeholder": {
+     "planted": 4,
+     "by code": 4,
+     "read together": 0
+    },
+    "reference": {
+     "planted": 4,
+     "by code": 4,
+     "read together": 0
+    },
+    "unplanted": {
+     "siblings (named by a value)": 12
+    }
+   },
+   "implied": {
+    "planted": 2,
+    "found": 0,
+    "inferences": 0
+   },
+   "suspicions": {
+    "misread": {
+     "named by a value": 22
+    }
+   },
+   "log": {
+    "subjects": 30,
+    "dropped": 0,
+    "failed": 0
+   }
+  },
+  "clean": {
+   "documents": 2,
+   "contradictions": {
+    "planted": 0,
+    "found": 0,
+    "false": 0
+   },
+   "condition": {
+    "pairs": 4,
+    "contradicts": 0
+   },
+   "restatement": {
+    "pairs": 12,
+    "contradicts": 0
+   },
+   "gaps": {
+    "sibling": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "placeholder": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "reference": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "unplanted": {}
+   },
+   "implied": {
+    "planted": 2,
+    "found": 0,
+    "inferences": 2
+   },
+   "suspicions": {},
+   "log": {
+    "subjects": 30,
+    "dropped": 0,
+    "failed": 0
+   }
+  }
+ },
+ "documents": {
+  "station-s1-clean": {
+   "contradictions": {
+    "planted": 0,
+    "found": 0,
+    "said": {},
+    "false": 0,
+    "false pairs": []
+   },
+   "condition": {
+    "pairs": 2,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition"
+     ],
+     "P-302.capacity / P-302.capacity_runout": [
+      "differs_by_condition"
+     ]
+    }
+   },
+   "restatement": {
+    "pairs": 6,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity": [
+      "corroborates"
+     ],
+     "P-301.tdh / P-301.tdh": [],
+     "forcemain.length / forcemain.length_mi": [],
+     "P-302.motor / P-302.motor": [],
+     "P-304.tdh / P-304.tdh": [
+      "restates"
+     ],
+     "wetwell.volume / wetwell.volume": []
+    }
+   },
+   "gaps": {
+    "sibling": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "placeholder": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "reference": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "unplanted": {}
+   },
+   "implied": {
+    "planted": 1,
+    "found": 0,
+    "inferences": 1
+   },
+   "suspicions": {},
+   "claims": {
+    "claims": 72,
+    "classes": {
+     "loose": 4,
+     "misread": 1,
+     "right": 62,
+     "text": 5
+    }
+   },
+   "log": {
+    "subjects": 15,
+    "dropped": 0,
+    "failed": 0
+   }
+  },
+  "station-s1-planted": {
+   "contradictions": {
+    "planted": 3,
+    "found": 3,
+    "said": {
+     "P-302.motor / P-302.motor_said": [
+      "contradicts"
+     ],
+     "P-304.tdh / P-304.tdh_said": [
+      "contradicts"
+     ],
+     "wetwell.volume / wetwell.volume_said": [
+      "contradicts"
+     ]
+    },
+    "false": 0,
+    "false pairs": []
+   },
+   "condition": {
+    "pairs": 2,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition"
+     ],
+     "P-302.capacity / P-302.capacity_runout": [
+      "differs_by_condition"
+     ]
+    }
+   },
+   "restatement": {
+    "pairs": 3,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity": [
+      "corroborates"
+     ],
+     "P-301.tdh / P-301.tdh": [
+      "corroborates"
+     ],
+     "forcemain.length / forcemain.length_mi": []
+    }
+   },
+   "gaps": {
+    "sibling": {
+     "planted": 2,
+     "by code": 2,
+     "read together": 2
+    },
+    "placeholder": {
+     "planted": 2,
+     "by code": 2,
+     "read together": 0
+    },
+    "reference": {
+     "planted": 2,
+     "by code": 2,
+     "read together": 0
+    },
+    "unplanted": {
+     "siblings (named by a value)": 6
+    }
+   },
+   "implied": {
+    "planted": 1,
+    "found": 0,
+    "inferences": 0
+   },
+   "suspicions": {
+    "misread": {
+     "named by a value": 11
+    }
+   },
+   "claims": {
+    "claims": 85,
+    "classes": {
+     "loose": 34,
+     "right": 45,
+     "text": 6
+    }
+   },
+   "log": {
+    "subjects": 15,
+    "dropped": 0,
+    "failed": 0
+   }
+  },
+  "station-s2-clean": {
+   "contradictions": {
+    "planted": 0,
+    "found": 0,
+    "said": {},
+    "false": 0,
+    "false pairs": []
+   },
+   "condition": {
+    "pairs": 2,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition"
+     ],
+     "P-302.capacity / P-302.capacity_runout": [
+      "differs_by_condition"
+     ]
+    }
+   },
+   "restatement": {
+    "pairs": 6,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity": [
+      "corroborates"
+     ],
+     "P-301.tdh / P-301.tdh": [
+      "corroborates"
+     ],
+     "forcemain.length / forcemain.length_mi": [],
+     "P-302.motor / P-302.motor": [],
+     "P-304.tdh / P-304.tdh": [
+      "restates"
+     ],
+     "wetwell.volume / wetwell.volume": []
+    }
+   },
+   "gaps": {
+    "sibling": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "placeholder": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "reference": {
+     "planted": 0,
+     "by code": 0,
+     "read together": 0
+    },
+    "unplanted": {}
+   },
+   "implied": {
+    "planted": 1,
+    "found": 0,
+    "inferences": 1
+   },
+   "suspicions": {},
+   "claims": {
+    "claims": 73,
+    "classes": {
+     "loose": 5,
+     "misread": 1,
+     "right": 62,
+     "text": 5
+    }
+   },
+   "log": {
+    "subjects": 15,
+    "dropped": 0,
+    "failed": 0
+   }
+  },
+  "station-s2-planted": {
+   "contradictions": {
+    "planted": 3,
+    "found": 2,
+    "said": {
+     "P-302.motor / P-302.motor_said": [
+      "contradicts"
+     ],
+     "P-304.tdh / P-304.tdh_said": [
+      "contradicts",
+      "contradicts"
+     ],
+     "wetwell.volume / wetwell.volume_said": [
+      "differs_by_condition"
+     ]
+    },
+    "false": 0,
+    "false pairs": []
+   },
+   "condition": {
+    "pairs": 2,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition"
+     ],
+     "P-302.capacity / P-302.capacity_runout": [
+      "differs_by_condition"
+     ]
+    }
+   },
+   "restatement": {
+    "pairs": 3,
+    "contradicts": 0,
+    "said": {
+     "P-301.capacity / P-301.capacity": [
+      "corroborates"
+     ],
+     "P-301.tdh / P-301.tdh": [
+      "corroborates"
+     ],
+     "forcemain.length / forcemain.length_mi": []
+    }
+   },
+   "gaps": {
+    "sibling": {
+     "planted": 2,
+     "by code": 2,
+     "read together": 2
+    },
+    "placeholder": {
+     "planted": 2,
+     "by code": 2,
+     "read together": 0
+    },
+    "reference": {
+     "planted": 2,
+     "by code": 2,
+     "read together": 0
+    },
+    "unplanted": {
+     "siblings (named by a value)": 6
+    }
+   },
+   "implied": {
+    "planted": 1,
+    "found": 0,
+    "inferences": 0
+   },
+   "suspicions": {
+    "misread": {
+     "named by a value": 11
+    }
+   },
+   "claims": {
+    "claims": 86,
+    "classes": {
+     "loose": 34,
+     "right": 46,
+     "text": 6
+    }
+   },
+   "log": {
+    "subjects": 15,
+    "dropped": 0,
+    "failed": 0
+   }
+  }
+ }
+}

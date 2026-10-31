@@ -12,6 +12,7 @@
     python scripts/controlled.py context                     # context.json: each claim's context, offline (below)
     python scripts/controlled.py refresh --jobs 6 --max-cost 2   # all of it after a change, six runs at once
     python scripts/controlled.py run --variant b62.json --jobs 6     # a named variant, into the archive (below)
+    python scripts/controlled.py analyze --jobs 4            # the planted reports analyzed, scored (below)
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
@@ -37,6 +38,11 @@ benchmarks/runs/controlled/variants/<name> (scripts/paired.py names it), its ans
 replayed from it. From a frozen worktree (to pin the code), the archive, the ledger and the variants are the main
 checkout's.
 
+`analyze` reads each planted report and its clean twin (docs-analysis; consistency.py) with `analyze`, its second
+pass on and situated (references), recorded or replayed as `run` is (a variant's settings over them with --variant),
+and scores what the second pass and the gaps found by code found against what's planted: analysis.json (the
+standard arm's; docs/plans/single-document-analysis-2026-10-28.md, milestones 3 to 5).
+
 Recording adds to the working fixture (fixture.sqlite, git-ignored), an archive keeping every answer ever recorded,
 every variant's. `pack` exports the committed replay.zip from it: the standard runs replay from fresh stores, reading
 the archive, and every answer they're served is copied into a new fixture, which is packed (the --unaligned runs'
@@ -57,6 +63,8 @@ DOCS_MD = FOLDER / "docs-md"  # the same projects as Markdown (representations.p
 DOCS_DOCX = FOLDER / "docs-docx"  # and as Word documents
 DOCS_PPTX = FOLDER / "docs-pptx"  # and as slide decks
 DOCS_XLSX = FOLDER / "docs-xlsx"  # and as workbooks
+DOCS_ANALYSIS = FOLDER / "docs-analysis"  # the planted reports and their clean twins, analyzed (consistency.py)
+ANALYSIS = {"second_pass": True}  # the analyses' arm over the corpus's settings (a variant's settings over it)
 # The representations' documents by suffix, in the order they're read and compared (code review 2026-10-08, E4).
 REPRESENTATIONS = {".md": DOCS_MD, ".docx": DOCS_DOCX, ".pptx": DOCS_PPTX, ".xlsx": DOCS_XLSX}
 from semantic_pdf_diff_lab.bench import recording  # noqa: E402
@@ -64,11 +72,13 @@ MAIN = recording.main_checkout(ROOT)  # from a frozen worktree, the main checkou
 WORKING = MAIN / "benchmarks/controlled/fixture.sqlite"  # the archive of recorded answers (git-ignored)
 PACKED = FOLDER / "replay.zip"
 RUNS = ROOT / "benchmarks/runs/controlled"
+ANALYSIS_RUNS = ROOT / "benchmarks/runs/controlled-analysis"
 PAIR_RUNS = ROOT / "benchmarks/runs/controlled-pairs"
 VARIANTS = MAIN / "benchmarks/runs/controlled/variants"  # a named variant's runs, then its pairs'
 VARIANT_PAIRS = MAIN / "benchmarks/runs/controlled-pairs/variants"
 LEDGER = recording.ledger(ROOT)
 BASE_SETTINGS = recording.BASE_SETTINGS  # the settings recordings share: they shape the queries
+ONE_SOURCE = "analysis"  # an analysis's mode (report.ONE_SOURCE)
 
 SETTINGS = FOLDER / "settings.json"  # every setting that shapes a query, resolved when first recorded (committed)
 
@@ -103,6 +113,12 @@ def main(argv=None):
     packing = sub.add_parser("pack", help="export the answers the standard runs replay into replay.zip (offline)")
     for each in (running, refreshing, packing):
         each.add_argument("--jobs", type=int, default=1, help="runs at once, in processes sharing the fixture")
+    analyzing = sub.add_parser("analyze", help="analyze the planted reports and their clean twins, their second pass "
+                                               "on, and score what's found against what's planted")
+    analyzing.add_argument("--replay", action="store_true", help="from the packed fixture, without calling a model")
+    analyzing.add_argument("--max-cost", type=float, default=0.2)
+    analyzing.add_argument("--jobs", type=int, default=1, help="runs at once, in processes sharing the fixture")
+    analyzing.add_argument("--variant", type=Path, metavar="FILE", help="a named variant, as `run --variant` takes")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
@@ -123,6 +139,9 @@ def main(argv=None):
         for seed in args.seed or (1,):
             for path in word.write(DOCS_DOCX, seed):  # Word's own difficulties (word.py)
                 print(path)
+        from semantic_pdf_diff_lab.bench.controlled import consistency
+        for project in consistency.corpus():  # planted inconsistencies and gaps, and their clean twins
+            print(f"{consistency.write(project, DOCS_ANALYSIS)}: {len(project.planted)} planted")
         return 0
     if args.command == "run":
         if args.unaligned and args.rows:
@@ -134,6 +153,12 @@ def main(argv=None):
                        pair_runs=VARIANT_PAIRS / name, config=config, only=only)
         return run(args.replay, args.responder, args.max_cost, args.unaligned, parser.error, rows=args.rows,
                    jobs=args.jobs)
+    if args.command == "analyze":
+        if args.variant:
+            name, config, only = variant(args.variant, base=ANALYSIS, folder=ANALYSIS_RUNS / "variants")
+            return analyze(args.replay, args.max_cost, args.jobs, runs=ANALYSIS_RUNS / "variants" / name,
+                           config=config, only=only)
+        return analyze(args.replay, args.max_cost, args.jobs)
     if args.command == "pack":
         return pack(args.jobs)
     if args.command == "refresh":
@@ -142,7 +167,7 @@ def main(argv=None):
         return context()
     return score()
 
-def variant(path):
+def variant(path, base=None, folder=None):
     """(name, settings file, document patterns) of a variant defined in a JSON file: {"settings": an overlay on the
     corpus's settings, "only": shell patterns of the documents' file names (default: every document; a pair by its
     earlier document), "name": its folder's (default: the file's stem)}. Its resolved settings and its definition are
@@ -152,9 +177,9 @@ def variant(path):
     if unknown:
         raise SystemExit(f"{path}: unknown keys {sorted(unknown)} (settings, only, name, note)")
     name = data.get("name") or Path(path).stem
-    folder = VARIANTS / name
+    folder = (folder or VARIANTS) / name
     folder.mkdir(parents=True, exist_ok=True)
-    settings = {**json.loads(settings_file().read_text(encoding="utf-8")), **data.get("settings", {})}
+    settings = {**json.loads(settings_file().read_text(encoding="utf-8")), **(base or {}), **data.get("settings", {})}
     (folder / "settings.json").write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
     (folder / "variant.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     return name, folder / "settings.json", tuple(data.get("only") or ())
@@ -165,9 +190,11 @@ def refresh(max_cost, jobs=1):
     or a step did, 3 when a recording reached its cap (rerun to resume); incomplete coverage (2) isn't a failure."""
     steps = [("record", lambda: run(False, None, max_cost, False, jobs=jobs)),
              ("record rows", lambda: run(False, None, max_cost, False, rows=True, jobs=jobs)),
+             ("record analyses", lambda: analyze(False, max_cost, jobs, scoring=False)),
              ("pack", lambda: pack(jobs)),
              ("replay", lambda: run(True, None, 0, False, jobs=jobs)),
              ("replay rows", lambda: run(True, None, 0, False, rows=True, jobs=jobs)),
+             ("replay analyses", lambda: analyze(True, 0, jobs)),
              ("score", score), ("context", context)]
     for name, step in steps:
         code = step()
@@ -192,6 +219,9 @@ def pack(jobs=1):
             if code in (0, 2):
                 code = max(code, run(True, None, 0, False, fixture=WORKING, runs=d / "runs", pair_runs=d / "pairs",
                                      rows=True, export=export, jobs=jobs))
+            if code in (0, 2):
+                code = max(code, analyze(True, 0, jobs, fixture=WORKING, runs=d / "analyses", export=export,
+                                         scoring=False))
         if code not in (0, 2):
             failed = [line for line in said.getvalue().splitlines() if "exit 1" in line or "fixture holds" in line]
             print(f"the replay failed (exit {code}): nothing packed\n  " + "\n  ".join(failed[:20]))
@@ -276,22 +306,102 @@ def _each(batch, jobs):
     from semantic_pdf_diff_lab.bench.recording import forked
     yield from forked(_one, batch, jobs)
 
+def analyze(replay, max_cost, jobs=1, fixture=None, runs=ANALYSIS_RUNS, export=None, config=None, only=(),
+            scoring=True):
+    """Each planted report and its clean twin analyzed (docs-analysis), its second pass on (ANALYSIS, or a variant's
+    settings in config), situated: recorded into the working fixture, or replayed (from replay.zip, or `fixture`)
+    into stores under runs; then scored (consistency.scored) into analysis.json for the standard runs, printed for a
+    variant's. Exit status as run's."""
+    import fnmatch
+    from semantic_pdf_diff import fixtures, ledger
+    from semantic_pdf_diff.progress import setup_logging
+    fixture = fixture or (PACKED if replay else WORKING)
+    out = runs / ("replay" if replay else "recorded")
+    responder = None
+    if replay:
+        with fixtures.open(fixture, "read") as f:
+            held = f.responders(answered=True)
+        if len(held) != 1:
+            print(f"the fixture holds {held}: nothing analyzed")
+            return 1
+        responder = held[0]
+    if config is None:
+        config = runs / "settings.json"
+        config.parent.mkdir(parents=True, exist_ok=True)
+        config.write_text(json.dumps({**json.loads(settings_file().read_text(encoding="utf-8")), **ANALYSIS},
+                                     indent=2) + "\n", encoding="utf-8")
+    setup_logging(quiet=True)
+    batch = [(pdf, None, out / pdf.stem, f"analysis {pdf.stem}", ONE_SOURCE)
+             for pdf in sorted(DOCS_ANALYSIS.glob("*.pdf"))
+             if not only or any(fnmatch.fnmatch(pdf.name, pattern) for pattern in only)]
+    before = ledger.spent(LEDGER, round="controlled")
+    _BATCH.update(replay=replay, responder=responder, fixture=fixture, export=export, config=config, overrides={},
+                  max_cost=max_cost, before=before)
+    worst, capped = 0, 0
+    for name, code in _each(batch, jobs):
+        if code == CAPPED:
+            capped += 1
+            continue
+        print(f"{name}: exit {code}", flush=True)
+        worst = max(worst, code)
+    if capped:
+        print(f"cap of ${max_cost} reached: {capped} runs not started (run again to resume)")
+        worst = max(worst, 3)
+    if not replay:
+        print(f"spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}; run `pack` before committing")
+    if scoring and worst in (0, 2):
+        scored = score_analyses(out, write=runs == ANALYSIS_RUNS)
+        worst = max(worst, 0 if scored else 1)
+    return worst
+
+def score_analyses(out, write=True):
+    """Each analysis under out scored against its key (consistency.scored), the twins' totals printed; into
+    analysis.json when write. Returns the results ({} when none was found)."""
+    from semantic_pdf_diff_lab.bench.controlled import consistency
+    results = {}
+    for pdf in sorted(DOCS_ANALYSIS.glob("*.pdf")):
+        report = out / pdf.stem / "report.json"
+        if report.exists():
+            key = json.loads((DOCS_ANALYSIS / f"{pdf.stem}.key.json").read_text(encoding="utf-8"))
+            results[pdf.stem] = consistency.scored(key, json.loads(report.read_text(encoding="utf-8")))
+    if not results:
+        print(f"no analyses under {out}")
+        return {}
+    found = {"totals": consistency.totals(results), "documents": results}
+    for twin, t in found["totals"].items():
+        c, g = t["contradictions"], t["gaps"]
+        print(f"{twin} ({t['documents']} documents): contradictions {c['found']}/{c['planted']} found, {c['false']} "
+              f"false; under another condition {t['condition']['contradicts']}/{t['condition']['pairs']} said to "
+              f"contradict, restated {t['restatement']['contradicts']}/{t['restatement']['pairs']}")
+        print("  gaps: " + ", ".join(f"{kind} {g[kind]['by code']}/{g[kind]['planted']} by code, "
+                                     f"{g[kind]['read together']} read together"
+                                     for kind in ("sibling", "placeholder", "reference"))
+              + f"; not planted {g['unplanted']}")
+        print(f"  implied {t['implied']['found']}/{t['implied']['planted']} ({t['implied']['inferences']} inferences); "
+              f"suspicions {t['suspicions']}; log {t['log']}")
+    if write:
+        (FOLDER / "analysis.json").write_text(json.dumps(found, indent=1) + "\n", encoding="utf-8")
+    return results
+
 def _one(job):
     """One run of the batch (_BATCH): (its name, its exit code, or CAPPED)."""
     from semantic_pdf_diff import ledger, pipeline
     a, b, folder, name, mode = job
     c = _BATCH
+    situate = mode == ONE_SOURCE  # an analysis situates: its references are found there (the gaps cited, not found)
     options = pipeline.RunOptions(mode=mode, fixture=c["fixture"], export=c["export"],
                                   fixture_mode="replay" if c["replay"] else "record-new", responder=c["responder"])
     if c["replay"]:  # the model named as recorded, whatever the environment says (its name is in the stores' binding)
-        settings = pipeline.settings_from(c["config"], situate=False, base_url=pipeline.NO_MODEL, model=c["responder"],
-                                          **c["overrides"])
+        settings = pipeline.settings_from(c["config"], situate=situate, base_url=pipeline.NO_MODEL,
+                                          model=c["responder"], **c["overrides"])
     else:
         left = c["max_cost"] - (ledger.spent(LEDGER, round="controlled") - c["before"])
         if left <= 0:
             return name, CAPPED
-        settings = pipeline.settings_from(c["config"], situate=False, max_cost=round(left, 4), **c["overrides"])
+        settings = pipeline.settings_from(c["config"], situate=situate, max_cost=round(left, 4), **c["overrides"])
         options.ledger, options.ledger_tags = LEDGER, {"round": "controlled", "run": name.replace(" ", "-")}
+    if mode == ONE_SOURCE:
+        return name, pipeline.attempt(pipeline.analyze_paths, a, folder, settings, options)
     return name, pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
 
 def context():

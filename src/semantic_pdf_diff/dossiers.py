@@ -6,8 +6,8 @@ second-pass recommendations": the subject's dossier, a stage, text first).
 - **A dossier:** one source's subject (the index's subjects: alignment's items, other names joined) of two claims or
   more, its claims named C1, C2, ... (where they're read, in order; MAX_CLAIMS at most): each with its entity,
   attribute, value, unit, conditions, quote, the passage it was read from (its snippet), its section and its context
-  records; the abouts of the sections and figures its claims come from; and what its kind's siblings give that it
-  doesn't (indexes.kinds).
+  records; the abouts of the sections (headed ones) and figures its claims come from; and what its kind's siblings
+  give that it doesn't (indexes.kinds).
 - **What's asked** (PROMPT): context a claim lacks that the dossier supplies; relations among its claims; suspicions;
   inferences; what's likely missing.
 - **The log** (the owner's list: "associations, conflicts, corroborations, re-situation, re-contextualization"):
@@ -46,8 +46,9 @@ and say:
 - "suspicions": a claim likely misread, about another subject, or out of place: {"claim", "kind":
   "misread|other_subject|out_of_place", "why"}
 - "inferences": what follows from claims together that none says: {"text", "claims": [names]}
-- "missing": what the source likely doesn't give about this subject (its siblings give it, or a passage points to
-  it): {"property", "why"}
+- "missing": a property of this subject the source likely doesn't give (its siblings give it, or a passage points
+  to it): {"property", "why"}; not what other subjects would give (their claims are read apart), and not what an
+  "about" says the source covers
 Say only what the dossier supports; leave a list empty where nothing applies.
 Return JSON {"context": [], "relations": [], "suspicions": [], "inferences": [], "missing": []}.
 DOSSIER:
@@ -60,7 +61,10 @@ def place(e):
 def dossiers(data, index):
     """Each source's subjects of two claims or more, as asked: [(source, subject's name, {name: claim}, dossier)]."""
     evidence = {e["id"]: e for e in data.get("evidence", [])}
-    about = {(s["content"], s["id"]): s.get("about", "") for s in data.get("sections", []) if s.get("about")}
+    # a section's about, but not a headless one's: the whole document as one section, its about what the document
+    # covers, not this subject's context (planted reports: every subject "lacked" what it listed)
+    about = {(s["content"], s["id"]): s["about"] for s in data.get("sections", [])
+             if s.get("about") and s.get("heading_path")}
     headings = {(s["content"], s["id"]): " > ".join(s.get("heading_path", [])) for s in data.get("sections", [])}
     figures = defaultdict(list)  # claim id: the abouts of the figures holding it
     for situation in (data.get("situation") or {}).values():

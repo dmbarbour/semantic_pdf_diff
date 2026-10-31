@@ -116,6 +116,21 @@ def compare_paths(a, b, out, settings, options=None, client=None):
         names = declare_paths(store, out, [Path(a), Path(b)])
         return run(options, settings, store, names, Path(out), force_rescan=True, client=client)
 
+def analyze_paths(path, out, settings, options=None, client=None):
+    """One source given as a path (a file, folder or zip), a shortcut source in the store at `out`, read and reported
+    as `semantic-pdf-diff analyze PATH --store DIR` does (the controlled corpus's analyses). Returns its exit code, as
+    compare_paths does."""
+    from dataclasses import replace
+    options = replace(options or RunOptions(), mode=ONE_SOURCE, split=False)
+    check_fixture(options)
+    if client is None:
+        require_model(settings, options)
+    with Store(out) as store:
+        if client is None and not options.fixture:
+            cache_of(store, bind=False)
+        names = declare_paths(store, out, [Path(path)])
+        return run(options, settings, store, names, Path(out), force_rescan=True, client=client)
+
 def declare_paths(store, out, paths):
     """Each path (a file, folder or zip) declared a shortcut source in the store at `out`, named by its final
     component; returns their names."""

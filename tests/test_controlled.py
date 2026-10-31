@@ -1,7 +1,11 @@
 """Controlled documents: generated the same way every time, every fact placed, claims classed exactly."""
 import stubs  # noqa: F401 (a clean environment)
 from stubs import slow
+import json
 import unittest
+
+import pymupdf
+
 from semantic_pdf_diff_lab.bench import controlled
 
 class Generation(unittest.TestCase):
@@ -796,6 +800,38 @@ class Replay(unittest.TestCase):
                 self.assertEqual((result["recall"], result["outcomes"]),
                                  (committed[run]["recall"], committed[run]["outcomes"]))
 
+    def test_a_planted_report_analyzes_again_to_the_recorded_scores(self):
+        import contextlib, io, tempfile
+        from pathlib import Path
+        from semantic_pdf_diff import cli, fixtures
+        from semantic_pdf_diff_lab.bench.controlled import consistency
+        folder = Path(__file__).resolve().parent.parent / "benchmarks" / "controlled"
+        if not (folder / "replay.zip").exists() or not (folder / "analysis.json").exists():
+            self.skipTest("no recorded analyses")
+        with fixtures.open(folder / "replay.zip", "read") as f:
+            recorded_with = f.meta().get("pymupdf")
+            responder = f.db.execute("SELECT DISTINCT responder FROM response").fetchone()[0]
+        if recorded_with != pymupdf.VersionBind:
+            self.skipTest(f"recorded with PyMuPDF {recorded_with}; documents differ under {pymupdf.VersionBind}")
+        name = "station-s1-planted"
+        committed = json.loads((folder / "analysis.json").read_text())["documents"][name]
+        with tempfile.TemporaryDirectory() as d:
+            d = Path(d)
+            project = next(p for p in consistency.corpus() if p.id == name)
+            pdf = consistency.write(project, d / "docs")
+            self.assertEqual(pdf.read_bytes(), (folder / "docs-analysis" / pdf.name).read_bytes())
+            config = d / "settings.json"  # the analyses' arm (scripts/controlled.py: ANALYSIS)
+            config.write_text(json.dumps({**json.loads((folder / "settings.json").read_text()), "second_pass": True}))
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                code = cli.main(["analyze", str(pdf), "--config", str(config), "-q", "--store", str(d / "run"),
+                                 "--fixture", str(folder / "replay.zip"), "--fixture-mode", "replay", "--base-url",
+                                 "http://127.0.0.1:9/v1", "--responder", responder])
+            self.assertIn(code, (0, 2))
+            got = consistency.scored(json.loads((d / "docs" / f"{name}.key.json").read_text()),
+                                     json.loads((d / "run" / "report.json").read_text()))
+        for part in ("contradictions", "condition", "restatement", "gaps", "suspicions"):
+            self.assertEqual(got[part], committed[part], part)
+
     def test_a_revision_pair_compares_again_to_the_recorded_scores(self):
         import contextlib, io, json, tempfile
         from pathlib import Path
@@ -828,6 +864,78 @@ class Replay(unittest.TestCase):
             self.assertEqual(result, committed)
 
 @slow
+class Planted(unittest.TestCase):
+    """The planted reports and their clean twins (consistency.py): the second pass and the gaps found by code scored
+    against what's planted (docs/plans/single-document-analysis-2026-10-28.md, milestones 3 to 5)."""
+    def test_the_twins_differ_only_where_planted_and_place_every_fact(self):
+        from semantic_pdf_diff_lab.bench.controlled import consistency
+        planted, clean = consistency.station(1, "planted"), consistency.station(1, "clean")
+        self.assertEqual(controlled.render(planted)[0], controlled.render(consistency.station(1, "planted"))[0])
+        controlled.render(clean)  # every fact found where it's printed (locate raises otherwise)
+        kinds = [p["kind"] for p in planted.planted]
+        self.assertEqual({k: kinds.count(k) for k in kinds},
+                         {"sibling": 2, "placeholder": 2, "contradiction": 3, "reference": 2})
+        self.assertEqual(clean.planted, [])
+        self.assertEqual(planted.implied, clean.implied)  # the same values drawn: the same total implied
+        self.assertEqual([p["kind"] for p in planted.pairs], ["condition"] * 2 + ["restatement"] * 3)
+        self.assertEqual([p["kind"] for p in clean.pairs], ["condition"] * 2 + ["restatement"] * 6)
+        text = lambda project: " ".join(page.get_text() for page in pymupdf.open("pdf", controlled.render(project)[0]))
+        self.assertIn("Figure 4", text(planted))
+        self.assertNotIn("Figure 4", text(clean))
+        self.assertIn("TBD", text(planted))
+        self.assertNotIn("TBD", text(clean))
+
+    def test_an_analysis_scored_against_what_is_planted(self):
+        from semantic_pdf_diff.schema import Evidence, PdfLocator
+        from semantic_pdf_diff_lab.bench.controlled import consistency
+        project = consistency.station(1, "planted")
+        data, log = controlled.render(project)
+        key = json.loads(json.dumps(consistency.keyed(project, log)))
+        fact = {f["id"]: f for f in key["facts"]}
+
+        def read(cid, fid, page=1):  # a claim reading a fact right
+            f = fact[fid]
+            return Evidence(id=cid, content="cs", locator=PdfLocator(page=page, bbox=(0, 0, 1, 1), region="text",
+                                                                     task="t"),
+                            entity=f["entity"], attribute=f["attribute"], value=f["value"], unit=f["unit"],
+                            conditions=f.get("conditions", ""), kind="text", quote=f["value"],
+                            confidence=.9).model_dump()
+        claims = [read("A-1", "P-302.motor"), read("A-2", "P-302.motor_said", 2), read("A-3", "P-301.capacity"),
+                  read("A-4", "P-301.capacity_50", 2), read("A-5", "wetwell.volume"),
+                  read("A-6", "wetwell.volume_said", 3)]
+        claims += [read(f"B-{k}", f"{tag}.npshr") for k, tag in enumerate(("P-301", "P-302", "P-304"))]
+        claims += [read(f"C-{k}", f"P-30{k}.tdh") for k in (1, 2, 3)]
+        relation = lambda a, b, said: {"kind": "relation", "relation": said, "source": "s",  # noqa: E731
+                                       "subject": "x", "claims": [a, b], "id": f"c-{a}{b}", "key": []}
+        firm = consistency.station(1, "planted").implied[0]["values"][0]
+        report = {"sources": [{"name": "s"}], "files": [{"source": "s", "path": "s.pdf", "content": "cs"}],
+                  "evidence": claims, "findings": [],
+                  "situation": {"cs": {"unresolved": [{"label": "Figure 4", "page": 1,
+                                                       "text": "The site layout is shown in Figure 4."}]}},
+                  "commentary": {"entries": [
+                      relation("A-1", "A-2", "contradicts"), relation("A-3", "A-4", "contradicts"),
+                      relation("A-5", "A-6", "refines"),
+                      {"kind": "inference", "source": "s", "subject": "x", "claims": ["A-3"], "id": "c-i", "key": [],
+                       "text": f"P-301, P-302 and P-303 together deliver {firm} gpm"},
+                      {"kind": "missing", "source": "s", "subject": "Pump P-303", "claims": [], "text": "NPSHr",
+                       "why": "its siblings give it", "id": "c-m", "key": []},
+                      {"kind": "suspicion", "relation": "misread", "source": "s", "subject": "x", "claims": ["A-2"],
+                       "why": "", "id": "c-s", "key": []}], "subjects": 3, "dropped": 1, "failed": 0}}
+        got = consistency.scored(key, report)
+        self.assertEqual({k: got["contradictions"][k] for k in ("planted", "found", "false")},
+                         {"planted": 3, "found": 1, "false": 1})
+        self.assertEqual(got["contradictions"]["false pairs"], ["P-301.capacity / P-301.capacity_50"])
+        self.assertEqual(got["contradictions"]["said"]["wetwell.volume / wetwell.volume_said"], ["refines"])
+        self.assertEqual((got["condition"]["pairs"], got["condition"]["contradicts"]), (2, 1))  # a trap taken
+        self.assertEqual(got["gaps"]["sibling"], {"planted": 2, "by code": 1, "read together": 1})  # P-303's NPSHr
+        self.assertEqual(got["gaps"]["reference"], {"planted": 2, "by code": 1, "read together": 0})
+        self.assertEqual(got["implied"], {"planted": 1, "found": 1, "inferences": 1})
+        self.assertEqual(got["suspicions"], {"misread": {"planted contradiction": 1}})
+        self.assertEqual(got["log"], {"subjects": 3, "dropped": 1, "failed": 0})
+        totals = consistency.totals({project.id: got})
+        self.assertEqual(totals["planted"]["contradictions"], {"planted": 3, "found": 1, "false": 1})
+        self.assertNotIn("clean", totals)
+
 class Corpus(unittest.TestCase):
     """Every committed document is generated again byte for byte, so recorded answers keep replaying (a drawing
     change that moved one chart's bytes once went unnoticed until a run had started)."""
@@ -896,6 +1004,15 @@ class Corpus(unittest.TestCase):
                 key = json.loads((folder / "docs-docx" / f"{project.id}.key.json").read_text(encoding="utf-8"))
                 self.assertEqual(json.loads(json.dumps(representations.docx_key(project, data), ensure_ascii=False)),
                                  key)
+        from semantic_pdf_diff_lab.bench.controlled import consistency
+        planted = consistency.corpus()  # the planted reports and their clean twins, analyzed
+        self.assertEqual({p.id for p in planted}, {f.stem for f in (folder / "docs-analysis").glob("*.pdf")})
+        for project in planted:
+            with self.subTest(analyzed=project.id):
+                data, log = controlled.render(project)
+                self.assertEqual(data, (folder / "docs-analysis" / f"{project.id}.pdf").read_bytes())
+                key = json.loads((folder / "docs-analysis" / f"{project.id}.key.json").read_text(encoding="utf-8"))
+                self.assertEqual(json.loads(json.dumps(consistency.keyed(project, log), ensure_ascii=False)), key)
 
 if __name__ == "__main__":
     unittest.main()

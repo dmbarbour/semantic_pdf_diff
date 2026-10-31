@@ -46,6 +46,12 @@ class Dossier(unittest.TestCase):
         self.assertEqual(dossier["siblings"], {"kind": "pump (P)", "items": 3, "they give, it doesn't": ["NPSH"]})
         self.assertIn("Read one subject's claims from an engineering source together", dossiers.prompt(dossier))
 
+    def test_a_headless_sections_about_is_the_documents_not_the_subjects(self):
+        d = data()
+        d["sections"][0]["heading_path"] = []  # no outline: the whole document one section, its about all it covers
+        made = dossiers.dossiers(d, indexes.built(d))
+        self.assertNotIn("about", made[0][3])
+
     def test_only_what_the_dossier_bears_out_logged(self):
         d = data()
         _, subject, named, dossier = dossiers.dossiers(d, indexes.built(d))[0]
