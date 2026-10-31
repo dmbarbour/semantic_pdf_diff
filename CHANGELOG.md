@@ -2,6 +2,17 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.22.0 (2026-10-31)
+
+- **The second pass is on by default** in `analyze` (`second_pass`; the owner: "Yes, turn `second_pass` on."). Comparisons don't run it yet. To turn it off: `semantic-pdf-diff config set second_pass false`.
+- **Gaps are looked for before they're reported.** In a PDF, each gap among siblings, and each the second pass says is likely, is looked for on the page that best names its subject and property. That place is rendered closer and asked whether it gives a value. The answer is shown beside the gap: "looked for on a.pdf, page 2: not given", "it gives 6.2 ft" or "not shown there".
+  - On the planted reports, every planted blank cell came back "not given". On 9 of scical's sheets, 15 of 126 gaps turned out to be given (mostly under another property name), and 26 not given.
+- **A kind's items are read together**: one request a kind, such as all the pumps. It looks for items said to be alike whose values differ, a value unlike its siblings', and what the items give together, such as a firm capacity.
+  - Where an inference cites plain numbers in one unit, their sum is worked out by code and shown beside it when its words don't give it (the model once summed 1,318 + 1,898 + 1,449 as 4,663).
+  - The planted reports' firm capacity, never found before, is now found in every one.
+- **Export** adds a chunk a subject (everything said about it, and what it doesn't give), a chunk a kind (its items as a Markdown table), and the second pass's notes under the claims they're about.
+- **Corrected:** 0.21.0's "14 values still lost" on two 16:9 decks were the same numbers read with other units. Counted by number alone, none is lost. A rule sending held tiles for numbers no claim gives was tried and not built: there was nothing for it to recover.
+
 ## 0.21.0 (2026-10-31)
 
 - **Wide pages are no longer sliced by default** (`skip_text_only: wide_pages`, now the default; the owner: "I think we should turn it on. We should also do the fallback."). On a page too wide for bands, such as a 16:9 slide, image tiles holding only text aren't sent; the text tasks read that text whole. Tiles holding a chart or picture are still sent.
