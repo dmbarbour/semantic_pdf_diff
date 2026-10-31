@@ -717,11 +717,20 @@ TABLE_PROJECTS = {"wtp-tables": equipment_schedules, "coaster-tables": track_sch
 # layer), a tinted panel behind the text, an ornate border, a decorated initial beside each page's first line,
 # footnotes in small print, the body in small print (7 pt), a scan with an invisible text layer (OCR's), the text
 # drawn as outlines (no text layer, many paths), and the first five together (noisy).
+# The owner's 16:9 pages (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2; the owner, 2026-10-31: "Next, try
+# for the 16:9 tiling."): 960 x 540 points, as one of their documents is ("13.33 x 7.50 inches, as if for powerpoint
+# presentations"), upright (widescreen), and stored portrait with its content turned and /Rotate turning it upright,
+# a banner written along the stored page so it runs up the displayed page's left edge (widescreen-turned: "the
+# selection cursor shows up sideways [...] a banner on the left side of each page that is written such that the
+# text would be upright if the page was rotated 90 degrees").
 NOISE_KNOBS = ("watermark", "tinted", "ornate", "initials", "footnotes", "small-print", "scanned-ocr", "outlined",
                "noisy")
 PROSE_KNOBS = ("clean", "traps", "furniture", "two-column", "all", "decorated", "decorated+two-column", "landscape",
-               "slide", "wide-letter", "frame", "frame-lines", "background", "scanned-frame", *NOISE_KNOBS)
+               "slide", "wide-letter", "frame", "frame-lines", "background", "scanned-frame", *NOISE_KNOBS,
+               "widescreen", "widescreen-turned")
 SLIDE = (720, 540)
+WIDESCREEN = (960, 540)
+BANNER = "LAKESHORE CONVENTION CENTER · DESIGN BASIS · FOR COORDINATION ONLY"
 WIDE_LETTER = (690, 792)
 FRAME_INSET = 24  # points from the page's edge
 
@@ -1300,6 +1309,7 @@ def render(project, page_size="letter"):
         return render_sheet(project)
     rect = (pymupdf.paper_rect("letter-l") if project.has("landscape")
             else pymupdf.Rect(0, 0, *SLIDE) if project.has("slide")
+            else pymupdf.Rect(0, 0, *WIDESCREEN) if project.has("widescreen") or project.has("widescreen-turned")
             else pymupdf.Rect(0, 0, *WIDE_LETTER) if project.has("wide-letter") else pymupdf.paper_rect(page_size))
     breaks = set()
     for _ in range(5):  # lay out; start any table Story split across pages on a new page; again
@@ -1389,6 +1399,8 @@ def render(project, page_size="letter"):
         data = scanned(data, ocr=True)
     elif project.has("outlined"):
         data = outlined(data)
+    elif project.has("widescreen-turned"):
+        data = turned(data)
     return data, log
 
 WATERMARK = "DRAFT FOR REVIEW"
@@ -1427,6 +1439,25 @@ def _noise(project, page, rect):
     if noisy or project.has("watermark"):  # light, diagonal, under the page's text: text, in the text layer
         page.insert_text((0.16 * w, 0.62 * h), WATERMARK, fontname="hebo", fontsize=54, color=(0.86, 0.86, 0.86),
                          morph=(pymupdf.Point(w / 2, h / 2), pymupdf.Matrix(-38)), overlay=False)
+
+def turned(data):
+    """Each page stored on its side, as the owner's widescreen document is: a portrait page holding the page's
+    content turned a quarter, /Rotate 90 showing it upright, and a banner written along the stored page, so that on
+    the displayed page it runs up the left edge (its text upright were the page turned back)."""
+    import pymupdf
+    src, out = pymupdf.open("pdf", data), pymupdf.open()
+    for page in src:
+        stored = out.new_page(width=page.rect.height, height=page.rect.width)
+        stored.show_pdf_page(stored.rect, src, page.number, rotate=90)
+        stored.set_rotation(90)
+        left = pymupdf.Rect(6, 20, 26, page.rect.height - 20) * stored.derotation_matrix  # displayed: the left edge
+        stored.set_rotation(0)
+        stored.insert_textbox(left, BANNER, fontname="helv", fontsize=9, align=pymupdf.TEXT_ALIGN_CENTER)
+        stored.draw_line(pymupdf.Point(left.x0, left.y1 + 2), pymupdf.Point(left.x1, left.y1 + 2),
+                         color=(0.4, 0.4, 0.4), width=0.5)
+        stored.set_rotation(90)
+    out.set_metadata({})
+    return out.tobytes(garbage=3, deflate=True, no_new_id=True)
 
 def outlined(data):
     """The PDF with its text drawn as outlines: paths, and no text layer, as some design tools and printers write

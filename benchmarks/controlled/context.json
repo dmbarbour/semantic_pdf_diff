@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 21969,
-   "evidence": 12282,
+   "claims": 22185,
+   "evidence": 12385,
    "frame in conditions": 36,
-   "grounded": 5770,
+   "grounded": 5809,
    "list records": 36,
    "no content words": 2,
    "note records": 11,
@@ -14,19 +14,19 @@
    "partly": 64,
    "partly (image)": 39,
    "positioned": 124,
-   "printed": 7756,
+   "printed": 7839,
    "sheet records": 11,
-   "table records": 322,
-   "unsupported": 33,
-   "unsupported (image)": 819,
-   "with conditions": 6727,
-   "with records": 6334
+   "table records": 324,
+   "unsupported": 35,
+   "unsupported (image)": 823,
+   "with conditions": 6772,
+   "with records": 6350
   },
   "placed": {
    "bound": {
-    "attribute": 37,
-    "conditions": 20,
-    "nowhere": 51
+    "attribute": 39,
+    "conditions": 22,
+    "nowhere": 53
    },
    "frame": {
     "attribute": 10,
@@ -52,15 +52,15 @@
    },
    "subject": {
     "conditions": 72,
-    "entity": 202,
-    "nowhere": 52,
+    "entity": 218,
+    "nowhere": 54,
     "records": 124
    }
   },
   "audit": {
    "bound": {
     "image only": 5,
-    "shown, not used": 46
+    "shown, not used": 48
    },
    "frame": {
     "shown, not used": 10
@@ -79,7 +79,7 @@
    },
    "subject": {
     "image only": 3,
-    "not shown": 22,
+    "not shown": 24,
     "shown, not used": 27
    }
   },
@@ -103,26 +103,26 @@
      "share": 0.0
     },
     "<0.9": {
-     "readings": 542,
-     "right": 320,
-     "share": 0.59
+     "readings": 548,
+     "right": 326,
+     "share": 0.595
     },
     "<0.95": {
-     "readings": 10702,
-     "right": 10554,
+     "readings": 10734,
+     "right": 10586,
      "share": 0.986
     },
     "<=1.0": {
-     "readings": 30360,
-     "right": 27604,
+     "readings": 30680,
+     "right": 27902,
      "share": 0.909
     }
    },
    "image": {
     "<0.9": {
-     "readings": 518,
-     "right": 312,
-     "share": 0.602
+     "readings": 524,
+     "right": 318,
+     "share": 0.607
     },
     "<0.95": {
      "readings": 264,
@@ -130,15 +130,15 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 21480,
-     "right": 19490,
-     "share": 0.907
+     "readings": 21744,
+     "right": 19736,
+     "share": 0.908
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 10362,
-     "right": 10334,
+     "readings": 10394,
+     "right": 10366,
      "share": 0.997
     }
    },
@@ -159,8 +159,8 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 8880,
-     "right": 8114,
+     "readings": 8936,
+     "right": 8166,
      "share": 0.914
     }
    }
@@ -5285,6 +5285,114 @@
     "context_bytes_per_request": 170,
     "data_bytes_per_request": 775,
     "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-widescreen": {
+   "inventory": {
+    "claims": 113,
+    "grounded": 18,
+    "unsupported": 1,
+    "unsupported (image)": 1,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 42,
+    "evidence": 54,
+    "context_bytes_per_request": 91,
+    "data_bytes_per_request": 450,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "bound": {
+      "nowhere": 1,
+      "attribute": 1,
+      "conditions": 1
+     },
+     "subject": {
+      "nowhere": 1,
+      "entity": 8
+     }
+    },
+    "audit": {
+     "bound": {
+      "shown, not used": 1
+     },
+     "subject": {
+      "not shown": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "bound: shown, not used": [
+      "hallc.liveload: wanted 'minimum'; read floor live load |  / floor live load | "
+     ],
+     "subject: not shown": [
+      "halls.area: wanted 'across the four halls'; read total exhibit space |  / total exhibit space | "
+     ]
+    }
+   }
+  },
+  "lcc-s1-widescreen-turned": {
+   "inventory": {
+    "claims": 103,
+    "grounded": 21,
+    "unsupported": 1,
+    "unsupported (image)": 3,
+    "with conditions": 25,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 8,
+    "printed": 41,
+    "evidence": 49,
+    "context_bytes_per_request": 88,
+    "data_bytes_per_request": 449,
+    "examples": {
+     "unsupported": [
+      "existing roof | snow load rating | maximum"
+     ]
+    }
    },
    "keyed": {
     "placed": {

@@ -1,6 +1,6 @@
 # Text cut by tiles: counted, then given whole and with its surroundings
 
-- **Status:** Planned (2026-10-28); [milestone 1](#1-count-it-on-noisy-pages-and-on-the-owners) done the same day (the owner: "Please proceed with report bookmarks and tiling counts with noisy pages."). [Design question](#design-questions) 1 answered (report pages); 2 and 3 open.
+- **Status:** Active (2026-10-31: milestone 2's 16:9 pages begun, the owner: "Next, try for the 16:9 tiling."); [milestone 1](#1-count-it-on-noisy-pages-and-on-the-owners) done 2026-10-28 (the owner: "Please proceed with report bookmarks and tiling counts with noisy pages."). [Design question](#design-questions) 1 answered (report pages); 2 and 3 open.
 - **The owner, 2026-10-28, from trials:** "we're still clipping a lot vertically across text in ways that make the text useless for claims. I wonder if techniques like fish-eye lenses would help, or if we need to include multiple clips in a query with some overlap in these cases, or similar strategies. We have a lot more context than we're using."
 - **The owner, answering design question 1 (2026-10-28):** "I'm getting most from ordinary report pages. Often with a border decoration, page numbers (and footnotes cut vertically, too), but not always, so I'm not sure whether that's the cause. It's as if our heuristics decided to zoom in, so now we just have three parts of a paragraph or bullet point (or multiple paragraphs) across three tiles, sliced vertically. The left part, middle part, right part. Basically useless, and it's unclear if the broken text is what our heuristics wanted to focus on at all (perhaps it's trying to focus on some small diagram in a corner? invisitext?). It might be useful to fog out parts of a tile that shouldn't receive model attention, then drop the tiles that would be mostly fog, or zoom in on the bits that aren't. We can probably create test cases that force zooming or that have light background decorations, complex border decorations, illuminated initials, and so on, i.e. test cases for tiling with more noise."
 - **Earlier, 2026-10-14,** on samples too sensitive to share (the tentative row *PyMuPDF's layout analysis*, moved in here):
@@ -141,12 +141,27 @@ Checked in the code and the tilings note, 2026-10-28.
 
 Each item is a lever, judged against null arms on the controlled corpus ([0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)), report pages first.
 
-- **First, the owner's 16:9 pages (960 × 540 pt):**
+- **First, the owner's 16:9 pages (960 × 540 pt)** (the owner, 2026-10-31: "Nice work. Next, try for the 16:9 tiling."):
   - A corpus layout of that size, with the owner's banner.
   - Two candidates against today's cut, read with the model and scored by the keys (a few cents):
     - bands on pages up to 960 pt wide, lower so their area stays 1.6 tiles (`band_width` 2.3)
     - text-only tiles not sent but on drawing sheets (`skip_text_only: except_sheets`)
   - The better made the default if it loses no facts on the corpus's charts and sheets.
+  - **Tried 2026-10-31** ($1.10 in all, most of it one read of a long deck; `scripts/tiling.py`):
+    - **Two corpus layouts** of the convention centre's design basis, 960 × 540 pt: `lcc-s1-widescreen`, upright, and `lcc-s1-widescreen-turned`, stored portrait with its content turned and `/Rotate 90`, a banner running up the left edge. Today's defaults cut them as the owner sees: snapped or grid tiles, six a page, 16 to 37 lines cut sideways a page.
+    - **Without the model, the corpus** (191 pages): bands to 960 pt and text-only tiles not sent (except sheets) each leave the 16:9 pages no line cut sideways. But text-only tiles not sent changes 59 pages, tables' among them, where tile choice, counting fewer images, takes one larger XY-cut tile for two bands: the effect that lost 4 chart facts on 2026-10-12.
+    - **So a narrower value, `skip_text_only: wide_pages`:** text-only tiles not sent only on pages too wide for bands (not drawing sheets). First applied before the choice, then after it (below).
+    - **The corpus's wide pages read** (its five: 16:9 upright and turned, the 720-pt slide, landscape, the 690-pt page): every fact found under every arm (23 of 23); today's tiles 35, `wide_pages` 5 to 10; today's 16:9 tiles gave a misread and loose claims, none under `wide_pages`. Bands gave six misbound claims on the turned page.
+    - **Two real 16:9 decks read** (no key: distinct values found, as the tilings note measured real pages; h2-amr-2023, cowe2024; 1,849 distinct values today):
+      | Arm | Tiles | Distinct values | Numbers only today | Only the arm's |
+      |---|---|---|---|---|
+      | Today | 589 | 1,849 | | |
+      | Bands to 960 pt | 216 | 1,633 | 166 | 86 |
+      | `wide_pages`, before the choice | 362 | 1,740 | 102 | 37 |
+      | `wide_pages`, after the choice | 435 | 1,795 | 32 | 0 |
+    - **Where the arms lost values:** before the choice, 122 of the 128 claims lost were on pages whose cut changed (grid or snapped to fewer, larger XY-cut tiles). After it, the 32 are on six pages; on two of them (cowe pages 43 and 49) every claim the text task gave was rejected, its quotes not found in the text layer (a slide's table), and the tiles were all that read them.
+    - **Built:** `skip_text_only: wide_pages`, after the choice (`levers.SkipTextOnly.sent_tiles`), off. Text-only 16:9 pages send no tiles; pages with charts keep their cut and send their tiles holding a graphic.
+    - **Not made the default:** it loses no facts on the corpus, as this milestone's rule asks, but loses 32 of 1,849 values on real decks where text tasks failed. Asked of the owner (2026-10-31); a fallback would close it: a wide page's held-back tiles sent where its text tasks come back with no claims.
 - **Then, tiles no finer than the page's own pixels:**
   - On a page that is one image (a scan), a tile's detail is capped at the image's: its side in points is at least what the image shows in `image_side` pixels.
   - So a scan written at its pixel size is cut as a page of its physical size would be: full-width bands on a report page.

@@ -5257,6 +5257,91 @@
     "visual": "12/12"
    }
   },
+  "lcc-s1-widescreen": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "loose": 3,
+    "right": 29,
+    "text": 21
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15
+    },
+    "visual": {
+     "loose": 3,
+     "right": 29,
+     "text": 21
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-widescreen-turned": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 49,
+   "outcomes": {
+    "loose": 2,
+    "misbound": 1,
+    "right": 30,
+    "text": 16
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15,
+     "text": 2
+    },
+    "visual": {
+     "loose": 2,
+     "misbound": 1,
+     "right": 30,
+     "text": 14
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
   "spec-s1": {
    "facts": 21,
    "found": 20,
@@ -15492,6 +15577,91 @@
     "visual": "12/12"
    }
   },
+  "lcc-s1-widescreen": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "loose": 3,
+    "right": 29,
+    "text": 21
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15
+    },
+    "visual": {
+     "loose": 3,
+     "right": 29,
+     "text": 21
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-widescreen-turned": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 49,
+   "outcomes": {
+    "loose": 2,
+    "misbound": 1,
+    "right": 30,
+    "text": 16
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15,
+     "text": 2
+    },
+    "visual": {
+     "loose": 2,
+     "misbound": 1,
+     "right": 30,
+     "text": 14
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
   "spec-s1": {
    "facts": 21,
    "found": 20,
@@ -25230,6 +25400,91 @@
     "visual": "12/12"
    }
   },
+  "lcc-s1-widescreen": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "loose": 3,
+    "right": 29,
+    "text": 21
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15
+    },
+    "visual": {
+     "loose": 3,
+     "right": 29,
+     "text": 21
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-widescreen-turned": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 49,
+   "outcomes": {
+    "loose": 2,
+    "misbound": 1,
+    "right": 30,
+    "text": 16
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15,
+     "text": 2
+    },
+    "visual": {
+     "loose": 2,
+     "misbound": 1,
+     "right": 30,
+     "text": 14
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
   "spec-s1": {
    "facts": 21,
    "found": 20,
@@ -34169,6 +34424,91 @@
    "conditions_by_reader": {
     "table": "8/8",
     "text": "3/4",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-widescreen": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 53,
+   "outcomes": {
+    "loose": 3,
+    "right": 29,
+    "text": 21
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15
+    },
+    "visual": {
+     "loose": 3,
+     "right": 29,
+     "text": 21
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
+    "visual": "12/12"
+   }
+  },
+  "lcc-s1-widescreen-turned": {
+   "facts": 23,
+   "found": 23,
+   "recall": 1.0,
+   "found_right": 23,
+   "missed": [],
+   "claims": 49,
+   "outcomes": {
+    "loose": 2,
+    "misbound": 1,
+    "right": 30,
+    "text": 16
+   },
+   "conditions_kept": "12/12",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3478,
+    "text": 0.6522,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 8
+    },
+    "text": {
+     "right": 15,
+     "text": 2
+    },
+    "visual": {
+     "loose": 2,
+     "misbound": 1,
+     "right": 30,
+     "text": 14
+    }
+   },
+   "conditions_by_reader": {
+    "table": "8/8",
+    "text": "4/4",
     "visual": "12/12"
    }
   },

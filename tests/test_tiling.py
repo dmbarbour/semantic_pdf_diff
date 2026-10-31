@@ -211,6 +211,29 @@ class Candidates(unittest.TestCase):
         self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 800, 200)), 2000)
         self.assertEqual(Settings(render_area=True).render_side(pymupdf.Rect(0, 0, 400, 400)), 1000)
 
+    def test_a_wide_pages_text_only_tiles_left_out_once_its_cut_is_chosen(self):
+        """wide_pages (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2; the owner, 2026-10-31: "Next, try for
+        the 16:9 tiling."): a 16:9 page's tiles holding text alone aren't sent, the cut chosen as without it (skipped
+        before the choice, they let it take fewer, larger tiles, which lost a chart-heavy deck's values); a report
+        page's are, as bands have them."""
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        doc, page = text_page(width=960, height=540, count=25, top=40)
+        page.draw_rect(pymupdf.Rect(700, 300, 900, 500), fill=(0, 0, 0), color=None)
+
+        def sent(page=page, **kw):
+            s = Settings(**kw)
+            reader = Context(doc, s)
+            tiles = [r for tag, r, _ in s.visual_regions(reader, page, 0) if tag.startswith("tile")]
+            return tiles, reader.page_choices.get(page.number, {}).get("chosen")
+        (every, chosen), (kept, chosen_too) = sent(), sent(skip_text_only="wide_pages")
+        self.assertEqual(chosen, chosen_too)  # the same cut
+        self.assertLess(len(kept), len(every))
+        self.assertTrue(kept and all(r.intersects(pymupdf.Rect(700, 300, 900, 500)) for r in kept))
+        doc, report = text_page(width=612, height=792, count=30, top=40)  # (sent reads doc when called)
+        report.draw_rect(pymupdf.Rect(400, 600, 560, 740), fill=(0, 0, 0), color=None)
+        self.assertEqual(sent(report, skip_text_only="wide_pages"), sent(report))
+
     def test_text_only_tiles_are_sent_where_no_text_task_reads_the_page(self):  # a Word document's pictures
         from semantic_pdf_diff.context import Context
         from semantic_pdf_diff.settings import Settings

@@ -617,14 +617,31 @@ class SkipEmpty(Lever):
 class SkipTextOnly(Lever):
     lever_name, stage, off = "skip_text_only", "segmentation", {"skip_text_only": False}
     # don't send tiles holding text and no graphic that counts (the text tasks read them), on every page, as bands; or
-    # on every page but a drawing sheet's (except_sheets: its text tasks miss what its tiles read, milestones 3 and 6)
-    skip_text_only: Annotated[bool | Literal["except_sheets"], _selecting(VISUAL)] = False
+    # on every page but a drawing sheet's (except_sheets: its text tasks miss what its tiles read, milestones 3 and 6);
+    # or, of the tiles sent, only on a page too wide for bands and not a drawing sheet, once its cut is chosen
+    # (wide_pages: a 16:9 slide's paragraphs were cut into a left, a middle and a right tile, the owner's "three
+    # slices"; docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2): skipped before the choice, they let it take
+    # fewer, larger tiles, which lost a chart-heavy deck's values
+    skip_text_only: Annotated[bool | Literal["except_sheets", "wide_pages"], _selecting(VISUAL)] = False
 
     def kept_tiles(self, reader, page, regions):
         regions = super().kept_tiles(reader, page, regions)
+        if self.skip_text_only == "wide_pages":
+            return regions
+        return self._with_graphics(reader, page, regions)
+
+    def sent_tiles(self, reader, page, regions):
+        regions = super().sent_tiles(reader, page, regions)
+        if self.skip_text_only != "wide_pages" or page.rect.width <= self.band_width * self.tile_points:
+            return regions
+        return self._with_graphics(reader, page, regions)
+
+    def _with_graphics(self, reader, page, regions):
+        """The tiles but those holding text and no graphic that counts, where the text tasks read the page (not a
+        drawing sheet's but where skip_text_only is true)."""
         if not self.skip_text_only or not regions or not reader.text_read:
             return regions
-        if self.skip_text_only == "except_sheets" and any(f.kind == "sheet" for f in reader.figures(page, page.number)):
+        if self.skip_text_only is not True and any(f.kind == "sheet" for f in reader.figures(page, page.number)):
             return regions
         texts = [box for box, _ in reader.lines(page) if not box.is_empty]
         graphics = self.content_graphics(reader, page)

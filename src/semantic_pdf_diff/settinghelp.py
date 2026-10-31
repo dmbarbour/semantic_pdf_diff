@@ -203,7 +203,9 @@ HELP = {
     "grow_tiles": Help(_L, "grid tiles grow to include every text line they cut"),
     "sheet_details": Help(_L, "drawing sheets cut into their details, titled from the sheet"),
     "skip_empty": Help(_L, "tiles with no text, drawing or image aren't sent"),
-    "skip_text_only": Help(_L, "tiles holding text and no graphic aren't sent (the text tasks read them)"),
+    "skip_text_only": Help(_L, "tiles holding text and no graphic aren't sent (the text tasks read them): everywhere "
+                                   "(true), but on drawing sheets (except_sheets), or only on pages too wide for "
+                                   "bands (wide_pages)"),
     "region_labels": Help(_L, "the model labels a page's tiles; text, decoration and blank ones aren't sent"),
     "another_tiling": Help(_L, "a partial tile is read again under the page's next cut, rather than in halves"),
     "refine_figures": Help(_L, "a partial tile mostly one figure is looked at again whole, rather than in halves"),
