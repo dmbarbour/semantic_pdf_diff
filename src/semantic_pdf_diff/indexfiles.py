@@ -107,9 +107,14 @@ def markdown(index):
     found = index.get("inconsistencies", [])
     if found:
         lines += ["", "## Inconsistencies", "", INCONSISTENCIES_NOTE, ""] + [
-            f"- {(x['source'] + ': ') if many else ''}**{x['subject']}**: {x['said'][0]} ({x['where'][0]}) against "
-            f"{x['said'][1]} ({x['where'][1]})" + (f"; {x['why']}" if x["why"] else "") for x in found]
+            f"- {(x['source'] + ': ') if many else ''}**{x['subject']}**: {x['said'][0]} ({placed(x, 0)}) against "
+            f"{x['said'][1]} ({placed(x, 1)})" + (f"; {x['why']}" if x["why"] else "") for x in found]
     return "\n".join(lines).rstrip() + "\n"
+
+def placed(x, k):
+    """An inconsistency's claim's place, and what it gave read again ("page 5; read again: it gives 16D")."""
+    again = (x.get("read again") or ["", ""])[k]
+    return x["where"][k] + (f"; read again: {again}" if again else "")
 
 # The gaps' kinds, as index.md, the workbook and the page head them
 GAP_TITLES = {"siblings": "Missing among siblings", "reference": "Cited, not found", "placeholder": "Placeholders",
@@ -181,9 +186,10 @@ def tables(index, evidence):
             "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Reach", "Block", "How", "Differs",
                           "Alike on sheets"], glossary),
             "kinds": (["Kind", "Item", "Property", *tail], kinds),
-            **({"inconsistencies": (["Source", "Subject", "Says", "Where", "Against", "Where", "Why", "Claims"],
-                                    [[x["source"], x["subject"], x["said"][0], x["where"][0], x["said"][1],
-                                      x["where"][1], x["why"], " ".join(x["claims"])]
+            **({"inconsistencies": (["Source", "Subject", "Says", "Where", "Read again", "Against", "Where",
+                                     "Read again", "Why", "Claims"],
+                                    [[x["source"], x["subject"], x["said"][0], x["where"][0], x["read again"][0],
+                                      x["said"][1], x["where"][1], x["read again"][1], x["why"], " ".join(x["claims"])]
                                      for x in index["inconsistencies"]])}
                if index.get("inconsistencies") else {}),  # the second pass's, where it found any
             "gaps": (["Gap", "Source", "Subject", "Property", "Where", "Why", "Claims"],

@@ -372,6 +372,10 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
     if settings.reads_together(ONE_SOURCE):  # each subject's claims read together (the second_pass lever)
         from . import dossiers, indexes
         data['commentary'] = dossiers.read_together(data, indexes.built(data), client, ONE_SOURCE, label, progress)
+        again = dossiers.rereads(data, data['commentary'], store, client, ONE_SOURCE, label, settings.image_side,
+                                 progress)  # the claims it doubts read again from their places
+        data['commentary']['entries'] += again.pop('entries')
+        data['commentary']['reread'] = again
     progress.close()  # its search's requests (topics' names, other names, vectors), and the second pass's
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)

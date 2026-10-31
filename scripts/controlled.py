@@ -378,7 +378,7 @@ def score_analyses(out, write=True):
                                      for kind in ("sibling", "placeholder", "reference"))
               + f"; not planted {g['unplanted']}")
         print(f"  implied {t['implied']['found']}/{t['implied']['planted']} ({t['implied']['inferences']} inferences); "
-              f"suspicions {t['suspicions']}; log {t['log']}")
+              f"suspicions {t['suspicions']}; read again {t['reread']}; log {t['log']}")
     if write:
         (FOLDER / "analysis.json").write_text(json.dumps(found, indent=1) + "\n", encoding="utf-8")
     return results

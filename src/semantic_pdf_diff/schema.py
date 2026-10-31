@@ -528,6 +528,14 @@ class SecondPass(Lenient):
     inferences: list[Inference] = Field(default_factory=list, max_length=20)
     missing: list[LikelyMissing] = Field(default_factory=list, max_length=20)
 
+class Reread(Lenient):
+    """A claim suspected misread, read again from its place rendered closer (dossiers.rereads)."""
+    reads: str = Field(default="", max_length=20)   # as_claimed, otherwise or not_shown (dossiers.READS)
+    value: str = Field(default="", max_length=200)
+    unit: str = Field(default="", max_length=60)
+    quote: str = Field(default="", max_length=300)
+    why: str = Field(default="", max_length=300)
+
 class OtherNames(DropsUnknown):
     """The names two documents give one thing, grouped: items' and properties' (the search_names lever;
     synonyms.py)."""

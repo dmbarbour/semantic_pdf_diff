@@ -12,7 +12,7 @@ from pathlib import Path
 from semantic_pdf_diff import dossiers, indexes
 from semantic_pdf_diff.report import unpacked
 from semantic_pdf_diff.schema import SecondPass
-from stubs import chat_answer, prompt_of, request_body, serving
+from stubs import chat_answer, prompt_of, request_body, serving, text_pdf
 from test_analyze import run
 from test_embed import endpoint
 from test_indexes import claim, report
@@ -127,6 +127,53 @@ class Analyzed(unittest.TestCase):
         self.assertIn('<button data-view="inconsistencies">Inconsistencies 1</button>', page)
         self.assertIn("## Inconsistencies", index)
         self.assertIn("### Likely missing, read together", index)
+
+    def test_a_pdfs_doubted_claims_read_again_from_their_place(self):
+        """The claims a contradiction names read again, each from its place rendered closer, once; what the image
+        gives logged beside the claim (ours), on its card and against the inconsistency."""
+        state = {"embedded": [], "names": 0, "reread": []}
+        serve = endpoint(state)
+
+        def post(handler):
+            if not handler.path.endswith("/embeddings"):
+                body = request_body(handler)
+                prompt = prompt_of(body["messages"][1]["content"])
+                if "Read one subject's claims" in prompt:
+                    return chat_answer(handler, {"relations": [{"a": "C1", "b": "C2", "relation": "contradicts",
+                                                                "why": "two heads"}]})
+                if "doubts it" in prompt:
+                    images = [p for p in body["messages"][1]["content"] if p.get("type") == "image_url"]
+                    state["reread"].append(len(images))
+                    said = "45" if "45" in prompt.split("Why it's doubted")[0] else "42"
+                    return chat_answer(handler, {"reads": "otherwise" if said == "45" else "as_claimed",
+                                                 "value": "42", "unit": "m", "quote": "P101 | head | 42 | m",
+                                                 "why": "the 2 is clear"})
+                handler.rfile = io.BytesIO(json.dumps(body).encode())
+                handler.headers.replace_header("Content-Length", str(len(json.dumps(body).encode())))
+            return serve(handler)
+        with tempfile.TemporaryDirectory() as d, serving(post) as url:
+            root = Path(d)
+            text_pdf(root / "pumps.pdf", ["P101 | head | 42 | m", "P102 | head | 40 | m", "P101 | head | 45 | m"])
+            config = root / "settings.json"
+            config.write_text(json.dumps({"second_pass": True, "search_names": False, "topic_names": False,
+                                          "vision": False}))
+            args = ("analyze", root / "pumps.pdf", "--store", root / "out", "--base-url", url, "--config", config,
+                    "--no-situate")
+            code, _, _ = run(*args)
+            found = json.loads((root / "out" / "report.json").read_text())
+            page = unpacked((root / "out" / "report.html").read_text())
+            rendered = sorted(p.name for p in (root / "out" / "assets").glob("*-reread-*.png"))
+            again, _, _ = run(*args)
+        self.assertIn(code, (0, 2))  # (a page of a few words: partly read, by the stub)
+        self.assertEqual(again, code)
+        self.assertEqual(state["reread"], [1, 1])  # each claim once, with its image; then from the cache
+        self.assertEqual(len(rendered), 2)
+        log = found["commentary"]
+        reread = [e for e in log["entries"] if e["kind"] == "reread"]
+        self.assertEqual(sorted(e["relation"] for e in reread), ["as_claimed", "otherwise"])
+        self.assertEqual(log["reread"], {"asked": 2, "failed": 0, "skipped": 0})
+        self.assertIn("Read again from its place: it gives 42 m", page)
+        self.assertIn("read again: it gives 42 m", page)  # against the inconsistency
 
 if __name__ == "__main__":
     unittest.main()

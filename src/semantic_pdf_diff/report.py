@@ -190,6 +190,10 @@ class Cards:
                                                                              else ""))
             elif c["kind"] == "inference":
                 lines.append(f"Inferred: {esc(c['text'])}")
+            elif c["kind"] == "reread":
+                from .dossiers import reread_said
+                lines.append(f"Read again from its place: {esc(reread_said(c))}"
+                             + (f" ({esc(c['why'])})" if c.get("why") else ""))
         if not lines:
             return ""
         return ('<div class="notes"><b>Read with its subject\'s other claims</b> (ours, not the document\'s):'
@@ -810,7 +814,9 @@ def inconsistencies_html(found, sources):
     from .indexfiles import INCONSISTENCIES_NOTE
     many = len(sources) > 1
     def link(x, k):
-        return f'<a href="#claim={esc(x["claims"][k])}">{esc(x["said"][k])}</a> <small>{esc(x["where"][k])}</small>'
+        again = (x.get("read again") or ["", ""])[k]
+        return (f'<a href="#claim={esc(x["claims"][k])}">{esc(x["said"][k])}</a> <small>{esc(x["where"][k])}'
+                + (f'; read again: {esc(again)}' if again else '') + '</small>')
     rows = ''.join(
         f'<tr data-text="{esc(" ".join([x["subject"], *x["said"], x["why"]]).casefold())}">'
         + (f'<td>{esc(x["source"])}</td>' if many else '') + f'<td>{esc(x["subject"])}</td><td>{link(x, 0)}</td>'

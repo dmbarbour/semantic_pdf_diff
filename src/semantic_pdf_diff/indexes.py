@@ -300,8 +300,12 @@ def gaps(data, subjects, found_kinds, where):
 
 def inconsistencies(data, where):
     """Two claims of one subject the second pass says contradict each other (dossiers.py): [{"source", "subject",
-    "claims": [a, b], "said": [each one's value], "where": [each one's place], "why"}], in the log's order."""
+    "claims": [a, b], "said": [each one's value], "where": [each one's place], "why", "read again": [what each one's
+    place gave, read again ("" where it wasn't)]}], in the log's order."""
+    from .dossiers import reread_said
     evidence = {e["id"]: e for e in data.get("evidence", [])}
+    again = {c["claims"][0]: reread_said(c) for c in (data.get("commentary") or {}).get("entries", [])
+             if c["kind"] == "reread"}
     out = []
     for c in (data.get("commentary") or {}).get("entries", []):
         if c["kind"] != "relation" or c.get("relation") != "contradicts" or not all(x in evidence for x in c["claims"]):
@@ -311,7 +315,8 @@ def inconsistencies(data, where):
                     "said": [" ".join(x for x in (str(e["value"]), e["unit"] if e["unit"] not in ("", "-") else "",
                                                   f"({e['conditions']})" if e.get("conditions") else "") if x)
                              for e in claims],
-                    "where": [where(e) for e in claims], "why": c.get("why", "")})
+                    "where": [where(e) for e in claims], "why": c.get("why", ""),
+                    "read again": [again.get(x, "") for x in c["claims"]]})
     return out
 
 def data_sources(data):

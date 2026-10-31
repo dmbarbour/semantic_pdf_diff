@@ -45,6 +45,16 @@
      "named by a value": 22
     }
    },
+   "reread": {
+    "named by a value": {
+     "as_claimed": 1,
+     "otherwise": 21
+    },
+    "planted contradiction": {
+     "as_claimed": 10,
+     "otherwise": 1
+    }
+   },
    "log": {
     "subjects": 30,
     "dropped": 0,
@@ -90,6 +100,7 @@
     "inferences": 2
    },
    "suspicions": {},
+   "reread": {},
    "log": {
     "subjects": 30,
     "dropped": 0,
@@ -158,6 +169,7 @@
     "inferences": 1
    },
    "suspicions": {},
+   "reread": {},
    "claims": {
     "claims": 72,
     "classes": {
@@ -246,6 +258,14 @@
      "named by a value": 11
     }
    },
+   "reread": {
+    "named by a value": {
+     "otherwise": 11
+    },
+    "planted contradiction": {
+     "as_claimed": 6
+    }
+   },
    "claims": {
     "claims": 85,
     "classes": {
@@ -322,6 +342,7 @@
     "inferences": 1
    },
    "suspicions": {},
+   "reread": {},
    "claims": {
     "claims": 73,
     "classes": {
@@ -409,6 +430,16 @@
    "suspicions": {
     "misread": {
      "named by a value": 11
+    }
+   },
+   "reread": {
+    "named by a value": {
+     "as_claimed": 1,
+     "otherwise": 10
+    },
+    "planted contradiction": {
+     "as_claimed": 4,
+     "otherwise": 1
     }
    },
    "claims": {

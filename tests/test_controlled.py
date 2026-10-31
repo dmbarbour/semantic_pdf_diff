@@ -829,7 +829,7 @@ class Replay(unittest.TestCase):
             self.assertIn(code, (0, 2))
             got = consistency.scored(json.loads((d / "docs" / f"{name}.key.json").read_text()),
                                      json.loads((d / "run" / "report.json").read_text()))
-        for part in ("contradictions", "condition", "restatement", "gaps", "suspicions"):
+        for part in ("contradictions", "condition", "restatement", "gaps", "suspicions", "reread"):
             self.assertEqual(got[part], committed[part], part)
 
     def test_a_revision_pair_compares_again_to_the_recorded_scores(self):

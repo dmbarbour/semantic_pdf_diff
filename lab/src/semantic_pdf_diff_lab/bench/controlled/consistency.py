@@ -14,7 +14,8 @@ scored rather than judged by eye).
 - **Scored** (scored()) from an analysis's report.json against its key: each claim bound to its fact as the corpus's
   scorer binds it (score.classify), then each planted item found or not, by the second pass (contradictions, likely
   gaps, inferences) or by code (gaps), each pair's relations, what's found and not planted, and what the second
-  pass's suspicions were by the scorer's classes.
+  pass's suspicions and its claims read again were by the scorer's classes (a planted contradiction's claim is
+  right read again "as claimed"; a claim whose property was named by a value, "otherwise").
 """
 import json
 import re
@@ -282,6 +283,14 @@ def scored(key, data):
             suspected[e.get("relation", "")]["planted contradiction" if bound.get(c) in contradicted else
                                              "named by a value" if named else classes.get(c, "unknown")] += 1
     out["suspicions"] = {k: dict(sorted(v.items())) for k, v in sorted(suspected.items())}
+    again = defaultdict(lambda: defaultdict(int))  # a re-read claim's class: what its place gave, read again
+    for e in entries:
+        if e["kind"] == "reread":
+            c = e["claims"][0]
+            named = VALUE_NAMED.match(str(evidence.get(c, {}).get("attribute", "")))
+            again["planted contradiction" if bound.get(c) in contradicted else "named by a value" if named
+                  else classes.get(c, "unknown")][e.get("relation", "")] += 1
+    out["reread"] = {k: dict(sorted(v.items())) for k, v in sorted(again.items())}
     out["claims"] = {"claims": len(classes), "classes": dict(sorted(Counter(classes.values()).items()))}
     out["log"] = {k: (data.get("commentary") or {}).get(k, 0) for k in ("subjects", "dropped", "failed")}
     return out
@@ -324,6 +333,9 @@ def totals(results):
             "suspicions": {kind: dict(sorted(Counter(c for r in mine for c, n in r["suspicions"].get(kind, {}).items()
                                                      for _ in range(n)).items()))
                            for kind in sorted({k for r in mine for k in r["suspicions"]})},
+            "reread": {kind: dict(sorted(Counter(c for r in mine for c, n in r.get("reread", {}).get(kind, {}).items()
+                                                 for _ in range(n)).items()))
+                       for kind in sorted({k for r in mine for k in r.get("reread", {})})},
             "log": {k: add("log", k) for k in ("subjects", "dropped", "failed")}}
     return out
 
