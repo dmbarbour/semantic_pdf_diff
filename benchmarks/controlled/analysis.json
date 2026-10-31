@@ -4,7 +4,7 @@
    "documents": 2,
    "contradictions": {
     "planted": 6,
-    "found": 5,
+    "found": 6,
     "false": 0
    },
    "condition": {
@@ -52,8 +52,7 @@
      "otherwise": 21
     },
     "planted contradiction": {
-     "as_claimed": 10,
-     "otherwise": 1
+     "as_claimed": 13
     }
    },
    "looked": {
@@ -111,7 +110,7 @@
    "implied": {
     "planted": 2,
     "found": 2,
-    "inferences": 4
+    "inferences": 2
    },
    "suspicions": {},
    "reread": {},
@@ -138,6 +137,7 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition",
       "differs_by_condition"
      ],
      "P-302.capacity / P-302.capacity_runout": [
@@ -182,7 +182,7 @@
    "implied": {
     "planted": 1,
     "found": 1,
-    "inferences": 2
+    "inferences": 1
    },
    "suspicions": {},
    "reread": {},
@@ -226,6 +226,7 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition",
       "differs_by_condition"
      ],
      "P-302.capacity / P-302.capacity_runout": [
@@ -238,10 +239,10 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity": [
-      "corroborates"
+      "restates"
      ],
      "P-301.tdh / P-301.tdh": [
-      "corroborates"
+      "restates"
      ],
      "forcemain.length / forcemain.length_mi": []
     }
@@ -371,7 +372,7 @@
    "implied": {
     "planted": 1,
     "found": 1,
-    "inferences": 2
+    "inferences": 1
    },
    "suspicions": {},
    "reread": {},
@@ -395,7 +396,7 @@
   "station-s2-planted": {
    "contradictions": {
     "planted": 3,
-    "found": 2,
+    "found": 3,
     "said": {
      "P-302.motor / P-302.motor_said": [
       "contradicts"
@@ -405,7 +406,7 @@
       "contradicts"
      ],
      "wetwell.volume / wetwell.volume_said": [
-      "differs_by_condition"
+      "contradicts"
      ]
     },
     "false": 0,
@@ -416,6 +417,7 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity_50": [
+      "differs_by_condition",
       "differs_by_condition"
      ],
      "P-302.capacity / P-302.capacity_runout": [
@@ -428,10 +430,10 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity": [
-      "corroborates"
+      "restates"
      ],
      "P-301.tdh / P-301.tdh": [
-      "corroborates"
+      "restates"
      ],
      "forcemain.length / forcemain.length_mi": []
     }
@@ -472,8 +474,7 @@
      "otherwise": 10
     },
     "planted contradiction": {
-     "as_claimed": 4,
-     "otherwise": 1
+     "as_claimed": 7
     }
    },
    "looked": {

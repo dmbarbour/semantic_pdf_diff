@@ -46,6 +46,26 @@ class Dossier(unittest.TestCase):
         self.assertEqual(dossier["siblings"], {"kind": "pump (P)", "items": 3, "they give, it doesn't": ["NPSH"]})
         self.assertIn("Read one subject's claims from an engineering source together", dossiers.prompt(dossier))
 
+    def test_pairs_code_finds_differ_asked_to_be_settled(self):
+        """Inconsistency candidates by code (milestone 4): one property, two values in common units, their conditions
+        alike or one stating none (planted reports: a table's working volume and the prose's, read as differing by
+        condition)."""
+        said = [claim(f"A-{n}", "ca", "wet well", attribute, value, unit, page=n) for n, (attribute, value, unit) in
+                enumerate([("working volume", "9,176", "gal"), ("working volume", "7,761", "gal"), ("depth", "42", "m"),
+                           ("depth", "137.8", "ft"), ("inflow", "2", "MGD"), ("inflow", "12", "MGD"),
+                           ("length", "3", "m"), ("length", "4", "m"), ("length", "5", "m"), ("tag", "101-004", ""),
+                           ("tag", "20330", "")], 1)]
+        said[0]["conditions"] = "between the pump-off level and the lead pump's start level"
+        said[4]["conditions"], said[5]["conditions"] = "average, dry weather", "peak, wet weather"
+        d = report(said)
+        ((_, _, named, dossier),) = dossiers.dossiers(d, indexes.built(d))
+        self.assertEqual([[named[n]["value"] for n in p["claims"]] + [p["property"]] for p in dossier["differ"]],
+                         [["9,176", "7,761", "working volume"]])  # one condition stated; 137.8 ft is 42 m as printed;
+        # other conditions stated; three lengths list three things; a tag isn't a number
+        self.assertIn('also settles each pair under "differ"', dossiers.prompt(dossier))
+        del dossier["differ"]
+        self.assertNotIn('"differ"', dossiers.prompt(dossier))  # a dossier without asks as before
+
     def test_a_kinds_items_read_together_with_their_passages(self):
         """A kind's items in one request (the owner, 2026-10-31: "Your recommended path seems reasonable"): what
         siblings give together, and those that should agree and don't, out of a subject's dossier's reach."""
