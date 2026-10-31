@@ -2,6 +2,14 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.20.0 (2026-10-31)
+
+- **`skip_text_only: wide_pages`** (off by default): on a page too wide for bands, such as a 16:9 slide, image tiles holding only text aren't sent; the text tasks read that text whole. The cut is chosen first, as without it, so pages with charts keep their tiles that hold a graphic.
+  - A 16:9 page of text no longer goes out as a left, a middle and a right slice of every line.
+  - The controlled corpus's five wide documents keep every fact, with 10 tiles instead of 35.
+  - On two real 16:9 decks it keeps 1,795 of 1,849 distinct values with a quarter fewer tiles. The 32 numbers lost are on pages whose text task failed, where the tiles were all that read them.
+- The controlled corpus gains two 16:9 layouts (960 × 540 pt): one upright, one stored on its side and turned by `/Rotate`, with a banner up the left edge.
+
 ## 0.19.0 (2026-10-31)
 
 - **The second pass (`second_pass`, still off) is scored on planted reports.** Pump station design reports, each written twice, planted and clean. The planted copy holds values said otherwise in another section, blank schedule cells, "TBD"s and references to a figure and a table it lacks; both copies hold values restated under another condition.
