@@ -2,6 +2,16 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.18.0 (2026-10-31)
+
+- **`second_pass`** (off by default): an analysis reads each subject's claims together, one request per subject of two claims or more. Each request is shown the subject's claims, the passages they came from, their sections and what the subject's siblings give. What it finds is kept as notes beside the claims, never changing them: context a claim lacks, what restates, refines or contradicts what, suspected misreads, inferences, and what's likely missing.
+  - The notes appear on each claim's card, as likely gaps in "What it doesn't give", and as an Inconsistencies view (also in index.md, the workbook and `index/inconsistencies.csv`).
+  - On 9 drawing sheets it cost $0.085 and found 16 contradictions, including the document's own ("WP" defined as both water pump and waterproof) and the reader's (a "6D" where the passage says 16D), along with some that weren't real.
+- **`semantic-pdf-diff export`**: a store's report as Markdown chunks for a RAG system's ingest, with no model calls:
+  - One chunk per section, or per part of a section (about 400 tokens). Each says where it came from and lists its claims by subject, with their conditions, places and short excerpts.
+  - Chunks for finding things: subjects A to Z, figures and tables, the glossary, gaps and inconsistencies.
+  - An index.md. Each chunk file is named by its text's hash, so an unchanged chunk keeps its name from one export to the next.
+
 ## 0.17.0 (2026-10-31)
 
 - **Each claim's card shows the source's text around its quote:** the sentences holding it, up to about 600 characters, or a table row under its header, with the quote underlined. It's shown in full where the card has no crop or the size budget left its crop out, and folded to two lines below a crop that's shown (a click unfolds it). It isn't searched, and the judge never sees it.
