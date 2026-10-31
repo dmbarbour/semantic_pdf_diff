@@ -621,8 +621,10 @@ class SkipTextOnly(Lever):
     # or, of the tiles sent, only on a page too wide for bands and not a drawing sheet, once its cut is chosen
     # (wide_pages: a 16:9 slide's paragraphs were cut into a left, a middle and a right tile, the owner's "three
     # slices"; docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2): skipped before the choice, they let it take
-    # fewer, larger tiles, which lost a chart-heavy deck's values
-    skip_text_only: Annotated[bool | Literal["except_sheets", "wide_pages"], _selecting(VISUAL)] = False
+    # fewer, larger tiles, which lost a chart-heavy deck's values; held back, and sent where the page's text tasks give
+    # no claim. The default since 2026-10-31 (the owner: "I think we should turn it on. We should also do the
+    # fallback.")
+    skip_text_only: Annotated[bool | Literal["except_sheets", "wide_pages"], _selecting(VISUAL)] = "wide_pages"
 
     def kept_tiles(self, reader, page, regions):
         regions = super().kept_tiles(reader, page, regions)
@@ -631,10 +633,16 @@ class SkipTextOnly(Lever):
         return self._with_graphics(reader, page, regions)
 
     def sent_tiles(self, reader, page, regions):
+        """wide_pages: a wide page's tiles holding text alone held back (reader.held_tiles), sent only where its
+        text tasks give no claim (extract.PdfReading.vision; the owner, 2026-10-31: "We should also do the
+        fallback.")."""
         regions = super().sent_tiles(reader, page, regions)
         if self.skip_text_only != "wide_pages" or page.rect.width <= self.band_width * self.tile_points:
             return regions
-        return self._with_graphics(reader, page, regions)
+        sent = self._with_graphics(reader, page, regions)
+        if len(sent) < len(regions):
+            reader.held_tiles[page.number] = [x for x in regions if x not in sent]
+        return sent
 
     def _with_graphics(self, reader, page, regions):
         """The tiles but those holding text and no graphic that counts, where the text tasks read the page (not a

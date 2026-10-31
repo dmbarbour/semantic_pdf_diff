@@ -17,7 +17,7 @@ from .regions import crop_name, crop_stem
 from .schema import DerivationStep, PdfLocator, coverage_row
 from .sections import pdf_sections
 from .tables import Marks, column_edges, cut_columns, pdf_grid, pdf_parts, row_boxes, ruled_rows, same_form, split_cuts
-from .tasks import TaskCore, split_utf8
+from .tasks import TaskCore, Watch, split_utf8
 from .visuals import Visuals, render
 
 def text_pieces(page, text_bytes, left_out=(), split=split_utf8):
@@ -106,6 +106,7 @@ class PdfReading:
         self.context_of.ask = core.dispatch.client.ask  # the tiling question, asked while a page is planned
         self.visuals = Visuals(core, self.context_of, assets, stem, s)
         self.regions = {}  # page -> its image tasks' regions, worked out once (the vision step; tables read as figures)
+        self.watches = {}  # page -> its text tasks counted to their end (tasks.Watch), for the tiles held back
         self.signals = {}
         self.carried = None  # (header, width) of a table that ended near the bottom of the previous page
 
@@ -169,8 +170,22 @@ class PdfReading:
         self.core.find_positions(number, [seg for _, segments in groups for seg in segments],
                                  lambda: next((f for f in self.context_of.figures(page, number)
                                                if f.kind == "sheet"), None))
+        watch = self.watches.setdefault(number, Watch())
         for ids, segments in groups:
-            self.core.text_task(number, segments, f"text:p{number}:{ids}")
+            self.core.text_task(number, segments, f"text:p{number}:{ids}", watch=watch)
+
+    def image_task(self, number, page, tag, rect, note, held=False):
+        """One image task of the page's (a tile, a figure, the overview); held: a tile held back, sent because the
+        page's text tasks gave no claim."""
+        # Task tags are unique within content: "<region>:p<page>[:<index>]".
+        region, _, index = tag.partition(":")
+        tag = f"{region}:p{number}" + (f":{index}" if index else "")
+        # a tile's path, kept on its coverage row: the page's cut, and whether the page has a text layer
+        tiling = ({"cut": self.s.tiling_of(self.context_of, page), "depth": 0,
+                   "text": bool(self.context_of.lines(page)), **({"held": True} if held else {})}
+                  if region == "tile" else None)
+        # A figure's caption, or a sheet detail's titles, as source text.
+        self.visuals.task(number, page, tag, rect, text=note, tiling=tiling)
 
     def detect(self, number, page):
         """The page's tables as detected and mended: ([(bbox, rows, boxes, styles, rules, edges)], its drawn marks)."""
@@ -234,14 +249,12 @@ class PdfReading:
     def vision(self, number, page):
         if self.s.vision:
             for tag, rect, note in self.regions_of(number, page):
-                # Task tags are unique within content: "<region>:p<page>[:<index>]".
-                region, _, index = tag.partition(":")
-                tag = f"{region}:p{number}" + (f":{index}" if index else "")
-                # a tile's path, kept on its coverage row: the page's cut, and whether the page has a text layer
-                tiling = ({"cut": self.s.tiling_of(self.context_of, page), "depth": 0,
-                           "text": bool(self.context_of.lines(page))} if region == "tile" else None)
-                # A figure's caption, or a sheet detail's titles, as source text.
-                self.visuals.task(number, page, tag, rect, text=note, tiling=tiling)
+                self.image_task(number, page, tag, rect, note)
+            held = self.context_of.held_tiles.pop(page.number, [])
+            if held:  # tiles holding text alone, held back (skip_text_only: wide_pages): sent if the text gave nothing
+                self.watches.setdefault(number, Watch()).wait(
+                    lambda claims: [self.image_task(number, page, tag, rect, note, held=True)
+                                    for tag, rect, note in held] if not claims else None)
         else:
             self.record(coverage_row(content=self.content, page=number, bbox=list(native_page(page)),
                                      task=f"vision:p{number}", status="skipped",

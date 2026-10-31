@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 22185,
-   "evidence": 12385,
+   "claims": 22076,
+   "evidence": 12333,
    "frame in conditions": 36,
-   "grounded": 5809,
+   "grounded": 5788,
    "list records": 36,
    "no content words": 2,
    "note records": 11,
@@ -14,12 +14,12 @@
    "partly": 64,
    "partly (image)": 39,
    "positioned": 124,
-   "printed": 7839,
+   "printed": 7803,
    "sheet records": 11,
    "table records": 324,
    "unsupported": 35,
-   "unsupported (image)": 823,
-   "with conditions": 6772,
+   "unsupported (image)": 819,
+   "with conditions": 6747,
    "with records": 6350
   },
   "placed": {
@@ -103,9 +103,9 @@
      "share": 0.0
     },
     "<0.9": {
-     "readings": 548,
-     "right": 326,
-     "share": 0.595
+     "readings": 542,
+     "right": 320,
+     "share": 0.59
     },
     "<0.95": {
      "readings": 10734,
@@ -113,16 +113,16 @@
      "share": 0.986
     },
     "<=1.0": {
-     "readings": 30680,
-     "right": 27902,
-     "share": 0.909
+     "readings": 30534,
+     "right": 27776,
+     "share": 0.91
     }
    },
    "image": {
     "<0.9": {
-     "readings": 524,
-     "right": 318,
-     "share": 0.607
+     "readings": 518,
+     "right": 312,
+     "share": 0.602
     },
     "<0.95": {
      "readings": 264,
@@ -130,8 +130,8 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 21744,
-     "right": 19736,
+     "readings": 21598,
+     "right": 19610,
      "share": 0.908
     }
    },
@@ -4252,19 +4252,19 @@
   },
   "lcc-s1-landscape": {
    "inventory": {
-    "claims": 75,
-    "grounded": 5,
+    "claims": 64,
+    "grounded": 3,
     "unsupported": 1,
     "unsupported (image)": 1,
-    "with conditions": 7,
+    "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 24,
-    "evidence": 26,
+    "printed": 22,
+    "evidence": 24,
     "context_bytes_per_request": 234,
     "data_bytes_per_request": 824,
     "examples": {
@@ -4552,19 +4552,19 @@
   },
   "lcc-s1-slide": {
    "inventory": {
-    "claims": 78,
-    "grounded": 16,
+    "claims": 62,
+    "grounded": 10,
     "unsupported": 1,
     "unsupported (image)": 1,
-    "with conditions": 18,
+    "with conditions": 12,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 23,
-    "evidence": 25,
+    "printed": 22,
+    "evidence": 24,
     "context_bytes_per_request": 225,
     "data_bytes_per_request": 772,
     "examples": {
@@ -5270,18 +5270,18 @@
   },
   "lcc-s1-wide-letter": {
    "inventory": {
-    "claims": 70,
-    "grounded": 11,
-    "unsupported (image)": 2,
-    "with conditions": 13,
+    "claims": 54,
+    "grounded": 5,
+    "unsupported (image)": 1,
+    "with conditions": 6,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 22,
-    "evidence": 24,
+    "printed": 21,
+    "evidence": 22,
     "context_bytes_per_request": 170,
     "data_bytes_per_request": 775,
     "examples": {}
@@ -5319,19 +5319,18 @@
   },
   "lcc-s1-widescreen": {
    "inventory": {
-    "claims": 113,
-    "grounded": 18,
+    "claims": 81,
+    "grounded": 15,
     "unsupported": 1,
-    "unsupported (image)": 1,
-    "with conditions": 20,
+    "with conditions": 16,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 42,
-    "evidence": 54,
+    "printed": 28,
+    "evidence": 31,
     "context_bytes_per_request": 91,
     "data_bytes_per_request": 450,
     "examples": {
@@ -5373,19 +5372,19 @@
   },
   "lcc-s1-widescreen-turned": {
    "inventory": {
-    "claims": 103,
-    "grounded": 21,
+    "claims": 69,
+    "grounded": 17,
     "unsupported": 1,
-    "unsupported (image)": 3,
-    "with conditions": 25,
+    "unsupported (image)": 1,
+    "with conditions": 19,
     "positioned": 0,
     "misplaced": {},
     "records": {
      "table": 1
     },
     "with records": 8,
-    "printed": 41,
-    "evidence": 49,
+    "printed": 23,
+    "evidence": 25,
     "context_bytes_per_request": 88,
     "data_bytes_per_request": 449,
     "examples": {

@@ -54,6 +54,9 @@ class Context:
         # whether text tasks read the pages' text layers: a PDF's do; a Word document's pictures' don't (its text tasks
         # read its paragraphs), so a picture's text-only tiles are sent (pictures.Reading)
         self.text_read = True
+        # page -> the tiles holding text alone that skip_text_only: wide_pages held back, sent if the page's text tasks
+        # give no claim (extract.PdfReading.vision)
+        self.held_tiles = {}
         # a page's vector drawings (never changed by their readers), and its display list: Page.get_pixmap builds one
         # for every crop, interpreting the whole page again
         self.drawings = Recent(lambda page: page.get_cdrawings())

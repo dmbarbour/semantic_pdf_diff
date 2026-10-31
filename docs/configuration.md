@@ -137,7 +137,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `grow_tiles` | `true` | shaping | grow_tiles | extract | figure, overview, tile, vision |
 | `sheet_details` | `false` | selecting | sheet_details | extract | figure, overview, tile, vision |
 | `skip_empty` | `true` | selecting | skip_empty | extract | figure, overview, tile, vision |
-| `skip_text_only` | `false` | selecting | skip_text_only | extract | figure, overview, tile, vision |
+| `skip_text_only` | `"wide_pages"` | selecting | skip_text_only | extract | figure, overview, tile, vision |
 | `region_labels` | `"off"` | selecting | region_labels | extract | figure, overview, tile, vision |
 | `another_tiling` | `"measures"` | shaping | another_tiling | extract | figure, overview, tile, vision |
 | `refine_figures` | `"halves"` | selecting | figure_refinement | extract | figure, overview, tile, vision |

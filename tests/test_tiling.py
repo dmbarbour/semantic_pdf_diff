@@ -226,13 +226,56 @@ class Candidates(unittest.TestCase):
             reader = Context(doc, s)
             tiles = [r for tag, r, _ in s.visual_regions(reader, page, 0) if tag.startswith("tile")]
             return tiles, reader.page_choices.get(page.number, {}).get("chosen")
-        (every, chosen), (kept, chosen_too) = sent(), sent(skip_text_only="wide_pages")
+        (every, chosen), (kept, chosen_too) = sent(skip_text_only=False), sent(skip_text_only="wide_pages")
         self.assertEqual(chosen, chosen_too)  # the same cut
         self.assertLess(len(kept), len(every))
         self.assertTrue(kept and all(r.intersects(pymupdf.Rect(700, 300, 900, 500)) for r in kept))
         doc, report = text_page(width=612, height=792, count=30, top=40)  # (sent reads doc when called)
         report.draw_rect(pymupdf.Rect(400, 600, 560, 740), fill=(0, 0, 0), color=None)
-        self.assertEqual(sent(report, skip_text_only="wide_pages"), sent(report))
+        self.assertEqual(sent(report, skip_text_only="wide_pages"), sent(report, skip_text_only=False))
+
+    def test_a_wide_pages_held_tiles_sent_where_its_text_gave_no_claim(self):
+        """The fallback (the owner, 2026-10-31: "We should also do the fallback."): a 16:9 page's tiles of text alone
+        are held back, and sent once its text tasks, refinements too, end with no claim (on two slides' tables every
+        quote was rejected, and the tiles were all that read them); not where the text gave claims."""
+        import json
+        from stubs import chat_answer, prompt_of, request_body, serving
+        from test_analyze import run
+
+        def analyzed(quote):
+            asked = {"images": 0}
+
+            def post(handler):
+                parts = request_body(handler)["messages"][1]["content"]
+                if any(part["type"] == "image_url" for part in parts):
+                    asked["images"] += 1
+                    return chat_answer(handler, {"claims": [], "complete": True, "issues": []})
+                prompt = prompt_of(parts)
+                claims = [{"entity": "pump", "attribute": "rated power", "value": "10", "unit": "kW", "kind": "text",
+                           "quote": quote, "confidence": .9}] if "the pump delivers" in prompt else []
+                return chat_answer(handler, {"claims": claims, "complete": True, "issues": []})
+            with tempfile.TemporaryDirectory() as d, serving(post) as url:
+                root = Path(d)
+                doc = pymupdf.open()
+                page = doc.new_page(width=960, height=540)
+                for i in range(25):  # text alone, lines 800 points long: a grid of tiles cuts every one
+                    page.insert_text((40, 40 + 18 * i), f"{i:02d} the pump delivers 10 kW at its rated point " * 3,
+                                     fontsize=10)
+                doc.save(root / "deck.pdf")
+                config = root / "settings.json"
+                config.write_text(json.dumps({"skip_text_only": "wide_pages", "search_names": False,
+                                              "topic_names": False, "glossary": False}))
+                run("analyze", root / "deck.pdf", "--store", root / "out", "--base-url", url, "--config", config,
+                    "--no-situate")
+                coverage = json.loads((root / "out" / "report.json").read_text())["coverage"]
+            tiles = [r for r in coverage if r["task"].startswith("tile:")]
+            return asked["images"], tiles
+        images, tiles = analyzed("the pump delivers 10 kW")  # the text read: its tiles stay held
+        self.assertEqual((images, tiles), (1, []))  # the overview alone
+        images, tiles = analyzed("a quote the page doesn't hold")  # every claim rejected: the tiles sent
+        self.assertTrue(tiles)
+        self.assertTrue(all(r["tiling"]["held"] for r in tiles))
+        self.assertEqual(images, 1 + len(tiles))
 
     def test_text_only_tiles_are_sent_where_no_text_task_reads_the_page(self):  # a Word document's pictures
         from semantic_pdf_diff.context import Context

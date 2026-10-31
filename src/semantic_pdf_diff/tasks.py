@@ -177,6 +177,30 @@ class Task:
     stance: tuple = ()  # the Links holding every claim it reads (a table row's holder: the table_holders lever)
     view: object = None  # a Claim: the view its row's yes-or-no cell states, kept if the reader gives none (view_rows)
     tiling: dict | None = None  # an image tile's path, kept on its coverage row (schema.CoverageRow)
+    accepted: int = 0  # the claims its earlier turns kept (a continued task's), for then's "accepted"
+
+class Watch:
+    """A page's text tasks counted to their end, their refinements too: then(claims) once the last ends and the
+    watcher has said it's waiting (wait), however answers and the page's planning interleave."""
+    def __init__(self):
+        self.pending, self.claims, self.then = 0, 0, None
+
+    def started(self):
+        self.pending += 1
+
+    def finished(self, claims):
+        self.pending -= 1
+        self.claims += claims
+        self._settle()
+
+    def wait(self, then):
+        self.then = then
+        self._settle()
+
+    def _settle(self):
+        if self.pending == 0 and self.then is not None:
+            then, self.then = self.then, None
+            then(self.claims)
 
 class TaskCore:
     """One content item's extraction tasks: the evidence and coverage they make, as tasks finish.
@@ -279,8 +303,8 @@ class TaskCore:
 
     def consume(self, made):
         """Queue one extraction task (a Task); when it finishes, record it and call then(status, done): done, the last
-        turn's coverage row, every turn's claims, and the image's edges its answer said cut content ({"row", "claims",
-        "cut"}).
+        turn's coverage row, every turn's claims, the image's edges its answer said cut content, and how many claims
+        every turn kept ({"row", "claims", "cut", "accepted"}).
 
         An answer incomplete with its claims at the limit is the model asking for more: the task is asked again
         ("<task>-c<n>", up to the continuation limit), told the claims returned so far (continued), and then waits
@@ -377,9 +401,11 @@ class TaskCore:
                       f" ({'; '.join(row['issues'])[:200]})" if row["issues"] else "")
             if asked:
                 self.consume(replace(made, tag=f"{origin}-c{turn + 1}", repeat_key=None, repeat_after=1,
-                                     continued=tuple(continued) + tuple(more), origin=origin, leading=lead))
+                                     continued=tuple(continued) + tuple(more), origin=origin, leading=lead,
+                                     accepted=made.accepted + row["claims"]))
             elif then:
-                then(row["status"], {"row": row, "claims": tuple(continued) + tuple(said), "cut": cut})
+                then(row["status"], {"row": row, "claims": tuple(continued) + tuple(said), "cut": cut,
+                                     "accepted": made.accepted + row["claims"]})
 
         def handle(result):
             row["status"] = "complete" if result.complete else "partial"
@@ -436,9 +462,10 @@ class TaskCore:
 
     # --- text and table tasks, the same for every format
 
-    def text_task(self, page_no, segments, task, depth=0, derivation=None, context=None):
+    def text_task(self, page_no, segments, task, depth=0, derivation=None, context=None, watch=None):
         """segments: [(bbox, text)] of consecutive blocks sent together; derivation: the steps to its claims, and
-        context: its context lines, if not a text block's (a key-value list's: a table's)."""
+        context: its context lines, if not a text block's (a key-value list's: a table's); watch: a Watch counting
+        a page's text tasks to their end, their refinements too (extract.PdfReading's held tiles)."""
         s = self.s
         text = "\n\n".join(t for _, t in segments)
         given = context  # a refined part is given the same override, else gets its own text's context
@@ -447,13 +474,19 @@ class TaskCore:
             return next((b for b, t in segments if quoted(quote, t)), union(b for b, _ in segments))
         match = lambda q: quoted(q, text) or s.loose_match(q, text)
         positions = self.positions.get(page_no, {})
+
+        def then(status, done):
+            self.refine_text(page_no, segments, text, task, depth, status, derivation, given, watch)
+            if watch is not None:  # after its refinements are asked, so the page's count reaches 0 only at the end
+                watch.finished(done["accepted"])  # the claims kept: a quote not found in the text isn't one
+        if watch is not None:
+            watch.started()
         self.consume(Task(page_no, union(b for b, _ in segments), task, text, check=match, locate=locate,
                           context=context, derivation=derivation,
                           position=(lambda q: positions.get(tuple(locate(q)))) if positions else None,
-                          then=lambda status, _: self.refine_text(page_no, segments, text, task, depth, status,
-                                                                  derivation, given)))
+                          then=then))
 
-    def refine_text(self, page_no, segments, text, task, depth, status, derivation=None, context=None):
+    def refine_text(self, page_no, segments, text, task, depth, status, derivation=None, context=None, watch=None):
         if status not in ("partial", "failed") or depth >= self.s.refinement_depth:
             return
         if len(segments) > 1:
@@ -465,7 +498,7 @@ class TaskCore:
         else:
             return
         for i, part in enumerate(parts):
-            self.text_task(page_no, part, f"{task}:r{i}", depth + 1, derivation, context)
+            self.text_task(page_no, part, f"{task}:r{i}", depth + 1, derivation, context, watch)
 
     def table_task(self, page_no, bbox, task, header, row, columns, depth=0, derivation=None, repeat_key=None,
                    above=()):
