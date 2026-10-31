@@ -1,6 +1,6 @@
 # The report: the text a claim came from, and views kept in the address
 
-- **Status:** Planned (2026-10-28); [milestone 2](#2-every-view-kept-in-the-address) done the same day (the owner: "Please proceed with report bookmarks"). Milestone 1's [design questions](#design-questions) open.
+- **Status:** Planned (2026-10-28); [milestone 2](#2-every-view-kept-in-the-address) done the same day (the owner: "Please proceed with report bookmarks"). Milestone 1's [design questions](#design-questions) answered 2026-10-31.
 - **The owner, 2026-10-28, from trials:**
   - "when a claim comes from text or the PDF text layer, we should include the relevant snippet of text in the report even when the image is dropped due to lower priority."
   - "bookmarking of views in the report, e.g. with `#anchor` but a javascript-driven anchor?"
@@ -78,8 +78,11 @@ The page keeps two things in its address already: the view and the search (`#cla
 
 1. **Where the snippet comes from:**
    - **At extraction, stored with the claim** (proposed). The report needs only the store, as now.
+   - **Answered 2026-10-31 (the owner: "Agreed with report snippets recommendations."):** at extraction, stored with the claim.
    - **At report time, from the files on disk.** No store change, but it fails when a file has moved, and a report written elsewhere has none.
 2. **Is the snippet searched?** Searching it finds a claim by words its quote left out, but it changes what the 17 real queries return.
    - **I'd leave it out of search at first,** and add it as a measured change against those queries.
+   - **Answered 2026-10-31 (the owner: "Agreed with report snippets recommendations."):** out of search at first.
 3. **Shown on every card, or only in place of a crop left out?** Your words ask for it at least where the image is dropped.
    - **I'd show it on every card that has one,** folded to two lines on cards whose crop is shown.
+   - **Answered 2026-10-31 (the owner: "Agreed with report snippets recommendations."):** on every card that has one.

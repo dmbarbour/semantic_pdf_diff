@@ -1,6 +1,6 @@
 # Single-document analysis: claims situated among their subject's claims, inconsistencies and gaps
 
-- **Status:** Active (2026-10-29): milestone 1, `analyze`, built 2026-10-29 (0.7.0); the rest planned. [Design questions](#design-questions) 1 and 3 answered 2026-10-28, 6 on 2026-10-29; 2, 4 and 5 open. Milestone 2 moved to [indexes and glossaries](indexes-and-glossaries-2026-10-29.md) (2026-10-29).
+- **Status:** Active (2026-10-29): milestone 1, `analyze`, built 2026-10-29 (0.7.0); the rest planned. [Design questions](#design-questions) 1 and 3 answered 2026-10-28, 6 on 2026-10-29, 2, 4 and 5 on 2026-10-31. Milestone 2 moved to [indexes and glossaries](indexes-and-glossaries-2026-10-29.md) (2026-10-29).
 - **The owner, 2026-10-29, setting the focus:** "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless." And: "Well, I say "single document" but I really mean "single source" that might be a folder of docs." The indexes are [their own plan](indexes-and-glossaries-2026-10-29.md).
 - **The owner, 2026-10-28, from trials:**
   - "we probably need to prioritize development of a second pass (or an entire refinement, situating, contextualizing strategy) where claims are analyzed in context, not just the provenance of where the claim is located but also situating it with other claims about the subject and distinguishing it with more nuance. A lot of comparisons don't make sense because they're compared without enough context. Context can help mitigate drift from heuristics (I hope!)."
@@ -190,11 +190,14 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
 1. **Annotations, not edits:** answered 2026-10-28 (quoted at the top): claims are never changed; commentary is a log, traceable, monotonic and reproducible ([Concepts](#concepts)).
 2. **The unit of the second pass:** one subject's dossier per request, or a section's claims, or a document's?
    - **I'd use the subject's dossier.** It's small and cached, and a changed claim re-asks only its subject.
+   - **Answered 2026-10-31 (the owner: "Agree with all second-pass recommendations."):** the subject's dossier.
    - **A section** keeps the document's order but splits subjects across requests.
    - **A large specification's claims** don't fit one request.
 3. **Gaps' reach:** answered 2026-10-28 (quoted at the top): gaps in general, not only those a page points to. The clearest is an attribute another source gives for the same subject ([Gaps](#gaps-what-we-dont-know-about-a-subject); milestones 5 and 7). A checklist for a document's kind stays with criteria-first comparison.
 4. **Where it runs:** a stage after situating, in comparisons too, or one-source runs only until it's measured?
    - **I'd make it a stage, as situating is,** and turn it on in comparisons once milestone 6 measures it.
+   - **Answered 2026-10-31 (the owner: "Agree with all second-pass recommendations."):** a stage, in comparisons once measured.
 5. **Images in the second pass:** text only (claims, quotes, records, abouts), with a suspected misread re-read from its crop as a follow-up? Or crops in the dossier from the start?
    - **I'd start with text.** A dossier of a busy subject would otherwise carry dozens of images.
+   - **Answered 2026-10-31 (the owner: "Agree with all second-pass recommendations."):** text first.
 6. **The command:** answered 2026-10-29 (chosen from the options I offered): a new command, `analyze`, for one source; `compare` stays for two or more. `check` names the report's inconsistencies view, not a command.

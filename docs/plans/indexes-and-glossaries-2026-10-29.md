@@ -136,7 +136,7 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 - Blocks found and read; definitions in prose; checked.
 - Shown, exported, and given to search (an abbreviation finds its expansion's claims).
 - Merged by term in a comparison.
-- **Built 2026-10-30** (`glossary.py`; the `glossary` lever, on by default for the owner to confirm):
+- **Built 2026-10-30** (`glossary.py`; the `glossary` lever, a default, confirmed 2026-10-31: "Confirm glossary on by default."):
   - **Blocks:** a PDF's outline sections so headed; on a page, headings side by side (a sheet's SYMBOLS and ABBREVIATIONS) as one block, the band around them read as rows of words by position, since a sheet's text layer often lists a table's columns apart (the dc set's did: terms and meanings in separate runs); a text file's heading and its lines, a heading holding others so headed left to them (TS 38.300's 3 to its 3.1 and 3.2).
   - **As they are:** a text file's tables under the heading, and lists of tabbed lines (TS 38.300's 264 abbreviations, with no request).
   - **The model:** the rest, a part of 3,000 characters a request (one cut short: halves); a term kept only where its term and its meaning are in the part.

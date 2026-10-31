@@ -1199,7 +1199,8 @@ class ReadGlossary(Lever):
     # the sources' glossaries read before their claims: their abbreviations, defined terms, symbols and
     # conventions, from the blocks defining them (the model, a request a block's part) and from prose (by pattern),
     # for the index and the search (glossary.py; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 2; the
-    # owner, 2026-10-30: "Please proceed with the glossary."). On by default, for the owner to confirm
+    # owner, 2026-10-30: "Please proceed with the glossary."). A default, confirmed 2026-10-31 (the owner: "Confirm
+    # glossary on by default.")
     glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def reads_glossary(self):
