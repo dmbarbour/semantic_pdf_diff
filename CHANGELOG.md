@@ -2,6 +2,18 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.16.0 (2026-10-31)
+
+- **What it doesn't give.** Every report's index now lists gaps found by code, with no model requests. Each is labelled weak, with where it was expected and why:
+  - a property most of an item's siblings give that it doesn't (on TS 38.300, PUCCH formats 0 and 1 give no "UCI payload" where formats 2 to 4 do);
+  - a figure, table or sheet cited and not found in the document;
+  - a value given as a placeholder ("TBD", "to be confirmed").
+
+  They appear in a view of the page, a section of index.md, a Gaps sheet in the workbook and `index/gaps.csv`.
+- **Fixed:** the progress line could read "0 in flight" while a page waited minutes on a request it had sent itself (the tiling question, its tiles' labels). It now counts every request at the endpoint.
+- **Fixed:** a glossary entry read across a drawing's column gap (a fan schedule's row taken as "EF" meaning "GREENHECK | SP-B90") is now dropped.
+- The `glossary` setting's default is confirmed (the owner: "Confirm glossary on by default.").
+
 ## 0.15.0 (2026-10-30)
 
 - **`retrieve_glossary` and `topic_glossary` are on by default** (the owner: "Yes, turn on the recommended items."). Comparing proposals, a meaning written out pairs with its term among the pairs judged. The topics count a meaning written out as its term, so "SWD" in one source and "side water depth" in the other make one topic. Where a source defines no terms, nothing changes.
