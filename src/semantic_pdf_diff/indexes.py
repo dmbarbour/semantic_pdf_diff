@@ -262,13 +262,18 @@ SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most 
 PLACEHOLDER = re.compile(r"^\W*(?:TBD|TBC|TBA|TBV|TBR|to be (?:determined|confirmed|provided|advised|verified|decided|"
                          r"agreed|supplied|issued))\b", re.IGNORECASE)
 GAP_KINDS = ("siblings", "reference", "placeholder", "likely")
+# a gap looked for, in a kind: the reader's misses first, then what the place leaves blank, those not looked for,
+# and last those the place has no place for or doesn't show (dossiers.looks)
+LOOKED = {"given": 0, "not_given": 1, "no_place": 3, "not_shown": 4}
 
 def gaps(data, subjects, found_kinds, where):
     """What the sources don't give, found by code (single-document analysis, milestone 5): [{"kind": "siblings",
     "reference" or "placeholder", "source", "subject", "property", "where": where it was expected, "why", "claims"}].
     A sibling's gap is each source's own: of a kind's items in it (SIBLINGS or more), a property more than half of
     them give and this one doesn't; where expected, where its other values are. Each is weak: saying nothing isn't
-    evidence of absence, and the reader may have missed what's there."""
+    evidence of absence, and the reader may have missed what's there. A gap looked for where it would be
+    (dossiers.looks) also has "looked" (where, and what was found there) and "look" (dossiers.LOOKS), and comes in its
+    kind in LOOKED's order."""
     out = []
     for k in found_kinds:
         for source in data_sources(data):
@@ -315,19 +320,19 @@ def gaps(data, subjects, found_kinds, where):
                         "where": first.get((c["source"], c["subject"]), ""),
                         "why": "read together: " + (c.get("why") or "its dossier suggests it"), "claims": []})
     from .dossiers import looked_said
-    looked = {(c["source"], fold(c["subject"]), fold(c["text"])): looked_said(c)
+    looked = {(c["source"], fold(c["subject"]), fold(c["text"])): c
               for c in (data.get("commentary") or {}).get("entries", []) if c["kind"] == "looked"}
     for g in out:  # what a look where it would be found (dossiers.looks)
-        said = looked.get((g["source"], fold(g["subject"]), fold(g["property"])))
-        if said:
-            g["looked"] = said
+        c = looked.get((g["source"], fold(g["subject"]), fold(g["property"])))
+        if c:
+            g["looked"], g["look"] = looked_said(c), c.get("relation", "")
     for e in data.get("evidence", []):
         if PLACEHOLDER.match(str(e["value"])):
             out.append({"kind": "placeholder", "source": where.source.get(e["content"], ""), "subject": e["entity"],
                         "property": e["attribute"], "where": where(e), "why": f"given as “{e['value']}”",
                         "claims": [e["id"]]})
-    return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), g["source"], natural(g["subject"]),
-                                      natural(g["property"]), natural(g["where"])))
+    return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), LOOKED.get(g.get("look"), 2), g["source"],
+                                      natural(g["subject"]), natural(g["property"]), natural(g["where"])))
 
 def inconsistencies(data, where):
     """Two claims of one subject the second pass says contradict each other (dossiers.py): [{"source", "subject",

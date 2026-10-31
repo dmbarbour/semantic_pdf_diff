@@ -269,6 +269,21 @@ class Gaps(unittest.TestCase):
                          "a.pdf, page 4: not given")
         self.assertNotIn("looked", index["gaps"][2])  # a placeholder isn't looked for
 
+    def test_gaps_looked_for_the_readers_misses_first_those_with_no_place_last(self):
+        pumps = [claim(f"A-{n}{k}", "ca", f"P-10{n} pump", attribute, value, unit, page=n)
+                 for n in (1, 2, 3, 4, 5) for k, (attribute, value, unit) in enumerate([("rated power", f"1{n}", "kW"),
+                                                                                        ("head", f"4{n}", "m")])
+                 if n < 4 or attribute != "head"]
+        looked = lambda subject, relation, **more: {"kind": "looked", "source": "a", "subject": subject,  # noqa: E731
+                                                    "claims": [], "relation": relation, "text": "head",
+                                                    "where": "a.pdf, page 4", **more}
+        data = report(pumps, commentary={"entries": [looked("P-104 pump", "no_place"),
+                                                     looked("P-105 pump", "given", value="45 m")]})
+        gaps = indexes.built(data)["gaps"]
+        self.assertEqual([(g["subject"], g["look"], g["looked"]) for g in gaps],
+                         [("P-105 pump", "given", "a.pdf, page 4: it gives 45 m"),
+                          ("P-104 pump", "no_place", "a.pdf, page 4: no place for it there")])
+
     def test_more_than_half_must_give_it_of_three_at_least(self):
         two = [claim("A-1", "ca", "P-101", "head", "40", "m"), claim("A-2", "ca", "P-101", "flow", "5", "L/s"),
                claim("A-3", "ca", "P-102", "flow", "6", "L/s")]

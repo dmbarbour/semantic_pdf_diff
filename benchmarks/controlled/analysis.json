@@ -61,7 +61,9 @@
     },
     "siblings: named by a value": {
      "given": 6,
-     "not_given": 6
+     "no_place": 4,
+     "not_given": 1,
+     "not_shown": 1
     },
     "siblings: planted": {
      "not_given": 4
@@ -292,7 +294,8 @@
     },
     "siblings: named by a value": {
      "given": 3,
-     "not_given": 3
+     "no_place": 2,
+     "not_shown": 1
     },
     "siblings: planted": {
      "not_given": 2
@@ -483,7 +486,8 @@
     },
     "siblings: named by a value": {
      "given": 3,
-     "not_given": 3
+     "no_place": 2,
+     "not_given": 1
     },
     "siblings: planted": {
      "not_given": 2

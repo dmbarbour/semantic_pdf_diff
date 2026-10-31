@@ -26,8 +26,9 @@ second-pass recommendations": the subject's dossier, a stage, text first).
 - **Gaps looked for** (looks; the owner, 2026-10-31: "Your recommended path seems reasonable"): each gap the index
   finds among siblings, or the second pass says is likely, looked for before it's reported: in the PDF page that names
   its subject and property best (its claims there, the siblings' values of that property, the words), that place
-  rendered closer and asked whether it gives a value of the property for the subject: given (the reader missed it),
-  not given, or not shown; an entry of the log of its own ("looked"), shown beside the gap. Progressive disclosure led
+  rendered closer and asked whether it gives a value of the property for the subject: given (the reader missed it,
+  or named it otherwise), not given (a blank cell), no place for it (the item shown, nowhere it would give the
+  property), or not shown; an entry of the log of its own ("looked"), shown beside the gap. Progressive disclosure led
   by the pipeline: the gap says where to look, as a doubt says what to read again.
 - **The log** (the owner's list: "associations, conflicts, corroborations, re-situation, re-contextualization"):
   entries {"id", "kind", "source", "subject", "claims" (their ids), "text", "quote", "relation", "why", "key"},
@@ -59,7 +60,7 @@ SUSPICIONS = ("misread", "other_subject", "out_of_place")
 ADDS = ("scope", "condition", "frame", "holder")
 NAME = re.compile(r"\bC\d+\b")  # a claim's name in its dossier
 READS = ("as_claimed", "otherwise", "not_shown")  # what a re-read finds
-LOOKS = ("given", "not_given", "not_shown")      # what a look for a gap finds
+LOOKS = ("given", "not_given", "no_place", "not_shown")  # what a look for a gap finds
 LOOKED_FOR = ("siblings", "likely")              # the gaps looked for: a subject and a property each
 ZOOM = 4.0           # a re-read's rendering, at most this many pixels a point
 AROUND = (3.0, 6.0)  # a marked claim's box widened this many times (across, down), within its tile,
@@ -450,10 +451,12 @@ Look for it in this image of the source:
 item: {subject}
 property: {property}
 Why it was expected: {why}
-Say what the image gives: "reads" is "given" only if the image prints a value of this property for this item (say
-it in "value" and "unit", as printed, and in "quote" the image's words around it, exactly); "not_given" if the image
-shows the item and where the property would be, with no value for it (a blank cell, "-", "TBD"); "not_shown" if it
-doesn't show where the property would be for this item. "why": briefly.
+Say what the image gives: "reads" is "given" if the image prints a value of this property for this item, under
+its name or another name for the same property (a sheet index's title is a sheet's name), not another property's
+value (say it in "value" and "unit", as printed, and in "quote" the image's words around it, exactly); "not_given" if
+it shows where the property would be for this item, with no value there (a blank cell, "-", "TBD"); "no_place" if it
+shows the item but nowhere it would give this property (no such column, field or note); "not_shown" if it doesn't
+show the item. "why": briefly.
 Return JSON {"reads": "", "value": "", "unit": "", "quote": "", "why": ""}.
 '''
 
@@ -464,8 +467,9 @@ def look_prompt(gap, names):
 
 def looked_said(found):
     """Where a gap was looked for and what was found (its log entry), as the gaps say it after "looked for on": "a.pdf,
-    page 2: it gives 6.2 ft", "...: not given", "...: not shown there"."""
-    said = {"given": "it gives " + (found.get("value") or "a value"), "not_given": "not given"}
+    page 2: it gives 6.2 ft", "...: not given", "...: no place for it there", "...: not shown there"."""
+    said = {"given": "it gives " + (found.get("value") or "a value"), "not_given": "not given",
+            "no_place": "no place for it there"}
     return f"{found.get('where', '')}: " + said.get(found.get("relation"), "not shown there")
 
 def subject_of(gap, index):
