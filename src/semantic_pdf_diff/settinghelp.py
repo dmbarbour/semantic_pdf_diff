@@ -144,6 +144,8 @@ HELP = {
                      "index and the search", "From the parts headed Abbreviations, Definitions, Symbols, Legend and "
                      "the like (the model, a request a part of about 100 lines; a text file's tables as they are), "
                      "and from prose (\"net positive suction head (NPSH)\"). off: none read.", basic=True),
+    "second_pass": Help(_L, "analyses: each subject's claims read together, a request a subject; context added, "
+                            "relations, suspicions and likely gaps noted beside the claims, never changing them"),
     "topic_glossary": Help(_L, "with glossary: the topics count a meaning written out as its term, one word"),
     "topic_names": Help("comparing", "the model chooses the report's topics and names them, in one request",
                         "off: topics named by their words.", basic=True),

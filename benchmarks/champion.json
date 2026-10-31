@@ -62,7 +62,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "embed", "rerank"
+    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "second_pass", "embed", "rerank"
   ],
   "context_before": 400,
   "context_after": 400,

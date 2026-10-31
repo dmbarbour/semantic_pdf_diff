@@ -1280,6 +1280,17 @@ class JudgeGlossary(Lever):
                             evidence.locator.page)
         return {**shown, **({"terms": used} if used else {})}
 
+class ReadTogether(Lever):
+    lever_name, stage, off = "second_pass", "comparison", {"second_pass": False}
+    # analyses: each subject's claims read together, a request a subject, what's learnt kept as a log of commentary
+    # beside the claims (context added, relations, suspicions, inferences, what's likely missing; dossiers.py;
+    # docs/plans/single-document-analysis-2026-10-28.md, milestone 3; the owner, 2026-10-31: "Agree with all
+    # second-pass recommendations": a stage, in comparisons once measured). Off until measured
+    second_pass: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def reads_together(self, mode):
+        return self.second_pass and mode == "analysis"
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -1306,7 +1317,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, Embed, Rerank)
+                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ReadTogether, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1518,6 +1529,12 @@ class Platform(Composable):
     def names_synonyms(self):
         """Whether the model groups the documents' other names for one thing, for the report's search (synonyms.py):
         the platform's, never; the search_names lever's, when on."""
+        return False
+
+    @chosen
+    def reads_together(self, mode):
+        """Whether a report's subjects are read together, after its claims (dossiers.py): the platform's, never; the
+        second_pass lever's, in analyses when on."""
         return False
 
     @chosen

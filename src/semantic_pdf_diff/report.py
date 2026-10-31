@@ -88,7 +88,8 @@ border-radius:12px;padding:22px;margin:18px 0}
 section{min-width:0;padding:12px;background:var(--panel);border-radius:8px}
 img{display:block;max-width:100%;max-height:500px;margin:14px auto}\
 blockquote{border-left:3px solid var(--rule);margin:14px 0;padding-left:12px}\
-.snippet{color:var(--muted);font-size:13px;white-space:pre-line;margin:6px 0}.snippet em{font-style:normal;\
+.snippet{color:var(--muted);font-size:13px;white-space:pre-line;margin:6px 0}.notes{font-size:13px;\
+border-left:3px dotted var(--rule);padding-left:10px;margin:6px 0}.notes p{margin:2px 0}.snippet em{font-style:normal;\
 text-decoration:underline;text-decoration-thickness:2px;color:var(--fg)}.snippet.folded{display:-webkit-box;\
 -webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}\
@@ -163,6 +164,36 @@ class Cards:
             self.occurrences.setdefault(f["content"], []).append(f"{f['source']} / {f['path']}")
         self.headings = {(x["content"], x["id"]): " > ".join(x["heading_path"]) for x in data.get("sections", [])}
         self.records = {(r["content"], r["id"]): r for r in data.get("records", [])}
+        self.notes = {}  # claim id: the second pass's entries about it (dossiers.py)
+        for c in (data.get("commentary") or {}).get("entries", []):
+            for x in c["claims"]:
+                self.notes.setdefault(x, []).append(c)
+
+    def noted(self, eid):
+        """What the second pass said of a claim (dossiers.py), held as ours: after the card's own words, out of search
+        as its snippet is."""
+        lines = []
+        for c in self.notes.get(eid, []):
+            others = [x for x in c["claims"] if x != eid]
+            other = self.evidence.get(others[0]) if others else None
+            unit = other['unit'] if other and other['unit'] not in ('', '-') else ''
+            at = (f"{PAGE_WORDS.get(other['locator'].get('format'), 'page')} {other['locator']['page']}: "
+                  f"{other['value']} {unit}".strip()) if other else ""
+            if c["kind"] == "context":
+                lines.append(f"{c['adds'].capitalize()}: {esc(c['text'])} — “{esc(c['quote'])}”")
+            elif c["kind"] == "relation" and other is not None:
+                first = c["claims"][0] == eid
+                said = RELATION_SAID[c["relation"]][0 if first else 1]
+                lines.append(f"{said} {esc(at)}" + (f" ({esc(c['why'])})" if c.get("why") else ""))
+            elif c["kind"] == "suspicion":
+                lines.append(f"Suspected {SUSPICION_SAID[c['relation']]}" + (f": {esc(c['why'])}" if c.get("why")
+                                                                             else ""))
+            elif c["kind"] == "inference":
+                lines.append(f"Inferred: {esc(c['text'])}")
+        if not lines:
+            return ""
+        return ('<div class="notes"><b>Read with its subject\'s other claims</b> (ours, not the document\'s):'
+                + "".join(f"<p>{line}</p>" for line in lines) + "</div>")
 
     def context(self, e):
         """Where a claim sits and what reaches it, as its records and position say (the records lever): its name as
@@ -218,7 +249,14 @@ class Cards:
 {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']} · {esc(e['kind'])}</h3>
         <div data-said="{self.said_of[eid]}"></div>{self.context(e)}{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>\
-{snippet_html(e, folded='<span class="shot">' in image)}{image}</section>'''
+{snippet_html(e, folded='<span class="shot">' in image)}{self.noted(eid)}{image}</section>'''
+
+# How a card says another claim relates to it (dossiers.RELATIONS): as the relation's first claim, as its second
+RELATION_SAID = {"restates": ("Restated", "Restated"), "corroborates": ("Corroborated by", "Corroborates"),
+                 "refines": ("Refines", "Refined by"), "differs_by_condition": ("Differs by condition from",
+                                                                               "Differs by condition from"),
+                 "contradicts": ("Contradicts", "Contradicts"), "derived_from": ("Derived from", "Gives")}
+SUSPICION_SAID = {"misread": "misread", "other_subject": "about another subject", "out_of_place": "out of place"}
 
 def snippet_html(e, folded=False):
     """A card's snippet of its source's text (report snippets, milestone 1; the owner, 2026-10-28: "include the
@@ -590,7 +628,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
         page += topic_coverage_html(claims, names, sides)
     index = data.get('index') or {}
     subjects, figures, terms = index.get('subjects', []), index.get('figures', []), index.get('glossary', [])
-    kinds, gaps = index.get('kinds', []), index.get('gaps', [])
+    kinds, gaps, clashes = index.get('kinds', []), index.get('gaps', []), index.get('inconsistencies', [])
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
@@ -599,6 +637,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              + (f'<button data-view="figures">Figures and tables {len(figures)}</button>' if figures else '')
              + (f'<button data-view="glossary">Glossary {len(terms)}</button>' if terms else '')
              + (f'<button data-view="gaps">What it doesn\'t give {len(gaps)}</button>' if gaps else '')
+             + (f'<button data-view="inconsistencies">Inconsistencies {len(clashes)}</button>' if clashes else '')
              + '</div>')
     page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
              + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
@@ -646,7 +685,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
     sources = index.get('sources', [])
     page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
-             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources) + gaps_html(gaps, sources))
+             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources) + gaps_html(gaps, sources)
+             + inconsistencies_html(clashes, sources))
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -761,6 +801,24 @@ def gaps_html(gaps, sources):
              + '<th>Item</th><th>Property</th><th>Where</th><th>Why</th>')
     return (f'<section data-for="gaps" class="index" hidden><p class="meta">{esc(GAPS_NOTE)}</p><div class="wide">'
             f'<table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div></section>')
+
+def inconsistencies_html(found, sources):
+    """The Inconsistencies view (indexes.inconsistencies): two claims of one subject the second pass says contradict
+    each other, each linked to its card, with its reason."""
+    if not found:
+        return ''
+    from .indexfiles import INCONSISTENCIES_NOTE
+    many = len(sources) > 1
+    def link(x, k):
+        return f'<a href="#claim={esc(x["claims"][k])}">{esc(x["said"][k])}</a> <small>{esc(x["where"][k])}</small>'
+    rows = ''.join(
+        f'<tr data-text="{esc(" ".join([x["subject"], *x["said"], x["why"]]).casefold())}">'
+        + (f'<td>{esc(x["source"])}</td>' if many else '') + f'<td>{esc(x["subject"])}</td><td>{link(x, 0)}</td>'
+        f'<td>{link(x, 1)}</td><td>{esc(x["why"])}</td></tr>' for x in found)
+    heads = ('<th>Source</th>' if many else '') + '<th>Item</th><th>Says</th><th>Against</th><th>Why</th>'
+    return (f'<section data-for="inconsistencies" class="index" hidden><p class="meta">{esc(INCONSISTENCIES_NOTE)}'
+            f'</p><div class="wide"><table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div>'
+            '</section>')
 
 def item_kinds_html(kinds, subjects, sources):
     """The Kinds view: each kind of item a table of its items by property, the most given first, each value linked

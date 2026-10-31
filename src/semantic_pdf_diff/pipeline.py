@@ -354,7 +354,10 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
         limitations=ANALYSIS_LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = searchable({**data, **({'glossary': found} if found is not None else {})}, settings, client, ONE_SOURCE,
                       label, progress)
-    progress.close()  # its search's requests (topics' names, other names, vectors)
+    if settings.reads_together(ONE_SOURCE):  # each subject's claims read together (the second_pass lever)
+        from . import dossiers, indexes
+        data['commentary'] = dossiers.read_together(data, indexes.built(data), client, ONE_SOURCE, label, progress)
+    progress.close()  # its search's requests (topics' names, other names, vectors), and the second pass's
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)
 

@@ -493,6 +493,41 @@ class GlossaryTerms(DropsUnknown):
     """The terms a part of a document defines, as the model read them (the glossary lever; glossary.py)."""
     terms: list[GlossaryTerm] = Field(default_factory=list)
 
+class AddedContext(Lenient):
+    """Context a claim lacks that its subject's dossier supplies (the second pass; dossiers.py)."""
+    claim: str = Field(default="", max_length=20)   # its name in the dossier: C1, C2, ...
+    adds: str = Field(default="", max_length=20)    # scope, condition, frame or holder
+    text: str = Field(default="", max_length=300)
+    quote: str = Field(default="", max_length=300)  # the dossier's words that supply it
+
+class ClaimRelation(Lenient):
+    a: str = Field(default="", max_length=20)
+    b: str = Field(default="", max_length=20)
+    relation: str = Field(default="", max_length=40)  # dossiers.RELATIONS
+    why: str = Field(default="", max_length=300)
+
+class Suspicion(Lenient):
+    claim: str = Field(default="", max_length=20)
+    kind: str = Field(default="", max_length=40)  # dossiers.SUSPICIONS
+    why: str = Field(default="", max_length=300)
+
+class Inference(Lenient):
+    text: str = Field(default="", max_length=400)
+    claims: list[str] = Field(default_factory=list, max_length=20)
+
+class LikelyMissing(Lenient):
+    property: str = Field(default="", max_length=160)
+    why: str = Field(default="", max_length=300)
+
+class SecondPass(Lenient):
+    """One subject's claims read together (the second pass; dossiers.py): what the model says of them, before it's
+    checked."""
+    context: list[AddedContext] = Field(default_factory=list, max_length=40)
+    relations: list[ClaimRelation] = Field(default_factory=list, max_length=60)
+    suspicions: list[Suspicion] = Field(default_factory=list, max_length=40)
+    inferences: list[Inference] = Field(default_factory=list, max_length=20)
+    missing: list[LikelyMissing] = Field(default_factory=list, max_length=20)
+
 class OtherNames(DropsUnknown):
     """The names two documents give one thing, grouped: items' and properties' (the search_names lever;
     synonyms.py)."""

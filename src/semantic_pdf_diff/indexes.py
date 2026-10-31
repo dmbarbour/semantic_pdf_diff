@@ -25,8 +25,11 @@ document that would be useful, and it seems deeply related to the problem of com
   each source's, a term the sources define differently marked.
 - **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): a property
   most of an item's siblings give that it doesn't (each source's own); a figure, table or sheet cited and not found
-  (situating's unresolved references); a value given as a placeholder ("TBD", "to be confirmed"). Each weak: where
-  it was expected and why, never a finding.
+  (situating's unresolved references); a value given as a placeholder ("TBD", "to be confirmed"); and, where the
+  second pass ran (dossiers.py), what it says a subject likely lacks. Each weak: where it was expected and why, never
+  a finding.
+- **Inconsistencies** (milestone 4): two claims of one subject the second pass says contradict each other (other
+  values for the same thing under the same conditions), each with both claims and its reason.
 """
 import re
 from collections import Counter, defaultdict
@@ -186,7 +189,8 @@ def built(data):
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
     found_kinds = kinds(subjects)
     return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data),
-            "kinds": found_kinds, "gaps": gaps(data, subjects, found_kinds, where)}
+            "kinds": found_kinds, "gaps": gaps(data, subjects, found_kinds, where),
+            "inconsistencies": inconsistencies(data, where)}
 
 # An item named with a number: its kind's name before the number ("Room 104", "blower 3", "Pump No. 2").
 NUMBERED_NAME = re.compile(r"^(.*?[A-Za-z][A-Za-z ./&'-]*?)[\s#-]*(?:no\.?\s*)?\d+[A-Za-z]?$", re.IGNORECASE)
@@ -233,7 +237,7 @@ SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most 
 # A value that holds a place for one not given ("N/A" says it doesn't apply, not that it's missing)
 PLACEHOLDER = re.compile(r"^\W*(?:TBD|TBC|TBA|TBV|TBR|to be (?:determined|confirmed|provided|advised|verified|decided|"
                          r"agreed|supplied|issued))\b", re.IGNORECASE)
-GAP_KINDS = ("siblings", "reference", "placeholder")
+GAP_KINDS = ("siblings", "reference", "placeholder", "likely")
 
 def gaps(data, subjects, found_kinds, where):
     """What the sources don't give, found by code (single-document analysis, milestone 5): [{"kind": "siblings",
@@ -276,6 +280,16 @@ def gaps(data, subjects, found_kinds, where):
                         "property": "", "where": (f["path"] if f else content) + f", page {u['page']}",
                         "why": "cited, not found in the document: “" + " ".join(u.get("text", "").split())[:120]
                                + "”", "claims": list(u.get("evidence") or [])})
+    first = {}  # (source, subject): where its first value is given
+    for s in subjects:
+        for p in s["properties"]:
+            for v in p["values"]:
+                first.setdefault((v["source"], s["name"]), v["where"])
+    for c in (data.get("commentary") or {}).get("entries", []):
+        if c["kind"] == "missing":
+            out.append({"kind": "likely", "source": c["source"], "subject": c["subject"], "property": c["text"],
+                        "where": first.get((c["source"], c["subject"]), ""),
+                        "why": "read together: " + (c.get("why") or "its dossier suggests it"), "claims": []})
     for e in data.get("evidence", []):
         if PLACEHOLDER.match(str(e["value"])):
             out.append({"kind": "placeholder", "source": where.source.get(e["content"], ""), "subject": e["entity"],
@@ -283,6 +297,22 @@ def gaps(data, subjects, found_kinds, where):
                         "claims": [e["id"]]})
     return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), g["source"], natural(g["subject"]),
                                       natural(g["property"]), natural(g["where"])))
+
+def inconsistencies(data, where):
+    """Two claims of one subject the second pass says contradict each other (dossiers.py): [{"source", "subject",
+    "claims": [a, b], "said": [each one's value], "where": [each one's place], "why"}], in the log's order."""
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+    out = []
+    for c in (data.get("commentary") or {}).get("entries", []):
+        if c["kind"] != "relation" or c.get("relation") != "contradicts" or not all(x in evidence for x in c["claims"]):
+            continue
+        claims = [evidence[x] for x in c["claims"]]
+        out.append({"source": c["source"], "subject": c["subject"], "claims": c["claims"],
+                    "said": [" ".join(x for x in (str(e["value"]), e["unit"] if e["unit"] not in ("", "-") else "",
+                                                  f"({e['conditions']})" if e.get("conditions") else "") if x)
+                             for e in claims],
+                    "where": [where(e) for e in claims], "why": c.get("why", "")})
+    return out
 
 def data_sources(data):
     return [s["name"] for s in data.get("sources", [])]

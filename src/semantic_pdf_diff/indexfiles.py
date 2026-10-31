@@ -104,10 +104,19 @@ def markdown(index):
                      + (" — defined differently" if t.get("differs") else "")
                      + (f" — {reach_said(t)}" if reach_said(t) else ""))
     lines += gaps_md(index.get("gaps", []), many)
+    found = index.get("inconsistencies", [])
+    if found:
+        lines += ["", "## Inconsistencies", "", INCONSISTENCIES_NOTE, ""] + [
+            f"- {(x['source'] + ': ') if many else ''}**{x['subject']}**: {x['said'][0]} ({x['where'][0]}) against "
+            f"{x['said'][1]} ({x['where'][1]})" + (f"; {x['why']}" if x["why"] else "") for x in found]
     return "\n".join(lines).rstrip() + "\n"
 
 # The gaps' kinds, as index.md, the workbook and the page head them
-GAP_TITLES = {"siblings": "Missing among siblings", "reference": "Cited, not found", "placeholder": "Placeholders"}
+GAP_TITLES = {"siblings": "Missing among siblings", "reference": "Cited, not found", "placeholder": "Placeholders",
+              "likely": "Likely missing, read together"}
+INCONSISTENCIES_NOTE = ("Two claims of one subject that the second pass, reading its claims together, says contradict "
+                        "each other: other values for the same thing under the same conditions. Ours, not the "
+                        "document's: check both against their places.")
 GAPS_NOTE = ("Found by code, each weak: where it was expected and why. A document may say it elsewhere, in other "
              "words, and a reader may have missed what's there; never a finding.")
 
@@ -172,6 +181,11 @@ def tables(index, evidence):
             "glossary": (["Term", "Kind", "Meaning", "Source", "Where", "Reach", "Block", "How", "Differs",
                           "Alike on sheets"], glossary),
             "kinds": (["Kind", "Item", "Property", *tail], kinds),
+            **({"inconsistencies": (["Source", "Subject", "Says", "Where", "Against", "Where", "Why", "Claims"],
+                                    [[x["source"], x["subject"], x["said"][0], x["where"][0], x["said"][1],
+                                      x["where"][1], x["why"], " ".join(x["claims"])]
+                                     for x in index["inconsistencies"]])}
+               if index.get("inconsistencies") else {}),  # the second pass's, where it found any
             "gaps": (["Gap", "Source", "Subject", "Property", "Where", "Why", "Claims"],
                      [[GAP_TITLES[g["kind"]], g["source"], g["subject"], g["property"], g["where"], g["why"],
                        " ".join(g["claims"])] for g in index.get("gaps", [])])}
@@ -294,6 +308,8 @@ def workbook(index, evidence):
     sheets = [("About", sheet([], about, widths=[20, 90])), ("Subjects", sheet(header, outlined, outline)),
               ("Kinds", kinds_sheet(index))]
     sheets += [(name.title(), sheet(*found[name])) for name in ("properties", "claims", "figures", "glossary", "gaps")]
+    if index.get("inconsistencies"):  # the second pass's, where it ran
+        sheets.append(("Inconsistencies", sheet(*found["inconsistencies"])))
     out = io.BytesIO()
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
         def put(name, text):

@@ -62,7 +62,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "embed", "rerank"
+    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "second_pass", "embed", "rerank"
   ],
   "table_rules": null,
   "table_structure": false,
@@ -94,6 +94,7 @@
   "retrieve_glossary": false,
   "explain_glossary": false,
   "topic_glossary": false,
+  "second_pass": false,
   "reader_glossary": false,
   "hedges_apart": false,
   "read_holders": false,
