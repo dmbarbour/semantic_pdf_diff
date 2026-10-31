@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.17.0 (2026-10-31)
+
+- **Each claim's card shows the source's text around its quote:** the sentences holding it, up to about 600 characters, or a table row under its header, with the quote underlined. It's shown in full where the card has no crop or the size budget left its crop out, and folded to two lines below a crop that's shown (a click unfolds it). It isn't searched, and the judge never sees it.
+- **Stores are read again once,** with their answers from the answers cache, so their claims get their snippets. No model requests are needed for that.
+
 ## 0.16.0 (2026-10-31)
 
 - **What it doesn't give.** Every report's index now lists gaps found by code, with no model requests. Each is labelled weak, with where it was expected and why:
