@@ -795,14 +795,17 @@ def gaps_html(gaps, sources):
         return ''
     from .indexfiles import GAP_TITLES, GAPS_NOTE
     many = len(sources) > 1
+    looked = any(g.get("looked") for g in gaps)  # the second pass's looks (dossiers.looks), where it ran
     rows = ''.join(
         f'<tr data-text="{esc(" ".join([g["subject"], g["property"], g["why"], g["where"]]).casefold())}">'
         f'<td>{esc(GAP_TITLES[g["kind"]])}</td>' + (f'<td>{esc(g["source"])}</td>' if many else '')
         + '<td>' + (f'<a href="#claim={esc(g["claims"][0])}">{esc(g["subject"])}</a>' if g['claims']
                     else esc(g['subject'])) + f'</td><td>{esc(g["property"])}</td><td>{esc(g["where"])}</td>'
-        f'<td>{esc(g["why"])}</td></tr>' for g in gaps)
+        f'<td>{esc(g["why"])}</td>' + (f'<td>{esc(g.get("looked", ""))}</td>' if looked else '') + '</tr>'
+        for g in gaps)
     heads = ('<th>Gap</th>' + ('<th>Source</th>' if many else '')
-             + '<th>Item</th><th>Property</th><th>Where</th><th>Why</th>')
+             + '<th>Item</th><th>Property</th><th>Where</th><th>Why</th>'
+             + ('<th>Looked for on</th>' if looked else ''))
     return (f'<section data-for="gaps" class="index" hidden><p class="meta">{esc(GAPS_NOTE)}</p><div class="wide">'
             f'<table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div></section>')
 

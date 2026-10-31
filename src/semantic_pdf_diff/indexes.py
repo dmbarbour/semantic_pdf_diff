@@ -290,6 +290,13 @@ def gaps(data, subjects, found_kinds, where):
             out.append({"kind": "likely", "source": c["source"], "subject": c["subject"], "property": c["text"],
                         "where": first.get((c["source"], c["subject"]), ""),
                         "why": "read together: " + (c.get("why") or "its dossier suggests it"), "claims": []})
+    from .dossiers import looked_said
+    looked = {(c["source"], fold(c["subject"]), fold(c["text"])): looked_said(c)
+              for c in (data.get("commentary") or {}).get("entries", []) if c["kind"] == "looked"}
+    for g in out:  # what a look where it would be found (dossiers.looks)
+        said = looked.get((g["source"], fold(g["subject"]), fold(g["property"])))
+        if said:
+            g["looked"] = said
     for e in data.get("evidence", []):
         if PLACEHOLDER.match(str(e["value"])):
             out.append({"kind": "placeholder", "source": where.source.get(e["content"], ""), "subject": e["entity"],

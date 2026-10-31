@@ -175,5 +175,47 @@ class Analyzed(unittest.TestCase):
         self.assertIn("Read again from its place: it gives 42 m", page)
         self.assertIn("read again: it gives 42 m", page)  # against the inconsistency
 
+    def test_a_pdfs_gaps_looked_for_where_they_would_be(self):
+        """A gap among siblings looked for before it's reported (the owner, 2026-10-31: "Your recommended path seems
+        reasonable"): the page naming its subject and property rendered, asked once; what it gives beside the gap."""
+        state = {"embedded": [], "names": 0, "looked": []}
+        serve = endpoint(state)
+
+        def post(handler):
+            if not handler.path.endswith("/embeddings"):
+                body = request_body(handler)
+                prompt = prompt_of(body["messages"][1]["content"])
+                if "Read one subject's claims" in prompt:
+                    return chat_answer(handler, {})
+                if "found no value of one property" in prompt:
+                    images = [p for p in body["messages"][1]["content"] if p.get("type") == "image_url"]
+                    state["looked"].append((len(images), "item: P104" in prompt, "property: head" in prompt))
+                    return chat_answer(handler, {"reads": "not_given", "why": "no head on its line"})
+                handler.rfile = io.BytesIO(json.dumps(body).encode())
+                handler.headers.replace_header("Content-Length", str(len(json.dumps(body).encode())))
+            return serve(handler)
+        with tempfile.TemporaryDirectory() as d, serving(post) as url:
+            root = Path(d)
+            text_pdf(root / "pumps.pdf", ["P101 | head | 42 | m", "P102 | head | 40 | m", "P103 | head | 41 | m",
+                                          "P104 | rated power | 75 | kW", "P104 | speed | 1480 | rpm"])
+            config = root / "settings.json"
+            config.write_text(json.dumps({"second_pass": True, "search_names": False, "topic_names": False,
+                                          "vision": False}))
+            args = ("analyze", root / "pumps.pdf", "--store", root / "out", "--base-url", url, "--config", config,
+                    "--no-situate")
+            code, _, _ = run(*args)
+            found = json.loads((root / "out" / "report.json").read_text())
+            page = unpacked((root / "out" / "report.html").read_text())
+            index = (root / "out" / "index.md").read_text()
+            rendered = sorted(p.name for p in (root / "out" / "assets").glob("*-look-*.png"))
+            again, _, _ = run(*args)
+        self.assertEqual(again, code)
+        self.assertEqual(state["looked"], [(1, True, True)])  # once, with its image; then from the cache
+        self.assertEqual(len(rendered), 1)
+        self.assertEqual(found["commentary"]["looked"], {"asked": 1, "failed": 0, "skipped": 0})
+        self.assertIn("P104: head** (pumps.pdf, page 4; 3 of its 4", index)  # (a line a page)
+        self.assertIn("; looked for on pumps.pdf, page 4: not given", index)
+        self.assertIn("<th>Looked for on</th>", page)
+
 if __name__ == "__main__":
     unittest.main()

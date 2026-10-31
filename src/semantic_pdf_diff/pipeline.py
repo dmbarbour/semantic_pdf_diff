@@ -376,6 +376,10 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
                                  progress)  # the claims it doubts read again from their places
         data['commentary']['entries'] += again.pop('entries')
         data['commentary']['reread'] = again
+        looked = dossiers.looks(data, indexes.built(data), store, client, ONE_SOURCE, label, settings.image_side,
+                                progress)  # its gaps, and the index's among siblings, looked for where they'd be
+        data['commentary']['entries'] += looked.pop('entries')
+        data['commentary']['looked'] = looked
     progress.close()  # its search's requests (topics' names, other names, vectors), and the second pass's
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)

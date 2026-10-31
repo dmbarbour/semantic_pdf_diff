@@ -91,6 +91,11 @@ class Chunks(unittest.TestCase):
                       "What it doesn't give (weak: it may be said elsewhere, or missed by the reader):\n"
                       "- Missing among siblings: head (", p104)
         self.assertNotIn("Read together", p104)  # no second pass: no notes, nor the line saying what they are
+        data["commentary"] = {"entries": [{"kind": "looked", "source": "a", "subject": "P-104 pump", "claims": [],
+                                           "relation": "not_given", "text": "head", "where": "a.pdf, page 4"}]}
+        files = export.exported(data, indexes.built(data), "")
+        (p104,) = [t for t in files.values() if t.startswith('---\ntitle: "Subject: P-104 pump"')]
+        self.assertIn("; looked for on a.pdf, page 4: not given", p104)  # where the gap was looked for
 
     def test_the_second_passs_notes_under_the_claims_they_are_about(self):
         data = pumps(2)

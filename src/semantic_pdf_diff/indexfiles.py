@@ -129,7 +129,7 @@ def gap_said(g, many=False):
     """A gap in a line: "P-103: head (page 12; 2 of its 3 pump (P) items give it: P-101, P-102)"."""
     what = g["subject"] + (f": {g['property']}" if g["property"] else "")
     return ((f"{g['source']}: " if many else "") + f"**{what}** ({g['where']}" + (f"; {g['why']}" if g["why"] else "")
-            + ")")
+            + ")" + (f"; looked for on {g['looked']}" if g.get("looked") else ""))
 
 def gaps_md(gaps, many):
     """index.md's section "What it doesn't give" (indexes.gaps): the gaps by kind."""
@@ -192,9 +192,9 @@ def tables(index, evidence):
                                       x["said"][1], x["where"][1], x["read again"][1], x["why"], " ".join(x["claims"])]
                                      for x in index["inconsistencies"]])}
                if index.get("inconsistencies") else {}),  # the second pass's, where it found any
-            "gaps": (["Gap", "Source", "Subject", "Property", "Where", "Why", "Claims"],
+            "gaps": (["Gap", "Source", "Subject", "Property", "Where", "Why", "Looked for", "Claims"],
                      [[GAP_TITLES[g["kind"]], g["source"], g["subject"], g["property"], g["where"], g["why"],
-                       " ".join(g["claims"])] for g in index.get("gaps", [])])}
+                       g.get("looked", ""), " ".join(g["claims"])] for g in index.get("gaps", [])])}
 
 def csv_text(header, rows):
     out = io.StringIO()

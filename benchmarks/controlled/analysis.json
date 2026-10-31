@@ -55,6 +55,18 @@
      "otherwise": 1
     }
    },
+   "looked": {
+    "likely: planted": {
+     "not_given": 4
+    },
+    "siblings: named by a value": {
+     "given": 6,
+     "not_given": 6
+    },
+    "siblings: planted": {
+     "not_given": 4
+    }
+   },
    "log": {
     "subjects": 30,
     "dropped": 0,
@@ -101,6 +113,7 @@
    },
    "suspicions": {},
    "reread": {},
+   "looked": {},
    "log": {
     "subjects": 30,
     "dropped": 0,
@@ -170,6 +183,7 @@
    },
    "suspicions": {},
    "reread": {},
+   "looked": {},
    "claims": {
     "claims": 72,
     "classes": {
@@ -266,6 +280,18 @@
      "as_claimed": 6
     }
    },
+   "looked": {
+    "likely: planted": {
+     "not_given": 2
+    },
+    "siblings: named by a value": {
+     "given": 3,
+     "not_given": 3
+    },
+    "siblings: planted": {
+     "not_given": 2
+    }
+   },
    "claims": {
     "claims": 85,
     "classes": {
@@ -343,6 +369,7 @@
    },
    "suspicions": {},
    "reread": {},
+   "looked": {},
    "claims": {
     "claims": 73,
     "classes": {
@@ -440,6 +467,18 @@
     "planted contradiction": {
      "as_claimed": 4,
      "otherwise": 1
+    }
+   },
+   "looked": {
+    "likely: planted": {
+     "not_given": 2
+    },
+    "siblings: named by a value": {
+     "given": 3,
+     "not_given": 3
+    },
+    "siblings: planted": {
+     "not_given": 2
     }
    },
    "claims": {

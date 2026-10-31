@@ -236,7 +236,17 @@ class Gaps(unittest.TestCase):
         self.assertIn("## What it doesn't give", page)
         self.assertIn("- **Table 5** (a.pdf, page 2; cited, not found in the document: “as given in Table 5”)", page)
         self.assertEqual(indexfiles.tables(index, {e["id"]: e for e in pumps})["gaps"][0],
-                         ["Gap", "Source", "Subject", "Property", "Where", "Why", "Claims"])
+                         ["Gap", "Source", "Subject", "Property", "Where", "Why", "Looked for", "Claims"])
+        # looked for where it would be (dossiers.looks): what was found there beside the gap
+        data["commentary"] = {"entries": [{"kind": "looked", "source": "a", "subject": "P-104 pump", "claims": [],
+                                           "relation": "not_given", "text": "Head", "where": "a.pdf, page 4"}]}
+        index = indexes.built(data)
+        self.assertEqual(index["gaps"][0]["looked"], "a.pdf, page 4: not given")
+        self.assertIn("4 pump (P) items give it: P-101 pump, P-102 pump, P-103 pump); looked for on a.pdf, page 4: not "
+                      "given", indexfiles.markdown(index))
+        self.assertEqual(indexfiles.tables(index, {e["id"]: e for e in pumps})["gaps"][1][0][6],
+                         "a.pdf, page 4: not given")
+        self.assertNotIn("looked", index["gaps"][2])  # a placeholder isn't looked for
 
     def test_more_than_half_must_give_it_of_three_at_least(self):
         two = [claim("A-1", "ca", "P-101", "head", "40", "m"), claim("A-2", "ca", "P-101", "flow", "5", "L/s"),

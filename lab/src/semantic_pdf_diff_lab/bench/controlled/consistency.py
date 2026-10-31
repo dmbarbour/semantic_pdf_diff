@@ -226,7 +226,8 @@ def write(project, folder):
 
 def scored(key, data):
     """An analysis's report.json (data) scored against its key: {"contradictions", "pairs", "gaps", "implied",
-    "suspicions"}, each count exact (see the module's docstring)."""
+    "suspicions", "reread", "looked"}, each count exact (see the module's docstring); "looked": each gap looked for
+    (dossiers.looks), by its kind and whether it was planted, what its place gave."""
     from semantic_pdf_diff import indexes
     from .score import classify, key_facts
     facts = [f for f in key_facts(key) if not f.relation]
@@ -291,6 +292,16 @@ def scored(key, data):
             again["planted contradiction" if bound.get(c) in contradicted else "named by a value" if named
                   else classes.get(c, "unknown")][e.get("relation", "")] += 1
     out["reread"] = {k: dict(sorted(v.items())) for k, v in sorted(again.items())}
+    from semantic_pdf_diff.terms import fold as folded
+    looked = {(e["source"], folded(e["subject"]), folded(e.get("text", ""))): e.get("relation", "")
+              for e in entries if e["kind"] == "looked"}
+    seen = defaultdict(lambda: defaultdict(int))  # a gap looked for, by kind and whether planted: what its place gave
+    for k, g in enumerate(gaps):
+        found = looked.get((g["source"], folded(g["subject"]), folded(g["property"])))
+        if found:
+            seen[g["kind"] + (": planted" if k in matched else ": named by a value" if VALUE_NAMED.match(g["property"])
+                              else ": not planted")][found] += 1
+    out["looked"] = {k: dict(sorted(v.items())) for k, v in sorted(seen.items())}
     out["claims"] = {"claims": len(classes), "classes": dict(sorted(Counter(classes.values()).items()))}
     out["log"] = {k: (data.get("commentary") or {}).get(k, 0) for k in ("subjects", "dropped", "failed")}
     return out
@@ -333,9 +344,9 @@ def totals(results):
             "suspicions": {kind: dict(sorted(Counter(c for r in mine for c, n in r["suspicions"].get(kind, {}).items()
                                                      for _ in range(n)).items()))
                            for kind in sorted({k for r in mine for k in r["suspicions"]})},
-            "reread": {kind: dict(sorted(Counter(c for r in mine for c, n in r.get("reread", {}).get(kind, {}).items()
-                                                 for _ in range(n)).items()))
-                       for kind in sorted({k for r in mine for k in r.get("reread", {})})},
+            **{part: {kind: dict(sorted(Counter(c for r in mine for c, n in r.get(part, {}).get(kind, {}).items()
+                                                for _ in range(n)).items()))
+                      for kind in sorted({k for r in mine for k in r.get(part, {})})} for part in ("reread", "looked")},
             "log": {k: add("log", k) for k in ("subjects", "dropped", "failed")}}
     return out
 

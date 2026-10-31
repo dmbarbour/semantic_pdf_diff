@@ -271,7 +271,9 @@ def subject_chunks(data, index, files, size=CHUNK, notes=None):
             lines.append("\n".join(["What it doesn't give (weak: it may be said elsewhere, or missed by the reader):"]
                                    + [f"- {(g['source'] + ': ') if many else ''}{GAP_TITLES[g['kind']]}"
                                       + (f": {g['property']}" if g["property"] else "") + f" ({g['where']}"
-                                      + (f"; {g['why']}" if g["why"] else "") + ")" for g in missing]))
+                                      + (f"; {g['why']}" if g["why"] else "") + ")"
+                                      + (f"; looked for on {g['looked']}" if g.get("looked") else "")
+                                      for g in missing]))
         also = [n for n in s["names"] if n.casefold() != s["name"].casefold()]
         noted = any(notes.get(c) for c in ids)
         lead = (f"What {' and '.join(index['sources'])} {'say' if many else 'says'} about {s['name']}"
@@ -372,7 +374,8 @@ def discovery_chunks(index, located, size=CHUNK):
     lists.append(("What it doesn't give", "Gaps found by code, each weak: where it was expected and why; the source "
                   "may say it elsewhere, and a reader may have missed it.",
                   [f"- **{g['subject']}**" + (f": {g['property']}" if g["property"] else "") + f" ({g['where']}; "
-                   f"{g['why']})" for g in index.get("gaps", [])]))
+                   f"{g['why']})" + (f"; looked for on {g['looked']}" if g.get("looked") else "")
+                   for g in index.get("gaps", [])]))
     lists.append(("Inconsistencies", "Two claims of one subject that a second reading says contradict each other; "
                   "check both against their places.",
                   [f"- **{x['subject']}**: {x['said'][0]} ({x['where'][0]}) against {x['said'][1]} ({x['where'][1]})"
