@@ -48,6 +48,13 @@ class Blocks(unittest.TestCase):
         self.assertNotIn("W12X26", text)
         self.assertNotIn("DIMENSIONS", text)
 
+    def test_a_term_read_across_a_column_gap_dropped(self):
+        answer = GlossaryTerms(terms=[{"term": "EF", "meaning": "GREENHECK | SP-B90"},
+                                      {"term": "DIRECTION IN WHICH BARS EXTEND", "meaning": "ENGINEERING | ENGRG."},
+                                      {"term": "EF", "meaning": "EXHAUST FAN"}])
+        text = "EF | EXHAUST FAN\nEF | GREENHECK | SP-B90\nDIRECTION IN WHICH BARS EXTEND | ENGINEERING | ENGRG."
+        self.assertEqual(glossary.kept(answer, text), ([("EF", "EXHAUST FAN", "term")], 2))
+
     def test_a_list_running_past_its_page_read_on_to_the_next_heading(self):
         doc = pymupdf.open()
         page = doc.new_page(width=612, height=792)

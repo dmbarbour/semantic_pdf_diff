@@ -314,6 +314,12 @@ def drawn_marks(page, rect):
     from .pages import shown
     return sum(1 for d in page.get_drawings() if shown(page, d["rect"]) in rect)
 
+def apart(term, meaning):
+    """Whether the model read a term or its meaning across a column gap (region_text's " | "): a schedule's row ("EF"
+    meaning "GREENHECK | SP-B90"), a scale bar ("0 | 2' | 4' | 8'"), or two columns' words paired ("ENGINEERING |
+    ENGRG."): 5 of the drawing sets' 703 entries, none of them right."""
+    return "|" in term or "|" in meaning
+
 def pictured_prompt(heading, text):
     return f"{PICTURED}HEADING: {heading}\nWORDS:\n{text}\n"
 
@@ -325,7 +331,7 @@ def kept_pictured(answer, text):
     for t in answer.terms:
         term, meaning = " ".join(t.term.split()), " ".join(t.meaning.split())
         found = fold(meaning) if len(meaning) <= 60 else fold(meaning)[:40]
-        if term and meaning and found in said and (drawn(term) or fold(term) in said):
+        if term and meaning and found in said and (drawn(term) or fold(term) in said) and not apart(term, meaning):
             out.append((term, meaning, "symbol"))
         else:
             dropped += 1
@@ -336,12 +342,12 @@ def prompt(heading, text):
 
 def kept(answer, text):
     """The terms the model gave that the block's text holds, term and meaning (a long meaning, its first 40
-    characters): [(term, meaning, kind)], and how many it gave that it doesn't."""
+    characters), neither across a column gap (apart): [(term, meaning, kind)], and how many it gave that it doesn't."""
     said, out, dropped = fold(text), [], 0
     for t in answer.terms:
         term, meaning = " ".join(t.term.split()), " ".join(t.meaning.split())
         found = fold(meaning) if len(meaning) <= 60 else fold(meaning)[:40]
-        if term and meaning and fold(term) in said and found in said:
+        if term and meaning and fold(term) in said and found in said and not apart(term, meaning):
             out.append((term, meaning, t.kind if t.kind in KINDS else "term"))
         else:
             dropped += 1
