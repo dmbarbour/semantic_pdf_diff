@@ -20,12 +20,16 @@ feature 2, milestone 2): `semantic-pdf-diff export`. The target ingest tool keep
 - **Discovery chunks:** the subjects A to Z, the figures and tables, the glossary, what the source doesn't give and,
   where the second pass found any, its inconsistencies, each pointing to the chunks holding what it names.
 - **Named by content:** each file's name is its text's hash, so an unchanged chunk keeps its name from one export to
-  the next and a changed one gets a new one; nothing is deleted (the user manages the corpus: decision of 2026-09-23).
+  the next and a changed one gets a new one (the user manages the corpus: decision of 2026-09-23). The folder holds
+  one export alone: an earlier export's chunks this one doesn't hold are removed, and a folder holding other files
+  refused (the owner, 2026-10-31: "Each export or report should be logically fresh from the sources, not
+  history-dependent.").
 - **index.md:** every chunk with its title, and how the export was made (the tool's version, the report's date and
   mode, its models, its coverage).
 """
 import hashlib
 import json
+import re
 from collections import defaultdict
 
 from .indexfiles import GAP_TITLES, KIND_COLUMNS, cell_md, kind_cell
@@ -35,6 +39,31 @@ EXCERPT = 120    # characters of a claim's quote shown, at most
 
 def name_of(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16] + ".md"
+
+NAMED = re.compile(r"[0-9a-f]{16}\.md")  # a chunk's name (name_of)
+
+def written(out, files):
+    """files ({name: text}) written into out, an empty folder or an earlier export's, and the earlier export's chunks
+    this one doesn't hold removed: an export is made from its report alone, never from what an earlier one left (the
+    owner, 2026-10-31: "Each export or report should be logically fresh from the sources, not history-dependent.").
+    A folder holding a file no export writes is refused, nothing written; hidden files are left alone. Returns how
+    many were removed."""
+    out.mkdir(parents=True, exist_ok=True)
+    index = out / "index.md"
+    foreign = sorted(p.name for p in out.iterdir() if not p.name.startswith(".") and not (
+        p.is_file() and (NAMED.fullmatch(p.name) or p.name == "index.md")))
+    if index.is_file() and not index.read_text(encoding="utf-8").startswith("# Export\n"):
+        foreign.append(index.name)
+    if foreign:
+        raise ValueError(f"{out} holds files an export doesn't write ({', '.join(foreign[:3])}"
+                         f"{', ...' if len(foreign) > 3 else ''}): export into an empty folder, or an earlier "
+                         "export's; nothing was written")
+    stale = [p for p in out.iterdir() if NAMED.fullmatch(p.name) and p.name not in files]
+    for name, text in files.items():
+        (out / name).write_text(text, encoding="utf-8")
+    for p in stale:
+        p.unlink()
+    return len(stale)
 
 def front(**fields):
     return "---\n" + "".join(f"{k}: {json.dumps(v, ensure_ascii=False)}\n" for k, v in fields.items() if v) + "---\n"

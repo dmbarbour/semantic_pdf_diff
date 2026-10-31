@@ -272,6 +272,24 @@ class ManyFiles(unittest.TestCase):
         self.assertIn("Findings: 1 different, 1 uncertain", second)
         self.assertEqual(account.size, sum(x.stat().st_size for x in folder.iterdir()))
 
+    def test_a_report_written_again_leaves_nothing_of_the_last_ones_pages(self):
+        """Each made fresh (the owner, 2026-10-31: "Each export or report should be logically fresh from the
+        sources, not history-dependent.")."""
+        out, data = self.root / "out", two_files_a_side(self.assets)
+        folder = out / "report-split"
+        write_report(data, out, assets=self.assets, split=True)
+        (folder / "03-r.html").write_text("an earlier report's third part")
+        write_report(data, out, assets=self.assets, split=True)
+        self.assertEqual(sorted(x.name for x in folder.iterdir()), ["01-p.html", "02-q.html", "index.html"])
+        write_report(data, out, assets=self.assets)
+        self.assertTrue((out / "report.html").exists())
+        self.assertFalse(folder.exists())  # the split report's pages gone, and their emptied folder
+        folder.mkdir()
+        (folder / "notes.txt").write_text("mine")
+        write_report(data, out, assets=self.assets, split=True)
+        self.assertFalse((out / "report.html").exists())  # the unsplit page gone beside the split one
+        self.assertIn("notes.txt", [x.name for x in folder.iterdir()])  # a file no report writes, kept
+
     def test_one_pair_of_files_is_never_split(self):
         a = ev("A-1")
         write_report(report([a, ev("B-1")], [finding(a, ev("B-1"), "different")]), self.root / "out", split=True)

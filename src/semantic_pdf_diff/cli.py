@@ -1344,9 +1344,11 @@ def store_parser(command):
                               'counterpart; then chunks for finding things '
                               '(subjects A to Z, figures and tables, the glossary, gaps), and index.md listing them. '
                               'Each chunk is named by its text\'s hash, so an unchanged chunk keeps its name from one '
-                              'export to the next; nothing is deleted.')
+                              'export to the next; the folder then holds this export alone, an earlier export\'s '
+                              'chunks it doesn\'t hold removed.')
         parser.add_argument('--comparison', type=int, help='Report id (see: show comparisons); default: latest')
-        parser.add_argument('--out', type=Path, help='The folder written into (default: the store\'s export/)')
+        parser.add_argument('--out', type=Path, help='The folder written into, empty or an earlier export\'s '
+                                                     '(default: the store\'s export/)')
         parser.add_argument('--chunk-chars', type=int, default=CHUNK,
                             help=f'Characters of claims a chunk holds, about (default {CHUNK}: some 400 tokens, '
                                  'under an ingest tool\'s 512)')
@@ -1375,11 +1377,10 @@ def store_command(command, argv):
             from . import __version__, export, indexes
             data = store.comparison(args.comparison)
             out = args.out or args.store / 'export'
-            out.mkdir(parents=True, exist_ok=True)
             files = export.exported(data, indexes.built(data), __version__, args.chunk_chars)
-            for name, text in files.items():
-                (out / name).write_text(text, encoding='utf-8')
-            print(f"Export: {out} ({len(files) - 1} chunks and index.md)")
+            removed = export.written(out, files)
+            print(f"Export: {out} ({len(files) - 1} chunks and index.md"
+                  + (f"; {removed} of the last export's chunks removed" if removed else "") + ")")
         else:
             out = args.out or args.store
             from .settings import user_settings

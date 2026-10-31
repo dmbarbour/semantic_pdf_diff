@@ -423,9 +423,25 @@ def write_report(data, output, assets=None, budget=crops.DEFAULT_BUDGET, write=T
         output.mkdir(exist_ok=True, parents=True)
         (output/"report.json").write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
         (output/'report.html').write_text(page, encoding='utf-8')
+        cleared(output, {output/'report.html'})
     return account
 
 SPLIT = "report-split"  # a split report's folder, beside report.json
+PART = re.compile(r"\d{2,}-[A-Za-z0-9._-]*\.html")  # a split report's part's name (write_split)
+
+def cleared(output, kept):
+    """The page files an earlier report left in output and this one didn't write, removed: report.html beside a split
+    report, a split report's index and parts beside an unsplit one or one split otherwise. The page is this report's
+    alone (the owner, 2026-10-31: "Each export or report should be logically fresh from the sources, not
+    history-dependent."); only names a report gives are removed, and the split folder once it's empty."""
+    folder = output / SPLIT
+    parts = [p for p in folder.iterdir() if p.name == "index.html" or PART.fullmatch(p.name)] if folder.is_dir() else []
+    found = [output / "report.html", *parts]
+    for path in found:
+        if path not in kept and path.is_file():
+            path.unlink()
+    if folder.is_dir() and not any(folder.iterdir()):
+        folder.rmdir()
 # the index's links to its parts carry its address on (#claims&q=pump), so each part opens on that view and search
 CARRY = ('<script>document.addEventListener("click", (e) => {const a = e.target.closest("a[href]"); '
          'if (a && location.hash && !a.getAttribute("href").includes("#")) a.href = a.getAttribute("href") '
@@ -462,6 +478,7 @@ def write_split(data, output, pairs, stored, budget, write):
         (folder / "index.html").write_text(index, encoding="utf-8")
         for name, page in parts:
             (folder / name).write_text(page, encoding="utf-8")
+        cleared(output, {folder / "index.html", *(folder / name for name, _ in parts)})
     return total
 
 def part_of(data, kind, a, b):

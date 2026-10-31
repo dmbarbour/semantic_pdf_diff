@@ -132,6 +132,26 @@ class Chunks(unittest.TestCase):
         self.assertTrue(all("| Item | head | rated power |\n|---|---|---|\n| P-10" in t for t in parts))
 
 class Command(unittest.TestCase):
+    def test_an_export_replaces_the_last_one_in_its_folder(self):
+        """Each made fresh (the owner, 2026-10-31: "Each export or report should be logically fresh from the
+        sources, not history-dependent.")."""
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "export"
+            first = export.exported(pumps(3), indexes.built(pumps(3)))
+            self.assertEqual(export.written(out, first), 0)
+            (out / ".hidden").write_text("a viewer's")
+            second = export.exported(pumps(2), indexes.built(pumps(2)))
+            removed = export.written(out, second)
+            files = sorted(p.name for p in out.iterdir() if p.name != ".hidden")
+            (out / "notes.txt").write_text("mine")
+            with self.assertRaisesRegex(ValueError, r"holds files an export doesn't write \(notes\.txt\)"):
+                export.written(out, first)
+            after = sorted(p.name for p in out.iterdir() if p.name not in (".hidden", "notes.txt"))
+        self.assertEqual(files, sorted(second))  # the folder this export alone
+        self.assertEqual(removed, len(set(first) - set(second)))
+        self.assertGreater(removed, 0)
+        self.assertEqual(after, files)  # refused: nothing written
+
     def test_an_analysis_exported_beside_its_store(self):
         state = {"embedded": [], "names": 0}
         with tempfile.TemporaryDirectory() as d, serving(asked(state)) as url:

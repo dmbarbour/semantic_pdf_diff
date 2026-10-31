@@ -286,6 +286,20 @@ class Files(unittest.TestCase):
         self.assertEqual(book["About"]["B1"].value, "a")
         self.assertEqual(book["Claims"].max_row, 5)
 
+    def test_every_table_is_named_so_one_left_from_an_earlier_report_is_removed(self):
+        index = indexes.built(report(ONE))
+        index["inconsistencies"] = [{"source": "a", "subject": "P-101", "said": ["42 m", "61 m"], "where": ["", ""],
+                                     "read again": ["", ""], "why": "", "claims": ["A-1", "A-2"]}]
+        self.assertEqual(set(indexfiles.tables(index, {e["id"]: e for e in ONE})), set(indexfiles.TABLES))
+        with tempfile.TemporaryDirectory() as d:
+            folder = Path(d)
+            indexfiles.written(index, {e["id"]: e for e in ONE}, folder)
+            (folder / "index" / "notes.csv").write_text("mine")
+            indexfiles.written(indexes.built(report(ONE)), {e["id"]: e for e in ONE}, folder)  # it found none
+            files = sorted(p.name for p in (folder / "index").iterdir())
+        self.assertNotIn("inconsistencies.csv", files)  # the earlier report's, gone (the owner: "logically fresh")
+        self.assertIn("notes.csv", files)  # a file no report writes, kept
+
     def test_a_unit_of_dash_is_none(self):
         self.assertEqual(indexfiles.said({"value": "1.5", "unit": "-", "conditions": "at -100 deg"}),
                          "1.5 (at -100 deg)")

@@ -353,9 +353,14 @@ def workbook(index, evidence):
             put(f"xl/worksheets/sheet{i}.xml", xml)
     return out.getvalue()
 
+# every table tables() may give, so one an earlier report wrote and this one doesn't is removed
+TABLES = ("subjects", "properties", "claims", "figures", "glossary", "kinds", "inconsistencies", "gaps")
+
 def written(index, evidence, folder):
-    """The index's files written into folder (a report's): index.md, index.xlsx and index/*.csv. Returns their
-    paths."""
+    """The index's files written into folder (a report's): index.md, index.xlsx and index/*.csv; a table an earlier
+    report wrote there and this one doesn't give (inconsistencies, where the second pass found none) removed, so the
+    files are this report's alone (the owner, 2026-10-31: "Each export or report should be logically fresh from the
+    sources, not history-dependent."). Returns their paths."""
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "index.md").write_text(markdown(index), encoding="utf-8")
     (folder / "index.xlsx").write_bytes(workbook(index, evidence))
@@ -365,4 +370,8 @@ def written(index, evidence, folder):
         path = folder / "index" / f"{name}.csv"
         path.write_text(csv_text(header, rows), encoding="utf-8")
         paths.append(path)
+    for name in TABLES:
+        path = folder / "index" / f"{name}.csv"
+        if path not in paths and path.is_file():
+            path.unlink()
     return paths
