@@ -56,6 +56,22 @@ def main(argv=None, client=None):
         return attempt(command, sys.argv[1:], client)
     except KeyboardInterrupt:
         interrupted(sys.argv[1:])
+    except SystemError as e:
+        if not from_interrupt(e):
+            raise
+        interrupted(sys.argv[1:])
+
+def from_interrupt(error):
+    """Whether an error is Ctrl+C's: the KeyboardInterrupt first_interrupt raises while a C extension's call runs
+    (PyMuPDF's) comes out of it as SystemError, the interrupt its cause (the quick suite, 2026-10-31: a traceback and
+    exit 1, not the resume note and 130)."""
+    seen = set()
+    while error is not None and id(error) not in seen:
+        if isinstance(error, KeyboardInterrupt):
+            return True
+        seen.add(id(error))
+        error = error.__cause__ or error.__context__
+    return False
 
 def first_interrupt(signum, frame):
     """Ctrl+C: KeyboardInterrupt, as Python's own handler raises it, and a second Ctrl+C ends the process where it is,

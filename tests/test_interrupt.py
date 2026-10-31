@@ -172,5 +172,22 @@ class Interrupted(unittest.TestCase):
         self.assertEqual(lines[-1], MESSAGE)
         self.assertFalse([r for r in lines if 'Traceback' in r], lines)
 
+class FromInterrupt(unittest.TestCase):
+    def test_an_interrupt_coming_out_of_a_c_extension_as_system_error_is_the_interrupt(self):
+        from semantic_pdf_diff.cli import from_interrupt
+
+        def c_call():  # as PyMuPDF's wrapper raises it: the interrupt the cause, twice over
+            try:
+                raise KeyboardInterrupt
+            except KeyboardInterrupt as e:
+                try:
+                    raise SystemError("returned a result with an exception set") from e
+                except SystemError as inner:
+                    raise SystemError("returned a result with an exception set") from inner
+        with self.assertRaises(SystemError) as raised:
+            c_call()
+        self.assertTrue(from_interrupt(raised.exception))
+        self.assertFalse(from_interrupt(SystemError("a bug of its own")))
+
 if __name__ == '__main__':
     unittest.main()
