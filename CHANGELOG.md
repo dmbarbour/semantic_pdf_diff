@@ -2,6 +2,17 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.23.0 (2026-10-31)
+
+- **Fixed: the index joined opposite properties.** The model's other names for a property (asked for search) are joined into one property only where they can be one: written in other words ("rated output", "nominal power"), or the same words spelled otherwise ("SIZE W", "size width"). Not a name and a more general one, nor "Maximum transient pressure" and "Minimum transient pressure", which the index had joined on a planted report. On 9 of scical's sheets, one right join is lost ("drawing title", "sheet title").
+- **Contradiction candidates found by code.** The second pass is shown pairs of a subject's claims that give one property two values differing in common units, their conditions alike or one stating none, and asked to settle each. On the planted reports, contradictions found went from 5 of 6 to 6 of 6, with none false and no trap taken.
+- **A gap's look tells more apart.** Besides given and not given, it now says "no place for it there" (the item is shown, with nowhere it would give the property) or "not shown there" (the item isn't). A value under another name for the same property counts as given. Gaps the reader missed come first in each kind.
+  - On 9 of scical's sheets, 150 gaps: 55 given, 3 not given, 77 no place, 15 not shown. Before: 15 given, 26 not given, 85 not shown of 126. Two earlier answers were wrong against the sheet index.
+- **A document's own tables.** A table read by rules keeps its cells as read, so:
+  - **`export`** writes each table as a Markdown table, a long one in parts under its header again.
+  - **A cell left blank** in a column most of the table's rows fill is a gap of its own, "Left blank in a table".
+  - Every reader's version is raised: a store is read again from the answers cache, with no requests.
+
 ## 0.22.1 (2026-10-31)
 
 - **Exports and reports are made fresh** (the owner: "Each export or report should be logically fresh from the sources, not history-dependent.").
