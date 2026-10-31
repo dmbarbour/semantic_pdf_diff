@@ -5,6 +5,12 @@ feature 2, milestone 2): `semantic-pdf-diff export`. The target ingest tool keep
 - **A chunk a section** (or a part of one, CHUNK characters at most): front matter (title, source, file, pages), a
   line saying where it came from (source, file, pages, section, a short content id), the section's "about", then its
   claims by subject, each with its conditions, basis, hedges and where it's read, and a short verbatim excerpt.
+- **A chunk a topic** (or a part of one; the owner, 2026-10-31: "The proposed next steps seem good to me. Please
+  proceed."): the topics the report is browsed by, each its claims by subject, from every file and section, each
+  claim naming its file and place.
+- **A comparison's findings:** a chunk of findings at a time, by what was found (they differ, uncertain, they
+  complement each other, they agree), each with both claims and where each is read, the judge's reason and the
+  explanation; then each source's claims with no counterpart in the other.
 - **Discovery chunks:** the subjects A to Z, the figures and tables, the glossary, what the source doesn't give and,
   where the second pass found any, its inconsistencies, each pointing to the chunks holding what it names.
 - **Named by content:** each file's name is its text's hash, so an unchanged chunk keeps its name from one export to
@@ -52,8 +58,9 @@ def span(claims):
         return ""
     return f"{one} {found[0]}" if found[0] == found[-1] else f"{many} {found[0]}–{found[-1]}"
 
-def claim_line(e):
-    """A claim as a chunk says it: its property and value, its qualifiers, where it's read, a short excerpt."""
+def claim_line(e, where=None):
+    """A claim as a chunk says it: its property and value, its qualifiers, where it's read (where: as given, its
+    files named where a chunk holds several files' claims; "" for none), a short excerpt."""
     unit = e["unit"] if e.get("unit") not in ("", "-", None) else ""
     said = f"{e['attribute']}: {e['value']}" + (f" {unit}" if unit else "")
     qualifiers = [x for x in (e.get("conditions"), f"basis: {e['basis']}" if e.get("basis") not in (None, "", "unknown")
@@ -63,7 +70,7 @@ def claim_line(e):
     quote = " ".join(e.get("quote", "").split())
     excerpt = (quote if len(quote) <= EXCERPT else quote[:EXCERPT - 1].rstrip() + "…") if quote and \
         quote.casefold() not in said.casefold() else ""  # a quote that only says its value again: none
-    at = span([e])
+    at = span([e]) if where is None else where
     return (f"- {said}" + (f" ({'; '.join(qualifiers)})" if qualifiers else "") + (f" [{at}]" if at else "")
             + (f" — “{excerpt}”" if excerpt else ""))
 
@@ -121,6 +128,118 @@ def detail_chunks(data, size=CHUNK):
             out.append((title, text, [s for s, _, _ in part]))
     return out
 
+def place(e, files):
+    """Where a claim is read, its file named: a topic's or a finding's claims come from several."""
+    f = files.get(e["content"])
+    return ", ".join(x for x in (f["path"] if f else "", span([e])) if x)
+
+def placed_line(e, files):
+    return claim_line(e, place(e, files))
+
+def cut(blocks, size):
+    """Blocks (text) in parts of about size characters, a block never split."""
+    parts, current = [], []
+    for block in blocks:
+        if current and sum(len(b) + 1 for b in current) + len(block) > size:
+            parts.append(current)
+            current = []
+        current.append(block)
+    if current:
+        parts.append(current)
+    return parts
+
+def by_subject(claims, files, size=CHUNK):
+    """Claims as blocks, a block a subject's ("### name" and its lines), in their files' and places' order; a
+    subject of more than a chunk's claims cut into several."""
+    grouped = defaultdict(dict)  # a subject's: a line said (its places apart): the claim and its places
+    for e in sorted(claims, key=lambda e: (files[e["content"]]["path"] if e["content"] in files else "", order(e))):
+        said = grouped[" ".join(e["entity"].split())].setdefault(claim_line(e, ""), (e, []))
+        said[1].append(place(e, files))  # said alike in several places (two revisions): one line, every place
+    return [f"### {subject}\n\n" + "\n".join(part) + "\n" for subject, lines in grouped.items()
+            for part in cut([claim_line(e, "; ".join(places)) for e, places in lines.values()], size)]
+
+def titled(title, lead, parts, **fields):
+    """[(title, text)]: a list's parts as chunks, each titled (k of n) and led alike."""
+    out = []
+    for k, part in enumerate(parts, 1):
+        named = title + (f" ({k} of {len(parts)})" if len(parts) > 1 else "")
+        out.append((named, front(title=named, **fields) + f"# {named}\n\n{lead}\n\n" + "\n".join(part)))
+    return out
+
+def topic_chunks(data, files, size=CHUNK):
+    """[(title, text)]: a chunk a topic the report is browsed by (report.browsing: the model's names where it chose
+    them), or a part of one: its claims by subject, across the files and sections they come from."""
+    from .report import browsing
+    _, placed, names = browsing(data)
+    if not placed:
+        return []
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+    claims = defaultdict(list)
+    for cid, t in placed.items():
+        if cid in evidence:
+            claims[t].append(evidence[cid])
+    out = []
+    for t, name in enumerate(names):
+        if claims[t]:
+            out += titled(f"Topic: {name}", f"Claims on {name}, as the report's browsing groups them, from every file "
+                          "and section; each says where it's read.", cut(by_subject(claims[t], files, size), size),
+                          topic=name)
+    return out
+
+FINDINGS = ("different", "uncertain", "complementary", "equivalent")
+FINDING_SAID = {"different": "They differ", "uncertain": "Uncertain", "complementary": "They complement each other",
+                "equivalent": "They agree"}
+
+def alike(a, b):
+    """Two claims that say the same, word for word (the report folds such agreements: report.SAME's)."""
+    said = lambda e: tuple(" ".join(str(e.get(k) or "").split()).casefold()  # noqa: E731
+                           for k in ("entity", "attribute", "value", "unit", "conditions", "quote"))
+    return said(a) == said(b)
+
+def finding_chunks(data, files, size=CHUNK):
+    """([(title, text)], n left out): a comparison's findings, by what was found (different, uncertain,
+    complementary, equivalent), each with both claims, where each is read, the judge's reason and the explanation;
+    then what each source says that the other doesn't (unmatched). Agreements whose two claims say the same, word for
+    word, left out and counted: the other chunks hold the claim. None for an analysis."""
+    findings = data.get("findings") or []
+    sources = [s["name"] for s in data.get("sources", [])]
+    if not findings and not data.get("unmatched") or len(sources) != 2:
+        return [], 0
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+    side = lambda e: files[e["content"]]["source"] if e["content"] in files else ""  # noqa: E731
+    against = f"{sources[0]} against {sources[1]}"
+    out, same = [], 0
+    for relation in FINDINGS:
+        blocks = []
+        for x in findings:
+            if x.get("relation") != relation or x["a"] not in evidence or x["b"] not in evidence:
+                continue
+            a, b = evidence[x["a"]], evidence[x["b"]]
+            if relation == "equivalent" and alike(a, b):
+                same += 1
+                continue
+            explained = x.get("explanation") or {}
+            blocks.append(f"### {' '.join(a['entity'].split())} — {a['attribute']}\n\n"
+                          + f"- {side(a)}: {placed_line(a, files)[2:]}\n- {side(b)}: {placed_line(b, files)[2:]}\n"
+                          + f"- {FINDING_SAID[relation]} (confidence {x.get('confidence', 0):.2g}): "
+                          + " ".join(str(x.get("rationale", "")).split()) + "\n"
+                          + (f"- Why it differs: {explained['kind'].replace('_', ' ')}: "
+                             + " ".join(str(explained.get("rationale", "")).split()) + "\n"
+                             if explained.get("kind") else ""))
+        if blocks:
+            out += titled(f"{FINDING_SAID[relation]}: {against}", f"Findings of comparing {against}: two claims, "
+                          "one from each, judged by a model; check both against their places.", cut(blocks, size),
+                          compared=against)
+    unmatched = [evidence[u["id"]] for u in data.get("unmatched", []) if u.get("id") in evidence]
+    for name in sources:
+        mine = [e for e in unmatched if side(e) == name]
+        if mine:
+            other = next(s for s in sources if s != name)
+            out += titled(f"Only in {name}: {against}", f"Claims of {name} with no counterpart found in {other}: "
+                          "possibly added, removed or said otherwise; weak, as an absence is.",
+                          cut(by_subject(mine, files, size), size), compared=against)
+    return out, same
+
 def discovery_chunks(index, located, size=CHUNK):
     """[(title, text)]: the subjects A to Z (each with the chunks holding its claims), figures and tables, the
     glossary, the gaps and inconsistencies; each list cut into chunks of about size characters."""
@@ -170,7 +289,11 @@ def exported(data, index, version="", size=CHUNK):
         titles.append((name, title))
         for s in subjects:
             located[s].append(name)
-    for title, text in discovery_chunks(index, located, size):
+    files_of = {}
+    for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
+        files_of.setdefault(f["content"], f)
+    found, same = finding_chunks(data, files_of, size)
+    for title, text in topic_chunks(data, files_of, size) + found + discovery_chunks(index, located, size):
         name = name_of(text)
         files[name] = text
         titles.append((name, title))
@@ -186,6 +309,8 @@ def exported(data, index, version="", size=CHUNK):
         + f"- Made by semantic-pdf-diff {version}" + (f" from the report of {data['created_at']}"
                                                          if data.get("created_at") else "") + "\n"
         + (f"- Models: {', '.join(models)}\n" if models else "")
-        + "- Coverage: " + ", ".join(f"{n} tasks {status}" for status, n in sorted(coverage.items())) + "\n\n"
+        + "- Coverage: " + ", ".join(f"{n} tasks {status}" for status, n in sorted(coverage.items())) + "\n"
+        + (f"- Left out: {same} agreements whose two claims say the same, word for word (the claim is in the other "
+           "chunks)\n" if same else "") + "\n"
         + "## Chunks\n\n" + "".join(f"- [{title}]({name})\n" for name, title in titles))
     return files

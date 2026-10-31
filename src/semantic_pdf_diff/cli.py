@@ -1337,9 +1337,11 @@ def store_parser(command):
         from .export import CHUNK
         parser.description = ('A saved report\'s claims as Markdown chunks for a RAG system\'s ingest, without model '
                               'calls: a chunk a section (or a part of one), each saying in its own words where it came '
-                              'from, then chunks for finding things (subjects A to Z, figures and tables, the '
-                              'glossary, gaps), and index.md listing them. Each chunk is named by its text\'s hash, so '
-                              'an unchanged chunk keeps its name from one export to the next; nothing is deleted.')
+                              'from; a chunk a topic the report is browsed by; a comparison\'s findings by what was '
+                              'found, and each side\'s claims with no counterpart; then chunks for finding things '
+                              '(subjects A to Z, figures and tables, the glossary, gaps), and index.md listing them. '
+                              'Each chunk is named by its text\'s hash, so an unchanged chunk keeps its name from one '
+                              'export to the next; nothing is deleted.')
         parser.add_argument('--comparison', type=int, help='Report id (see: show comparisons); default: latest')
         parser.add_argument('--out', type=Path, help='The folder written into (default: the store\'s export/)')
         parser.add_argument('--chunk-chars', type=int, default=CHUNK,
