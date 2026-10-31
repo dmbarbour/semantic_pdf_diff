@@ -380,13 +380,16 @@ class Evidence(Claim):
     # the crop's width and height in the crop's orientation: the text block quoting it, a table claim's row. For
     # reports only (portable reports, milestone 4); none, the whole crop or no crop.
     mark: tuple[float, float, float, float] | None = None
+    # The source's text it was read from, as its card shows it (quotes.snippet: the sentences holding its quote, a
+    # table row under its header); "" where none was found. For reports only (report snippets, milestone 1).
+    snippet: str = ""
 
     @model_serializer(mode="wrap")
     def _without_absent_context(self, handler):
         out = handler(self)  # none, no key: evidence written without the levers that fill them stays as it was
         if isinstance(out, dict):
             for key, empty in (("frame", ""), ("position", None), ("records", []), ("printed", ""), ("stance", []),
-                               ("mark", None)):
+                               ("mark", None), ("snippet", "")):
                 if out.get(key, empty) == empty:
                     out.pop(key, None)
         return out

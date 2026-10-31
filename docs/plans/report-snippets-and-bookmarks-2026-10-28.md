@@ -1,6 +1,6 @@
 # The report: the text a claim came from, and views kept in the address
 
-- **Status:** Planned (2026-10-28); [milestone 2](#2-every-view-kept-in-the-address) done the same day (the owner: "Please proceed with report bookmarks"). Milestone 1's [design questions](#design-questions) answered 2026-10-31.
+- **Status:** Planned (2026-10-28); [milestone 2](#2-every-view-kept-in-the-address) done the same day (the owner: "Please proceed with report bookmarks"). Milestone 1 built 2026-10-31.
 - **The owner, 2026-10-28, from trials:**
   - "when a claim comes from text or the PDF text layer, we should include the relevant snippet of text in the report even when the image is dropped due to lower priority."
   - "bookmarking of views in the report, e.g. with `#anchor` but a javascript-driven anchor?"
@@ -48,6 +48,13 @@ The page keeps two things in its address already: the view and the search (`#cla
   - Measured on TS 38.300's real pair (10.1 MB today) and the slices: the page's size with snippets, and the crops they push out.
 - **Searched or not:** see [design question 2](#design-questions).
 - **Tested:** the snippet of each kind of claim, on the replay fixtures. A card with its crop left out shows its snippet, checked in the headless browser as the page's other tests are.
+- **Built 2026-10-31** (design questions answered: "Agreed with report snippets recommendations."):
+  - **Taken at extraction** from the text each task was sent (`quotes.snippet`): a text or image claim's sentences holding its quote (its longest fragment), widened to about 600 characters at sentence ends, the pipeline's own notes left out; a table row's cells under its header, a row read by rules too (`quotes.row_snippet`). None where the quote isn't found (a misread, a picture without a text layer).
+  - **Stored on the claim** (`Evidence.snippet`); every reader's version raised, so a store is read again once, its answers from the cache.
+  - **On every card that has one,** after the card's own words, its quote's words underlined: in full where it has no crop or the budget left it out (the note stays), folded to two lines below a crop shown, a click unfolding it. Out of search (a claim's search reads the card's words before it; a finding's leaves it out), and never shown to the judge.
+  - **Counted** in the page's size before crops are chosen (the page is measured with every crop left out).
+  - **Measured** (the stores read again from the answers cache): TS 38.300's clauses 1 to 8, 2,539 of 2,809 claims with a snippet (every text, table and figure claim, 368 of 632 from pictures' overviews), a median of 414 characters, the page 2.16 → 2.41 MB; 9 of scical's sheets, 1,190 of 1,289, the page 5.84 → 5.88 MB; neither near the budget, no crop pushed out; the same claims.
+  - **Found on the way:** the judge was first shown the new field, and asked every judged pair again ($0.02); kept out since (`compare.PROVENANCE_FIELDS`), a re-run asks nothing.
 
 ### 2. Every view kept in the address
 

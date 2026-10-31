@@ -39,6 +39,7 @@ from dataclasses import dataclass, field
 from pydantic import Field, field_validator
 
 from .asking import Asking
+from .quotes import row_snippet
 from .schema import DerivationStep, Evidence, Lenient, as_text, claim_id, coverage_row
 from .stance import VIEW_COLUMN, is_yes_no
 from .tablegrid import (header_name, header_unit, kind, moment, noted, number, plain as _plain,
@@ -903,12 +904,13 @@ def read(core, page, g, task, by_itself, source, image=None, mark=None):
                 found.append(_evidence(core, page, row_box(i), name, fields, quote, True, [
                     *source_, DerivationStep(step="table-rules", detail=describe_rule(rule))],
                     records=[table.id] if table else (),
-                    printed=printed_name(g, i, used, fields["value"]) if table else "", stance=stance, mark=mark))
+                    printed=printed_name(g, i, used, fields["value"]) if table else "", stance=stance, mark=mark,
+                    snippet=row_snippet(g.labels, g.rows[i])))
             view = core.s.table_view(g.labels, g.rows[i], context)  # its yes or no, if no rule reads it (view_rows)
             if view is not None and not any(is_yes_no(fields["value"]) for fields, _, _ in made):
                 found.append(_evidence(core, page, row_box(i), name, view.model_dump(), view.quote, True,
                                        [*source_, VIEW_COLUMN], records=[table.id] if table else (), stance=stance,
-                                       mark=mark))
+                                       mark=mark, snippet=row_snippet(g.labels, g.rows[i])))
         for i in misfits:
             by_itself(g.keys[i])
         summary = (f"Read by rules: {len(g.rows) - len(misfits)} of {len(g.rows)} rows, {len(found)} claims"
@@ -932,7 +934,7 @@ def printed_name(g, i, used, value):
     return " | ".join(x for x in (section, label, g.labels[col].strip()) if x)[:200]
 
 def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False, records=(), printed="",
-              stance=(), mark=None):
+              stance=(), mark=None, snippet=""):
     from .schema import Claim
     claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
                   unit=fields["unit"][:40], conditions=fields["conditions"][:300], frame=fields.get("frame", "")[:200],
@@ -944,4 +946,4 @@ def _evidence(core, page, box, task, fields, quote, verified, derivation, approx
     home = core.sections.box(page, box).id
     return Evidence(**claim.model_dump(), id=claim_id(core.content, claim), content=core.content, section=home,
                     locator=core.locator(page, box, "table", task), derivation=derivation, quote_verified=verified,
-                    records=list(records), printed=printed, mark=mark(box) if mark else None)
+                    records=list(records), printed=printed, mark=mark(box) if mark else None, snippet=snippet)

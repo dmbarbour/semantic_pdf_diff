@@ -65,3 +65,48 @@ def covered(quote, text, fold=False):
     """Every word of the quote occurs in text; tolerates quotes spanning table cells."""
     words = terms(quote, fold)
     return bool(words) and words <= terms(text, fold)
+
+# --- a claim's snippet: the source's text around its quote (report snippets, milestone 1) -------------------------
+
+SNIPPET = 600  # characters of the source's text a claim's card shows, at most
+# The pipeline's own notes in a task's text (levers.LAYER_NOTE, levers.TABLE_CUT_NOTE), never the source's
+NOTES = re.compile(r"(?:TEXT LAYER OF THIS REGION|THIS REGION CUTS A TABLE)[^:\n]*(?::[^:\n]*)?:")
+ROW = re.compile(r"^(?:Header|Row): (\[.*\])\s*$", re.MULTILINE)
+SENTENCE_END = re.compile(r"(?<=[.!?;:])\s+|\s*\n\s*")
+
+def row_snippet(head, cells, limit=SNIPPET):
+    """A table row as its card shows it: its header's cells over its own, " | " between."""
+    lines = [" | ".join(str(c).strip() for c in row if c not in (None, "") and str(c).strip())
+             for row in (head, cells) if row]
+    out = "\n".join(line for line in lines if line)
+    return out if len(out) <= limit else out[:limit - 1].rstrip() + "…"
+
+def snippet(text, quote, limit=SNIPPET):
+    """The source's text a claim was read from, as its card shows it: a table row's cells under its header; else the
+    sentences (or lines) holding its quote, widened to about limit characters at sentence ends, "…" where cut;
+    "" where the quote isn't found (a misread, a picture without a text layer)."""
+    import json
+    rows = []
+    for m in ROW.finditer(text or ""):
+        try:
+            rows.append(json.loads(m.group(1)))
+        except ValueError:
+            return ""
+    if rows:
+        return row_snippet(rows[0] if len(rows) > 1 else [], rows[-1], limit)
+    body = NOTES.sub("\n", text or "")
+    fragments = sorted((f for f in ELLIPSIS.split(quote or "") if len(f.strip()) >= 3), key=len, reverse=True)
+    found = None
+    for fragment in fragments[:1]:
+        words = fragment.split()
+        found = re.search(r"\s+".join(map(re.escape, words)), body, re.IGNORECASE) if words else None
+    if found is None:
+        return ""
+    pad = max(0, (limit - (found.end() - found.start())) // 2)
+    start, end = max(0, found.start() - pad), min(len(body), found.end() + pad)
+    ends = [m.end() for m in SENTENCE_END.finditer(body, start, found.start())]  # a sentence's start, the first
+    start = ends[0] if ends and start > 0 else start
+    after = [m.start() for m in SENTENCE_END.finditer(body, found.end(), min(len(body), end + 1))]  # the last's end
+    end = after[-1] if after and end < len(body) else end
+    said = " ".join(body[start:end].split())
+    return ("…" if start > 0 and not ends else "") + said + ("…" if end < len(body) and not after else "")

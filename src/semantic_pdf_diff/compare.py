@@ -111,9 +111,9 @@ ATTRIBUTED = ("Attribution changed, found without a model: the same value, held 
 HEDGED = ("Hedge changed, found without a model: the same value, stated \"{a}\" in one revision and \"{b}\" in the "
           "other.")
 
-# Provenance stays out of the model's view; it sees the claims and any source crops.
+# Provenance stays out of the model's view; it sees the claims and any source crops (a snippet is the report's).
 PROVENANCE_FIELDS = {"id", "content", "locator", "section", "derivation", "image", "quote_verified", "occurrences",
-                     "position", "records", "printed", "mark"}
+                     "position", "records", "printed", "mark", "snippet"}
 
 # With the judge_context lever: each claim's context records shown, and subject, scope and frame ruled on apart
 # (schema.RuledJudgment; docs/plans/claim-context-2026-10-14.md, milestone 4, design question 4).

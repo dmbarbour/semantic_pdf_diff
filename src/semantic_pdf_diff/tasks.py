@@ -14,7 +14,7 @@ from .failures import CallLimitReached, NotRecorded
 from .pages import union
 from .schema import DerivationStep, Evidence, Extraction, claim_id, coverage_row, merge_occurrences
 from .progress import log
-from .quotes import covered, quoted
+from .quotes import covered, quoted, snippet
 from .regions import region_of
 from .retiling import CUT_NOTE
 from .stance import VIEW_COLUMN, is_yes_no
@@ -426,7 +426,8 @@ class TaskCore:
                                       derivation=(derivation or self.derivation[region]) + (
                                           [VIEW_COLUMN] if claim_read is made.view else []), image=image,
                                       quote_verified=verified, position=position, records=records,
-                                      printed=s.printed_name(claim) if verified else "", mark=mark))
+                                      printed=s.printed_name(claim) if verified else "", mark=mark,
+                                      snippet=snippet(made.text, claim.quote)))
                 row["claims"] += 1
 
         self.progress.add()

@@ -59,6 +59,7 @@ BOILERPLATE = re.compile(r"^\s*(Quote (not )?found|Read |Found \d+ times)")  # t
 LABEL = re.compile(r"^\s*(As printed|Position|Frame|Basis): ")
 # a finding's own words: why and its rationale, not what every finding of its relation or kind says
 SAME = re.compile(r"<details>[\s\S]*?</details>|<small>[\s\S]*?</small>|<h2>[\s\S]*?</h2>|<b>[\s\S]*?</b>|"
+                  r"<div class=\"snippet[^\"]*\"[^>]*>[\s\S]*?</div>|"
                   r"<p class=['\"]warning['\"]>[\s\S]*?</p>")
 
 def lines(html):

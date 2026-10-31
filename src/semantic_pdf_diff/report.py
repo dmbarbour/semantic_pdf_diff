@@ -87,7 +87,10 @@ border-radius:12px;padding:22px;margin:18px 0}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:24px}\
 section{min-width:0;padding:12px;background:var(--panel);border-radius:8px}
 img{display:block;max-width:100%;max-height:500px;margin:14px auto}\
-blockquote{border-left:3px solid var(--rule);margin:14px 0;padding-left:12px}
+blockquote{border-left:3px solid var(--rule);margin:14px 0;padding-left:12px}\
+.snippet{color:var(--muted);font-size:13px;white-space:pre-line;margin:6px 0}.snippet em{font-style:normal;\
+text-decoration:underline;text-decoration-thickness:2px;color:var(--fg)}.snippet.folded{display:-webkit-box;\
+-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 small{overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}\
 td,th{text-align:left;border-bottom:1px solid var(--line);padding:8px}
 select,input{padding:10px;border:1px solid var(--field);border-radius:6px;margin:8px;\
@@ -215,7 +218,24 @@ class Cards:
 {PAGE_WORDS.get(loc.get('format'), 'page')} {loc['page']} · {esc(e['kind'])}</h3>
         <div data-said="{self.said_of[eid]}"></div>{self.context(e)}{verified}{read}{also}
         <small>{esc(eid)} · {esc(loc['region'])} region, {esc(place(loc))} · confidence {e['confidence']:.2f}</small>\
-{image}</section>'''
+{snippet_html(e, folded='<span class="shot">' in image)}{image}</section>'''
+
+def snippet_html(e, folded=False):
+    """A card's snippet of its source's text (report snippets, milestone 1; the owner, 2026-10-28: "include the
+    relevant snippet of text in the report even when the image is dropped"), its quote's words marked: in full,
+    taking a crop's place where it has none or the budget left it out; folded to two lines below a crop shown (a
+    click unfolds it). After the card's own words, so a claim's search doesn't read it (design question 2: not
+    searched at first)."""
+    text = e.get('snippet', '')
+    if not text:
+        return ''
+    from .quotes import ELLIPSIS
+    words = max((f for f in ELLIPSIS.split(e.get('quote', '')) if len(f.strip()) >= 3), key=len, default='').split()
+    found = re.search(r'\s+'.join(map(re.escape, words)), text, re.IGNORECASE) if words else None
+    said = (esc(text[:found.start()]) + f'<em>{esc(found.group(0))}</em>' + esc(text[found.end():]) if found
+            else esc(text))
+    return (f'<div class="snippet folded" title="Click to read it all">{said}</div>' if folded
+            else f'<div class="snippet">{said}</div>')
 
 CLIP = 160  # characters of a record's text shown beside a claim
 

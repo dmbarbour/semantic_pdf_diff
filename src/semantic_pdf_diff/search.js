@@ -97,6 +97,7 @@ const Search = (() => {
     };
     // a finding's own words: why and its rationale, not what every finding of its relation or kind says
     const SAME = new RegExp(['<details>[\\s\\S]*?</details>', '<small>[\\s\\S]*?</small>', '<h2>[\\s\\S]*?</h2>',
+      '<div class="snippet[^"]*"[^>]*>[\\s\\S]*?</div>',
       '<b>[\\s\\S]*?</b>', '<p class=[\'"]warning[\'"]>[\\s\\S]*?</p>'].join('|'), 'g');
     const finding = (f) => add([[OTHER, plain(f.html.replace(SAME, ''))]]);
 

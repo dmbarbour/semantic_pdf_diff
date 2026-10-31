@@ -348,6 +348,8 @@
   window.addEventListener('hashchange', restore);
   root.addEventListener('click', (e) => {
     if (e.target.matches('img.crop')) e.target.classList.toggle('full');
+    const snippet = e.target.closest('.snippet.folded');  // a snippet below a crop: unfolded by a click
+    if (snippet) snippet.classList.remove('folded');
     const tab = e.target.closest('.views button');
     if (tab) {
       view = tab.dataset.view;
