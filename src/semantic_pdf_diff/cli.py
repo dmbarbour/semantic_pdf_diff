@@ -992,7 +992,11 @@ reranker. Names are the settings' own (max_cost, report_budget, rerank_threshold
   semantic-pdf-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
   semantic-pdf-diff config test                     the endpoint, the key and each model checked, for a few cents
                                                     (exit 5 when a check fails)
-  semantic-pdf-diff config models vision            the endpoint's models reading images: context, price
+  semantic-pdf-diff config test --model NAME        a candidate tried before it's set (--base-url: at another
+                                                    endpoint); --only json,image; --new: what isn't remembered
+  semantic-pdf-diff config checks                   the checks remembered passing: when, and what they measured
+  semantic-pdf-diff config checks --forget [MODEL]  forgotten (every one, or a model's): the next run checks again
+  semantic-pdf-diff config models vision            the endpoint's models reading images: context, price, checked
 """
 
 def config_parser():
@@ -1025,14 +1029,36 @@ def config_parser():
     check = actions.add_parser('test', parents=[where], help='the endpoint, the key and each model the settings name, '
                                                             'checked by asking (a few cents); exit 5 when a check '
                                                             'fails')
+    check.add_argument('--model', help="a candidate for the chat model, checked without setting it (its endpoint "
+                                       "listing, json and image checks unless --only says), remembered like any check")
+    check.add_argument('--base-url', help='the endpoint to check at, for this command only')
+    check.add_argument('--only', action='append', metavar='CHECKS',
+                       help=f"only these checks, comma-separated: {', '.join(checkup_names())} (the endpoint's "
+                            "listing comes with json or image)")
+    check.add_argument('--new', action='store_true', help="only the checks not remembered passing (`config checks`)")
     add_log_options(check)
+    remembered = actions.add_parser('checks', parents=[where], help='the checks remembered passing: each model and '
+                                                                    'endpoint, when, what was measured')
+    remembered.add_argument('--forget', nargs='?', const='', metavar='MODEL',
+                            help="forget them (every one, or MODEL's at any endpoint): the next run checks again")
     listed = actions.add_parser('models', parents=[where], help="the endpoint's models, with what it says of each "
                                                                 "(context, price, tags), those the settings name "
-                                                                "marked")
+                                                                "and those checked marked")
     listed.add_argument('words', nargs='*', help='only models whose name or tags hold every word ("vision": those '
                                                  'reading images, where the endpoint says)')
     listed.add_argument('--json', action='store_true', help='every field, as JSON')
     return parser
+
+def checkup_names():
+    from .checkup import KINDS
+    return list(KINDS.values())
+
+def checks_memory(store):
+    """The record of checks passed that the store's runs read (checkup.memory_of): beside its answers cache, else the
+    cache in effect's."""
+    from . import checkup
+    from .settings import cache_path
+    return checkup.memory_of(cache_in_use([store]) if (store / 'store.sqlite').exists() else cache_path())
 
 def measured_layer(store):
     """What first-use checks measured for the store's runs (checkup.calibrated), the layer under the user's: none
@@ -1079,24 +1105,55 @@ def config_command(argv):
     if args.action == 'help':
         print('\n'.join(configuration.help_lines(args.name, layers)))
         return 0
-    if args.action in ('test', 'models'):
+    if args.action in ('test', 'models', 'checks'):
         from . import checkup
+        tried = {k: v for k in ('model', 'base_url') if (v := getattr(args, k, None))}  # test --model, --base-url
         settings = settings_from(layer={k: v for k, v in Store.settings_of(store).items()
-                                        if k not in configuration.RUN_OPTIONS})
+                                        if k not in configuration.RUN_OPTIONS}, **tried)
         if args.action == 'models':
             try:
-                print('\n'.join(checkup.listing(settings, ' '.join(args.words), as_json=args.json)))
+                memory = checks_memory(store)
+            except (OSError, StoreError, ValueError):
+                memory = None
+            try:
+                print('\n'.join(checkup.listing(settings, ' '.join(args.words), as_json=args.json, memory=memory)))
             except (OSError, ValueError) as e:
                 raise ValueError(f"the endpoint's models can't be listed ({type(e).__name__}: {e})") from None
             return 0
+        if args.action == 'checks':
+            memory = checks_memory(store)
+            if args.forget is None:
+                print('\n'.join(checkup.checks_lines(memory, settings)))
+                return 0
+            gone, whose = checkup.forget_model(memory, args.forget), args.forget or 'any model'
+            print(f"{gone} check(s) of {whose} forgotten in {memory}: the next run checks again" if gone else
+                  f"no check of {whose} is remembered in {memory} (`config checks` lists them)")
+            return 0
         start_logging(args)
-        checks, cost = checkup.run(settings)
+        only = [n.strip() for given in args.only for n in given.split(',') if n.strip()] if args.only else None
+        unknown = sorted(set(only or ()) - set(checkup_names()))
+        if unknown:
+            raise ValueError(f"--only: no check is named {', '.join(unknown)}; the checks: "
+                             f"{', '.join(checkup_names())}")
+        if only is None and args.model:  # a candidate for the chat model: its checks, not the reranker's
+            only = ['json', 'image']
+        try:
+            memory = checks_memory(store)
+        except (OSError, StoreError, ValueError):
+            memory = None
+        if args.new and memory is not None:
+            left = checkup.missing(settings, memory)
+            only = [n for n in (only if only is not None else left) if n in left]
+            if not only:
+                print(f"every check asked for is remembered passing in {memory} (`config checks` lists them): "
+                      "nothing was asked")
+                return 0
+        checks, cost = checkup.run(settings, only=only)
         print('\n'.join(checkup.lines(settings, checks, cost)))
         try:  # remembered, so a run needn't check again (checkup.first_use)
-            from .settings import cache_path
-            cache = cache_in_use([store]) if (store / 'store.sqlite').exists() else cache_path()
-            checkup.record(checkup.memory_of(cache), settings, checks)
-        except (OSError, StoreError, ValueError):
+            if memory is not None:
+                checkup.record(memory, settings, checks)
+        except (OSError, ValueError):
             pass
         return checkup.FAILED if any(c.ok is False for c in checks) else 0
     if args.action == 'export':
@@ -1151,6 +1208,11 @@ def config_command(argv):
                                                                 and layer == 'environment' else '')
               + (f"; the next run redoes: {configuration.redoes(name)}" if moved else ''))
         before = configuration.resolved(layers)[name][0]
+        if name == 'model' and changes[name]:  # endpoint setup, milestone 3: checked against the endpoint's listing
+            from .checkup import name_check
+            print('\n'.join(name_check(settings_from(layer={k: v for k, v in Store.settings_of(store).items()
+                                                            if k not in configuration.RUN_OPTIONS}), changes[name]))
+                  or f"{changes[name]} is among the endpoint's models")
         if name == 'answers_cache' and moved and before:
             from .settings import located
             old, new = located(before, store), (located(value, store) if value else 'NEW')

@@ -16,6 +16,7 @@ from unittest.mock import patch
 
 from stubs import chat_answer, prompt_of, request_body, serving, user_settings
 from semantic_pdf_diff import checkup, cli
+from semantic_pdf_diff.settings import user_settings as saved_settings
 
 def run(*argv):
     with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
@@ -67,12 +68,23 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
             patch.dict(os.environ, {"OPENAI_BASE_URL": url}):
         yield url
 
-class ConfigTest(unittest.TestCase):
+class Remembered(unittest.TestCase):
+    """The checks remembered (endpoints.json, beside the answers cache) in a cache of the test's own."""
     def setUp(self):
         temp = tempfile.TemporaryDirectory()
         self.addCleanup(temp.cleanup)
         self.store = Path(temp.name) / "store"
+        cache = patch.dict(os.environ, {"SEMANTIC_PDF_DIFF_CACHE": str(Path(temp.name) / "cache")})
+        cache.start()
+        self.addCleanup(cache.stop)
+        self.memory = Path(temp.name) / "cache" / "endpoints.json"
 
+    def config(self, *argv):
+        with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()) as err:
+            code = cli.main(["config", *map(str, argv), "--store", str(self.store)])
+        return code, out.getvalue() + err.getvalue()
+
+class ConfigTest(Remembered):
     def test_every_check_passes_against_a_working_endpoint(self):
         with endpoint() as url, user_settings({"model": "gemma-4", "rerank_model": "Qwen/Qwen3-Reranker-8B",
                                                "rerank_api": "tei", "rerank_url": url + "/rerank",
@@ -171,7 +183,7 @@ class NoModel(unittest.TestCase):
                                r"\(URLError: .*\)\. \$OPENAI_BASE_URL names the endpoint, else the user's base_url .* "
                                r"`semantic-pdf-diff config test` checks it\.$")
 
-class ConfigModels(unittest.TestCase):
+class ConfigModels(Remembered):
     def test_the_endpoints_models_those_in_use_marked(self):
         with endpoint(listed=("gemma-4", "gemma-4-turbo", "llama")), tempfile.TemporaryDirectory() as d:
             code, out = run("config", "models", "gemma", "--store", Path(d) / "s")
@@ -203,7 +215,102 @@ class ConfigModels(unittest.TestCase):
             self.assertEqual(run("config", "models", "vision", "--store", Path(d) / "s")[1].split("\n")[1][:5], "googl")
             code, out = run("config", "models", "seer", "--json", "--store", Path(d) / "s")
         self.assertEqual(json.loads(out), [{"id": "acme/seer", "context": 128000, "price_in": 0.5, "price_out": 1.5,
-                                            "tags": ["vision"], "named_by": []}])
+                                            "tags": ["vision"], "named_by": [], "checked": {}}])
+
+class TryingAndForgetting(Remembered):
+    """Endpoint setup, milestone 2: a candidate tried before it's set, checks run selectively, the checks remembered
+    shown and forgotten (the owner, 2026-10-28: "better configuration setup, support for browsing available models at
+    the endpoint and validating the endpoint, running a few checks if not calibrated")."""
+    def test_a_candidate_tried_before_its_set_and_remembered(self):
+        with endpoint(listed=("gemma-4", "gemma-4-turbo")) as url, user_settings({"model": "gemma-4"}):
+            code, out = self.config("test", "--model", "gemma-4-turbo")
+            self.assertEqual(code, 0, out)
+            self.assertIn(f"checking gemma-4-turbo at {url}", out)
+            self.assertIn("  endpoint  ok: 2 models listed, gemma-4-turbo among them", out)
+            self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"; an image 1000 px square is 258 tokens')
+            self.assertNotIn("reranker", out)  # another model's check
+            self.assertEqual(saved_settings()["model"], "gemma-4")  # not set
+            self.assertEqual(self.config("test")[0], 0)  # the model set
+            code, out = self.config("checks")
+        self.assertEqual(code, 0)
+        lines = out.splitlines()
+        self.assertEqual(lines[0], f"checks remembered passing in {self.memory}; a run checks a model first unless its "
+                                   "checks are here")
+        self.assertEqual(lines[1], f"gemma-4 at {url}  (model)")
+        self.assertRegex(lines[2], r"^  json      passed \d{4}-\d\d-\d\d \d\d:\d\d UTC$")
+        self.assertRegex(lines[3], r"^  image     passed .* UTC; an image 1000 px square is 258 tokens$")
+        self.assertEqual(lines[4], f"gemma-4-turbo at {url}")
+        self.assertEqual(lines[-1], "`semantic-pdf-diff config checks --forget [MODEL]` forgets them: the next run "
+                                    "checks again")
+
+    def test_only_some_checks_or_those_not_remembered(self):
+        with endpoint(), user_settings({"model": "gemma-4"}):
+            code, out = self.config("test", "--only", "image")
+            self.assertEqual(code, 0, out)
+            self.assertIn("  image     ok", out)
+            self.assertNotIn("  json", out)
+            code, out = self.config("test", "--new")  # the image's remembered: json only
+            self.assertIn("  json      ok", out)
+            self.assertNotIn("  image", out)
+            self.assertEqual(self.config("test", "--new"), (0, f"every check asked for is remembered passing in "
+                                                               f"{self.memory} (`config checks` lists them): nothing "
+                                                               "was asked\n"))
+            code, out = self.config("test", "--only", "json,eyes")
+        self.assertEqual(code, 1)
+        self.assertIn("--only: no check is named eyes; the checks: json, image, reranker, embedding", out)
+
+    def test_checks_forgotten_a_models_or_every_one(self):
+        with endpoint(listed=("gemma-4", "gemma-4-turbo")), user_settings({"model": "gemma-4"}):
+            self.config("test")
+            self.config("test", "--model", "gemma-4-turbo")
+        self.assertEqual(self.config("checks", "--forget", "llama"),
+                         (0, f"no check of llama is remembered in {self.memory} (`config checks` lists them)\n"))
+        self.assertEqual(self.config("checks", "--forget", "gemma-4-turbo"),
+                         (0, f"2 check(s) of gemma-4-turbo forgotten in {self.memory}: the next run checks again\n"))
+        self.assertNotIn("gemma-4-turbo", self.config("checks")[1])
+        self.assertEqual(self.config("checks", "--forget")[1].split(" in ")[0], "2 check(s) of any model forgotten")
+        self.assertTrue(self.config("checks")[1].startswith(f"no check is remembered in {self.memory}: a run checks "
+                                                            "each model before its first request"))
+
+class ChoosingAModel(Remembered):
+    """Endpoint setup, milestone 3: a model's name checked as it's set, and the models checked marked."""
+    LISTED = ({"id": "google/gemma-4-31B-it", "metadata": {"context_length": 262144, "tags": ["chat", "vision"]}},
+              {"id": "acme/text-only", "metadata": {"tags": ["chat"]}})
+
+    def test_a_name_set_is_checked_against_the_listing_warned_of_never_refused(self):
+        with endpoint(listed=self.LISTED) as url, user_settings({}):
+            code, out = self.config("set", "--user", "model", "google/gemma-4-31b-it")
+            self.assertEqual(code, 0)
+            self.assertIn(f"warning: the endpoint at {url} lists 2 models, not google/gemma-4-31b-it; like it: "
+                          "google/gemma-4-31B-it (`config models WORDS` lists them); `semantic-pdf-diff config test "
+                          "--model google/gemma-4-31b-it` tries it (a few cents)", out)
+            self.assertEqual(saved_settings()["model"], "google/gemma-4-31b-it")  # set all the same
+            code, out = self.config("set", "--user", "model", "acme/text-only")
+            self.assertIn("warning: the endpoint doesn't tag acme/text-only as reading images, and pages are read as "
+                          "images (vision): `semantic-pdf-diff config test --model acme/text-only` tries it", out)
+            code, out = self.config("set", "model", "google/gemma-4-31B-it")  # a store's, checked alike
+            self.assertTrue(out.endswith("google/gemma-4-31B-it is among the endpoint's models\n"), out)
+            with socket.socket() as s:  # a port nothing listens on
+                s.bind(("127.0.0.1", 0))
+                port = s.getsockname()[1]
+            with patch.dict(os.environ, {"OPENAI_BASE_URL": f"http://127.0.0.1:{port}/v1"}):
+                code, out = self.config("set", "--user", "model", "gemma-4")
+        self.assertEqual(code, 0)
+        self.assertIn(f"not checked: the endpoint at http://127.0.0.1:{port}/v1 can't be asked for its models "
+                      "(URLError", out)
+
+    def test_the_models_checked_marked_with_what_was_measured(self):
+        with endpoint(listed=self.LISTED), user_settings({"model": "google/gemma-4-31B-it"}):
+            self.config("test")
+            code, out = self.config("models")
+            self.assertEqual(code, 0)
+            self.assertEqual(out.splitlines(), [
+                "acme/text-only                                  chat",
+                "google/gemma-4-31B-it  (model)  262,144 tokens  chat, vision  checked: json, image (an image 258 "
+                "tokens)"])
+            listed = json.loads(self.config("models", "--json")[1])
+        self.assertEqual({k: sorted(v) for k, v in listed[1]["checked"].items()},
+                         {"json": ["at", "context_tokens"], "image": ["at", "image_tokens", "side"]})
 
 if __name__ == "__main__":
     unittest.main()

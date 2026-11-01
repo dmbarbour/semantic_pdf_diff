@@ -1,10 +1,12 @@
-"""`semantic-pdf-diff config test` and `config models` (decision 0032, as cameo_ingest's): the endpoint, the key and
-each model the settings name checked for a few cents, and the endpoint's models listed.
+"""`semantic-pdf-diff config test`, `config checks` and `config models` (decision 0032, as cameo_ingest's): the
+endpoint, the key and each model the settings name (or a candidate, --model) checked for a few cents, the checks
+remembered shown and forgotten, and the endpoint's models listed, those checked marked.
 
 The checks ask for real: never the answers cache, so a check passes only when the model answers now. The image check
 is an eye-test card: a random code drawn large, which can't be guessed, read back exactly (the lab's eye tests measure
 how small a model can read: lab/src/semantic_pdf_diff_lab/bench/eyetest.py).
 """
+import difflib
 import json
 import math
 import os
@@ -93,12 +95,12 @@ def described(item):
         tags.append("vision")
     return Listed(str(item["id"]), context, price_in, price_out, tuple(dict.fromkeys(tags)))
 
-def listed(settings, api_key=""):
+def listed(settings, api_key="", timeout=30):
     """The endpoint's models (GET {base_url}/models, the OpenAI format) as Listed, sorted by id (case aside); OSError
-    or ValueError when they can't be listed."""
+    or ValueError when they can't be listed (timeout: seconds at most, under the settings' own)."""
     url = settings.base_url.rstrip("/") + "/models"
     request = urllib.request.Request(url, headers={"Authorization": "Bearer " + api_key} if api_key else {})
-    with urllib.request.urlopen(request, timeout=min(settings.timeout, 30)) as response:
+    with urllib.request.urlopen(request, timeout=min(settings.timeout, timeout)) as response:
         data = json.load(response)
     items = data.get("data") if isinstance(data, dict) else data
     if not isinstance(items, list):
@@ -330,24 +332,28 @@ def lines(settings, checks, cost):
     out.append(f"{len(failed)} check(s) failed: {', '.join(failed)}" if failed else "every check passed")
     return out
 
-def listing(settings, words="", as_json=False):
+def listing(settings, words="", as_json=False, memory=None):
     """`config models [WORDS]`: the endpoint's models whose name or tags hold every word ("vision" those that read
-    images, at DeepInfra), with what the endpoint says of each; those the settings name marked."""
-    names = used(settings)
+    images, at DeepInfra), with what the endpoint says of each; those the settings name marked, and those whose checks
+    the record at memory remembers passing at this endpoint (endpoint setup, milestone 3)."""
+    names, checked = used(settings), checked_here(memory, settings) if memory else {}
     found = [m for m in listed(settings, os.getenv("OPENAI_API_KEY", ""))
              if all(w in " ".join((m.id,) + m.tags).casefold() for w in words.casefold().split())]
     if as_json:
         return [json.dumps([{"id": m.id, "context": m.context, "price_in": m.price_in, "price_out": m.price_out,
-                             "tags": list(m.tags), "named_by": names.get(m.id, [])} for m in found], indent=1)]
+                             "tags": list(m.tags), "named_by": names.get(m.id, []),
+                             "checked": {c["check"]: {k: v for k, v in c.items()
+                                                      if k not in ("check", "url", "model", "key")}
+                                         for c in checked.get(m.id, [])}} for m in found], indent=1)]
     if not found:
         return [f"no model at the endpoint holds {words!r}" if words else "the endpoint lists no models"]
-    return table(found, names)
+    return table(found, names, checked)
 
-def table(found, names=None):
-    """Listed models a line each, in columns: the name (marked with the settings naming it), and what the endpoint
-    says of it."""
+def table(found, names=None, checked=None):
+    """Listed models a line each, in columns: the name (marked with the settings naming it), what the endpoint says
+    of it, and the checks remembered passing (checked: {model: [remembered's entries]})."""
     rows = [[m.id + (f"  ({', '.join(names[m.id])})" if names and m.id in names else "")] + m.described()
-            for m in found]
+            + ([checked_said(checked.get(m.id, []))] if checked else []) for m in found]
     widths = [max(len(r[k]) for r in rows) for k in range(len(rows[0]))]
     return ["  ".join(cell.ljust(w) if k == 0 else cell.rjust(w) if k == 1 else cell.ljust(w)
                       for k, (cell, w) in enumerate(zip(r, widths)) if w).rstrip() for r in rows]
@@ -418,6 +424,116 @@ def record(path, settings, checks):
         passed.pop(wanted["json"], None)
     _kept(path, passed)
 
+KINDS = {"chat": "json", "image": "image", "reranker": "reranker", "embedding": "embedding"}  # a key's word: its check
+
+def _parts(key):
+    """A remembered check's key (keys) as {"check", "url", "model"}, and image_side or rerank_api where it holds one;
+    None for a key it doesn't know."""
+    kind, _, rest = key.partition(" ")
+    url, _, model = rest.partition(" ")
+    if kind not in KINDS or not model:
+        return None
+    out = {"check": KINDS[kind], "url": url, "model": model}
+    if kind in ("image", "reranker") and " " in model:
+        out["model"], extra = model.rsplit(" ", 1)
+        out["side" if kind == "image" else "api"] = extra
+    return out
+
+def remembered(path):
+    """The record's checks, each {"check", "url", "model", "key", "at", what it measured...}, by model, endpoint and
+    check."""
+    order = list(KINDS.values())
+    out = [{**entry, **parts, "key": key} for key, entry in recalled(path).items()
+           if (parts := _parts(key)) and isinstance(entry, dict)]
+    return sorted(out, key=lambda c: (c["model"].casefold(), c["url"], order.index(c["check"])))
+
+def checked_here(path, settings):
+    """{model: [remembered's entries]}: the checks remembered passing at the settings' endpoint (a reranker's or an
+    embedding model's URL under it)."""
+    from .llm import redact_url
+    base, out = redact_url(settings.base_url.rstrip("/")), {}
+    for c in remembered(path):
+        if c["url"] == base or c["url"].startswith(base + "/"):
+            out.setdefault(c["model"], []).append(c)
+    return out
+
+def _when(at):
+    return at.replace("T", " ")[:16] + " UTC" if at else "at a time not kept"
+
+def _said(c):
+    """What a remembered check measured, in words."""
+    if c.get("image_tokens"):
+        return f"an image {c.get('side', '?')} px square is {c['image_tokens']:,} tokens"
+    if c.get("context_tokens"):
+        return f"{c['context_tokens']:,} tokens of context, as the endpoint lists it"
+    return f"the {c['api']} API" if c.get("api") else ""
+
+def checked_said(entries):
+    """A model's checks remembered, for `config models`' last column: "checked: json, image (an image 258 tokens)"."""
+    if not entries:
+        return ""
+    tokens = next((c["image_tokens"] for c in entries if c.get("image_tokens")), None)
+    return "checked: " + ", ".join(c["check"] for c in entries) + (f" (an image {tokens:,} tokens)" if tokens else "")
+
+def checks_lines(path, settings):
+    """`config checks`: what the record remembers passing, by model and endpoint, the models the settings name marked;
+    when each passed and what it measured; and how to forget them (endpoint setup, milestone 2)."""
+    found = remembered(path)
+    if not found:
+        return [f"no check is remembered in {path}: a run checks each model before its first request, "
+                "`semantic-pdf-diff config test` now"]
+    names, in_use, groups = used(settings), set(keys(settings).values()), {}
+    for c in found:
+        groups.setdefault((c["model"], c["url"]), []).append(c)
+    out = [f"checks remembered passing in {path}; a run checks a model first unless its checks are here"]
+    for (model, url), checks in groups.items():
+        mine = model in names and any(c["key"] in in_use for c in checks)
+        out.append(f"{model} at {url}" + (f"  ({', '.join(names[model])})" if mine else ""))
+        for c in checks:
+            said = _said(c)
+            out.append(f"  {c['check']:<9} passed {_when(c.get('at', ''))}" + (f"; {said}" if said else ""))
+    out.append("`semantic-pdf-diff config checks --forget [MODEL]` forgets them: the next run checks again")
+    return out
+
+def forget_model(path, model=""):
+    """Remembered checks forgotten: every one, or a model's at any endpoint, so the next run checks (and calibrates)
+    again: how many."""
+    passed = recalled(path)
+    gone = [k for k in passed if not model or ((p := _parts(k)) and p["model"] == model)]
+    if gone:
+        for k in gone:
+            passed.pop(k)
+        _kept(path, passed)
+    return len(gone)
+
+def missing(settings, path):
+    """The checks the settings call for that the record doesn't remember passing (keys' names)."""
+    passed = recalled(path)
+    return [name for name, key in keys(settings).items() if key not in passed]
+
+def name_check(settings, name, timeout=10):
+    """What `config set model NAME` says of a name, the endpoint's listing asked (endpoint setup, milestone 3): [line].
+    It warns where the endpoint doesn't list the name, or lists it untagged as reading images where it tags others;
+    it never refuses (an endpoint may serve a model it doesn't list), and says where the listing can't be had."""
+    from .llm import redact_url
+    where = redact_url(settings.base_url)
+    try:
+        found = listed(settings, os.getenv("OPENAI_API_KEY", ""), timeout=timeout)
+    except (OSError, ValueError) as e:
+        return [f"not checked: the endpoint at {where} can't be asked for its models ({type(e).__name__}: {e})"]
+    try_it = f"`semantic-pdf-diff config test --model {name}` tries it (a few cents)"
+    by_id = {m.id: m for m in found}
+    if name not in by_id:
+        folded = {m.id.casefold(): m.id for m in found}
+        close = [folded[k] for k in difflib.get_close_matches(name.casefold(), list(folded), n=3, cutoff=0.6)]
+        like = f"; like it: {', '.join(close)}" if close else ""
+        return [f"warning: the endpoint at {where} lists {len(found)} models, not {name}{like} (`config models WORDS` "
+                f"lists them); {try_it}"]
+    if settings.vision and not by_id[name].reads_images and any(m.reads_images for m in found):
+        return [f"warning: the endpoint doesn't tag {name} as reading images, and pages are read as images (vision): "
+                + try_it]
+    return []
+
 def forget(path, settings):
     """Every check the settings call for forgotten (their requests failed in a row): the next run checks again."""
     passed = recalled(path)
@@ -435,12 +551,11 @@ def first_use(settings, cache):
     lines logged."""
     from .progress import log
     path = memory_of(cache)
-    wanted, passed = keys(settings), recalled(path)
-    missing = [name for name, key in wanted.items() if key not in passed]
-    if not missing:
+    unchecked = missing(settings, path)
+    if not unchecked:
         return calibrated(settings, path)
-    log.info(f"First use: {', '.join(missing)} checked before anything is asked (remembered in {path})")
-    checks, cost = run(settings, only=missing)
+    log.info(f"First use: {', '.join(unchecked)} checked before anything is asked (remembered in {path})")
+    checks, cost = run(settings, only=unchecked)
     for line in lines(settings, checks, cost)[1:]:
         log.info(line)
     record(path, settings, checks)

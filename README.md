@@ -32,8 +32,10 @@ source .venv/bin/activate
 pip install -e .
 export OPENAI_API_KEY='your-serving-provider-key'
 export OPENAI_BASE_URL='https://your-provider.example/v1'
-semantic-pdf-diff config set --user model your-vision-model-id
-semantic-pdf-diff config test        # the endpoint, the key and the model checked, for a fraction of a cent
+semantic-pdf-diff config models vision           # the endpoint's models reading images
+semantic-pdf-diff config test --model MODEL-ID    # a candidate tried before it's set, for a fraction of a cent
+semantic-pdf-diff config set --user model MODEL-ID
+semantic-pdf-diff config test                     # the endpoint, the key and the model checked
 semantic-pdf-diff compare team-a.pdf team-b.pdf --store result
 ```
 

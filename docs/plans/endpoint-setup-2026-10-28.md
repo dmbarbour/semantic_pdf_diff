@@ -1,6 +1,6 @@
 # Endpoint setup: choosing a model, trying it, and seeing what's remembered
 
-- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day. [Design question](#design-questions) 1 answered (the environment and the user's settings); 2 and 3 open.
+- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."). [Design question](#design-questions) 1 answered (the environment and the user's settings); 2 and 3 open.
 - **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
 - **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
 - **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
@@ -68,6 +68,12 @@
 - **`config test --only` check names,** and `--new` for only what isn't remembered.
 - **`config checks`** lists what `endpoints.json` remembers: each check, its endpoint and model, when it passed, and what it measured. The file's path is shown too.
 - **`config checks --forget [MODEL]`** forgets them, so the next run checks and calibrates again.
+- **Done 2026-11-01:**
+  - **`config test --model NAME`** checks a candidate as the chat model: the endpoint's listing, the JSON answer and the card, not the reranker's or the embedding model's checks unless `--only` names them. `--base-url URL` checks at another endpoint for this command. The results are remembered under that model and URL, as any check's.
+  - **`--only json,image,reranker,embedding`**, comma-separated or repeated; a name it doesn't know is refused, naming the checks. **`--new`** runs those of the checks asked for that aren't remembered passing, and asks nothing when every one is.
+  - **`config checks`** prints the record's path, then each model at each endpoint, marked with the settings naming it where its checks are the ones they call for; each check, when it passed (UTC) and what it measured (the context the endpoint lists; an image's tokens at its `image_side`).
+  - **`config checks --forget`** forgets every check; `--forget MODEL` a model's at any endpoint, saying how many.
+  - **Tried at DeepInfra** (a scratch cache; $0.0002): `--model google/gemma-4-26B-A4B-it` passed its three checks (258 tokens an image) without changing the model set; `--new` then asked nothing; `--forget` of it left the 31B's.
 
 ### 3. Choosing a model
 
@@ -75,6 +81,9 @@
   - It warns, without refusing, when the name isn't listed or isn't tagged as reading images.
   - It offers `config test --model NAME`.
 - **`config models` marks the models already checked,** with what was measured.
+- **Done 2026-11-01:**
+  - **`config set model NAME`** (a store's or the user's, and `config import`) asks the endpoint's listing, at most 10 s, once the model is set. It warns where the name isn't listed, naming up to three like it (`google/gemma-4-31b-it` offers `google/gemma-4-31B-it` at DeepInfra), and where it's listed untagged as reading images while others are tagged (`meta-llama/Llama-3.3-70B-Instruct-Turbo`). Each warning offers `config test --model NAME`; a name listed and tagged says so. Where the listing can't be had, it says the name wasn't checked, and why.
+  - **`config models`** marks each model whose checks are remembered passing at its endpoint: `checked: json, image (an image 258 tokens)`. `--json` gives each model's `checked`, with when and what was measured.
 
 ### 4. A guided setup
 
