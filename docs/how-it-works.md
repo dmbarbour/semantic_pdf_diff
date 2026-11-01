@@ -129,7 +129,8 @@ Model output is validated; unknown keys are ignored, individually malformed clai
 | `retrieval.py` | The candidate pairs a comparison judges, by shared words and values |
 | `explain.py` | The explain stage of a revisions comparison: the kind of each difference, shown its claims' items |
 | `align.py` | Revisions mode: items matched across revisions before judging; equal values settled |
-| `indexes.py`, `indexfiles.py` | A report's indexes (subjects from alignment's items, properties, figures and tables; a comparison's merged), and their files: index.md, index.xlsx, CSV |
+| `indexes.py`, `indexfiles.py` | A report's indexes (subjects from alignment's items, properties, figures and tables; a comparison's merged; kinds, a set's sheets one, a property named two ways once, a claim naming several items counted for none), and their files: index.md, index.xlsx, CSV |
+| `kindcheck.py` | The kinds named by the model (`confirm_kinds`, off): one request a source, kinds renamed, merged and items moved |
 | `report.py` | Escaped HTML and JSON reports: the page's parts, packed into one file with its scripts (`report.js`, and `search.js` finding what's searched) |
 | `crops.py` | A report's crops: their order of value, their encoding, and what a byte budget leaves out |
 | `embed.py` | Claims embedded after the comparison (the `embed` lever), for a search by meaning: `near:ID`, `like:ID` blended, `meaning:` from the command line |

@@ -144,6 +144,8 @@ HELP = {
                      "index and the search", "From the parts headed Abbreviations, Definitions, Symbols, Legend and "
                      "the like (the model, a request a part of about 100 lines; a text file's tables as they are), "
                      "and from prose (\"net positive suction head (NPSH)\"). off: none read.", basic=True),
+    "confirm_kinds": Help(_L, "analyses: the kinds of item the rules found shown to the model, one request a "
+                              "source; it names each by what its items are and moves those not of it"),
     "second_pass": Help(_L, "analyses: each subject's claims read together, a request a subject; context added, "
                             "relations, suspicions and likely gaps noted beside the claims, never changing them; in "
                             "PDFs, the claims it doubts read again and the gaps looked for where they'd be"),

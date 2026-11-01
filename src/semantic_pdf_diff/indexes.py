@@ -21,6 +21,12 @@ document that would be useful, and it seems deeply related to the problem of com
   tagged items by their tag's letters (P-101 and P-102 are the P items), named by the word their names most share
   ("pump"); items named with a number by the name without it ("Room 104" and "Room 105": Room); a kind of two items
   or more, with how many of its items give each property (what one of them leaves out shows: siblings' gaps).
+  Grouped by what their items are (milestone 3, 2026-11-01; the owner: "Let's try your recommendations on the
+  decisions."): a drawing set's sheets one kind, "sheet", by the shape its title blocks print their numbers in
+  (G-001: letters, a dash, three digits), whatever their letters; a claim naming several items ("A-102 A-201": rows
+  read as one, or a statement about several) counted for none of them, and a subject whose claims all do left out of
+  kinds and marked; two of a kind's properties one where three of its items or more give both, alike each time
+  ("sheet name" and "drawing title"). Where the confirm_kinds lever ran (kindcheck.py), the model's names and moves.
 - **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
   each source's, a term the sources define differently marked.
 - **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): a property
@@ -183,6 +189,13 @@ def matched(found, findings, sources, alias=lambda name: None):
         merged += [group, *apart]
     return merged
 
+def several(entity):
+    """The items a name names, where it names two or more ("A-102 A-201", "SRB0, SRB1 and SRB3"): their tags, else
+    []. Such a claim is a row read as one, or a statement about several: counted for none of them in kinds."""
+    from .align import TAG
+    tags = list(dict.fromkeys(TAG.findall(str(entity))))
+    return tags if len(tags) > 1 else []
+
 def built(data):
     """The report's index: {"sources", "subjects", "figures"} (as report.json keeps it under "index"). Each subject:
     its name, its names as printed, how it was matched across sources, its claims by source, and its properties,
@@ -200,18 +213,27 @@ def built(data):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
         properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)
+        name = mine[0][1][1]  # alignment's (its claims' most given), else the most given naming it alone
+        if several(name):
+            name = next((n for n in sorted(names, key=lambda n: (-names[n], natural(n))) if not several(n)), name)
         subjects.append({
-            "name": mine[0][1][1], "names": sorted(names, key=lambda n: (-names[n], natural(n))),
+            "name": name, "names": sorted(names, key=lambda n: (-names[n], natural(n))),
+            **({"several": several(name)} if several(name) else {}),
             "matched_by": group["matched_by"],
             "claims": {source: [c["id"] for c in cs] for source, (_, _, cs) in mine},
             "properties": [{"name": Counter(plain(c["attribute"]) for c in cs).most_common(1)[0][0],
                             "names": sorted({plain(c["attribute"]) for c in cs}, key=natural),
                             "values": [{"source": where.source.get(c["content"], ""), "value": c["value"],
                                         "unit": c["unit"], "conditions": c.get("conditions", ""), "claim": c["id"],
-                                        "where": where(c)} for c in cs]}
+                                        "where": where(c),
+                                        **({"several": several(c["entity"])} if several(c["entity"]) else {})}
+                                       for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
-    found_kinds = kinds(subjects)
+    regroup = None
+    if data.get("kind_check"):  # the model's names and moves (the confirm_kinds lever, kindcheck.py)
+        regroup = lambda groups: regrouped(groups, subjects, data["kind_check"])  # noqa: E731
+    found_kinds = kinds(subjects, sheet_shapes(data), regroup)
     return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data),
             "kinds": found_kinds, "gaps": gaps(data, subjects, found_kinds, where),
             "inconsistencies": inconsistencies(data, where)}
@@ -219,42 +241,152 @@ def built(data):
 # An item named with a number: its kind's name before the number ("Room 104", "blower 3", "Pump No. 2").
 NUMBERED_NAME = re.compile(r"^(.*?[A-Za-z][A-Za-z ./&'-]*?)[\s#-]*(?:no\.?\s*)?\d+[A-Za-z]?$", re.IGNORECASE)
 
-def kind_of(subject):
-    """A subject's kind's key: ("tag", its tag's letters) for a tagged item, ("name", the name without its number)
-    for one named with a number, else None."""
+# An item named by a sheet's number alone: "A-101", "Sheet G-101", "DWG. NO. S-201"
+SHEET_NAME = re.compile(r"^(?:(?i:sheet|drawing|dwg)\.?\s*(?:(?i:no)\.?\s*)?)?([A-Z]{1,4}-?\d{1,4}[A-Z]?)$")
+JOIN_ITEMS = 3  # a kind's items giving two properties, at least, alike each time, for them to be one
+
+def shape(tag):
+    """A tag's shape: its letters A, its digits 9 ("XA-501": "AA-999")."""
+    return re.sub(r"\d", "9", re.sub(r"[A-Z]", "A", tag))
+
+def sheet_shapes(data):
+    """The shapes of the sheet numbers the sources' title blocks print (situating's sheets, labelled "sheet G-001")."""
     from .align import TAG
-    for name in [subject["name"], *subject["names"]]:
+    out = set()
+    for s in (data.get("situation") or {}).values():
+        for f in s.get("figures", []):
+            found = TAG.search(f.get("label") or "") if f.get("kind") == "sheet" else None
+            if found:
+                out.add(shape(found[0]))
+    return out
+
+def given(subject, source=None):
+    """{a property's name, case folded: (its name, its values' words)}: what a subject gives (in a source), from
+    claims naming it alone (several)."""
+    out = {}
+    for p in subject["properties"]:
+        values = [v for v in p["values"] if not v.get("several") and (source is None or v["source"] == source)]
+        if values:
+            out[p["name"].casefold()] = (p["name"], {" ".join(re.findall(r"[^\W_]+", str(v["value"]).casefold()))
+                                                     for v in values} - {""})
+    return out
+
+def keys_of(k):
+    """{a kind's property's name, case folded: the name it's counted under}: its names joined (properties)."""
+    return {n.casefold(): p["name"].casefold() for p in k["properties"] for n in p.get("names", [p["name"]])}
+
+def gives(subject, k, source=None):
+    """The kind's properties (keys_of's) a subject gives, in a source."""
+    keys = keys_of(k)
+    return {keys.get(n, n) for n in given(subject, source)}
+
+def kind_of(subject, shapes=()):
+    """A subject's kind's key: ("sheet", "sheet") for an item named by a sheet's number alone in a shape the set's
+    title blocks print (shapes: sheet_shapes); ("tag", its tag's letters) for a tagged item; ("name", the name without
+    its number) for one named with a number; else None. Its names naming several items aren't asked."""
+    from .align import TAG
+    names = _alone(subject)
+    if not names:
+        return None
+    sheets = [SHEET_NAME.match(" ".join(n.split())) for n in names]
+    if shapes and all(m and shape(m[1]) in shapes for m in sheets):
+        return "sheet", "sheet"
+    for name in names:
         tag = TAG.search(name)
         if tag:
             return "tag", re.match(r"[A-Z]+", tag[0])[0]
-    found = NUMBERED_NAME.match(" ".join(subject["name"].split()))
+    found = NUMBERED_NAME.match(" ".join(names[0].split()))
     return ("name", found[1].strip(" .#-").casefold()) if found and found[1].strip(" .#-") else None
 
-def kinds(subjects):
+def _alone(subject):
+    """A subject's names naming it alone (not several), its name first."""
+    return [n for n in dict.fromkeys([subject["name"], *subject["names"]]) if not several(n)]
+
+def _alike(a, b):
+    """Two properties' values on one item said alike: the same words, or one's within the other's; not numbers
+    alone, which two properties can share by chance."""
+    from .align import NUMERIC
+    if any(NUMERIC.match(x) for x in a | b):
+        return False
+    return any(x == y or f" {x} " in f" {y} " or f" {y} " in f" {x} " for x in a for y in b)
+
+def _joins(gives_):
+    """{a property's name: the name it's joined under}: a kind's two properties one where JOIN_ITEMS of its items or
+    more give both, alike each time (gives_: {item: given()})."""
+    names = sorted({n for g in gives_.values() for n in g})
+    root = {n: n for n in names}
+
+    def find(n):
+        while root[n] != n:
+            n = root[n]
+        return n
+    for a_, a in enumerate(names):
+        for b in names[a_ + 1:]:
+            both = [g for g in gives_.values() if a in g and b in g]
+            if len(both) >= JOIN_ITEMS and all(_alike(g[a][1], g[b][1]) for g in both):
+                root[find(b)] = find(a)
+    return {n: find(n) for n in names}
+
+def _kind(name, members, subjects):
+    """A kind as the index keeps it: {"kind", "subjects", "properties": [{"name", "names", "given"}]}, the most
+    given first; a property named several ways (_joins) once, under the name its items most give."""
+    gives_ = {i: given(subjects[i]) for i in members}
+    root = _joins(gives_)
+    count = Counter(n for g in gives_.values() for n in g)
+    group = defaultdict(set)
+    for n, r in root.items():
+        group[r].add(n)
+    shown = {n: next(g[n][0] for g in gives_.values() if n in g) for n in count}
+    properties = []
+    for r, names in group.items():
+        first = max(sorted(names, key=natural), key=lambda n: count[n])
+        properties.append({"name": shown[first], "names": [shown[n] for n in sorted(names, key=lambda n: (-count[n],
+                                                                                                    natural(n)))],
+                           "given": sum(1 for g in gives_.values() if names & set(g))})
+    properties.sort(key=lambda p: (-p["given"], natural(p["name"])))
+    return {"kind": name, "subjects": members, "properties": properties}
+
+def regrouped(groups, subjects, check):
+    """The rules' kinds ([(name, [subject indices])]) as the model named them (check: "kind_check"): each named as it
+    said, an item it moved in the kind so named (its own, where none is), kinds it named alike one. A kind it said
+    nothing of keeps its rules' name. In the rules' order."""
+    said = {k["rule"]: k for k in check.get("kinds", [])}
+    out = {}
+    for name, members in groups:
+        k = said.get(name, {})
+        for i in members:
+            to = k.get("moved", {}).get(subjects[i]["name"]) or k.get("name") or name
+            out.setdefault(fold(to), [to, []])[1].append(i)
+    return [(name, sorted(set(members))) for name, members in out.values()]
+
+def kinds(subjects, shapes=(), regroup=None):
     """The kinds of the subjects (A to Z): {"kind": its name, "subjects": [their indices in subjects], "properties":
-    [{"name", "given": how many of its items give it}], the most given first}, each of two items or more."""
+    [{"name", "names", "given": how many of its items give it}], the most given first}, each of two items or more.
+    A subject giving nothing from claims naming it alone (several) is of none. shapes: the set's sheet numbers'
+    (sheet_shapes); regroup: [(name, members)] -> [(name, members)], the model's (regrouped)."""
     from .align import TAG, words
     by = defaultdict(list)
     for i, s in enumerate(subjects):
-        key = kind_of(s)
+        key = kind_of(s, shapes) if given(s) else None
         if key:
             by[key].append(i)
-    out = []
+    groups = []
     for (how, key), members in by.items():
         if len(members) < 2:
             continue
-        if how == "tag":
-            said = Counter(w for i in members for n in subjects[i]["names"] for w in words(TAG.sub(" ", n))
-                           if not any(c.isdigit() for c in w))
+        if how == "sheet":
+            name = "sheet"
+        elif how == "tag":
+            said = Counter(w for i in members for n in subjects[i]["names"] if not several(n)
+                           for w in words(TAG.sub(" ", n)) if not any(c.isdigit() for c in w))
             name = f"{said.most_common(1)[0][0]} ({key})" if said else f"{key}-"
         else:
-            name = Counter(NUMBERED_NAME.match(" ".join(subjects[i]["name"].split()))[1].strip(" .#-")
+            name = Counter(NUMBERED_NAME.match(" ".join(_alone(subjects[i])[0].split()))[1].strip(" .#-")
                            for i in members).most_common(1)[0][0]
-        given = Counter(p["name"].casefold() for i in members for p in subjects[i]["properties"])
-        named = {p["name"].casefold(): p["name"] for i in members for p in subjects[i]["properties"]}
-        out.append({"kind": name, "subjects": members,
-                    "properties": [{"name": named[k], "given": n}
-                                   for k, n in sorted(given.items(), key=lambda x: (-x[1], natural(x[0])))]})
+        groups.append((name, members))
+    if regroup:
+        groups = regroup(groups)
+    out = [_kind(name, members, subjects) for name, members in groups if len(members) >= 2]
     return sorted(out, key=lambda k: natural(k["kind"]))
 
 SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most of them give to be a gap
@@ -279,23 +411,21 @@ def gaps(data, subjects, found_kinds, where):
     out = []
     for k in found_kinds:
         for source in data_sources(data):
-            members = [i for i in k["subjects"] if subjects[i]["claims"].get(source)]
+            members = [i for i in k["subjects"] if given(subjects[i], source)]
             if len(members) < SIBLINGS:
                 continue
-            gives, named = {}, {}
-            for i in members:
-                mine = [p for p in subjects[i]["properties"] if any(v["source"] == source for v in p["values"])]
-                gives[i] = {p["name"].casefold() for p in mine}
-                named.update({p["name"].casefold(): p["name"] for p in mine})
-            given = Counter(name for names in gives.values() for name in names)
-            for name, n in sorted(given.items(), key=lambda x: natural(x[0])):
+            mine = {i: gives(subjects[i], k, source) for i in members}
+            named = {p["name"].casefold(): p["name"] for p in k["properties"]}
+            counted = Counter(name for names in mine.values() for name in names)
+            for name, n in sorted(counted.items(), key=lambda x: natural(x[0])):
                 if not n * 2 > len(members) or n == len(members):
                     continue
-                others = [subjects[i]["name"] for i in members if name in gives[i]]
+                others = [subjects[i]["name"] for i in members if name in mine[i]]
                 for i in members:
-                    if name in gives[i]:
+                    if name in mine[i]:
                         continue
-                    at = [v for p in subjects[i]["properties"] for v in p["values"] if v["source"] == source]
+                    at = [v for p in subjects[i]["properties"] for v in p["values"]
+                          if v["source"] == source and not v.get("several")]
                     out.append({"kind": "siblings", "source": source, "subject": subjects[i]["name"],
                                 "property": named[name], "where": at[0]["where"] if at else "",
                                 "why": f"{n} of its {len(members)} {k['kind']} items give it: "

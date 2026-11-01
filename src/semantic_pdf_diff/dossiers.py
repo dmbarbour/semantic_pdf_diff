@@ -145,8 +145,9 @@ def dossiers(data, index):
                                      for a, b, p in pairs]
             k = kind_of.get(i)
             if k is not None:
-                mine = {p["name"].casefold() for p in s["properties"]
-                        if any(v["source"] == source for v in p["values"])}
+                keys = {n.casefold(): p["name"].casefold() for p in k["properties"] for n in p.get("names", [])}
+                mine = {keys.get(p["name"].casefold(), p["name"].casefold()) for p in s["properties"]  # as its kind
+                        if any(v["source"] == source and not v.get("several") for v in p["values"])}  # counts them
                 lacks = [p["name"] for p in k["properties"] if p["name"].casefold() not in mine and p["given"] >= 2]
                 dossier["siblings"] = {"kind": k["kind"], "items": len(k["subjects"]),
                                        **({"they give, it doesn't": lacks[:10]} if lacks else {})}

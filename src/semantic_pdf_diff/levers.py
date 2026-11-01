@@ -1317,6 +1317,16 @@ class ReadTogether(Lever):
     def reads_together(self, mode):
         return self.second_pass and mode == "analysis"
 
+class ConfirmKinds(Lever):
+    lever_name, stage, off = "confirm_kinds", "comparison", {"confirm_kinds": False}
+    # analyses: the kinds the rules found (indexes.kinds) shown to the model, one request a source, which names each
+    # by what its items are and moves the items not of it (kindcheck.py; docs/plans/indexes-and-glossaries-
+    # 2026-10-29.md, design question 7; the owner, 2026-11-01: "But test the model on Q7 and see how it works out.")
+    confirm_kinds: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def confirms_kinds(self, mode):
+        return self.confirm_kinds and mode == "analysis"
+
 class DedupeRepeated(Lever):
     lever_name, stage, off = "dedupe_repeated", "matching", {"dedupe_repeated": False}
     # extract exactly repeated table rows (same cells, same table position, 3+ pages) once
@@ -1343,7 +1353,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ReadTogether, Embed, Rerank)
+                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds, ReadTogether, Embed,
+                 Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1555,6 +1566,12 @@ class Platform(Composable):
     def names_synonyms(self):
         """Whether the model groups the documents' other names for one thing, for the report's search (synonyms.py):
         the platform's, never; the search_names lever's, when on."""
+        return False
+
+    @chosen
+    def confirms_kinds(self, mode):
+        """Whether the model names a report's kinds, after its claims and before the second pass (kindcheck.py): the
+        platform's, never; the confirm_kinds lever's, in analyses when on."""
         return False
 
     @chosen

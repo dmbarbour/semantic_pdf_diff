@@ -369,6 +369,9 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
         limitations=ANALYSIS_LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     data = searchable({**data, **({'glossary': found} if found is not None else {})}, settings, client, ONE_SOURCE,
                       label, progress)
+    if settings.confirms_kinds(ONE_SOURCE):  # the kinds named by the model (the confirm_kinds lever), before the
+        from . import indexes, kindcheck  # second pass, whose sibling hints and kinds' dossiers take them
+        data['kind_check'] = kindcheck.confirmed(data, indexes.built(data), client, ONE_SOURCE, label, progress)
     if settings.reads_together(ONE_SOURCE):  # each subject's claims read together (the second_pass lever)
         from . import dossiers, indexes
         data['commentary'] = dossiers.read_together(data, indexes.built(data), client, ONE_SOURCE, label, progress)

@@ -27,9 +27,10 @@ FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # every member's, so the same index gives th
 NUMBER = re.compile(r"-?(?:0|[1-9]\d*|[1-9]\d{0,2}(?:,\d{3})+)(?:\.\d+)?")
 
 def said(v):
-    """A value as written: its value, unit (none for "-") and conditions."""
+    """A value as written: its value, unit (none for "-") and conditions; a claim naming several items says so."""
     unit = "" if v["unit"] in ("", "-") else v["unit"]
-    return " ".join(x for x in (str(v["value"]), unit) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
+    return (" ".join(x for x in (str(v["value"]), unit) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
+            + (f" [of {', '.join(v['several'])}]" if v.get("several") else ""))
 
 def counted(n, one, many=None):
     """ "1 claim", "2 claims"."""
@@ -54,6 +55,8 @@ def markdown(index):
     for s in index["subjects"]:
         names = [n for n in s["names"] if n.casefold() != s["name"].casefold()]
         lines.append(f"### {s['name']}" + (f" (also {', '.join(names[:5])})" if names else ""))
+        if s.get("several"):
+            lines.append(SEVERAL.format(", ".join(s["several"])))
         if many:
             lines.append("Claims: " + "; ".join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
                          + (f" (matched by {s['matched_by']})" if s["matched_by"] else ""))
@@ -78,12 +81,13 @@ def markdown(index):
     for k in index.get("kinds", []):
         shown, items = k["properties"][:KIND_COLUMNS], [index["subjects"][i] for i in k["subjects"]]
         lines += [f"### {k['kind']}: {len(items)} items", "",
-                  "| Item | " + " | ".join(cell_md(p["name"]) for p in shown) + " |",
+                  "| Item | " + " | ".join(cell_md(kind_property(p)) for p in shown) + " |",
                   "|---|" + "---|" * len(shown)]
         for s in items:
-            lines.append(f"| {cell_md(s['name'])} | " + " | ".join(cell_md(kind_cell(s, p["name"], many))
+            lines.append(f"| {cell_md(s['name'])} | " + " | ".join(cell_md(kind_cell(s, p, many))
                                                                    for p in shown) + " |")
-        lines += ["", "Given by: " + "; ".join(f"{p['name']} {p['given']} of {len(items)}" for p in k["properties"]),
+        lines += ["", "Given by: " + "; ".join(f"{kind_property(p)} {p['given']} of {len(items)}"
+                                               for p in k["properties"]),
                   ""]
     lines += ["", "## Figures and tables", ""]
     for f in index["figures"]:
@@ -147,10 +151,21 @@ KIND_COLUMNS = 8  # a kind's properties shown as columns in index.md, the most g
 def cell_md(text):
     return str(text).replace("|", "\\|").replace("\n", " ")
 
-def kind_cell(subject, name, many):
-    """An item's values for a property, as a kind's table shows them: "10 kW", or each source's ("a: 10 kW; b:
-    12 kW"); "—" where it gives none."""
-    values = [v for p in subject["properties"] if p["name"].casefold() == name.casefold() for v in p["values"]]
+# A subject whose name names several items (indexes.several), as the index marks it
+SEVERAL = "Names several items ({}): rows read as one, or a statement about several; its kind counts it for none."
+
+def kind_property(p):
+    """A kind's property as its table heads it: its name, and its other names where its items name it several ways
+    ("content (also sheet name, drawing title)")."""
+    also = [n for n in p.get("names", []) if n.casefold() != p["name"].casefold()]
+    return p["name"] + (f" (also {', '.join(also)})" if also else "")
+
+def kind_cell(subject, prop, many):
+    """An item's values for a kind's property (under any of its names), as a kind's table shows them: "10 kW", or
+    each source's ("a: 10 kW; b: 12 kW"); "—" where it gives none, from claims naming it alone."""
+    names = {n.casefold() for n in prop.get("names", [prop["name"]])}
+    values = [v for p in subject["properties"] if p["name"].casefold() in names for v in p["values"]
+              if not v.get("several")]
     if not values:
         return "—"
     return "; ".join((f"{v['source']}: " if many else "") + said(v) for v in values[:3]) + (" …" if len(values) > 3
@@ -274,15 +289,16 @@ def kinds_sheet(index):
     rows, outline, width = [], [], 2
     for k in index.get("kinds", []):
         items = [index["subjects"][i] for i in k["subjects"]]
-        names = [p["name"] for p in k["properties"]]
+        names = [kind_property(p) for p in k["properties"]]
         width = max(width, len(names) + 1)
         rows.append([k["kind"], f"{len(items)} items; given by: "
-                     + "; ".join(f"{p['name']} {p['given']} of {len(items)}" for p in k["properties"])[:500]])
+                     + "; ".join(f"{n} {p['given']} of {len(items)}" for n, p in zip(names, k["properties"]))
+                     [:500]])
         outline.append((0, BOLD))
         rows.append(["Item", *names])
         outline.append((1, BOLD, True))
         for s in items:
-            rows.append([s["name"], *(kind_cell(s, n, many) for n in names)])
+            rows.append([s["name"], *(kind_cell(s, p, many) for p in k["properties"])])
             outline.append((1, 0))
     return sheet([], rows, outline, widths=[32] + [18] * (width - 1))
 

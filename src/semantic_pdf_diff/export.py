@@ -32,7 +32,7 @@ import json
 import re
 from collections import defaultdict
 
-from .indexfiles import GAP_TITLES, KIND_COLUMNS, cell_md, kind_cell
+from .indexfiles import GAP_TITLES, KIND_COLUMNS, cell_md, kind_cell, kind_property
 
 CHUNK = 1600     # characters of a chunk's claims, about (~400 tokens; the ingest tool cuts 512 with 128 overlapping)
 EXCERPT = 120    # characters of a claim's quote shown, at most
@@ -344,12 +344,14 @@ def kind_chunks(index, size=CHUNK):
     out = []
     for k in index.get("kinds", []):
         shown, items = k["properties"][:KIND_COLUMNS], [index["subjects"][i] for i in k["subjects"]]
-        header = ("| Item | " + " | ".join(cell_md(p["name"]) for p in shown) + " |\n|---|" + "---|" * len(shown))
-        rows = [f"| {cell_md(s['name'])} | " + " | ".join(cell_md(kind_cell(s, p["name"], many)) for p in shown) + " |"
+        header = ("| Item | " + " | ".join(cell_md(kind_property(p)) for p in shown) + " |\n|---|"
+                  + "---|" * len(shown))
+        rows = [f"| {cell_md(s['name'])} | " + " | ".join(cell_md(kind_cell(s, p, many)) for p in shown) + " |"
                 for s in items]
         rest = k["properties"][KIND_COLUMNS:]
         lead = (f"The {len(items)} items of the kind {k['kind']}, by property, the most given first; “—” where an "
-                "item gives none. Given by: " + "; ".join(f"{p['name']} {p['given']} of {len(items)}" for p in shown)
+                "item gives none. Given by: " + "; ".join(f"{kind_property(p)} {p['given']} of {len(items)}"
+                                                       for p in shown)
                 + "." + (f" Also given, by fewer: {', '.join(p['name'] for p in rest)}." if rest else ""))
         out += titled(f"Kind: {k['kind']}", lead, [[header, *part] for part in cut(rows, size)], kind=k["kind"])
     return out

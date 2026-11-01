@@ -36,7 +36,7 @@
     },
     "unplanted": {
      "blank (named by a value)": 2,
-     "siblings (named by a value)": 12
+     "siblings (named by a value)": 6
     }
    },
    "implied": {
@@ -64,10 +64,8 @@
      "not_given": 4
     },
     "siblings: named by a value": {
-     "given": 6,
-     "no_place": 4,
-     "not_given": 1,
-     "not_shown": 1
+     "given": 3,
+     "no_place": 3
     },
     "siblings: planted": {
      "not_given": 4
@@ -280,7 +278,7 @@
     },
     "unplanted": {
      "blank (named by a value)": 1,
-     "siblings (named by a value)": 6
+     "siblings (named by a value)": 2
     }
    },
    "implied": {
@@ -307,9 +305,8 @@
      "not_given": 2
     },
     "siblings: named by a value": {
-     "given": 3,
-     "no_place": 2,
-     "not_shown": 1
+     "given": 1,
+     "no_place": 1
     },
     "siblings: planted": {
      "not_given": 2
@@ -479,7 +476,7 @@
     },
     "unplanted": {
      "blank (named by a value)": 1,
-     "siblings (named by a value)": 6
+     "siblings (named by a value)": 4
     }
    },
    "implied": {
@@ -506,9 +503,8 @@
      "not_given": 2
     },
     "siblings: named by a value": {
-     "given": 3,
-     "no_place": 2,
-     "not_given": 1
+     "given": 2,
+     "no_place": 2
     },
     "siblings: planted": {
      "not_given": 2

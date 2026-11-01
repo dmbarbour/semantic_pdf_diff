@@ -99,6 +99,54 @@ class Subjects(unittest.TestCase):
                       "| P-103 feed pump | 9 kW | — | 3 m |", page)
         self.assertIn("Given by: rated power 3 of 3; head 1 of 3; NPSH required 1 of 3", page)
 
+    def test_kinds_grouped_by_what_their_items_are(self):
+        """Milestone 3, 2026-11-01 (the owner: "Let's try your recommendations on the decisions."): a set's sheets one
+        kind by the shape its title blocks print their numbers in; a property named two ways one where its items give
+        both alike; a claim naming several items counted for none, a subject whose claims all do left out and
+        marked."""
+        situation = {"ca": {"figures": [{"id": "f1", "page": 1, "kind": "sheet", "label": "sheet G-001"},
+                                        {"id": "f2", "page": 2, "kind": "sheet", "label": "sheet XA-501"}]}}
+        rows = [("A-101", "FLOOR PLAN"), ("Sheet E-102", "LIGHTING PLAN"), ("XB-001", "COVER"),
+                ("M-301", "SECTIONS")]
+        evidence = [claim(f"S-{n}", "ca", name, "sheet name", title, "") for n, (name, title) in enumerate(rows)]
+        evidence += [claim(f"T-{n}", "ca", name, "drawing title", title + " AND DETAILS" * (n == 1), "")
+                     for n, (name, title) in enumerate(rows[:3])]
+        evidence += [claim("X-1", "ca", "XB-101", "drawing title", "ROOF PLAN", ""),
+                     claim("X-2", "ca", "XA04", "description", "3/4 bolt", ""),
+                     claim("X-3", "ca", "XA05", "description", "louvre", ""),
+                     claim("X-4", "ca", "A-401 A-402", "sheet name", "ELEVATIONS", ""),  # rows read as one
+                     claim("X-5", "ca", "XB-001 XB-002", "drawing title", "COVER", ""),
+                     claim("X-6", "ca", "pump P-101", "flow", "10", "l/s")]
+        index = indexes.built(report(evidence, situation=situation))
+        found = {k["kind"]: k for k in index["kinds"]}
+        self.assertEqual(list(found), ["sheet", "XA-"])  # the components keep their tag's kind
+        sheets = found["sheet"]
+        self.assertEqual(sorted(index["subjects"][i]["name"] for i in sheets["subjects"]),
+                         ["A-101", "M-301", "Sheet E-102", "XB-001", "XB-101"])
+        self.assertEqual(sheets["properties"], [{"name": "drawing title", "names": ["drawing title", "sheet name"],
+                                                 "given": 5}])  # 4 items each: the first A to Z
+        self.assertEqual([g for g in index["gaps"] if g["kind"] == "siblings"], [])  # each gives its title
+        several = next(s for s in index["subjects"] if s["name"] == "A-401 A-402")
+        self.assertEqual(several["several"], ["A-401", "A-402"])
+        self.assertNotIn(index["subjects"].index(several), sheets["subjects"])
+        xb = next(s for s in index["subjects"] if s["name"] == "XB-001")  # its claim naming two counted for none
+        self.assertEqual([v.get("several", []) for p in xb["properties"] for v in p["values"]],
+                         [[], ["XB-001", "XB-002"], []])
+        page = indexfiles.markdown(index)
+        self.assertIn("### A-401 A-402\nNames several items (A-401, A-402): rows read as one, or a statement about "
+                      "several; its kind counts it for none.", page)
+        self.assertIn("### sheet: 5 items\n\n| Item | drawing title (also sheet name) |", page)
+        self.assertIn("| XB-001 | COVER; COVER |", page)  # its own claims, not the row naming two
+        self.assertIn("- **drawing title**: COVER (a.pdf, page 1); COVER [of XB-001, XB-002] (a.pdf, page 1)", page)
+        apart = indexes.built(report(evidence))  # no sheets situated: the tags' letters, as before
+        self.assertNotIn("sheet", {k["kind"] for k in apart["kinds"]})
+
+    def test_numbers_alike_dont_join_properties(self):
+        evidence = [claim(f"{a}-{n}", "ca", f"P-10{n}", a, "12", "kW") for n in range(1, 4) for a in ("A", "B")]
+        evidence = [dict(e, attribute={"A": "rated power", "B": "shaft power"}[e["id"][0]]) for e in evidence]
+        (pumps,) = indexes.built(report(evidence))["kinds"]
+        self.assertEqual([p["names"] for p in pumps["properties"]], [["rated power"], ["shaft power"]])
+
     def test_figures_and_tables(self):
         situation = {"ca": {"figures": [{"id": "f1", "page": 4, "kind": "figure", "label": "Figure 2",
                                          "caption": "Pump curve", "about": "The pumps' head against flow.",
@@ -113,6 +161,55 @@ class Subjects(unittest.TestCase):
         self.assertEqual(index["figures"][0]["title"], "Pump curve")
         self.assertIn('- **Figure 2 “Pump curve”** (a.pdf, page 4): The pumps\' head against flow; 1 claim; cited once',
                       indexfiles.markdown(index))
+
+class KindsNamedByTheModel(unittest.TestCase):
+    """The confirm_kinds lever (kindcheck.py; the owner, 2026-11-01: "But test the model on Q7 and see how it works
+    out."): the rules' kinds shown to the model, which names each and moves the items not of it."""
+    class Answering:
+        """A client answering every request with one answer, each prompt kept (the dispatcher asks it inline)."""
+        def __init__(self, answer):
+            self.answer, self.prompts = answer, []
+
+        def ask(self, prompt, schema, images=(), key=None):
+            self.prompts.append(prompt)
+            return schema.model_validate(self.answer(prompt) if callable(self.answer) else self.answer)
+
+    def test_kinds_renamed_merged_and_items_moved(self):
+        from semantic_pdf_diff import kindcheck
+        situation = {"ca": {"figures": [{"id": "f1", "page": 1, "kind": "sheet", "label": "sheet G-001"}]}}
+        sheets = [("A-101", "FLOOR PLAN"), ("M-301", "SECTIONS"), ("E-102", "LIGHTING")]
+        evidence = [claim(f"S-{n}", "ca", name, "sheet name", title, "") for n, (name, title) in enumerate(sheets)]
+        evidence += [claim(f"P-{n}", "ca", f"P-30{n}", "flow", str(10 + n), "l/s") for n in (1, 2)]  # pumps, by tag
+        evidence += [claim("X-1", "ca", "XA04", "description", "3/4 bolt", ""),
+                     claim("X-2", "ca", "XA05", "description", "louvre", "")]
+        data = report(evidence, situation=situation)
+        index = indexes.built(data)
+        self.assertEqual([(k["kind"], len(k["subjects"])) for k in index["kinds"]], [("sheet", 5), ("XA-", 2)])
+        shown, kinds, items = kindcheck.dossier(index)
+        self.assertEqual(shown["kinds"][0]["items"][3], {"id": "K1.4", "item": "P-301", "gives": {"flow": "11 l/s"}})
+        pumps = [i for i, name in items.items() if name.startswith("P-")]
+
+        def answer(prompt):
+            return {"kinds": [{"id": "K1", "name": "drawing sheet",
+                               "not_of_it": [{"item": i, "kind": "pump"} for i in pumps]
+                               + [{"item": "K2.1", "kind": "bolt"}]},  # another kind's item: dropped
+                              {"id": "K2", "name": "hardware component"}, {"id": "K9", "name": "pump"}]}
+        client = self.Answering(answer)
+        data["kind_check"] = kindcheck.confirmed(data, index, client, "analysis", "label")
+        self.assertIn('"item": "P-301"', client.prompts[0])
+        self.assertEqual(data["kind_check"], {"kinds": [{"rule": "sheet", "name": "drawing sheet",
+                                                         "moved": {"P-301": "pump", "P-302": "pump"}},
+                                                        {"rule": "XA-", "name": "hardware component"}],
+                                              "asked": 1, "failed": 0, "dropped": 2})
+        named = indexes.built(data)
+        self.assertEqual([(k["kind"], sorted(named["subjects"][i]["name"] for i in k["subjects"]))
+                          for k in named["kinds"]],
+                         [("drawing sheet", ["A-101", "E-102", "M-301"]), ("hardware component", ["XA04", "XA05"]),
+                          ("pump", ["P-301", "P-302"])])
+        alike = self.Answering({"kinds": [{"id": "K1", "name": "Component"}, {"id": "K2", "name": "component"}]})
+        data["kind_check"] = kindcheck.confirmed(data, index, alike, "analysis", "label")
+        self.assertEqual([(k["kind"], len(k["subjects"])) for k in indexes.built(data)["kinds"]],
+                         [("Component", 7)])  # named alike: one
 
 class Glossary(unittest.TestCase):
     def test_terms_merged_across_sources_and_marked_where_defined_differently(self):

@@ -750,13 +750,16 @@ def subjects_html(subjects, sources):
     if not subjects:
         return ''
     many = len(sources) > 1
-    def values(vs):
-        return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">{esc(said_of(v))}</a> <small>{esc(v["where"])}</small>'
+    def values(vs):  # a claim naming several items says which (indexes.several)
+        return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">{esc(said_of(v))}</a> <small>{esc(v["where"])}'
+                           + (f'; of {esc(", ".join(v["several"]))}' if v.get('several') else '') + '</small>'
                            for v in vs) or '—'
     out = []
     for s in subjects:
         names = [n for n in s['names'] if n.casefold() != s['name'].casefold()]  # ("Airfoil" isn't also "airfoil")
+        from .indexfiles import SEVERAL
         meta = ([f"also {', '.join(names[:8])}"] if names else []) + (
+            [SEVERAL.format(', '.join(s['several']))] if s.get('several') else []) + (
             ['claims: ' + ', '.join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
              + (f" (matched by {s['matched_by']})" if s['matched_by'] else '')] if many else [])
         heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Values</th>'
@@ -853,26 +856,31 @@ def item_kinds_html(kinds, subjects, sources):
     if not kinds:
         return ''
     many = len(sources) > 1
-    def cell(s, name):
-        values = [v for p in s['properties'] if p['name'].casefold() == name.casefold() for v in p['values']]
+    def cell(s, prop):  # under any of its names, from claims naming the item alone (indexfiles.kind_cell)
+        names = {n.casefold() for n in prop.get('names', [prop['name']])}
+        values = [v for p in s['properties'] if p['name'].casefold() in names for v in p['values']
+                  if not v.get('several')]
         return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">' + (f'{esc(v["source"])}: ' if many else '')
                            + f'{esc(said_of(v))}</a>' for v in values) or '—'
     out = []
     for k in kinds:
         items = [subjects[i] for i in k['subjects']]
-        names = [p['name'] for p in k['properties']]
+        from .indexfiles import kind_property
+        names = [kind_property(p) for p in k['properties']]
         words = ' '.join([k['kind'], *(s['name'] for s in items), *names]).casefold()
         out.append(f'<div class="subject" data-text="{esc(words)}"><h3>{esc(k["kind"])}</h3><p class="meta">'
-                   f'{len(items)} items; given by: ' + esc('; '.join(f"{p['name']} {p['given']} of {len(items)}"
-                                                                      for p in k['properties']))
+                   f'{len(items)} items; given by: ' + esc('; '.join(f"{n} {p['given']} of {len(items)}"
+                                                                      for n, p in zip(names, k['properties'])))
                    + '</p><div class="wide"><table><thead><tr><th>Item</th>'
                    + ''.join(f'<th>{esc(n)}</th>' for n in names) + '</tr></thead><tbody>'
-                   + ''.join(f'<tr><td>{esc(s["name"])}</td>' + ''.join(f'<td>{cell(s, n)}</td>' for n in names)
+                   + ''.join(f'<tr><td>{esc(s["name"])}</td>' + ''.join(f'<td>{cell(s, p)}</td>'
+                                                                        for p in k['properties'])
                              + '</tr>' for s in items) + '</tbody></table></div></div>')
-    return ('<section data-for="kinds" class="index" hidden><p class="meta">Each kind of item (tagged items by '
-            'their tag\'s letters, items named with a number by the name without it) as a table of its items by '
-            'property: "—" where an item gives none its siblings do (weak: not saying isn\'t evidence of absence).'
-            '</p>' + ''.join(out) + '</section>')
+    return ('<section data-for="kinds" class="index" hidden><p class="meta">Each kind of item (a set\'s sheets by '
+            'the shape of their numbers, tagged items by their tag\'s letters, items named with a number by the name '
+            'without it; named by the model where confirm_kinds ran) as a table of its items by property, a property '
+            'named several ways once: "—" where an item gives none its siblings do (weak: not saying isn\'t '
+            'evidence of absence).</p>' + ''.join(out) + '</section>')
 
 def said_of(v):
     unit = '' if v['unit'] in ('', '-') else v['unit']  # "-": none
