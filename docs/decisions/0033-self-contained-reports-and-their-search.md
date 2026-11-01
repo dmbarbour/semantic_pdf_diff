@@ -1,6 +1,11 @@
 # 0033. A report is one self-contained file, and the page and the command line search its claims alike
 
-- **Status:** Accepted (2026-10-21)
+- **Status:** Accepted (2026-10-21); amended 2026-11-01 (a claim's source text on its card; every view in the address)
+- **Amended 2026-11-01** ([the report: snippets and bookmarks](../plans/report-snippets-and-bookmarks-2026-10-28.md), milestones 1 and 2; the owner, 2026-10-28: "when a claim comes from text or the PDF text layer, we should include the relevant snippet of text in the report even when the image is dropped due to lower priority", and "bookmarking of views in the report, e.g. with `#anchor` but a javascript-driven anchor?"):
+  - **A claim keeps a snippet of its source's text** (`Evidence.snippet`), taken at extraction from the text its task was sent: the sentences holding its quote, about 600 characters at most, or a table row's cells under its header. Never shown to the judge (`compare.PROVENANCE_FIELDS`).
+  - **Every card that has one shows it,** its quote's words underlined: in full where the card has no crop or the budget left it out, folded to two lines below a crop. It's counted in the page's size before crops are chosen.
+  - **It isn't searched.** On the 17 queries holding the two engines to the same answers, searched as a field it changed the order of what 12 of them found and added mostly the claims beside a sentence or a table header holding the words (about 6 of 42 sampled were about what was searched).
+  - **Every view is kept in the page's address,** defaults left out: the view, each control, the unticked boxes, the topic, the search, and a linked claim or finding (`claim=ID`, `finding=A~B`). A Link button on each finding and claim; changing view, a Link, *Claims like this* and a coverage table's topic each add a step that Back returns from. A split report's links carry the address between its index and its parts.
 - **Source:** [portable reports](../plans/portable-reports-2026-10-19.md), milestones 1 to 6; [search beyond the words typed](../plans/search-2026-10-20.md), milestones 1 to 5
 
 ## Context

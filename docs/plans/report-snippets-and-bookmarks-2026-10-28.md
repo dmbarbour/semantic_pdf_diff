@@ -1,6 +1,6 @@
 # The report: the text a claim came from, and views kept in the address
 
-- **Status:** Planned (2026-10-28); [milestone 2](#2-every-view-kept-in-the-address) done the same day (the owner: "Please proceed with report bookmarks"). Milestone 1 built 2026-10-31.
+- **Status:** Completed (2026-11-01). [Milestone 2](#2-every-view-kept-in-the-address) done 2026-10-28 (the owner: "Please proceed with report bookmarks"); milestone 1 built 2026-10-31; the snippet measured in search 2026-11-01 and kept out of it ([design question 2](#design-questions)). Decision: [0033](../decisions/0033-self-contained-reports-and-their-search.md), amended. Nothing left over.
 - **The owner, 2026-10-28, from trials:**
   - "when a claim comes from text or the PDF text layer, we should include the relevant snippet of text in the report even when the image is dropped due to lower priority."
   - "bookmarking of views in the report, e.g. with `#anchor` but a javascript-driven anchor?"
@@ -55,6 +55,7 @@ The page keeps two things in its address already: the view and the search (`#cla
   - **Counted** in the page's size before crops are chosen (the page is measured with every crop left out).
   - **Measured** (the stores read again from the answers cache): TS 38.300's clauses 1 to 8, 2,539 of 2,809 claims with a snippet (every text, table and figure claim, 368 of 632 from pictures' overviews), a median of 414 characters, the page 2.16 → 2.41 MB; 9 of scical's sheets, 1,190 of 1,289, the page 5.84 → 5.88 MB; neither near the budget, no crop pushed out; the same claims.
   - **Found on the way:** the judge was first shown the new field, and asked every judged pair again ($0.02); kept out since (`compare.PROVENANCE_FIELDS`), a re-run asks nothing.
+  - **Searched or not, measured 2026-11-01** ($0; the owner, on the review of open items: "Please go ahead."): see [design question 2](#design-questions). Kept out.
 
 ### 2. Every view kept in the address
 
@@ -90,6 +91,12 @@ The page keeps two things in its address already: the view and the search (`#cla
 2. **Is the snippet searched?** Searching it finds a claim by words its quote left out, but it changes what the 17 real queries return.
    - **I'd leave it out of search at first,** and add it as a measured change against those queries.
    - **Answered 2026-10-31 (the owner: "Agreed with report snippets recommendations."):** out of search at first.
+   - **Measured 2026-11-01, and kept out.** The 17 queries that held the two engines to the same answers (2026-10-20), on reports written again with snippets ($0: the turbines' dev slice replayed, 711 claims, 523 with a snippet; TS 38.300's clauses 1 to 8 read again from the answers cache, 2,809 claims):
+     - **The queries:** on the turbines, "height above ground", "rated speed", "density", "blade OR rotor", "entity:tower -steel", `"rated power"`, `like:ev-299575f6cd1f63fb`, "page:3-5 mass", "mw"; on TS 38.300, "harq timer", "rrc inactive", "ue capability", "pdcch OR pdsch", "entity:ue -inactive", `like:`, "zip", "file:j30 handover" (`like:` a claim of clauses 1 to 8, `ev-ef4537550cefe51a`, the one of 2026-10-20 being in a later clause).
+     - **Tried two ways** (a prototype, not built): the snippet as a field of the claim weighing 0.25 or 0.5 (a quote's 1), left out of a claim's length; or the claims found by their snippet alone listed after the rest.
+     - **As a field,** the claims found grew from 886 to 1,046 on the turbines and from 515 to 763 on TS 38.300 (0.5: 1,047 and 771). The order of what's found now changed on 12 of the 17 queries, the 5 others finding 7 claims or fewer. An exclusion dropped claims whose snippet holds the word (`entity:tower -steel` 10 fewer, `entity:ue -inactive` 2), and `like:` found 5 to 20 more.
+     - **Listed after the rest,** for queries naming no field, nothing found now moves, and 159 claims are added on the turbines, 176 on TS 38.300.
+     - **What's added is mostly the neighbours:** a snippet is the sentence or the table row around a claim, so a sentence's or a table header's words find every claim read from it. Of 42 added claims sampled by eye (6 for each of 7 queries), about 6 are about what was searched, most of them for "pdcch OR pdsch" (a CORESET's duration, multi-TRP scheduling). "density" adds a tower's natural frequency and spectra beside a material table; `"rated power"`, finding nothing now, finds 6 claims whose sentence says "at rated power", none of them the turbine's rating.
 3. **Shown on every card, or only in place of a crop left out?** Your words ask for it at least where the image is dropped.
    - **I'd show it on every card that has one,** folded to two lines on cards whose crop is shown.
    - **Answered 2026-10-31 (the owner: "Agreed with report snippets recommendations."):** on every card that has one.
