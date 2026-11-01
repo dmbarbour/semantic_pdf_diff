@@ -1,6 +1,6 @@
 # Indexes and glossaries: a source's subjects, figures, claims and terms, alone or merged across a comparison
 
-- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2), names merged and kinds (milestone 3), and the glossary used by the comparison and given to the reader (milestone 5) built 2026-10-30. [Design questions](#design-questions) 1 to 3 answered 2026-10-29, 4 and 5 on 2026-10-30.
+- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2), names merged and kinds (milestone 3), and the glossary used by the comparison and given to the reader (milestone 5) built 2026-10-30. [Design questions](#design-questions) 1 to 3 answered 2026-10-29, 4 and 5 on 2026-10-30; 6 and 7 (kinds grouped by what their items are, designed 2026-11-01) open.
 - **The owner, 2026-10-29:**
   - "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless."
   - "Well, I say "single document" but I really mean "single source" that might be a folder of docs."
@@ -155,6 +155,22 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 - **Kinds** ([design question 4](#design-questions), answered: "indices for both, where feasible"): each kind of subject (pumps, rooms) with its items under it, where the items' names say the kind.
   - **Built 2026-10-30:** tagged items by their tag's letters, named by the word their names most share ("pump (P)"); items named with a number by the name without it ("Room"); a kind of two items or more, a table of its items by property, the most given first, "—" where an item gives none its siblings do (index.md, the workbook's Kinds sheet, kinds.csv, the page's Kinds view). On the two live slices: "Beam ID 4 opening" (openings 1, 3, 5), "dimension" (1 to 3), "drawing (A)" (A1, A6).
   - **The index built whenever a report is written** (not kept in the store), so `report` brings an older comparison's index up to date.
+- **Kinds grouped by what their items are: designed 2026-11-01, waiting on [design questions](#design-questions) 6 and 7** (the owner, on my review of 0.23.0, where I'd said loose kinds keep coming up as the cause and the fix needs a design first: "Please go ahead.").
+  - **What loose kinds cost, on 9 of scical's sheets** (offline, from the report of 2026-10-31): 152 gaps. 72 are on sheet-index rows (A-101 and the like) and 12 on names holding several sheets; when looked for, 37 of them were given and 30 had no place there, so nearly none is real. The second pass's sibling hints come from the same kinds. Three causes:
+    - **A set's sheets split by their letters.** A tag's letters make its kind, so the sheet index's 71 sheets fall into 15 kinds ("connection (A)", "E-", "XB-"...). One set's letters can also name two kinds of thing: XA-001, a sheet, shares a kind with the components XA04 to XA16.
+    - **One property under several names.** Each sheet's row gives its title as "sheet name", "drawing title", "content" or "drawing content", so a row giving one seems to lack the others. Where a row gives two, they carry the same title every time: 26 of 26 rows for "content" and "sheet name", 20 of 20, 14 of 14, 10 of 10, 10 of 10, 7 of 7 for the other pairs.
+    - **A name holding several items.** 13 subjects name two tags or more ("A-102 A-201", "XD-001 XD-102 XD-103"), mostly sheet-index rows read as one. Each counts as one sibling.
+  - **Elsewhere:** TS 38.300's clauses 1 to 8 have 10 kinds, mostly right (PUCCH formats 0 to 4, SIBs 1 to 28, numerologies 0 to 6, 5QIs); one is two lists ("SRB0, SRB1, SRB3 and other MAC CEs" with "SRB2 and DRB"). The turbines' items are untagged, so they make one kind of two. Rows of one table merged into one subject are rare: 1 of scical's 422 subjects, none of TS 38.300's.
+  - **Proposed, by code, with no requests:**
+    1. **A name holding several items** (two tags or more) stays a subject, marked "names several items" (rows read as one, or a statement about several). It's left out of kinds, so it's never a sibling or a gap. See [design question 6](#design-questions).
+    2. **A drawing set's sheets as one kind, "sheet".** An item named by a sheet number alone ("A-101", "Sheet G-101") in the shape the set's title blocks print it, whatever its letters. Situating's sheet labels give the shape: "G-001" and "XA-501" are letters, a dash and three digits. The set's components keep their tags' kinds (XA04). On scical, 15 kinds become one of 71 sheets.
+    3. **A kind's property named two ways, joined by its values.** Two of a kind's properties are one in its counts and its table, listed under both names, where three of its items or more give both, with the same words each time or one holding the other. Values that are numbers alone aren't joined this way (two dimensions can be equal by chance). This complements the names joined by their words (`kin`, milestone 3). On scical the sheets' four names become one, given by all 71.
+    4. **The second pass's sibling hints and kind dossiers** take the kinds as built, so likely gaps from loose kinds go with them.
+  - **Expected on scical:** the 83 gaps on sheet rows and on names holding several sheets go; the other 69 are untouched.
+  - **Measured before it's kept:**
+    - Offline, on scical, TS 38.300 and the planted reports: the kinds and the gaps among siblings.
+    - Then the second pass again on scical and the planted reports, costing pennies: the likely gaps and their looks. The planted scores should stay as they are (contradictions 6 of 6, gaps 4 of 4, no trap taken).
+  - **Later, if other sets show kinds these rules get wrong:** a model asked to confirm and name a source's kinds ([design question 7](#design-questions); a row in the [lever index](../reviews/levers.md)'s ideas).
 - Measured against the controlled keys.
 
 ### 4. Matching across sources, further
@@ -188,3 +204,8 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
    - So both: items, as built, and kinds, each with its items under it where an entity names the kind ("pump P-101", "pump P-102" under "pump"). Kinds are milestone 3's, with the names.
    - These are single-document analysis's siblings, whose gaps it finds.
 5. **Which files by default:** index.md, index.xlsx and the CSV files on every run, or only when asked? Answered 2026-10-30: "Keep every run."
+6. **A name holding several items** ("A-102 A-201", "SRB0, SRB1 and SRB3"): left out of kinds and marked, or its claims given to each item it names?
+   - A statement about several holds for each item ("SRB0, SRB1 and SRB3 use CAPC 1"). But rows read as one would give each sheet the other's title.
+   - **I'd leave them out of kinds and mark them.** Giving a list's claims to each item can come later, told apart from merged rows by where they were read (a table's row, or prose).
+7. **Kinds by rules alone, or a model as well?** The rules above fix what scical shows. A model asked to confirm and name each source's kinds would catch what rules can't: one request a source, showing its kinds' items and properties, about a cent.
+   - **I'd build the rules first and measure them,** and add the model as a lever (off until measured) only if other sets show kinds the rules get wrong.
