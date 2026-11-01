@@ -24,10 +24,10 @@ def run(*argv):
     return code, out.getvalue()
 
 @contextlib.contextmanager
-def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
-    """A stub endpoint: its models listed, sums added, the card's code read (misread: another; an image 258 tokens),
-    a reranker scoring the first document higher, and an embedding model putting the pump's two sentences
-    together."""
+def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False, info=None):
+    """A stub endpoint: its models listed (info: LiteLLM's /model/info, else none), sums added, the card's code read
+    (misread: another; an image 258 tokens), a reranker scoring the first document higher, and an embedding model
+    putting the pump's two sentences together."""
     codes, real = [], checkup.card
 
     def card(folder, rng, side=None):
@@ -36,6 +36,11 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False):
         return path, code
 
     def get(handler):
+        if handler.path.endswith("/model/info"):
+            handler.send_response(200 if info is not None else 404)
+            handler.end_headers()
+            handler.wfile.write(json.dumps({"data": info or []}).encode())
+            return
         handler.send_response(200)
         handler.end_headers()
         data = [m if isinstance(m, dict) else {"id": m} for m in listed]
@@ -91,7 +96,7 @@ class ConfigTest(Remembered):
                                                "embed_model": "toy"}):
             code, out = run("config", "test", "--store", self.store)
         self.assertEqual(code, 0, out)
-        self.assertIn(f"checking gemma-4 at {url}", out)
+        self.assertIn(f"checking gemma-4, Qwen/Qwen3-Reranker-8B (reranker), toy (embedding model) at {url}", out)
         self.assertIn("  endpoint  ok: 2 models listed, gemma-4 among them", out)
         self.assertRegex(out, r"  json      ok: (\d+) \+ (\d+) = \d+")
         self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"; an image 1000 px square is 258 tokens')
@@ -200,22 +205,47 @@ class ConfigModels(Remembered):
                     "metadata": {"context_length": 32768, "pricing": {"input_tokens": 0.005}, "tags": ["embed"]}}
         openrouter = {"id": "acme/seer", "context_length": 128000, "pricing": {"prompt": "0.0000005",
                                                                                "completion": "0.0000015"},
-                      "architecture": {"input_modalities": ["text", "image"]}}
+                      "architecture": {"input_modalities": ["text", "image"]},
+                      "top_provider": {"max_completion_tokens": 16000}}
         vllm = {"id": "local/reader", "max_model_len": 32768}
         with endpoint(listed=(deepinfra, embedder, openrouter, vllm)), tempfile.TemporaryDirectory() as d, \
                 user_settings({"model": "google/gemma-4-31B-it"}):
             code, out = run("config", "models", "--store", Path(d) / "s")
             self.assertEqual(code, 0)
             self.assertEqual(out.splitlines(), [
-                "acme/seer                       128,000 tokens  $0.50 in, $1.50 out a million  vision",
-                "google/gemma-4-31B-it  (model)  262,144 tokens  $0.20 in, $0.40 out a million  chat, vlm, vision, "
-                "reasoning",
-                "local/reader                     32,768 tokens",
-                "Qwen/Qwen3-Embedding-8B          32,768 tokens  $0.005 in a million            embed"])
+                "acme/seer                                  128,000 tokens (16,000 out)  $0.50 in, $1.50 out a million"
+                "  vision",
+                "google/gemma-4-31B-it  (model)  chat                    262,144 tokens  $0.20 in, $0.40 out a million"
+                "  vlm, vision, reasoning",
+                "local/reader                                             32,768 tokens",
+                "Qwen/Qwen3-Embedding-8B         embedding                32,768 tokens  $0.005 in a million"])
             self.assertEqual(run("config", "models", "vision", "--store", Path(d) / "s")[1].split("\n")[1][:5], "googl")
+            self.assertEqual(run("config", "models", "embedding", "--store", Path(d) / "s")[1][:8], "Qwen/Qwe")
             code, out = run("config", "models", "seer", "--json", "--store", Path(d) / "s")
-        self.assertEqual(json.loads(out), [{"id": "acme/seer", "context": 128000, "price_in": 0.5, "price_out": 1.5,
-                                            "tags": ["vision"], "named_by": [], "checked": {}}])
+        self.assertEqual(json.loads(out), [{"id": "acme/seer", "mode": "", "context": 128000, "output": 16000,
+                                            "price_in": 0.5, "price_out": 1.5, "tags": ["vision"], "named_by": [],
+                                            "checked": {}}])
+
+    def test_a_bare_listing_completed_from_litellms_model_info(self):
+        """A LiteLLM proxy lists names alone; its /model/info says each one's mode, context, price and images (the
+        owner: "can you list mode and other relevant stats (context size, etc.) upon for `config models`?")."""
+        info = [{"model_name": "dev/gemma", "model_info": {"mode": "chat", "max_input_tokens": 262144,
+                                                           "max_output_tokens": 8192, "supports_vision": True,
+                                                           "input_cost_per_token": 2e-07,
+                                                           "output_cost_per_token": 4e-07}},
+                {"model_name": "dev/gemma", "model_info": {"mode": None, "max_input_tokens": 1}},  # a 2nd deployment
+                {"model_name": "dev/bge-reranker", "model_info": {"mode": "rerank", "input_cost_per_token": 0}},
+                {"model_name": "dev/bge-m3", "model_info": {"mode": "embedding"}}]
+        with endpoint(listed=("dev/gemma", "dev/bge-reranker", "dev/bge-m3", "dev/unknown"), info=info), \
+                user_settings({"model": "dev/gemma"}):
+            self.assertEqual(self.config("models")[1].splitlines(), [
+                "dev/bge-m3          embedding",
+                "dev/bge-reranker    rerank",
+                "dev/gemma  (model)  chat       262,144 tokens (8,192 out)  $0.20 in, $0.40 out a million  vision",
+                "dev/unknown"])
+            self.assertEqual(self.config("models", "rerank")[1], "dev/bge-reranker  rerank\n")
+        with endpoint(listed=("dev/gemma",)):  # a server without /model/info: names alone
+            self.assertEqual(self.config("models")[1], "dev/gemma\n")
 
 class TryingAndForgetting(Remembered):
     """Endpoint setup, milestone 2: a candidate tried before it's set, checks run selectively, the checks remembered
@@ -242,6 +272,28 @@ class TryingAndForgetting(Remembered):
         self.assertEqual(lines[4], f"gemma-4-turbo at {url}")
         self.assertEqual(lines[-1], "`semantic-pdf-diff config checks --forget [MODEL]` forgets them: the next run "
                                     "checks again")
+
+    def test_a_candidate_reranker_or_embedding_model_tried_as_one(self):
+        """The owner: "how do we distinguish checking a rerank or embedding model?" By the flag naming its role: each
+        candidate gets its role's check alone, remembered under it."""
+        with endpoint(listed=("gemma-4", "bge-m3")) as url, user_settings({"model": "gemma-4", "rerank_api": "tei"}):
+            code, out = self.config("test", "--rerank", "bge-reranker", "--embed", "bge-m3", "--base-url", url)
+            self.assertEqual(code, 0, out)
+            self.assertIn(f"checking bge-reranker (reranker), bge-m3 (embedding model) at {url}", out)
+            self.assertIn("  reranker  ok: scores 0.91", out)
+            self.assertIn("  embedding ok: cosine", out)
+            self.assertNotIn("json", out)
+            self.assertNotIn("rerank_model", saved_settings())  # not set
+            lines = self.config("checks")[1].splitlines()
+        self.assertIn(f"bge-m3 at {url}/embeddings", lines)
+        self.assertIn("  embedding passed", lines[lines.index(f"bge-m3 at {url}/embeddings") + 1])
+
+    def test_a_chat_candidate_the_endpoint_lists_as_an_embedding_model(self):
+        listed = ({"id": "gemma-4", "metadata": {"tags": ["chat"]}}, {"id": "bge-m3", "metadata": {"tags": ["embed"]}})
+        with endpoint(listed=listed), user_settings({"model": "gemma-4"}):
+            code, out = self.config("test", "--model", "bge-m3", "--only", "json")
+        self.assertIn("  endpoint  ok: 2 models listed, bge-m3 among them; listed as an embedding model, not a chat "
+                      "model (`config test --embed bge-m3` tries it as one)", out)
 
     def test_only_some_checks_or_those_not_remembered(self):
         with endpoint(), user_settings({"model": "gemma-4"}):
@@ -299,14 +351,28 @@ class ChoosingAModel(Remembered):
         self.assertIn(f"not checked: the endpoint at http://127.0.0.1:{port}/v1 can't be asked for its models "
                       "(URLError", out)
 
+    def test_a_reranker_or_embedding_models_name_checked_as_one(self):
+        listed = (*self.LISTED, {"id": "BAAI/bge-m3", "metadata": {"tags": ["embed"]}})
+        with endpoint(listed=listed), user_settings({}):
+            self.assertIn("warning: the endpoint lists google/gemma-4-31B-it as a chat model, not an embedding model "
+                          "(embed_model): `semantic-pdf-diff config test --embed google/gemma-4-31B-it` tries it",
+                          self.config("set", "--user", "embed_model", "google/gemma-4-31B-it")[1])
+            self.assertIn("warning: the endpoint lists BAAI/bge-m3 as an embedding model, not a chat model (model)",
+                          self.config("set", "--user", "model", "BAAI/bge-m3")[1])
+            self.assertTrue(self.config("set", "--user", "embed_model", "BAAI/bge-m3")[1].endswith(
+                "BAAI/bge-m3 is among the endpoint's models\n"))
+            self.config("set", "--user", "rerank_url", "http://rerank.example/v1/rerank")
+            self.assertIn("not checked: a reranker served apart, at http://rerank.example/v1/rerank, isn't among the "
+                          "endpoint's models", self.config("set", "--user", "rerank_model", "bge-reranker")[1])
+
     def test_the_models_checked_marked_with_what_was_measured(self):
         with endpoint(listed=self.LISTED), user_settings({"model": "google/gemma-4-31B-it"}):
             self.config("test")
             code, out = self.config("models")
             self.assertEqual(code, 0)
             self.assertEqual(out.splitlines(), [
-                "acme/text-only                                  chat",
-                "google/gemma-4-31B-it  (model)  262,144 tokens  chat, vision  checked: json, image (an image 258 "
+                "acme/text-only                  chat",
+                "google/gemma-4-31B-it  (model)  chat  262,144 tokens  vision  checked: json, image (an image 258 "
                 "tokens)"])
             listed = json.loads(self.config("models", "--json")[1])
         self.assertEqual({k: sorted(v) for k, v in listed[1]["checked"].items()},

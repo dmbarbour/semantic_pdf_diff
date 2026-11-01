@@ -46,28 +46,46 @@ class Check:
         took = f" ({self.seconds:.1f} s)" if self.seconds >= 0.05 else ""
         return f"  {self.name:<{width}} {mark}: {self.said}{took}"
 
+# A host's tag saying what a model serves, as its mode (LiteLLM's word: chat, embedding, rerank, image_generation...)
+MODE_TAGS = {"chat": "chat", "embed": "embedding", "embedding": "embedding", "rerank": "rerank", "reranker": "rerank",
+             "image-gen": "image_generation", "video-gen": "video_generation", "tts": "audio_speech",
+             "stt": "audio_transcription"}
+CHATTING = ("chat", "completion", "responses")  # the modes a chat model is listed in
+ROLES = {"model": ("--model", "a chat model", CHATTING), "rerank_model": ("--rerank", "a reranker", ("rerank",)),
+         "embed_model": ("--embed", "an embedding model", ("embedding",))}  # a setting: config test's flag, its mode
+
 @dataclass(frozen=True)
 class Listed:
     """A model as the endpoint lists it, with what the endpoint says of it, where it says (the owner, 2026-10-20: "We
-    could let people know what's available."): its context window in tokens, its price in dollars a million tokens in
-    and out, and its tags (DeepInfra's: chat, vision, embed and more; vision too where OpenRouter lists images among
-    its inputs)."""
+    could let people know what's available."): its mode (what it serves: chat, embedding, rerank...), its context
+    window in tokens, the most it answers with, its price in dollars a million tokens in and out, and its tags
+    (DeepInfra's: chat, vision, embed and more; vision too where OpenRouter lists images among its inputs, or LiteLLM
+    says it supports them)."""
     id: str
     context: int | None = None
     price_in: float | None = None
     price_out: float | None = None
     tags: tuple = ()
+    mode: str = ""
+    output: int | None = None
 
     @property
     def reads_images(self):
         return "vision" in self.tags or "vlm" in self.tags
 
     def described(self):
-        """[its context, its price, its tags], each "" where the endpoint doesn't say."""
+        """[its mode, its context, its price, its other tags], each "" where the endpoint doesn't say."""
         prices = [f"${p:.2f} {way}" if p >= 0.01 or not p else f"${p:.2g} {way}"
                   for p, way in ((self.price_in, "in"), (self.price_out, "out")) if p is not None]
-        return [f"{self.context:,} tokens" if self.context else "",
-                ", ".join(prices) + " a million" if prices else "", ", ".join(self.tags)]
+        out = f" ({self.output:,} out)" if self.output and self.context and self.output < self.context else ""
+        return [self.mode, f"{self.context:,} tokens{out}" if self.context else "",
+                ", ".join(prices) + " a million" if prices else "",
+                ", ".join(t for t in self.tags if MODE_TAGS.get(t) != self.mode)]
+
+    def said(self):
+        """What it serves, in words: "an embedding model"."""
+        return next((said for _, said, modes in ROLES.values() if self.mode in modes),
+                    f"a {self.mode.replace('_', ' ')} model")
 
 def _count(*values):
     return next((int(v) for v in values if isinstance(v, (int, float)) and not isinstance(v, bool) and v > 0), None)
@@ -79,33 +97,60 @@ def _price(value, scale=1.0):
         return None
 
 def described(item):
-    """A /models item as Listed: DeepInfra's metadata (context_length; pricing in dollars a million tokens; tags),
-    vLLM's max_model_len, or OpenRouter's fields (context_length; pricing in dollars a token; architecture's input
-    modalities)."""
+    """A /models item as Listed: DeepInfra's metadata (context_length; max_tokens; pricing in dollars a million
+    tokens; tags, one saying its mode), vLLM's max_model_len, OpenRouter's fields (context_length; pricing in dollars
+    a token; architecture's input modalities; top_provider's max_completion_tokens), or LiteLLM's model_info where
+    /model/info gave it (mode; max_input_tokens and max_output_tokens; costs a token; supports_vision)."""
     get = lambda d, k: d.get(k) if isinstance(d, dict) else None  # noqa: E731
-    meta, top, arch = (get(item, k) or {} for k in ("metadata", "top_provider", "architecture"))
+    meta, top, arch, info = (get(item, k) or {} for k in ("metadata", "top_provider", "architecture", "model_info"))
     context = _count(get(meta, "context_length"), get(item, "context_length"), get(item, "max_model_len"),
-                     get(top, "context_length"))
+                     get(top, "context_length"), get(info, "max_input_tokens"))
+    output = _count(get(meta, "max_tokens"), get(top, "max_completion_tokens"), get(info, "max_output_tokens"))
     if isinstance(get(meta, "pricing"), dict):
         price_in, price_out = (_price(get(meta["pricing"], k)) for k in ("input_tokens", "output_tokens"))
+    elif isinstance(get(item, "pricing"), dict):
+        price_in, price_out = (_price(get(item["pricing"], k), 1e6) for k in ("prompt", "completion"))
     else:
-        price_in, price_out = (_price(get(get(item, "pricing"), k), 1e6) for k in ("prompt", "completion"))
+        price_in, price_out = (_price(get(info, k), 1e6) or None  # LiteLLM's 0: a model its price map lacks
+                               for k in ("input_cost_per_token", "output_cost_per_token"))
     tags = [str(x) for x in (get(meta, "tags") or get(item, "tags") or []) if isinstance(x, str)]
-    if "image" in (get(arch, "input_modalities") or []):
+    if "image" in (get(arch, "input_modalities") or []) or get(info, "supports_vision") is True:
         tags.append("vision")
-    return Listed(str(item["id"]), context, price_in, price_out, tuple(dict.fromkeys(tags)))
+    mode = get(info, "mode") or next((MODE_TAGS[t] for t in tags if t in MODE_TAGS), "")
+    return Listed(str(item["id"]), context, price_in, price_out, tuple(dict.fromkeys(tags)), str(mode), output)
+
+def _fetched(url, api_key, timeout):
+    request = urllib.request.Request(url, headers={"Authorization": "Bearer " + api_key} if api_key else {})
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return json.load(response)
+
+def model_info(base, api_key, timeout):
+    """{model: LiteLLM's model_info} from a LiteLLM proxy's /model/info (its deployments' merged, the first saying
+    each): what its bare /models listing leaves out. {} where it can't be had (another server, a key it refuses)."""
+    try:
+        data = _fetched(base + "/model/info", api_key, timeout)
+    except Exception:  # noqa: BLE001 (only a proxy has it, and the listing stands without it)
+        return {}
+    out = {}
+    for d in (data.get("data") if isinstance(data, dict) else None) or []:
+        if isinstance(d, dict) and isinstance(d.get("model_info"), dict) and d.get("model_name"):
+            merged = out.setdefault(str(d["model_name"]), {})
+            merged.update({k: v for k, v in d["model_info"].items() if merged.get(k) is None})
+    return out
 
 def listed(settings, api_key="", timeout=30):
     """The endpoint's models (GET {base_url}/models, the OpenAI format) as Listed, sorted by id (case aside); OSError
-    or ValueError when they can't be listed (timeout: seconds at most, under the settings' own)."""
-    url = settings.base_url.rstrip("/") + "/models"
-    request = urllib.request.Request(url, headers={"Authorization": "Bearer " + api_key} if api_key else {})
-    with urllib.request.urlopen(request, timeout=min(settings.timeout, timeout)) as response:
-        data = json.load(response)
+    or ValueError when they can't be listed (timeout: seconds at most, under the settings' own). A listing saying
+    nothing of any model but its name (a LiteLLM proxy's) is completed from /model/info, where the endpoint has it."""
+    base, timeout = settings.base_url.rstrip("/"), min(settings.timeout, timeout)
+    data = _fetched(base + "/models", api_key, timeout)
     items = data.get("data") if isinstance(data, dict) else data
     if not isinstance(items, list):
         raise ValueError("the endpoint's /models answer holds no list of models")
     found = {str(m["id"]): described(m) for m in items if isinstance(m, dict) and m.get("id")}
+    if found and not any(m.context or m.tags or m.mode or m.price_in is not None for m in found.values()):
+        info = model_info(base, api_key, timeout)
+        found = {k: described({"id": k, "model_info": info[k]}) if k in info else m for k, m in found.items()}
     return [found[k] for k in sorted(found, key=lambda k: (k.casefold(), k))]
 
 def models(settings, api_key=""):
@@ -218,11 +263,16 @@ def run(settings, rng=None, only=None):
         if settings.model not in ids:
             return False, (f"{len(ids)} models listed, not {settings.model} (`config models WORDS` lists those "
                            "like it)")
-        context = next(m.context for m in found if m.id == settings.model)
-        if context:
-            chat["context_tokens"] = context
-        return True, f"{len(ids)} models listed, {settings.model} among them" + (
-            f" ({context:,} tokens of context)" if context else "")
+        mine = next(m for m in found if m.id == settings.model)
+        if mine.context:
+            chat["context_tokens"] = mine.context
+        said = f"{len(ids)} models listed, {settings.model} among them" + (
+            f" ({mine.context:,} tokens of context)" if mine.context else "")
+        if mine.mode and mine.mode not in CHATTING:  # its checks say whether it chats all the same
+            flag = next((flag for flag, _, modes in ROLES.values() if mine.mode in modes), "")
+            said += f"; listed as {mine.said()}, not a chat model" + (
+                f" (`config test {flag} {settings.model}` tries it as one)" if flag else "")
+        return True, said
     if wanted & {"json", "image"}:
         checks.append(_timed("endpoint", endpoint))
         if checks[-1].ok is False and not ids and _unreachable(checks[-1].said):
@@ -324,7 +374,12 @@ def lines(settings, checks, cost):
     """`config test`'s report: what was checked, each check, what to set where the endpoint is out of reach or its
     key refused (advice), what it cost, and how many failed."""
     from .llm import redact_url
-    out = [f"checking {settings.model or 'no model'} at {redact_url(settings.base_url)}"]
+    ran = {c.name for c in checks}
+    named = [f"{model} ({said})" for model, said, check in
+             ((settings.rerank_model, "reranker", "reranker"), (settings.embed_model, "embedding model", "embedding"))
+             if model and check in ran]
+    chat = [settings.model or "no model"] if ran - {"reranker", "embedding"} or not named else []
+    out = [f"checking {', '.join(chat + named)} at {redact_url(settings.base_url)}"]
     out += [c.line() for c in checks]
     failed = [c.name for c in checks if c.ok is False]
     out += advice(checks)
@@ -333,14 +388,16 @@ def lines(settings, checks, cost):
     return out
 
 def listing(settings, words="", as_json=False, memory=None):
-    """`config models [WORDS]`: the endpoint's models whose name or tags hold every word ("vision" those that read
-    images, at DeepInfra), with what the endpoint says of each; those the settings name marked, and those whose checks
-    the record at memory remembers passing at this endpoint (endpoint setup, milestone 3)."""
+    """`config models [WORDS]`: the endpoint's models whose name, mode or tags hold every word ("vision" those that
+    read images, "embedding" or "rerank" those serving so, where the endpoint says), with what the endpoint says of
+    each; those the settings name marked, and those whose checks the record at memory remembers passing at this
+    endpoint (endpoint setup, milestone 3)."""
     names, checked = used(settings), checked_here(memory, settings) if memory else {}
     found = [m for m in listed(settings, os.getenv("OPENAI_API_KEY", ""))
-             if all(w in " ".join((m.id,) + m.tags).casefold() for w in words.casefold().split())]
+             if all(w in " ".join((m.id, m.mode) + m.tags).casefold() for w in words.casefold().split())]
     if as_json:
-        return [json.dumps([{"id": m.id, "context": m.context, "price_in": m.price_in, "price_out": m.price_out,
+        return [json.dumps([{"id": m.id, "mode": m.mode, "context": m.context, "output": m.output,
+                             "price_in": m.price_in, "price_out": m.price_out,
                              "tags": list(m.tags), "named_by": names.get(m.id, []),
                              "checked": {c["check"]: {k: v for k, v in c.items()
                                                       if k not in ("check", "url", "model", "key")}
@@ -351,11 +408,12 @@ def listing(settings, words="", as_json=False, memory=None):
 
 def table(found, names=None, checked=None):
     """Listed models a line each, in columns: the name (marked with the settings naming it), what the endpoint says
-    of it, and the checks remembered passing (checked: {model: [remembered's entries]})."""
+    of it (its mode, context, price and tags), and the checks remembered passing (checked: {model: [remembered's
+    entries]})."""
     rows = [[m.id + (f"  ({', '.join(names[m.id])})" if names and m.id in names else "")] + m.described()
             + ([checked_said(checked.get(m.id, []))] if checked else []) for m in found]
     widths = [max(len(r[k]) for r in rows) for k in range(len(rows[0]))]
-    return ["  ".join(cell.ljust(w) if k == 0 else cell.rjust(w) if k == 1 else cell.ljust(w)
+    return ["  ".join(cell.rjust(w) if k == 2 else cell.ljust(w)
                       for k, (cell, w) in enumerate(zip(r, widths)) if w).rstrip() for r in rows]
 
 # --- first use: each model checked before a run's first request, unless remembered as passing
@@ -511,17 +569,29 @@ def missing(settings, path):
     passed = recalled(path)
     return [name for name, key in keys(settings).items() if key not in passed]
 
-def name_check(settings, name, timeout=10):
-    """What `config set model NAME` says of a name, the endpoint's listing asked (endpoint setup, milestone 3): [line].
-    It warns where the endpoint doesn't list the name, or lists it untagged as reading images where it tags others;
-    it never refuses (an endpoint may serve a model it doesn't list), and says where the listing can't be had."""
+def name_check(settings, name, setting="model", timeout=10):
+    """What `config set` says of a model's name (setting: model, rerank_model or embed_model), the endpoint's listing
+    asked (endpoint setup, milestone 3): [line]. It warns where the endpoint doesn't list the name, lists it as
+    serving otherwise (an embedding model set as the chat model), or lists a chat model untagged as reading images
+    where it tags others; it never refuses (an endpoint may serve a model it doesn't list), and says where the
+    listing can't be had, or doesn't hold a model served apart (rerank_url, embed_url)."""
     from .llm import redact_url
+    from . import embed, rerank
+    flag, role, modes = ROLES[setting]
     where = redact_url(settings.base_url)
+    apart = (settings.rerank_url or settings.rerank_api == "deepinfra" if setting == "rerank_model" else
+             settings.embed_url if setting == "embed_model" else "")
+    if apart:
+        try:
+            at = redact_url((rerank if setting == "rerank_model" else embed).endpoint(settings))
+        except ValueError:
+            at = "its own URL"
+        return [f"not checked: {role} served apart, at {at}, isn't among the endpoint's models"]
     try:
         found = listed(settings, os.getenv("OPENAI_API_KEY", ""), timeout=timeout)
     except (OSError, ValueError) as e:
         return [f"not checked: the endpoint at {where} can't be asked for its models ({type(e).__name__}: {e})"]
-    try_it = f"`semantic-pdf-diff config test --model {name}` tries it (a few cents)"
+    try_it = f"`semantic-pdf-diff config test {flag} {name}` tries it (a few cents)"
     by_id = {m.id: m for m in found}
     if name not in by_id:
         folded = {m.id.casefold(): m.id for m in found}
@@ -529,7 +599,10 @@ def name_check(settings, name, timeout=10):
         like = f"; like it: {', '.join(close)}" if close else ""
         return [f"warning: the endpoint at {where} lists {len(found)} models, not {name}{like} (`config models WORDS` "
                 f"lists them); {try_it}"]
-    if settings.vision and not by_id[name].reads_images and any(m.reads_images for m in found):
+    mine = by_id[name]
+    if mine.mode and mine.mode not in modes:
+        return [f"warning: the endpoint lists {name} as {mine.said()}, not {role} ({setting}): {try_it}"]
+    if setting == "model" and settings.vision and not mine.reads_images and any(m.reads_images for m in found):
         return [f"warning: the endpoint doesn't tag {name} as reading images, and pages are read as images (vision): "
                 + try_it]
     return []

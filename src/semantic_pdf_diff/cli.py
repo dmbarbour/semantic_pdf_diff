@@ -992,11 +992,13 @@ reranker. Names are the settings' own (max_cost, report_budget, rerank_threshold
   semantic-pdf-diff config set --user model NAME    the user's, for every store (--user: set, unset, export, import)
   semantic-pdf-diff config test                     the endpoint, the key and each model checked, for a few cents
                                                     (exit 5 when a check fails)
-  semantic-pdf-diff config test --model NAME        a candidate tried before it's set (--base-url: at another
+  semantic-pdf-diff config test --model NAME        a candidate tried before it's set (--rerank NAME, --embed
+                                                    NAME: a reranker, an embedding model; --base-url: at another
                                                     endpoint); --only json,image; --new: what isn't remembered
   semantic-pdf-diff config checks                   the checks remembered passing: when, and what they measured
   semantic-pdf-diff config checks --forget [MODEL]  forgotten (every one, or a model's): the next run checks again
-  semantic-pdf-diff config models vision            the endpoint's models reading images: context, price, checked
+  semantic-pdf-diff config models vision            the endpoint's models reading images: mode, context, price,
+                                                    checked ("embedding", "rerank": those serving so)
 """
 
 def config_parser():
@@ -1031,6 +1033,12 @@ def config_parser():
                                                             'fails')
     check.add_argument('--model', help="a candidate for the chat model, checked without setting it (its endpoint "
                                        "listing, json and image checks unless --only says), remembered like any check")
+    check.add_argument('--rerank', dest='rerank_model', metavar='MODEL',
+                       help='a candidate reranker (rerank_model), checked without setting it: the reranker check '
+                            'unless --only says')
+    check.add_argument('--embed', dest='embed_model', metavar='MODEL',
+                       help='a candidate embedding model (embed_model), checked without setting it: the embedding '
+                            'check unless --only says')
     check.add_argument('--base-url', help='the endpoint to check at, for this command only')
     check.add_argument('--only', action='append', metavar='CHECKS',
                        help=f"only these checks, comma-separated: {', '.join(checkup_names())} (the endpoint's "
@@ -1042,10 +1050,11 @@ def config_parser():
     remembered.add_argument('--forget', nargs='?', const='', metavar='MODEL',
                             help="forget them (every one, or MODEL's at any endpoint): the next run checks again")
     listed = actions.add_parser('models', parents=[where], help="the endpoint's models, with what it says of each "
-                                                                "(context, price, tags), those the settings name "
-                                                                "and those checked marked")
-    listed.add_argument('words', nargs='*', help='only models whose name or tags hold every word ("vision": those '
-                                                 'reading images, where the endpoint says)')
+                                                                "(mode, context, price, tags), those the settings "
+                                                                "name and those checked marked")
+    listed.add_argument('words', nargs='*', help='only models whose name, mode or tags hold every word ("vision": '
+                                                 'those reading images, "embedding", "rerank": those serving so, '
+                                                 'where the endpoint says)')
     listed.add_argument('--json', action='store_true', help='every field, as JSON')
     return parser
 
@@ -1107,7 +1116,8 @@ def config_command(argv):
         return 0
     if args.action in ('test', 'models', 'checks'):
         from . import checkup
-        tried = {k: v for k in ('model', 'base_url') if (v := getattr(args, k, None))}  # test --model, --base-url
+        tried = {k: v for k in ('model', 'rerank_model', 'embed_model', 'base_url')  # test's candidates, --base-url
+                 if (v := getattr(args, k, None))}
         settings = settings_from(layer={k: v for k, v in Store.settings_of(store).items()
                                         if k not in configuration.RUN_OPTIONS}, **tried)
         if args.action == 'models':
@@ -1135,8 +1145,9 @@ def config_command(argv):
         if unknown:
             raise ValueError(f"--only: no check is named {', '.join(unknown)}; the checks: "
                              f"{', '.join(checkup_names())}")
-        if only is None and args.model:  # a candidate for the chat model: its checks, not the reranker's
-            only = ['json', 'image']
+        if only is None and tried.keys() - {'base_url'}:  # candidates: their checks, not the other models'
+            only = [check for role, checks in (('model', ['json', 'image']), ('rerank_model', ['reranker']),
+                                               ('embed_model', ['embedding'])) if role in tried for check in checks]
         try:
             memory = checks_memory(store)
         except (OSError, StoreError, ValueError):
@@ -1208,10 +1219,11 @@ def config_command(argv):
                                                                 and layer == 'environment' else '')
               + (f"; the next run redoes: {configuration.redoes(name)}" if moved else ''))
         before = configuration.resolved(layers)[name][0]
-        if name == 'model' and changes[name]:  # endpoint setup, milestone 3: checked against the endpoint's listing
-            from .checkup import name_check
+        if name in ('model', 'rerank_model', 'embed_model') and changes[name]:  # endpoint setup, milestone 3:
+            from .checkup import name_check  # checked against the endpoint's listing
             print('\n'.join(name_check(settings_from(layer={k: v for k, v in Store.settings_of(store).items()
-                                                            if k not in configuration.RUN_OPTIONS}), changes[name]))
+                                                            if k not in configuration.RUN_OPTIONS}), changes[name],
+                                        name))
                   or f"{changes[name]} is among the endpoint's models")
         if name == 'answers_cache' and moved and before:
             from .settings import located

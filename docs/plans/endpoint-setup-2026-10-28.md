@@ -6,6 +6,8 @@
 - **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
 - **Builds on:** [an endpoint checked and calibrated on first use](endpoint-first-use-2026-10-20.md) ([0034](../decisions/0034-endpoint-checked-and-calibrated-on-first-use.md)), settings in layers ([0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md)).
 
+- **The owner, 2026-11-01, on milestones 2 and 3:** "When trying, seeing, and forgetting model checks, how do we distinguish checking a rerank or embedding model? Or can you list mode and other relevant stats (context size, etc.) upon for `config models`?" Both built the same day ([milestone 2](#2-trying-seeing-and-forgetting-checks), [3](#3-choosing-a-model)).
+
 ## What exists (built 2026-10-20)
 
 - **`config models [WORDS] [--json]`:** the endpoint's models, each with its context window, price and tags where the host gives them. `config models vision` lists those reading images (DeepInfra: 53 of 177).
@@ -74,6 +76,11 @@
   - **`config checks`** prints the record's path, then each model at each endpoint, marked with the settings naming it where its checks are the ones they call for; each check, when it passed (UTC) and what it measured (the context the endpoint lists; an image's tokens at its `image_side`).
   - **`config checks --forget`** forgets every check; `--forget MODEL` a model's at any endpoint, saying how many.
   - **Tried at DeepInfra** (a scratch cache; $0.0002): `--model google/gemma-4-26B-A4B-it` passed its three checks (258 tokens an image) without changing the model set; `--new` then asked nothing; `--forget` of it left the 31B's.
+  - **A reranker or an embedding model tried as one** (2026-11-01, the owner's question above): `--model` had tried a candidate as the chat model only, and `--only reranker` checked the reranker set, not a candidate.
+    - **`config test --rerank NAME`, `--embed NAME`** (the run's `--rerank` flag's name): a candidate tried in its role, its role's check alone unless `--only` says; with `--model` too, each in its own. The first line names each model and its role: `checking bge-reranker (reranker), bge-m3 (embedding model) at URL`.
+    - **Remembered under its role:** `config checks` already listed each check by its name (`reranker`, `embedding`) and the URL it was asked at (`.../v1/rerank`, `.../v1/embeddings`), and `config models` marks it `checked: reranker`.
+    - **A chat candidate the endpoint lists as serving otherwise** says so on the listing's line, offering the flag that tries it as one: `listed as an embedding model, not a chat model (`config test --embed NAME` tries it as one)`. Not failed: its checks say whether it chats all the same.
+    - **Tried through a LiteLLM proxy** (a local one, as the owner's, in front of DeepInfra; a scratch cache; under $0.0001): `--rerank dev/rerank-tagged --embed Qwen/Qwen3-Embedding-8B` passed both (4,096 dimensions); `--model Qwen/Qwen3-Embedding-8B --only json` failed its JSON check (the proxy: "does not exist"), its listing's line saying it's an embedding model.
 
 ### 3. Choosing a model
 
@@ -84,6 +91,12 @@
 - **Done 2026-11-01:**
   - **`config set model NAME`** (a store's or the user's, and `config import`) asks the endpoint's listing, at most 10 s, once the model is set. It warns where the name isn't listed, naming up to three like it (`google/gemma-4-31b-it` offers `google/gemma-4-31B-it` at DeepInfra), and where it's listed untagged as reading images while others are tagged (`meta-llama/Llama-3.3-70B-Instruct-Turbo`). Each warning offers `config test --model NAME`; a name listed and tagged says so. Where the listing can't be had, it says the name wasn't checked, and why.
   - **`config models`** marks each model whose checks are remembered passing at its endpoint: `checked: json, image (an image 258 tokens)`. `--json` gives each model's `checked`, with when and what was measured.
+  - **Modes and stats in `config models`** (2026-11-01, the owner's question above):
+    - **A mode column:** what the model serves, in LiteLLM's words (`chat`, `embedding`, `rerank`, `image_generation`, `audio_speech`...), from LiteLLM's `mode` or DeepInfra's tags (chat, embed, image-gen, tts...); the tag saying it isn't repeated among the others. `config models embedding` and `config models rerank` find them, the mode searched with the name and tags.
+    - **The context column** adds the most a model answers with where it's less than its context (OpenRouter's `max_completion_tokens`, LiteLLM's `max_output_tokens`; DeepInfra's equals its context for all 173). `--json` gives `mode` and `output`.
+    - **A LiteLLM proxy's listing** (`/v1/models`) gives names alone, so where no model listed says anything more, its `/model/info` is asked too (not tried with a key of limited rights: the local proxy has no keys): each model group's mode, `max_input_tokens`, `max_output_tokens`, costs a token and `supports_vision`, from the proxy's configuration or LiteLLM's price map, the first deployment saying each. A price of 0 is taken as unknown (the map's default for a model it lacks). Another server, or a key refused it, leaves the names alone.
+    - **Seen on a local proxy** (LiteLLM 1.102.4): six model groups, those whose configuration sets `mode` listed `chat`, `embedding` or `rerank`; `deepinfra/google/gemma-4-26B-A4B-it` given context, prices and vision by the price map; a group neither configured nor in the map (`openai/google/gemma-4-31B-it`) says nothing but its name. So what the owner's proxy shows depends on its configuration.
+    - **`config set rerank_model` and `embed_model`** are checked as `model` is: listed, and listed in their mode (`warning: the endpoint lists google/gemma-4-31B-it as a chat model, not an embedding model (embed_model)`). One served apart (`rerank_url`, `embed_url`, DeepInfra's rerank API, which its `/models` doesn't list) says it isn't checked.
 
 ### 4. A guided setup
 
