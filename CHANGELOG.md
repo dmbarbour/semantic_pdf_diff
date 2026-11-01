@@ -2,6 +2,18 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.25.0 (2026-11-01)
+
+- **A reranker or an embedding model tried as one:** `config test --rerank NAME` and `--embed NAME` try a candidate in its role, with its role's check alone (scores, or vectors), without setting it; remembered under its role, as `config checks` shows. A chat candidate the endpoint lists as an embedding model or a reranker is said to be one, with the flag that tries it as one.
+- **`config models` says what each model serves:** a mode column (`chat`, `embedding`, `rerank`, `image_generation`...), its context, the most it answers with where that's less, its price. `config models embedding` and `config models rerank` find them. A LiteLLM proxy lists its models' names alone, so its `/model/info` is asked too, for what its configuration or price map says.
+- **`config set rerank_model` and `embed_model`** are checked against the endpoint's listing as `model` is: a warning where the endpoint doesn't list the name, or lists it as serving otherwise.
+- **Kinds grouped by what their items are** (the index's Kinds, its siblings' gaps, and the second pass's hints):
+  - **A drawing set's sheets are one kind, "sheet",** whatever their letters, recognized by the shape its title blocks print their numbers in (G-001). On 9 of scical's sheets, 15 kinds by letter became one of 84 sheets.
+  - **A property named two ways is one** where three items or more give both, alike each time ("drawing title" and "sheet name"), headed "drawing title (also sheet name)".
+  - **A claim naming several items** ("A-401 A-402": rows read as one) counts for none of them; a subject is named by a name naming it alone, and one whose every name names several is marked and left out of kinds.
+  - On 9 of scical's sheets, gaps 152 → 48 with the second pass read again, the 3 confirmed missing still found. On the planted reports, false gaps from a table read without its header 12 → 6, with every planted contradiction and gap still found.
+- **The model can name the kinds** (`confirm_kinds`, off): one request a source, which names each kind by what its items are, merges kinds of one thing and moves items not of a kind. Tried on scical and TS 38.300: better names, no fewer gaps than the rules, and one item moved wrongly, so it's off.
+
 ## 0.24.0 (2026-11-01)
 
 - **A model tried before it's set:** `config test --model NAME` checks a candidate as the chat model (the endpoint lists it, it answers in JSON, it reads a card), without changing the model set. `--base-url URL` checks at another endpoint. What passes is remembered, so a first run with that model needn't check again.
