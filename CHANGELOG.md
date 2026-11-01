@@ -2,6 +2,15 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.24.0 (2026-11-01)
+
+- **A model tried before it's set:** `config test --model NAME` checks a candidate as the chat model (the endpoint lists it, it answers in JSON, it reads a card), without changing the model set. `--base-url URL` checks at another endpoint. What passes is remembered, so a first run with that model needn't check again.
+- **Checks run selectively:** `config test --only json,image` (or `reranker`, `embedding`), and `--new` for only those not remembered passing.
+- **Remembered checks shown and forgotten:** `config checks` lists each model and endpoint checked, when, and what was measured (its context, an image's tokens), and where the record is kept. `config checks --forget [MODEL]` forgets them, so the next run checks again.
+- **A model's name checked when it's set:** `config set model NAME` asks the endpoint's listing. It warns, without refusing, where the endpoint doesn't list the name (naming those like it: `google/gemma-4-31b-it` offers `google/gemma-4-31B-it`) or doesn't tag it as reading images, and offers `config test --model NAME`.
+- **`config models` marks the models already checked**, with an image's tokens where measured.
+- **Snippets stay out of search.** Measured on the 17 queries that hold the page's and the command line's search alike: searched, a claim's snippet reordered 12 of them and added mostly claims beside a sentence or table header holding the words.
+
 ## 0.23.0 (2026-10-31)
 
 - **Fixed: the index joined opposite properties.** The model's other names for a property (asked for search) are joined into one property only where they can be one: written in other words ("rated output", "nominal power"), or the same words spelled otherwise ("SIZE W", "size width"). Not a name and a more general one, nor "Maximum transient pressure" and "Minimum transient pressure", which the index had joined on a planted report. On 9 of scical's sheets, one right join is lost ("drawing title", "sheet title").

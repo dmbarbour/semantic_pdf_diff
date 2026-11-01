@@ -4,7 +4,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.23.0** (2026-10-31; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
+**v0.24.0** (2026-11-01; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
 
 - **Sources** as files, folders and zip archives, declared in a persistent, resumable store
 - **Replay fixtures:** recorded model answers, so runs replay offline
@@ -16,6 +16,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 - **Indexes beside every report:** subjects and their kinds, properties, claims, figures and tables, a glossary, and what a source doesn't give (a sibling's missing property, a table's cell left blank, a reference not found, a placeholder), as index.md, an index workbook, CSV and the page's views; a comparison's merged, each subject once with each source's values
 - **RAG export** (`export`): a report as Markdown chunks, by section, by subject (with what it doesn't give), by kind (a table of its items), by table (a document's own, as read), by topic and, for a comparison, by finding, each saying where it came from, the second pass's notes under the claims they're about, with chunks for finding things and an index
 - **Differences explained:** in revisions, each difference named by kind (a value or its conditions changed, renamed, restated, misread, not the same item), value changes listed first
+- **An endpoint checked before it's used:** each model checked and calibrated on first use; `config models` lists what the endpoint serves, `config test --model NAME` tries a candidate before it's set, and `config checks` shows what was checked and measured
 
 **Status:**
 - Extraction has been measured with one real model (gemma-4-31B, through DeepInfra) on public sample documents and the controlled corpus.
