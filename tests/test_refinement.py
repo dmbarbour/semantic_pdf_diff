@@ -204,26 +204,33 @@ class Refined(unittest.TestCase):
 
     def test_a_scans_partial_band_is_halved_down_its_middle_and_its_rows_say_so(self):
         # the cause reproduced 2026-10-28 (docs/plans/text-cut-by-tiles-2026-10-28.md): with no text layer there are
-        # no lines to cut between, so a band is halved down every line in it; each tile's row records its path
+        # no lines to cut between, so a band is halved down every line in it (scan_halves: middle, the default until
+        # 2026-11-02); each tile's row records its path. By default now, between the lines its image shows
         def build(page):  # a letter page, scanned
             source = pymupdf.open().new_page(width=612, height=792)
             paragraph(source, count=40)
             page.insert_image(page.rect, pixmap=source.get_pixmap(dpi=100))
-        with tempfile.TemporaryDirectory() as d:
-            client = Recorder(lambda source, prompt: Extraction(claims=[], complete=False), refinement_depth=1)
-            _, coverage = extract_pdf(pdf(Path(d) / 's.pdf', build, 612, 792), CID, Path(d), client)
-        tiles = [r for r in coverage if r['task'].startswith('tile')]
-        first = [r['tiling'] for r in tiles if '-r' not in r['task']]
-        halved = [r for r in tiles if '-r' in r['task']]
-        self.assertTrue(first and halved)
-        self.assertEqual({str(x) for x in first}, {str({'cut': 'bands', 'depth': 0, 'text': False})})
-        self.assertEqual({str(r['tiling']) for r in halved},
-                         {str({'cut': 'halves', 'depth': 1, 'text': False, 'middle': True})})
-        for row in halved:  # the cut runs down the band: each half about half the page's width
-            self.assertLess(pymupdf.Rect(row['bbox']).width, 0.6 * 612)
-        self.assertEqual(tile_lines(coverage)[0],
-                         f'Image tiles read: {len(tiles)} (bands {len(first)}, halves {len(halved)} ({len(halved)} '
-                         f'down the middle)); {len(tiles)} on pages without a text layer')
+        for mode in ("middle", None):
+            with tempfile.TemporaryDirectory() as d:
+                client = Recorder(lambda source, prompt: Extraction(claims=[], complete=False), refinement_depth=1,
+                                  **({"scan_halves": mode} if mode else {}))
+                _, coverage = extract_pdf(pdf(Path(d) / 's.pdf', build, 612, 792), CID, Path(d), client)
+            tiles = [r for r in coverage if r['task'].startswith('tile')]
+            first = [r['tiling'] for r in tiles if '-r' not in r['task']]
+            halved = [r for r in tiles if '-r' in r['task']]
+            self.assertTrue(first and halved)
+            self.assertEqual({str(x) for x in first}, {str({'cut': 'bands', 'depth': 0, 'text': False})})
+            if mode is None:
+                self.assertEqual({str(r['tiling']) for r in halved},
+                                 {str({'cut': 'halves', 'depth': 1, 'text': False, 'image_lines': True})})
+                continue
+            self.assertEqual({str(r['tiling']) for r in halved},
+                             {str({'cut': 'halves', 'depth': 1, 'text': False, 'middle': True})})
+            for row in halved:  # the cut runs down the band: each half about half the page's width
+                self.assertLess(pymupdf.Rect(row['bbox']).width, 0.6 * 612)
+            self.assertEqual(tile_lines(coverage)[0],
+                             f'Image tiles read: {len(tiles)} (bands {len(first)}, halves {len(halved)} ({len(halved)} '
+                             f'down the middle)); {len(tiles)} on pages without a text layer')
 
 if __name__ == '__main__':
     unittest.main()

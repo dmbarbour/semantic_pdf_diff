@@ -755,8 +755,9 @@ class ScanHalves(Lever):
     # with a text layer is between its lines, not down the middle of its longer side, which cuts every line of a band
     # in two (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2: reproduced 2026-10-28; the owner, 2026-11-02,
     # "Let's go with your recommendations on the low-hanging fruit."); none found, across its shorter side. A drawing
-    # sheet's tile holding no text, on a page with a text layer, keeps its middle cut. Off: the owner's call
-    scan_halves: Annotated[Literal["middle", "lines"], _selecting(VISUAL)] = "middle"
+    # sheet's tile holding no text, on a page with a text layer, keeps its middle cut. A default since 2026-11-02 (the
+    # owner: "I agree `scan_halves` defaults to `lines`.")
+    scan_halves: Annotated[Literal["middle", "lines"], _selecting(VISUAL)] = "lines"
 
     def image_lines(self, reader, page, rect):
         found = super().image_lines(reader, page, rect)
@@ -1405,8 +1406,8 @@ class DedupeRepeated(Lever):
 # tile_choice, another_tiling, halve_parts: docs/decisions/0029-tiles-chosen-by-measures.md), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
-# view_rows, align_hedges, hedges_apart, read_holders and hedge_rule (docs/reviews/levers.md); round 0's settings
-# are benchmarks/round0.json.
+# view_rows, align_hedges, hedges_apart, read_holders, hedge_rule and scan_halves (docs/reviews/levers.md); round 0's
+# settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
                  ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
                  LeaveFurniture, TableContext, StemContext, References, ReaderGlossary, TileLocator, Decoration,

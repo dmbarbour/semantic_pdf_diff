@@ -233,7 +233,8 @@ HELP = {
     "halve_parts": Help(_L, "a refined tile's halves are cut around the figures it holds"),
     "scan_halves": Help(_L, "a scan's refined tile (no text layer) halved between the lines its image shows: lines, "
                         "or down its middle", "Down the middle cuts every line of a band in two; the lines are rows of "
-                        "ink found in the tile's own image. Off: it changes nothing the controlled corpus recorded."),
+                        "ink found in the tile's own image. Lines by default; it changes nothing the controlled corpus "
+                        "recorded."),
     "render_area": Help(_L, "a long region rendered to a square's pixel area, not its longer side to image_side"),
     "figure_tasks": Help(_L, "each detected figure is read whole, besides the tiles"),
     "table_filter": Help(_L, "detected tables that are charts, frames or paragraphs are dropped"),
