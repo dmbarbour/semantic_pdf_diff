@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.30.1 (2026-11-02)
+
+- **Fixed: a ruled table's rows each starting with their own tag were joined into one** ("A-102 A-201" | both titles). Our table mending took a table ruled at most of its boundaries for one whose unruled boundaries are a row's wrapped lines; scical's sheet index (61 of 95 ruled) lost 21 rows that way, each sheet's claims counted for none. Two lines each starting with a tag of their own, of one shape, now stay apart; a line whose tag and title PyMuPDF merged across the columns is parted where its words are, where that fits neatly. Of the corpus's 6,028 tables, 3 read otherwise, each by eye right; none in the controlled corpus. PDF tables are read again (reader pdf/14), unchanged requests from the cache. On scical's 9 sheets: rows read as one 21 → 0, its gaps and contradictions as before, 15 fewer doubted claims ($0.023).
+- **Fixed: a value cut short in a word kept a kind's two properties apart** (a title cut at a tile's edge, "HARDWIRED EQUIPMENT ELECTRICA", against the whole title): such a value, two words or more, is now alike.
+
 ## 0.30.0 (2026-11-02)
 
 - **The endpoint's key from a variable of its choosing:** `model_key_env` names the environment variable the endpoint's key is read from (default `OPENAI_API_KEY`). The reranker and the embedding model are sent it too, unless `rerank_key_env` or `embed_key_env` name their own. Only the name is kept; a value not shaped as a variable's name is refused without being said back. `config test`, `config show`, `debug` and a run's first line name the variable.
