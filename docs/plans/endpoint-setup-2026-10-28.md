@@ -1,6 +1,6 @@
 # Endpoint setup: choosing a model, trying it, and seeing what's remembered
 
-- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."), [4](#4-guidance-before-each-run-in-place-of-a-guided-setup) and [5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)'s ping 2026-11-02. [Design questions](#design-questions) 1 to 3 answered; 5's probes left to build.
+- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."), [4](#4-guidance-before-each-run-in-place-of-a-guided-setup) and [5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)'s ping 2026-11-02. [Design questions](#design-questions) 1 to 3 answered; 5's probes left to build (a first, one eye chart, tried and not built).
 - **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
 - **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
 - **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
@@ -133,6 +133,19 @@
   - **Failing, the run stops at once** with the check's lines, exit 5, as a first-use check failing does, and every check of the run's models is forgotten, so the next run checks and calibrates again.
   - **Tested on a stub refusing every request:** one request sent (the ping's sum), the run stopped before scanning, nothing remembered. On a stub answering the ping and refusing the run's requests, the run stops after 25 in a row, as before.
   - **Already up front, unchanged:** an untested model is checked on first use in every role (chat, reranker, embedding model), and the context window and an image's tokens are calibrated there. No other calibration runs in the product: the tiling calibrations (`scripts/calibration.py`, `labelling.py`, `asking.py`) are the lab's, for levers off by default (`tile_choice model`, `region_labels model`, `another_tiling asked`).
+- **The probes, a first one tried 2026-11-02 and not built: acuity, the smallest capitals a model reads** (Claude's design):
+  - **The idea:** an eye chart on a square `image_side` pixels a side (as large as an image is sent), lines of five random codes (`HXR-4027`) at several capitals' heights; a height is read where 90% of its codes are found in the answer (the eye tests' pass mark), and the measure is the smallest height from which every larger one is read. On first use with the image check, remembered and shown; said against what tiling assumes (`tilechoice.LEGIBLE_PX`, 7 px); not used for tiling, which is the lever *Vision profiles and adaptive slicing* plans.
+  - **Tried on gemma-4 at DeepInfra, one chart a request** (four charts each; $0.0042):
+
+| Chart | Measured (px, capitals) |
+|---|---|
+| 14 lines: 2 a size at 5, 6, 7, 8, 10, 12, 14 px, smallest first | 8, 8, 10, 8 |
+| The same, shuffled | 7, 7, 8, 7 (the eye tests: 7.0 at 1024 px) |
+| 24 lines: 3 a size, 16 px added, shuffled | 10, none, 10, none |
+
+  - **So one crowded chart isn't a probe:** with 24 lines, gemma-4 missed some 16 px lines too, and two charts of four measured nothing, which would have stopped the run. A long transcription measures attention as much as sight.
+  - **Next:** a card a size, five lines each, as the lab's eye test draws them (`lab/src/semantic_pdf_diff_lab/bench/eyetest.py`, family `read`), at 5 to 16 px: eight requests, about $0.002 and a minute on first use, sent together. The lab's cards gave gemma-4 7.0 px at 1024 px over two seeds, on a monotone fit. It would warn where a model reads coarser than tiling assumes, and stop a run only where it reads no size at all.
+  - **Left too:** a controlled document's page read against its key, which needs a pass mark measured across models.
 - **Then:** the vision profile, recommending a model per task ([*Model discovery and per-task selection*](README.md#tentative), [*Vision profiles and adaptive slicing*](README.md#tentative)), and keeping only the models a user's globs allow.
 
 ### Later: endpoints as named parts
