@@ -1,6 +1,6 @@
 # Endpoint setup: choosing a model, trying it, and seeing what's remembered
 
-- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."), [4](#4-guidance-before-each-run-in-place-of-a-guided-setup) and [5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)'s ping 2026-11-02. [Design questions](#design-questions) 1 to 3 answered; 5's probes left to build (a first, one eye chart, tried and not built).
+- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."), [4](#4-guidance-before-each-run-in-place-of-a-guided-setup) and [5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)'s ping and acuity 2026-11-02 (one eye chart tried first and not built; a card a size built: the owner, "Go ahead with the per-size probe cards."). [Design questions](#design-questions) 1 to 3 answered; a controlled page as a probe left.
 - **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
 - **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
 - **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
@@ -144,7 +144,23 @@
 | 24 lines: 3 a size, 16 px added, shuffled | 10, none, 10, none |
 
   - **So one crowded chart isn't a probe:** with 24 lines, gemma-4 missed some 16 px lines too, and two charts of four measured nothing, which would have stopped the run. A long transcription measures attention as much as sight.
-  - **Next:** a card a size, five lines each, as the lab's eye test draws them (`lab/src/semantic_pdf_diff_lab/bench/eyetest.py`, family `read`), at 5 to 16 px: eight requests, about $0.002 and a minute on first use, sent together. The lab's cards gave gemma-4 7.0 px at 1024 px over two seeds, on a monotone fit. It would warn where a model reads coarser than tiling assumes, and stop a run only where it reads no size at all.
+  - **Next, built below:** a card a size, five lines each, as the lab's eye test draws them (`lab/src/semantic_pdf_diff_lab/bench/eyetest.py`, family `read`), at 5 to 16 px: eight requests, about $0.002 and a minute on first use, sent together. The lab's cards gave gemma-4 7.0 px at 1024 px over two seeds, on a monotone fit. It would warn where a model reads coarser than tiling assumes, and stop a run only where it reads no size at all.
+- **Acuity, a card a size, done 2026-11-02** (the owner: "Go ahead with the per-size probe cards."; `acuity.py`, the check `acuity`):
+  - **The cards:** eight, one for each capitals' height of 5, 6, 7, 8, 10, 12, 14 and 16 px, each a square `image_side` pixels a side (as large as an image is sent) holding five lines of up to eight random codes and numbers (`HX-402`, `0.075`, `2'-9 1/2"`), placed as a block at a random spot. The eye test's read family: its items, prompt, pass mark (90% of a card's items, read exactly and in order) and fit (the height where reading reaches 90%, interpolated on a monotone fit). Sent together; a card not answered reads nothing, as in the eye test.
+  - **When:** on a model's first use, with the image check, and in `config test` (`--only acuity`; `--model NAME` runs it with the chat model's checks). Not in the ping. Remembered by endpoint, model and `image_side`, with each card's share read; shown by `config checks` (`acuity passed ...; capitals 7 px tall and up read at 1000 px square`) and `config models` (`checked: json, image, acuity (an image 258 tokens; capitals 7 px read)`).
+  - **What it does with the measure:** says it against what tiling assumes (`tilechoice.LEGIBLE_PX`, 7 px): `capitals 7 px tall and up read at 1000 px square (pages are tiled for text 7 px and up)`. Above 7.7 px (1.1 times), the line adds `smaller text on pages may be misread`. Reading no card at 90%, or no card answered, fails the check, and a run stops before anything is asked. Not used for tiling: that's the lever *Vision profiles and adaptive slicing* plans.
+  - **Measured at DeepInfra** (scratch cache; $0.0058 in all):
+
+| Model | Measured, 1000 px square | The eye test, 1024 px | Cost a check |
+|---|---|---|---|
+| gemma-4-31B-it, three checks | 7.0, 7.4, 7.0 px | 7.0 | $0.0013 |
+| gemma-3-27b-it, two | 8.2, 8.0 | 9.1 | $0.0005 |
+| Mistral-Small-3.2-24B | 8.3 | 9.1 | $0.0013 |
+| Llama-4-Scout-17B-16E | failed: every card refused, HTTP 429 "Model busy, retry later" | 7.2 | $0 |
+
+  - **So the measure orders models as the eye test did,** a little finer for the two weaker ones, and repeats on gemma-4 to within 0.4 px. The warning's 7.7 px sits between gemma-4's checks and the others'.
+  - **A busy model fails the check,** as it would the JSON check: eight requests at once met Llama-4-Scout's 429s, which the retries didn't outlast. Run again, it's asked again.
+  - **Scored a little apart from the lab:** text is folded (dashes, primes, quotes) before NFKC as well as after. NFKC makes a double prime (″) two primes, so the lab's scoring counts an inch mark written so as misread.
   - **Left too:** a controlled document's page read against its key, which needs a pass mark measured across models.
 - **Then:** the vision profile, recommending a model per task ([*Model discovery and per-task selection*](README.md#tentative), [*Vision profiles and adaptive slicing*](README.md#tentative)), and keeping only the models a user's globs allow.
 

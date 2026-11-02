@@ -13,7 +13,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from semantic_pdf_diff import checkup, cli
+from semantic_pdf_diff import acuity, checkup, cli
 from semantic_pdf_diff.settings import Settings
 from stubs import chat_answer, prompt_of, request_body, serving, source_data, text_pdf
 from test_failing_endpoint import failing
@@ -24,7 +24,12 @@ EMPTY = {'claims': [], 'complete': True, 'issues': []}
 def endpoint(right=True):
     """A stub endpoint answering the checks (its model listed with 65,536 tokens of context; sums, wrong unless
     right; the card read, an image 258 tokens) and a run's requests (a claim for a power in kW, equivalence)."""
-    state, codes, real = {'checks': 0, 'requests': 0}, [], checkup.card
+    state, codes, real, drawn, real_card = {'checks': 0, 'requests': 0}, [], checkup.card, [], acuity.card
+
+    def eye_card(folder, rng, size, side):
+        path, lines = real_card(folder, rng, size, side)
+        drawn.append(lines)
+        return path, lines
 
     def card(folder, rng, side=None):
         path, code = real(folder, rng, side)
@@ -48,6 +53,9 @@ def endpoint(right=True):
             a, b = map(int, re.findall(r'\d+', prompt)[:2])
             return chat_answer(handler, {'sum': a + b + (not right)}, usage={'prompt_tokens': 90,
                                                                              'completion_tokens': 5})
+        if prompt == acuity.PROMPT:  # the check's cards' lines: each finds its own among them
+            state['checks'] += 1
+            return chat_answer(handler, {'lines': [line for lines in drawn[-len(acuity.SIZES):] for line in lines]})
         if prompt == checkup.CODE:
             state['checks'] += 1
             return chat_answer(handler, {'code': codes[-1]}, usage={'prompt_tokens': 120 + 258 * imaged,
@@ -62,7 +70,8 @@ def endpoint(right=True):
         else:
             answer = EMPTY
         chat_answer(handler, answer)
-    with serving(post, get=get) as url, patch.object(checkup, 'card', card):
+    with serving(post, get=get) as url, patch.object(checkup, 'card', card), \
+            patch.object(acuity, 'card', eye_card):
         yield url, state
 
 def compare(root, url):
@@ -88,16 +97,20 @@ class FirstUse(unittest.TestCase):
         with endpoint() as (url, state):
             code, said = compare(self.root, url)
             self.assertNotEqual(code, 5, said)
-            self.assertIn(f'First use: json, image checked before anything is asked (remembered in {self.memory})',
+            self.assertIn(f'First use: json, image, acuity checked before anything is asked (remembered in '
+                          f'{self.memory})',
                           said)
             self.assertIn('  endpoint  ok: 1 models listed, gemma-4 among them (65,536 tokens of context)', said)
             self.assertRegex(said, r'  json      ok: \d+ \+ \d+ = \d+')
             self.assertRegex(said, r'  image     ok: read "[A-Z]{3}-\d{4}"; an image 1000 px square is 258 tokens')
-            self.assertEqual(state['checks'], 3)  # a sum, the card, and the card's prompt alone
+            self.assertIn('  acuity    ok: capitals 5 px tall and up read at 1000 px square', said)
+            self.assertEqual(state['checks'], 11)  # a sum, the card, the card's prompt alone, and 8 acuity cards
             self.assertGreater(state['requests'], 3)
             passed = json.loads(self.memory.read_text())['passed']
             self.assertEqual(stat.S_IMODE(os.stat(self.memory).st_mode), 0o600)
-            self.assertEqual(sorted(passed), [f'chat {url} gemma-4', f'image {url} gemma-4 1000'])
+            self.assertEqual(sorted(passed), [f'acuity {url} gemma-4 1000', f'chat {url} gemma-4',
+                                              f'image {url} gemma-4 1000'])
+            self.assertEqual(passed[f'acuity {url} gemma-4 1000']['legible_px'], 5)
             self.assertEqual(passed[f'chat {url} gemma-4']['context_tokens'], 65536)
             self.assertEqual(passed[f'image {url} gemma-4 1000']['image_tokens'], 258)
             # calibrated (milestone 5): the window listed, an image's tokens a tenth added, where no layer sets them
@@ -108,7 +121,7 @@ class FirstUse(unittest.TestCase):
             self.assertNotIn('First use', said)
             self.assertRegex(said, r'The endpoint answers: json in [\d.]+ s \(\$0\.\d{5}; asked each run, the '
                                    r'first-use checks remembered in ')
-            self.assertEqual(state['checks'], 4)
+            self.assertEqual(state['checks'], 12)  # the ping's sum alone
 
     def extracting(self):
         """(context_tokens, image_tokens) as the store's extraction was asked with them (evidence.json)."""
@@ -180,7 +193,7 @@ class FirstUse(unittest.TestCase):
         self.assertEqual(code, checkup.FAILED)
         self.assertIn("key       FAILED: refused (HTTP 401): OPENAI_API_KEY isn't set", said)
         self.assertIn("the endpoint refused the key: OPENAI_API_KEY holds the one it takes", said)
-        self.assertIn('Stopped: endpoint, key, json, image failed their check', said)
+        self.assertIn('Stopped: endpoint, key, json, image, acuity failed their check', said)
 
     def remember(self, url, **settings):
         """Every check the settings call for remembered passing, as a run before this one would have left them."""

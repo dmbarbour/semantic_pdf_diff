@@ -1042,7 +1042,7 @@ def config_parser():
     check.add_argument('--base-url', help='the endpoint to check at, for this command only')
     check.add_argument('--only', action='append', metavar='CHECKS',
                        help=f"only these checks, comma-separated: {', '.join(checkup_names())} (the endpoint's "
-                            "listing comes with json or image)")
+                            "listing comes with json, image or acuity)")
     check.add_argument('--new', action='store_true', help="only the checks not remembered passing (`config checks`)")
     add_log_options(check)
     remembered = actions.add_parser('checks', parents=[where], help='the checks remembered passing: each model and '
@@ -1146,8 +1146,9 @@ def config_command(argv):
             raise ValueError(f"--only: no check is named {', '.join(unknown)}; the checks: "
                              f"{', '.join(checkup_names())}")
         if only is None and tried.keys() - {'base_url'}:  # candidates: their checks, not the other models'
-            only = [check for role, checks in (('model', ['json', 'image']), ('rerank_model', ['reranker']),
-                                               ('embed_model', ['embedding'])) if role in tried for check in checks]
+            only = [check for role, checks in (('model', ['json', 'image', 'acuity']),
+                                               ('rerank_model', ['reranker']), ('embed_model', ['embedding']))
+                    if role in tried for check in checks]
         try:
             memory = checks_memory(store)
         except (OSError, StoreError, ValueError):

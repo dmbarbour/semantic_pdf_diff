@@ -281,15 +281,15 @@ def _prompted(client, prompt, schema, images, quietly=False):
     return got, client.usage["prompt_tokens"] - before
 
 def run(settings, rng=None, only=None):
-    """Every check, in order (only: those named, of json, image, reranker and embedding; the endpoint's listing with
-    the chat model's): [Check], and what they cost (dollars, as the provider reports it). The chat check measures the
-    model's context window, where the listing gives it, and the image check an image's tokens at image_side (calibrate
-    keeps them)."""
+    """Every check, in order (only: those named, of json, image, acuity, reranker and embedding; the endpoint's
+    listing with the chat model's): [Check], and what they cost (dollars, as the provider reports it). The chat check
+    measures the model's context window, where the listing gives it, and the image check an image's tokens at
+    image_side (calibrate keeps them); acuity, the smallest capitals the model reads there (acuity.py)."""
     from .llm import Client, is_local
     from . import embed
     from .rerank import request as rerank_request
     rng = rng or random.Random()
-    wanted = set(only) if only is not None else {"json", "image", "reranker", "embedding"}
+    wanted = set(only) if only is not None else {"json", "image", "acuity", "reranker", "embedding"}
     client = Client(settings, None)
     key = client.api_key
     checks = []
@@ -314,11 +314,11 @@ def run(settings, rng=None, only=None):
             said += f"; listed as {mine.said()}, not a chat model" + (
                 f" (`config test {flag} {settings.model}` tries it as one)" if flag else "")
         return True, said
-    if wanted & {"json", "image"}:
+    if wanted & {"json", "image", "acuity"}:
         checks.append(_timed("endpoint", endpoint))
         if checks[-1].ok is False and not ids and _unreachable(checks[-1].said):
             return checks + [Check(name, None, "skipped: the endpoint isn't reachable") for name in
-                             ("json", "image", "reranker", "embedding") if name in wanted], client.cost
+                             ("json", "image", "acuity", "reranker", "embedding") if name in wanted], client.cost
         if checks[-1].ok is False and not ids and not REFUSED.search(checks[-1].said):  # reachable, but listing
             # no models (some servers don't); one turning the key away fails, and the key check says why
             checks[-1] = Check("endpoint", None, "lists no models: " + checks[-1].said, checks[-1].seconds)
@@ -352,6 +352,39 @@ def run(settings, rng=None, only=None):
     if "image" in wanted:
         checks.append(Check("image", None, "skipped: no model is set") if not settings.model else
                       _timed("image", image) if settings.vision else Check("image", None, "not checked: vision is off"))
+
+    def eye_test():  # a card a size, sent together; a failed answer read nothing, as the eye test counts it
+        from . import acuity as cards
+        from .dispatch import Dispatcher
+        from .tilechoice import LEGIBLE_PX
+        shares, failures = {}, []
+        with tempfile.TemporaryDirectory(prefix="semantic-pdf-diff-check-") as folder:
+            drawn = cards.cards(folder, rng, settings.image_side)
+            with Dispatcher(client) as dispatch:
+                for size, path, lines in drawn:
+                    def done(value, error, size=size, lines=lines):
+                        shares[size] = cards.score(lines, value.lines) if error is None else 0.0
+                        if error is not None:
+                            failures.append(f"{type(error).__name__}: {error}")
+                    dispatch.submit(cards.PROMPT, cards.Lines, (path,), ("acuity", size), done)
+                dispatch.drain()
+        if len(failures) == len(drawn):
+            return False, f"no card answered: {failures[0]}"
+        px = cards.threshold(shares.items())
+        read = {str(size): round(share, 2) for size, share in sorted(shares.items())}
+        if px is None:
+            return False, (f"read no card's items at {cards.PASS:.0%}, up to capitals {cards.SIZES[-1]} px tall at "
+                           f"{settings.image_side} px square: pages' text would be misread"), {"read": read}
+        said = (f"capitals {px:g} px tall and up read at {settings.image_side} px square (pages are tiled for text "
+                f"{LEGIBLE_PX:g} px and up)")
+        if px > LEGIBLE_PX * 1.1:  # gemma-4 measured 7.0 to 7.4 at DeepInfra; gemma-3 8.0, Mistral-Small 8.3
+            said += ": smaller text on pages may be misread"
+        return True, said + (f"; {len(failures)} card(s) not answered" if failures else ""), {"legible_px": px,
+                                                                                               "read": read}
+    if "acuity" in wanted:
+        checks.append(Check("acuity", None, "skipped: no model is set") if not settings.model else
+                      _timed("acuity", eye_test) if settings.vision else
+                      Check("acuity", None, "not checked: vision is off"))
 
     def reranker():
         ranking = _asked(rerank_request(settings, "The rated power of the feed pump.",
@@ -498,6 +531,7 @@ def keys(settings):
     out = {"json": f"chat {base} {settings.model}"}
     if settings.vision:
         out["image"] = f"image {base} {settings.model} {settings.image_side}"
+        out["acuity"] = f"acuity {base} {settings.model} {settings.image_side}"
     if settings.rerank_model:
         try:
             where = redact_url(rerank.endpoint(settings))
@@ -523,7 +557,8 @@ def record(path, settings, checks):
         passed.pop(wanted["json"], None)
     _kept(path, passed)
 
-KINDS = {"chat": "json", "image": "image", "reranker": "reranker", "embedding": "embedding"}  # a key's word: its check
+# a key's word: its check
+KINDS = {"chat": "json", "image": "image", "acuity": "acuity", "reranker": "reranker", "embedding": "embedding"}
 
 def _parts(key):
     """A remembered check's key (keys) as {"check", "url", "model"}, and image_side or rerank_api where it holds one;
@@ -533,9 +568,9 @@ def _parts(key):
     if kind not in KINDS or not model:
         return None
     out = {"check": KINDS[kind], "url": url, "model": model}
-    if kind in ("image", "reranker") and " " in model:
+    if kind in ("image", "acuity", "reranker") and " " in model:
         out["model"], extra = model.rsplit(" ", 1)
-        out["side" if kind == "image" else "api"] = extra
+        out["api" if kind == "reranker" else "side"] = extra
     return out
 
 def remembered(path):
@@ -563,6 +598,8 @@ def _said(c):
     """What a remembered check measured, in words."""
     if c.get("image_tokens"):
         return f"an image {c.get('side', '?')} px square is {c['image_tokens']:,} tokens"
+    if c.get("legible_px"):
+        return f"capitals {c['legible_px']:g} px tall and up read at {c.get('side', '?')} px square"
     if c.get("context_tokens"):
         return f"{c['context_tokens']:,} tokens of context, as the endpoint lists it"
     return f"the {c['api']} API" if c.get("api") else ""
@@ -572,7 +609,9 @@ def checked_said(entries):
     if not entries:
         return ""
     tokens = next((c["image_tokens"] for c in entries if c.get("image_tokens")), None)
-    return "checked: " + ", ".join(c["check"] for c in entries) + (f" (an image {tokens:,} tokens)" if tokens else "")
+    px = next((c["legible_px"] for c in entries if c.get("legible_px")), None)
+    said = ([f"an image {tokens:,} tokens"] if tokens else []) + ([f"capitals {px:g} px read"] if px else [])
+    return "checked: " + ", ".join(c["check"] for c in entries) + (f" ({'; '.join(said)})" if said else "")
 
 def checks_lines(path, settings):
     """`config checks`: what the record remembers passing, by model and endpoint, the models the settings name marked;

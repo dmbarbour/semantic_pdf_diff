@@ -15,7 +15,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from stubs import chat_answer, prompt_of, request_body, serving, user_settings
-from semantic_pdf_diff import checkup, cli
+from semantic_pdf_diff import acuity, checkup, cli
 from semantic_pdf_diff.settings import user_settings as saved_settings
 
 def run(*argv):
@@ -26,9 +26,14 @@ def run(*argv):
 @contextlib.contextmanager
 def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False, info=None):
     """A stub endpoint: its models listed (info: LiteLLM's /model/info, else none), sums added, the card's code read
-    (misread: another; an image 258 tokens), a reranker scoring the first document higher, and an embedding model
-    putting the pump's two sentences together."""
-    codes, real = [], checkup.card
+    (misread: another; an image 258 tokens), the acuity cards of capitals 7 px and up read (misread: none), a
+    reranker scoring the first document higher, and an embedding model putting the pump's two sentences together."""
+    codes, real, drawn, real_card = [], checkup.card, [], acuity.card
+
+    def eye_card(folder, rng, size, side):
+        path, lines = real_card(folder, rng, size, side)
+        drawn.append((size, lines))
+        return path, lines
 
     def card(folder, rng, side=None):
         path, code = real(folder, rng, side)
@@ -61,6 +66,11 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False, info=N
             handler.wfile.write(json.dumps({"data": rows}).encode())
             return
         prompt = prompt_of(body["messages"][1]["content"])
+        if prompt == acuity.PROMPT:  # the check's cards' lines of 7 px and up: each card finds its own among them
+            check = drawn[-len(acuity.SIZES):]
+            lines = [] if misread else [line for size, lines in check if size >= 7 for line in lines]
+            chat_answer(handler, {"lines": lines}, usage={"prompt_tokens": 400, "completion_tokens": 200})
+            return
         if prompt.startswith("Add "):
             a, b = map(int, re.findall(r"\d+", prompt)[:2])
             chat_answer(handler, {"sum": a + b}, usage={"prompt_tokens": 90, "completion_tokens": 5,
@@ -69,7 +79,7 @@ def endpoint(listed=("gemma-4", "Qwen/Qwen3-Reranker-8B"), misread=False, info=N
             imaged = any(part["type"] == "image_url" for part in body["messages"][1]["content"])
             chat_answer(handler, {"code": "ZZZ-0000" if misread else codes[-1].lower()},
                         usage={"prompt_tokens": 120 + 258 * imaged, "completion_tokens": 9})
-    with serving(post, get=get) as url, patch.object(checkup, "card", card), \
+    with serving(post, get=get) as url, patch.object(checkup, "card", card), patch.object(acuity, "card", eye_card), \
             patch.dict(os.environ, {"OPENAI_BASE_URL": url}):
         yield url
 
@@ -100,6 +110,8 @@ class ConfigTest(Remembered):
         self.assertIn("  endpoint  ok: 2 models listed, gemma-4 among them", out)
         self.assertRegex(out, r"  json      ok: (\d+) \+ (\d+) = \d+")
         self.assertRegex(out, r'  image     ok: read "[a-z]{3}-\d{4}"; an image 1000 px square is 258 tokens')
+        self.assertIn("  acuity    ok: capitals 6.9 px tall and up read at 1000 px square (pages are tiled for text 7 "
+                      "px and up)", out)
         self.assertIn("  reranker  ok: scores 0.91 for the counterpart, 0.02 for the unrelated claim", out)
         self.assertIn("  embedding ok: cosine 1.00 with the counterpart, 0.01 with the unrelated claim; 3 dimensions, "
                       "the model's own", out)
@@ -125,7 +137,9 @@ class ConfigTest(Remembered):
                       "names one (`config models rerank` lists the endpoint's), `none` goes without", out)
         self.assertIn("  embedding --: not configured, so search by meaning is off: `config set --user embed_model "
                       "NAME` names one (`config models embedding` lists the endpoint's), `none` goes without", out)
-        self.assertTrue(out.endswith("2 check(s) failed: endpoint, image\n"))
+        self.assertIn("  acuity    FAILED: read no card's items at 90%, up to capitals 16 px tall at 1000 px square: "
+                      "pages' text would be misread", out)
+        self.assertTrue(out.endswith("3 check(s) failed: endpoint, image, acuity\n"))
         with endpoint(), user_settings({"model": "gemma-4", "rerank_model": None, "embed_model": None}):
             code, out = run("config", "test", "--store", self.store, "--only", "reranker,embedding")
         self.assertIn("  reranker  --: none: rerank_model is none, so reranking is off", out)
@@ -275,7 +289,8 @@ class TryingAndForgetting(Remembered):
         self.assertEqual(lines[1], f"gemma-4 at {url}  (model)")
         self.assertRegex(lines[2], r"^  json      passed \d{4}-\d\d-\d\d \d\d:\d\d UTC$")
         self.assertRegex(lines[3], r"^  image     passed .* UTC; an image 1000 px square is 258 tokens$")
-        self.assertEqual(lines[4], f"gemma-4-turbo at {url}")
+        self.assertRegex(lines[4], r"^  acuity    passed .* UTC; capitals 6.9 px tall and up read at 1000 px square$")
+        self.assertEqual(lines[5], f"gemma-4-turbo at {url}")
         self.assertEqual(lines[-1], "`semantic-pdf-diff config checks --forget [MODEL]` forgets them: the next run "
                                     "checks again")
 
@@ -315,7 +330,7 @@ class TryingAndForgetting(Remembered):
                                                                "was asked\n"))
             code, out = self.config("test", "--only", "json,eyes")
         self.assertEqual(code, 1)
-        self.assertIn("--only: no check is named eyes; the checks: json, image, reranker, embedding", out)
+        self.assertIn("--only: no check is named eyes; the checks: json, image, acuity, reranker, embedding", out)
 
     def test_checks_forgotten_a_models_or_every_one(self):
         with endpoint(listed=("gemma-4", "gemma-4-turbo")), user_settings({"model": "gemma-4"}):
@@ -324,9 +339,9 @@ class TryingAndForgetting(Remembered):
         self.assertEqual(self.config("checks", "--forget", "llama"),
                          (0, f"no check of llama is remembered in {self.memory} (`config checks` lists them)\n"))
         self.assertEqual(self.config("checks", "--forget", "gemma-4-turbo"),
-                         (0, f"2 check(s) of gemma-4-turbo forgotten in {self.memory}: the next run checks again\n"))
+                         (0, f"3 check(s) of gemma-4-turbo forgotten in {self.memory}: the next run checks again\n"))
         self.assertNotIn("gemma-4-turbo", self.config("checks")[1])
-        self.assertEqual(self.config("checks", "--forget")[1].split(" in ")[0], "2 check(s) of any model forgotten")
+        self.assertEqual(self.config("checks", "--forget")[1].split(" in ")[0], "3 check(s) of any model forgotten")
         self.assertTrue(self.config("checks")[1].startswith(f"no check is remembered in {self.memory}: a run checks "
                                                             "each model before its first request"))
 
@@ -378,11 +393,41 @@ class ChoosingAModel(Remembered):
             self.assertEqual(code, 0)
             self.assertEqual(out.splitlines(), [
                 "acme/text-only                  chat",
-                "google/gemma-4-31B-it  (model)  chat  262,144 tokens  vision  checked: json, image (an image 258 "
-                "tokens)"])
+                "google/gemma-4-31B-it  (model)  chat  262,144 tokens  vision  checked: json, image, acuity (an "
+                "image 258 tokens; capitals 6.9 px read)"])
             listed = json.loads(self.config("models", "--json")[1])
         self.assertEqual({k: sorted(v) for k, v in listed[1]["checked"].items()},
-                         {"json": ["at", "context_tokens"], "image": ["at", "image_tokens", "side"]})
+                         {"json": ["at", "context_tokens"], "image": ["at", "image_tokens", "side"],
+                          "acuity": ["at", "legible_px", "read", "side"]})
+
+class EyeCards(unittest.TestCase):
+    """The acuity check's cards (acuity.py): the eye test's read family, a card a size (the owner, 2026-11-02: "Go
+    ahead with the per-size probe cards.")."""
+    def test_each_card_holds_its_lines_at_its_size(self):
+        import pymupdf
+        with tempfile.TemporaryDirectory() as d:
+            drawn = acuity.cards(d, random.Random(1), 1000)
+            self.assertEqual([size for size, _, _ in drawn], list(acuity.SIZES))
+            for size, path, lines in drawn:
+                self.assertEqual(len(lines), acuity.LINES)
+                self.assertTrue(all(line.strip() for line in lines))
+                with pymupdf.open(path) as image:
+                    self.assertEqual(tuple(image[0].rect)[2:], (1000, 1000))
+        for seed in range(20):  # what's drawn is what's scored: the lines are the page's text, whole
+            for size in acuity.SIZES:
+                page, lines = acuity.drawn(random.Random(seed), size, 1000)
+                self.assertEqual(acuity.norm(page.get_text()).split(),
+                                 [acuity.norm(t) for line in lines for t in line.split()])
+
+    def test_items_are_scored_in_order_and_fitted_as_the_eye_test_does(self):
+        lines = ["HX-402   31.6   K7Q", "\u00b10.05   2'-9 1/2\"   RT58"]
+        self.assertEqual(acuity.score(lines, ["hx-402 31.6 K7Q", "±0.05 2\u2032-9 1/2\u2033 RT58"]), 1.0)
+        self.assertEqual(acuity.score(lines, ["HX-402 K7Q 31.6"]), 2 / 7)  # in order: the rest is misread
+        self.assertEqual(acuity.score(lines, []), 0.0)
+        # a dip at 8 px is averaged with 7's (reading only gets easier), then 90% is reached between 6 and 7 px
+        self.assertEqual(acuity.threshold([(8, 0.95), (5, 0.0), (6, 0.5), (7, 1.0), (10, 1.0)]), 6.8)
+        self.assertEqual(acuity.threshold([(5, 0.95), (6, 1.0)]), 5.0)
+        self.assertIsNone(acuity.threshold([(14, 0.5), (16, 0.85)]))
 
 if __name__ == "__main__":
     unittest.main()
