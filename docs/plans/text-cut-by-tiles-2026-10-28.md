@@ -179,6 +179,10 @@ Each item is a lever, judged against null arms on the controlled corpus ([0037](
   - The lines are found as dark rows in the tile's horizontal projection.
   - Where none are found, the cut goes across the tile's shorter side, crossing at most a line, not every line.
   - This is the cause reproduced above.
+  - **Built 2026-11-02, off** (`scan_halves: lines`; the owner, on the review of open items: "Let's go with your recommendations on the low-hanging fruit."): `segmentation.image_lines` renders the tile in grey at a pixel a point and takes runs of rows holding ink as its lines, each parted where a gap of 8 pt runs down it (a gutter); `halves` cuts between them as between text lines, and where none are found, across the tile's shorter side. Only on a page without a text layer: a drawing sheet's tile holding no text, on a page that has one, keeps its middle cut.
+    - **Synthetic scans** (a page's image alone): a band of 16 lines, cut down every one of them before, now between two, 8 lines a half; two staggered columns cut down their gutter.
+    - **The controlled corpus** (`scripts/tiling.py complaints`, its recorded runs): 41 tiles without a text layer (the scans, the outlined page), none halved, every band answered complete; the 10 halves down the middle are the floor plan's tiles holding no text on a page with a text layer, which this leaves alone. So it changes nothing the corpus recorded, and turning it on asks nothing again there.
+    - **Off, the owner's call:** the corpus can't judge it (no scan's band was partial); the case is the one reproduced on 2026-10-28.
 - **Measured:**
   - the noisy pages, the controlled corpus's wide pages and sheets, against their keys
   - milestone 1's count

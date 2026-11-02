@@ -19,12 +19,13 @@ ANOTHER = re.compile(r":(bands|grid|snapped|xycut)\d+$")  # another cut's tile, 
 def refined_path(context, page, tag, rect, depth, tiling):
     """A refined tile's path (schema.CoverageRow.tiling) from its tag and its parent's: halves ("-r0"), the region
     looked at again ("-a"), or another cut's tile ("tile:p3:grid4"); halves of a tile holding no text line are cut
-    down its middle (segmentation.halves)."""
+    down its middle (segmentation.halves), or, a scan's with scan_halves, between its image's lines."""
     another = ANOTHER.search(tag)
     cut = f"another {another.group(1)}" if another else "again" if tag.endswith("-a") else "halves"
     out = {"cut": cut, "depth": depth, "text": tiling["text"]}
     if cut == "halves" and not any(box.intersects(rect) for box, _ in context.lines(page)):
-        out["middle"] = True
+        scan = getattr(context.s, "scan_halves", "middle") == "lines" and not context.lines(page)
+        out["image_lines" if scan else "middle"] = True  # a scan's page: between its image's lines (scan_halves)
     return out
 
 def render(page, rect, target, max_side, context=None):

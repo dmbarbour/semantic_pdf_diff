@@ -30,6 +30,7 @@
     "another_tiling",
     "figure_refinement",
     "halve_parts",
+    "scan_halves",
     "render_area",
     "figure_tasks",
     "table_rules",

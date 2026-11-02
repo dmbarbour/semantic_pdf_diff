@@ -115,6 +115,8 @@ NOT_EXERCISED = {
                       "refined tiles are the sheet's, whose figure is the sheet (tests/test_refinement.py)",
     'halve_parts': "only a refined tile holding a detected figure smaller than it is cut around it; the sheet's figure "
                    "is the sheet (tests/test_refinement.py)",
+    'scan_halves': "only a refined tile without a text layer, a scan's; these documents have one "
+                   "(tests/test_refinement.py)",
     'base_url': 'the stub model is the endpoint',
     'rescan': 'reads sources, not the documents given on the command line',
     'max_zip_depth': 'archives only', 'max_source_bytes': 'sources only', 'zip_ratio_limit': 'archives only',

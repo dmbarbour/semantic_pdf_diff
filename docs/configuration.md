@@ -155,6 +155,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `another_tiling` | `"measures"` | shaping | another_tiling | extract | figure, overview, tile, vision |
 | `refine_figures` | `"halves"` | selecting | figure_refinement | extract | figure, overview, tile, vision |
 | `halve_parts` | `true` | selecting | halve_parts | extract | figure, overview, tile, vision |
+| `scan_halves` | `"middle"` | selecting | scan_halves | extract | figure, overview, tile, vision |
 | `render_area` | `false` | shaping | render_area | extract | figure, overview, tile, vision |
 | `figure_tasks` | `true` | selecting | figure_tasks | extract | figure |
 | `table_rules` | `0` | selecting | table_rules | extract | table |

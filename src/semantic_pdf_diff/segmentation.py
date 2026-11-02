@@ -102,7 +102,49 @@ def _gaps(boxes, axis, lo, hi):
         out.append((reach, hi))
     return [g for g in out if g[1] >= g[0]]
 
-def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP, parts=()):
+INK = 128          # a grey this dark or darker is ink (0 to 255)
+INK_SHARE = 0.003  # a row with ink across this share of the tile's width or more is part of a line
+INK_ROWS = 2       # a line's rows, at least: specks thinner aren't lines
+INK_GAP = 8        # a gap down a line's ink this many points wide or more parts it (a gutter between columns)
+_DARK = bytes(range(INK))
+
+def image_lines(page, rect):
+    """A tile's lines as its own image shows them, for a tile without a text layer (a scan's): runs of rows holding
+    ink, each parted where a gap of INK_GAP points runs down it (columns), as boxes in the page's points; [] where
+    none are found. Rendered in grey at a pixel a point (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2)."""
+    pix = page.get_pixmap(dpi=72, clip=rect, colorspace=pymupdf.csGRAY, alpha=False)
+    w, h, stride, data = pix.width, pix.height, pix.stride, pix.samples
+    if w < 2 or h < 2:
+        return []
+    sx, sy = rect.width / w, rect.height / h
+    least, gap = max(1, int(INK_SHARE * w)), max(1, round(INK_GAP / sx))
+    rows = [data[y * stride:y * stride + w] for y in range(h)]
+    inked = [w - len(row.translate(None, _DARK)) >= least for row in rows]
+    out, y = [], 0
+    while y < h:
+        if not inked[y]:
+            y += 1
+            continue
+        y0 = y
+        while y < h and inked[y]:
+            y += 1
+        if y - y0 < INK_ROWS:
+            continue
+        ink = [m < INK for m in map(min, *rows[y0:y])]  # each column's darkest pixel within the line
+        x = 0
+        while x < w:
+            if not ink[x]:
+                x += 1
+                continue
+            x0, blank = x, 0
+            while x < w and blank < gap:
+                blank = 0 if ink[x] else blank + 1
+                x += 1
+            x1 = x - blank
+            out.append(pymupdf.Rect(rect.x0 + x0 * sx, rect.y0 + y0 * sy, rect.x0 + x1 * sx, rect.y0 + y * sy))
+    return out
+
+def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFINE_OVERLAP, parts=(), inked=None):
     """A partial tile's two halves for refinement (decision 0029), each grown to whole lines.
 
     The cut crosses no text line where it can: in a gap between lines or between columns (no graphic crossed either,
@@ -110,9 +152,14 @@ def halves(page, rect, lines=None, graphics=None, least=LEAST_HALF, overlap=REFI
     holds, each side holding at least `least` of its extent, ties going to the cut across the tile's shorter side (a
     band is cut between its lines, not down them). Otherwise the cut crossing the fewest lines. Measured on what the
     tile holds, not on the tile, so neither half is left blank. A tile without text, such as a drawing or a scan, is
-    cut at the middle of its longer side, as before."""
+    cut at the middle of its longer side, as before; given the lines its image shows (inked: image_lines, the
+    scan_halves lever's), cut between them as between text lines, and none found, across its shorter side."""
     lines = _lines(page) if lines is None else lines
     texts = [box & rect for box, _ in lines if box.intersects(rect)]
+    if not texts and inked is not None:
+        texts = [box & rect for box in inked if box.intersects(rect)]
+        if not texts:
+            return _middle(rect, overlap, across=True)
     if not texts:
         return _middle(rect, overlap)
     held = [x for x in parts if x in rect]  # a part the tile doesn't hold is cut already
@@ -178,9 +225,9 @@ def mostly_figure(settings, reader, page, rect):
         extent |= b
     return any(abs(f) >= MOSTLY * abs(extent) for f in held) if not extent.is_empty else False
 
-def _middle(rect, overlap):
-    """Today's cut: the middle of the longer side."""
-    if rect.width > rect.height:
+def _middle(rect, overlap, across=False):
+    """Today's cut: the middle of the longer side; across, of the shorter (a band's, crossing at most a line)."""
+    if (rect.width > rect.height) != across:
         mid = (rect.x0 + rect.x1) / 2
         return [pymupdf.Rect(rect.x0, rect.y0, mid + overlap, rect.y1),
                 pymupdf.Rect(mid - overlap, rect.y0, rect.x1, rect.y1)]

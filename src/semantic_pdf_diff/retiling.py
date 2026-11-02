@@ -102,6 +102,7 @@ def path_text(tiling):
     """A tile's path in words (schema.CoverageRow.tiling): "bands", "halves, down the middle", "another grid"; ", no
     text layer" where its page has none."""
     return (tiling["cut"] + (", down the middle" if tiling.get("middle") else "")
+            + (", between its image's lines" if tiling.get("image_lines") else "")
             + ("" if tiling.get("text", True) else ", no text layer"))
 
 def tile_counts(rows):

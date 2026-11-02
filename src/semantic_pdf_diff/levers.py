@@ -749,6 +749,22 @@ class HalveParts(Lever):
         from .segmentation import inked_figures
         return parts + inked_figures(self, reader, page)
 
+class ScanHalves(Lever):
+    lever_name, stage, off = "scan_halves", "segmentation", {"scan_halves": "middle"}
+    # a partial tile of a page without a text layer (a scan) halved between the lines its own image shows, as one
+    # with a text layer is between its lines, not down the middle of its longer side, which cuts every line of a band
+    # in two (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2: reproduced 2026-10-28; the owner, 2026-11-02,
+    # "Let's go with your recommendations on the low-hanging fruit."); none found, across its shorter side. A drawing
+    # sheet's tile holding no text, on a page with a text layer, keeps its middle cut. Off: the owner's call
+    scan_halves: Annotated[Literal["middle", "lines"], _selecting(VISUAL)] = "middle"
+
+    def image_lines(self, reader, page, rect):
+        found = super().image_lines(reader, page, rect)
+        if self.scan_halves != "lines" or reader.lines(page):
+            return found
+        from .segmentation import image_lines
+        return image_lines(page, rect)
+
 class RenderArea(Lever):
     lever_name, stage, off = "render_area", "segmentation", {"render_area": False}
     # render a long region to a square's pixel area (image_side squared), not its longer side to image_side: a 4:1
@@ -1395,7 +1411,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LeaveFurniture, TableContext, StemContext, References, ReaderGlossary, TileLocator, Decoration,
                  Tiling, TileCut,
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty,
-                 SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, RenderArea, FigureTasks,
+                 SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, ScanHalves, RenderArea,
+                 FigureTasks,
                  TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
@@ -1893,13 +1910,19 @@ class Platform(Composable):
         each holding least_half of what the tile holds), cut around the parts tile_parts gives where they can be."""
         from .segmentation import halves
         found = halves(page, rect, reader.lines(page), reader.graphics(page), self.least_half,
-                       parts=self.tile_parts(reader, page))
+                       parts=self.tile_parts(reader, page), inked=self.image_lines(reader, page, rect))
         return [(f"{tag}-r{i}", r, {}) for i, r in enumerate(found)]
 
     @chained
     def tile_parts(self, reader, page):
         """Boxes a tile's halves are cut around where they can be, as around a graphic (segmentation.halves): none."""
         return []
+
+    @chained
+    def image_lines(self, reader, page, rect):
+        """The lines a tile without a text layer shows in its image, which its halves are cut between
+        (segmentation.halves): the platform's, None, not looked for (cut down its middle)."""
+        return None
 
     @chained
     def figure_regions(self, reader, page, number, grid):

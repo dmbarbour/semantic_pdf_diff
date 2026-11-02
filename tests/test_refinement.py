@@ -59,6 +59,44 @@ class Halves(unittest.TestCase):
         tile = pymupdf.Rect(0, 0, 500, 300)
         self.assertEqual(halves(page, tile), [pymupdf.Rect(0, 0, 262, 300), pymupdf.Rect(238, 0, 500, 300)])
 
+    def test_a_scans_band_is_cut_between_the_lines_its_image_shows(self):
+        """scan_halves (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2; the owner, 2026-11-02: "Let's go with
+        your recommendations on the low-hanging fruit."): a band without a text layer was cut down its middle,
+        through every line; its image's own lines say where to cut."""
+        from semantic_pdf_diff.segmentation import image_lines
+        text = pymupdf.open(); written = text.new_page(width=500, height=400)
+        paragraph(written)
+        boxes = [b for b, _ in lines(written)]  # before another page is added: it ends this one's handle
+        two = text.new_page(width=500, height=400)
+        for i in range(24):  # two columns, staggered: no row gap runs across both
+            two.insert_text((30, 40 + 12 * i), 'left column text', fontsize=10)
+            two.insert_text((280, 46 + 12 * i), 'right column text', fontsize=10)
+        doc = pymupdf.open()
+        for source in text:  # each page an image of it alone: a scan, no text layer
+            scan = doc.new_page(width=500, height=400)
+            scan.insert_image(scan.rect, pixmap=source.get_pixmap(dpi=150))
+        page = doc[0]
+        self.assertEqual(lines(page), [])
+        band = pymupdf.Rect(30, 40, 470, 290)
+        found = image_lines(page, band)
+        self.assertEqual(len(found), 16)  # its sixteen lines, as the image shows them
+        self.assertEqual([len(cut(boxes, half)) for half in halves(page, band)], [16, 16])  # down every line
+        parts = halves(page, band, inked=found)
+        self.assertEqual([cut(found, half) for half in parts], [[], []])  # no line's ink cut (a box's leading may be)
+        held = [[b for b in boxes if abs(b & half) > abs(b) / 2] for half in parts]
+        self.assertEqual([len(h) for h in held], [8, 8])
+        self.assertTrue(all(half.x0 <= 30 and half.x1 >= 470 for half in parts))
+        tile = pymupdf.Rect(20, 25, 480, 340)
+        ink = image_lines(doc[1], tile)
+        parts = halves(doc[1], tile, inked=ink)
+        self.assertEqual([cut(ink, half) for half in parts], [[], []])
+        self.assertEqual(len(ink), 2)  # staggered, the rows run together: a block a column, apart at the gutter
+        self.assertTrue(any(b.x1 < 260 for b in ink) and any(b.x0 > 260 for b in ink))
+        self.assertTrue(all(half.y0 <= 25 and half.y1 >= 340 for half in parts))  # down the gutter
+        blank = pymupdf.Rect(0, 350, 500, 400)  # nothing found: across the shorter side, crossing no line
+        self.assertEqual(halves(page, blank, inked=image_lines(page, blank)),
+                         [pymupdf.Rect(0, 350, 500, 387), pymupdf.Rect(0, 363, 500, 400)])
+
     def test_without_a_gap_the_cut_crosses_fewest_lines_and_halves_grow_to_whole_lines(self):
         doc = pymupdf.open(); page = doc.new_page(width=500, height=400)
         page.insert_text((40, 100), 'one long line ' * 6, fontsize=10)  # the only line, across the middle
@@ -103,6 +141,31 @@ class Again(unittest.TestCase):  # figure_refinement: a partial tile mostly one 
                 self.assertEqual([(t, again) for t, _, again in found], expected)
                 text = [r for r in tiles if r[0] == 'tile:1']  # the tile below the chart: text
                 self.assertEqual(len(s.refined_tile(reader, page, *text[0][:2], done)), 2)
+
+    def test_a_scans_band_is_halved_between_its_lines_with_scan_halves(self):
+        """The lever end to end, on the corpus's scan (no text layer) and its drawing sheet (a text layer: its tiles
+        holding no text keep the middle cut)."""
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        corpus = Path(__file__).resolve().parent.parent / 'benchmarks/controlled/docs'
+        done = {'row': {}, 'claims': (), 'cut': []}
+        cuts = {}
+        for name, page_no in (('lcc-s1-scanned-frame.pdf', 0), ('lcc-plan-s1-all.pdf', 0)):
+            with pymupdf.open(corpus / name) as doc:
+                page = doc[page_no]
+                for mode in ('middle', 'lines'):
+                    s = Settings(scan_halves=mode, **TILING_BEFORE)
+                    reader = Context(doc, s)
+                    tiles = [r for r in s.visual_regions(reader, page, page_no) if r[0].startswith('tile')]
+                    plain = [r for r in tiles if not any(b.intersects(r[1]) for b, _ in reader.lines(page))]
+                    tag, rect = plain[0][:2]
+                    cuts[name, mode] = (rect, [r for _, r, _ in s.refined_tile(reader, page, tag, rect, done)])
+        band, middle = cuts['lcc-s1-scanned-frame.pdf', 'middle']
+        _, lines_cut = cuts['lcc-s1-scanned-frame.pdf', 'lines']
+        self.assertGreater(band.width, band.height)  # a band: the middle cut ran down it
+        self.assertTrue(all(h.height >= band.height - 1 for h in middle))
+        self.assertTrue(all(h.width >= band.width - 1 for h in lines_cut))  # now across it, between its lines
+        self.assertEqual(cuts['lcc-plan-s1-all.pdf', 'middle'][1], cuts['lcc-plan-s1-all.pdf', 'lines'][1])
 
     def test_the_note_names_what_the_earlier_answer_noted(self):
         from semantic_pdf_diff.schema import Claim
