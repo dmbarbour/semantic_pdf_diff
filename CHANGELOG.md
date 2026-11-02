@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.29.0 (2026-11-02)
+
+- **A scan's tiles halved between their lines** (`scan_halves: lines`, off): a tile of a page without a text layer that's read again in halves was cut down the middle of its longer side, through every line of a band. With it, the cut goes between the lines the tile's own image shows (rows of ink, parted at gutters), and where none are found, across the tile's shorter side. A drawing sheet with a text layer keeps its cut. It changes nothing the controlled corpus recorded.
+
 ## 0.28.0 (2026-11-02)
 
 - **Fixed: one thing's name holding two tags was counted as naming several items.** TS 38.300 names things so ("L2 U2N Relay UE", "L1/L2 Triggered Mobility"): 477 of its claims were counted for none of their subjects, kinds and gaps. Now several items are rows read as one (tags of one shape, apart by spaces or titles: "A-102 A-201") or a list (apart by commas, "and", "or"). TS 38.300: 477 → 10; scical's merged rows as before.
