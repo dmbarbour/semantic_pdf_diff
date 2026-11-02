@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.27.0 (2026-11-02)
+
+- **How small a model reads, measured on its first use** (`acuity`, among the checks): eight cards of random codes and numbers, one for each capitals' height from 5 to 16 px, as large as an image is sent, give the smallest height the model reads 90% of. It's said against the 7 px pages are tiled for, with a warning where it's above 7.7 px. A model reading no card stops the run. `config test` runs it (`--only acuity`), `config checks` and `config models` show it. At DeepInfra: gemma-4 7.0 to 7.4 px, about $0.0013 a check; gemma-3-27b 8.0 to 8.2; Mistral-Small-3.2 8.3.
+
 ## 0.26.0 (2026-11-02)
 
 - **A run's settings said before it starts:** the models it asks and where, and each feature off for want of a model no layer names: reranking (comparisons in proposals mode) and search by meaning, with how to name one or go without.
