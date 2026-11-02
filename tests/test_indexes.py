@@ -138,8 +138,20 @@ class Subjects(unittest.TestCase):
         self.assertIn("### sheet: 5 items\n\n| Item | drawing title (also sheet name) |", page)
         self.assertIn("| XB-001 | COVER; COVER |", page)  # its own claims, not the row naming two
         self.assertIn("- **drawing title**: COVER (a.pdf, page 1); COVER [of XB-001, XB-002] (a.pdf, page 1)", page)
+
         apart = indexes.built(report(evidence))  # no sheets situated: the tags' letters, as before
         self.assertNotIn("sheet", {k["kind"] for k in apart["kinds"]})
+
+    def test_one_things_name_holding_two_tags_names_one_item(self):
+        """Rows read as one name items of one shape; a list, items apart by commas, "and" or "or"; but TS 38.300's
+        "L2 U2N Relay UE" is one thing (477 of its claims had been counted for none, 2026-11-02)."""
+        for name, tags in [("A-102 A-201", ["A-102", "A-201"]), ("E-102 E-103 E-601", ["E-102", "E-103", "E-601"]),
+                           ("H-101 SPILL CONTAINMENT, & SCHEDULE S-001 DRAWING", ["H-101", "S-001"]),
+                           ("SRB0, SRB1, SRB3 and other MAC CEs", ["SRB0", "SRB1", "SRB3"]),
+                           ("Pumps P-101 and P-102", ["P-101", "P-102"]), ("L2 U2N Relay UE", []),
+                           ("L2 U2N Relay UE and L2 U2N Remote UE", []), ("L1/L2 Triggered Mobility", []),
+                           ("PC5 U2U Relay RLC Channel", []), ("pump P-101", [])]:
+            self.assertEqual(indexes.several(name), tags, name)
 
     def test_numbers_alike_dont_join_properties(self):
         evidence = [claim(f"{a}-{n}", "ca", f"P-10{n}", a, "12", "kW") for n in range(1, 4) for a in ("A", "B")]

@@ -189,12 +189,24 @@ def matched(found, findings, sources, alias=lambda name: None):
         merged += [group, *apart]
     return merged
 
+LISTING = re.compile(r"\s*(?:,\s*(?:and|or)|,|;|&|and|or)\s*", re.IGNORECASE)  # between a list's items
+
 def several(entity):
-    """The items a name names, where it names two or more ("A-102 A-201", "SRB0, SRB1 and SRB3"): their tags, else
-    []. Such a claim is a row read as one, or a statement about several: counted for none of them in kinds."""
+    """The items a name names, where it names two or more: their tags, else []. Rows read as one ("A-102 A-201",
+    "H-101 TITLE S-001 TITLE"): tags of one shape, apart by spaces or their titles; a list ("SRB0, SRB1 and SRB3"):
+    tags apart by commas, "and" or "or". Not one thing's name holding two tags ("L2 U2N Relay UE", "L1/L2 Triggered
+    Mobility": tags of other shapes, or joined by a slash), which TS 38.300's are. Such a claim is a row read as one,
+    or a statement about several: counted for none of them in kinds."""
     from .align import TAG
-    tags = list(dict.fromkeys(TAG.findall(str(entity))))
-    return tags if len(tags) > 1 else []
+    text = str(entity)
+    found = list(TAG.finditer(text))
+    tags = list(dict.fromkeys(m[0] for m in found))
+    if len(tags) < 2:
+        return []
+    between = [text[a.end():b.start()] for a, b in zip(found, found[1:])]
+    if all(LISTING.fullmatch(gap) for gap in between):
+        return tags
+    return tags if len({shape(t) for t in tags}) == 1 and not any("/" in gap for gap in between) else []
 
 def built(data):
     """The report's index: {"sources", "subjects", "figures"} (as report.json keeps it under "index"). Each subject:
