@@ -2,6 +2,15 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.28.0 (2026-11-02)
+
+- **Fixed: one thing's name holding two tags was counted as naming several items.** TS 38.300 names things so ("L2 U2N Relay UE", "L1/L2 Triggered Mobility"): 477 of its claims were counted for none of their subjects, kinds and gaps. Now several items are rows read as one (tags of one shape, apart by spaces or titles: "A-102 A-201") or a list (apart by commas, "and", "or"). TS 38.300: 477 → 10; scical's merged rows as before.
+- **A list's claims count for each item it names** ("SRB0, SRB1, SRB3 and other MAC CEs", "Pumps P-101 and P-102"): the value is under each, marked "[said of ...]", and an item named only in a list is a subject of its own, so its siblings' gaps show what it lacks. Rows read as one still count for none.
+- **`export --json`:** `chunks.json` beside the Markdown chunks, every chunk as an object (name, title, front matter's fields, text), for a system ingesting JSON.
+- **`export --since FOLDER`:** a delta against an earlier export, written to the store's `export-delta/`: only the chunks the earlier one doesn't hold, and in index.md the names of its chunks to remove.
+- **A reranker's or an embedding model's own key:** `rerank_key_env` and `embed_key_env` name the environment variable its key is read from (unset: `OPENAI_API_KEY`). Only the name is kept; a value not shaped as a variable's name is refused without being said back. A run's first line names the variable, and says when it isn't set.
+- **The acuity check sends its cards two at a time,** gentler on an endpoint of a few servers.
+
 ## 0.27.0 (2026-11-02)
 
 - **How small a model reads, measured on its first use** (`acuity`, among the checks): eight cards of random codes and numbers, one for each capitals' height from 5 to 16 px, as large as an image is sent, give the smallest height the model reads 90% of. It's said against the 7 px pages are tiled for, with a warning where it's above 7.7 px. A model reading no card stops the run. `config test` runs it (`--only acuity`), `config checks` and `config models` show it. At DeepInfra: gemma-4 7.0 to 7.4 px, about $0.0013 a check; gemma-3-27b 8.0 to 8.2; Mistral-Small-3.2 8.3.
