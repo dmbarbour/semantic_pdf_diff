@@ -38,6 +38,11 @@ from dataclasses import dataclass, field
 from .values import inches, printed_value, singular, unit
 
 TAG = re.compile(r"\b[A-Z]{1,4}-?\d{1,4}[A-Z]?\b")
+
+def shape(tag):
+    """A tag's shape: its letters A, its digits 9 ("XA-501": "AA-999")."""
+    return re.sub(r"\d", "9", re.sub(r"[A-Z]", "A", tag))
+
 # Not "a": single letters name things (Option A, Revision A, valve A).
 STOP = {"the", "an", "of", "for", "per", "each", "at", "in", "on", "to", "and", "with", "is", "by", "its", "value",
         "no"}

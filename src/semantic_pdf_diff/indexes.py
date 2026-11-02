@@ -42,7 +42,7 @@ import os
 import re
 from collections import Counter, defaultdict
 
-from .align import Side
+from .align import Side, shape
 from .glossary import natural
 from .terms import fold
 from .schema import Evidence
@@ -302,10 +302,6 @@ NUMBERED_NAME = re.compile(r"^(.*?[A-Za-z][A-Za-z ./&'-]*?)[\s#-]*(?:no\.?\s*)?\
 # An item named by a sheet's number alone: "A-101", "Sheet G-101", "DWG. NO. S-201"
 SHEET_NAME = re.compile(r"^(?:(?i:sheet|drawing|dwg)\.?\s*(?:(?i:no)\.?\s*)?)?([A-Z]{1,4}-?\d{1,4}[A-Z]?)$")
 JOIN_ITEMS = 3  # a kind's items giving two properties, at least, alike each time, for them to be one
-
-def shape(tag):
-    """A tag's shape: its letters A, its digits 9 ("XA-501": "AA-999")."""
-    return re.sub(r"\d", "9", re.sub(r"[A-Z]", "A", tag))
 
 def sheet_shapes(data):
     """The shapes of the sheet numbers the sources' title blocks print (situating's sheets, labelled "sheet G-001")."""
