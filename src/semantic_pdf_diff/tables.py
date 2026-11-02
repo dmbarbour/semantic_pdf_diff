@@ -209,12 +209,12 @@ def column_edges(table):
         edges.append(statistics.median(xs) if xs else None)
     return edges
 
-def cut_columns(rows, boxes, edges, marks):
-    """(rows, edges, how many boundaries joined): columns joined across a boundary where every row with text on both
-    sides of it has a word cut there ("7. | 4" is "7.4"; a phantom column holding only the overflow of cut words),
-    without a space where the word was cut. A boundary with two separate values in any row stays."""
+def cut_boundaries(rows, boxes, edges, marks):
+    """The column boundaries cut_columns joins: those where every row with text on both sides of it has a word cut
+    there ("7. | 4" is "7.4"; a phantom column holding only the overflow of cut words). A boundary with two separate
+    values in any row stays."""
     if not edges or not rows or len(boxes) != len(rows):
-        return rows, edges, 0
+        return []
     cut = [marks.cuts(b, edges) if b else set() for b in boxes]
     filled = lambda r, k: k < len(r) and r[k] is not None and str(r[k]).strip()
     join = []
@@ -222,8 +222,16 @@ def cut_columns(rows, boxes, edges, marks):
         both = [i for i, r in enumerate(rows) if filled(r, j) and filled(r, j + 1)]
         if both and all(j in cut[i] for i in both):
             join.append(j)
-    if not join:
+    return join
+
+def cut_columns(rows, boxes, edges, marks, join=None):
+    """(rows, edges, how many boundaries joined): columns joined across the boundaries cut_boundaries finds (or join
+    names: the same columns joined in other lines of the table), without a space where a row's word was cut."""
+    join = cut_boundaries(rows, boxes, edges, marks) if join is None else join
+    if not edges or not rows or len(boxes) != len(rows) or not join:
         return rows, edges, 0
+    cut = [marks.cuts(b, edges) if b else set() for b in boxes]
+    filled = lambda r, k: k < len(r) and r[k] is not None and str(r[k]).strip()
     width = max(len(r) for r in rows)
     out = []
     for i, row in enumerate(rows):
@@ -284,30 +292,44 @@ def parted_across(table, rows, page):
         out.append(split if neat and split[0] == tag and sum(1 for c in split if c) > 1 else row)
     return out
 
+def ruled_groups(rows, boxes, rules, least=3, share=0.4):
+    """The lines of each row ruled_rows makes (indices into rows, in order), or None where it leaves the table
+    unchanged."""
+    if len(rows) < 3 or len(boxes) != len(rows) or any(b is None for b in boxes):
+        return None
+    ruled = [any(abs(boxes[k][1] - y) <= 1.5 for y in rules) for k in range(1, len(rows))]
+    if all(ruled) or sum(ruled) < max(least, share * len(ruled)):
+        return None
+    def apart(upper, lower):
+        digit = lambda c: c is not None and any(ch.isdigit() for ch in str(c))
+        return (bool(_filled(upper[:1])) and bool(_filled(lower[:1]))
+                and any(digit(a) and digit(b) for a, b in zip(upper[1:], lower[1:]))) or tagged_apart(upper, lower)
+    groups, row = [[0]], list(rows[0])
+    for k in range(1, len(rows)):
+        if ruled[k - 1] or apart(row, rows[k]):
+            groups.append([k])
+            row = list(rows[k])
+        else:
+            groups[-1].append(k)
+            row = _joined(row, rows[k])
+    return groups
+
 def ruled_rows(rows, boxes, rules, least=3, share=0.4):
     """(rows, boxes, how many joined): a table whose row boundaries are mostly ruled (3 or more, and 40% or more of
     them, drawn across most of its width) has its rows joined across the boundaries without a rule, which are lines
     of one row the parser took for rows (HabEx: each text line shaded with a box of its own). Two rows both labelled
     and both with a digit in the same column stay apart, as do two each starting with a tag of their own
     (tagged_apart). Else unchanged."""
-    if len(rows) < 3 or len(boxes) != len(rows) or any(b is None for b in boxes):
+    groups = ruled_groups(rows, boxes, rules, least, share)
+    if groups is None:
         return rows, boxes, 0
-    ruled = [any(abs(boxes[k][1] - y) <= 1.5 for y in rules) for k in range(1, len(rows))]
-    if all(ruled) or sum(ruled) < max(least, share * len(ruled)):
-        return rows, boxes, 0
-    def apart(upper, lower):
-        digit = lambda c: c is not None and any(ch.isdigit() for ch in str(c))
-        return (bool(_filled(upper[:1])) and bool(_filled(lower[:1]))
-                and any(digit(a) and digit(b) for a, b in zip(upper[1:], lower[1:]))) or tagged_apart(upper, lower)
-    out_rows, out_boxes = [list(rows[0])], [tuple(boxes[0])]
-    for k in range(1, len(rows)):
-        if ruled[k - 1] or apart(out_rows[-1], rows[k]):
-            out_rows.append(list(rows[k]))
-            out_boxes.append(tuple(boxes[k]))
-        else:
-            a, b = out_boxes[-1], boxes[k]
-            out_rows[-1] = _joined(out_rows[-1], rows[k])
-            out_boxes[-1] = union((a, b))
+    out_rows, out_boxes = [], []
+    for group in groups:
+        row, box = list(rows[group[0]]), tuple(boxes[group[0]])
+        for k in group[1:]:
+            row, box = _joined(row, rows[k]), union((box, boxes[k]))
+        out_rows.append(row)
+        out_boxes.append(box)
     return out_rows, out_boxes, len(rows) - len(out_rows)
 
 def pdf_parts(header, body, boxes, styles=None):
