@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.32.0 (2026-11-02)
+
+- **A ruled table's lines of two labels joined shown to the model by default** (`labels_joined: true`; the owner: "Yes, let's turn that on by default."). A store read before reads its tables again on its next run, each unchanged request answered from the cache; only a table part with such a join asks the structure query anew.
+
 ## 0.31.0 (2026-11-02)
 
 - **A ruled table's lines of two labels joined, shown to the model** (`labels_joined`, off; the owner: "Yes, please develop that check for suspect joins."). Our table mending joins lines across the unruled boundaries of a mostly ruled table, and can't tell two labels made one row ("ADDRESS:" and "DRAWN BY:" in a title block, "AH ALUM" in an abbreviation list) from one label over two lines. With it, such a part goes to the structure query with those lines apart, each tagged "read with the line above": the model's "keep" makes a line a row of its own, and otherwise it stays joined. On the corpus's pages with such a join, parts read by the model's rules 29 → 64 (development's pages) and 65 → 89 (held-out's), nearly every part read otherwise better by eye; 13 title blocks' answers failed twice where they had passed, read as the mending left them. It asks once more for a part with such a join that wasn't asked already.
