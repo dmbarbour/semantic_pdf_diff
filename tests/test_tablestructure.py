@@ -107,6 +107,13 @@ class Applying(unittest.TestCase):
         self.assertEqual(ts.example_mismatches(a, got, BODY, worst=7),
                          ["the row holding line 7 isn't among the examples: copy it from the image"])
 
+    def test_a_lone_value_given_for_a_list_is_a_list_of_it(self):
+        a = answer(rules=[{"action": "join columns", "column": "A", "into": "B"}, {"action": "keep", "lines": 4,
+                                                                                 "when": "no rule above"}],
+                   examples=[{"line": "4", "cells": "FOV"}])
+        self.assertEqual((a.rules[0].into, a.rules[1].lines, a.rules[1].when, a.examples[0].cells),
+                         (["B"], ["4"], ["no rule above"], ["FOV"]))
+
     def test_numbers_given_for_lines_and_cells_are_read_as_text(self):
         a = answer(rules=[{"action": "join above", "lines": [3, 5]}], examples=[{"line": 2, "cells": ["Detector", 7]}])
         self.assertEqual((a.rules[0].lines, a.examples[0].line, a.examples[0].cells),

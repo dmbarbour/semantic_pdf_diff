@@ -6,7 +6,7 @@ load, which held a cycle of 21 modules together).
 import hashlib
 import json
 import re
-from typing import Annotated, Literal
+from typing import Annotated, Literal, get_origin
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_serializer, model_validator
 
 class Strict(BaseModel):
@@ -233,8 +233,8 @@ def as_text(value):
     return value if isinstance(value, str) or value is None else str(value)
 
 class Lenient(Strict):
-    """Model output: unknown keys are dropped, nulls become defaults, and overlong
-    strings and lists are cut to their limits rather than failing the answer."""
+    """Model output: unknown keys are dropped, nulls become defaults, a lone value given for a list is a list of it,
+    and overlong strings and lists are cut to their limits rather than failing the answer."""
     @model_validator(mode="before")
     @classmethod
     def tidy(cls, data):
@@ -246,6 +246,8 @@ class Lenient(Strict):
                 continue
             if cls.model_fields[key].annotation is str and isinstance(value, list):  # lines given as a list
                 value = "\n".join(map(str, value))
+            elif get_origin(cls.model_fields[key].annotation) is list and isinstance(value, (str, int, float)):
+                value = [value]  # one item given alone (a structure rule's "into": "B", 2026-11-02)
             limit = next((m.max_length for m in cls.model_fields[key].metadata if hasattr(m, "max_length")), None)
             if limit is not None and isinstance(value, (str, list)):
                 value = value[:limit]
