@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.31.0 (2026-11-02)
+
+- **A ruled table's lines of two labels joined, shown to the model** (`labels_joined`, off; the owner: "Yes, please develop that check for suspect joins."). Our table mending joins lines across the unruled boundaries of a mostly ruled table, and can't tell two labels made one row ("ADDRESS:" and "DRAWN BY:" in a title block, "AH ALUM" in an abbreviation list) from one label over two lines. With it, such a part goes to the structure query with those lines apart, each tagged "read with the line above": the model's "keep" makes a line a row of its own, and otherwise it stays joined. On the corpus's pages with such a join, parts read by the model's rules 29 → 64 (development's pages) and 65 → 89 (held-out's), nearly every part read otherwise better by eye; 13 title blocks' answers failed twice where they had passed, read as the mending left them. It asks once more for a part with such a join that wasn't asked already.
+- **Fixed: a lone value a model gave for a list failed the whole answer** (a structure rule's `"into": "B"` for `["B"]`): it's now a list of that one value. It had failed structure answers wherever a join named one column.
+
 ## 0.30.1 (2026-11-02)
 
 - **Fixed: a ruled table's rows each starting with their own tag were joined into one** ("A-102 A-201" | both titles). Our table mending took a table ruled at most of its boundaries for one whose unruled boundaries are a row's wrapped lines; scical's sheet index (61 of 95 ruled) lost 21 rows that way, each sheet's claims counted for none. Two lines each starting with a tag of their own, of one shape, now stay apart; a line whose tag and title PyMuPDF merged across the columns is parted where its words are, where that fits neatly. Of the corpus's 6,028 tables, 3 read otherwise, each by eye right; none in the controlled corpus. PDF tables are read again (reader pdf/14), unchanged requests from the cache. On scical's 9 sheets: rows read as one 21 → 0, its gaps and contradictions as before, 15 fewer doubted claims ($0.023).
