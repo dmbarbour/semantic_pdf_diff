@@ -361,12 +361,19 @@ def _alone(subject):
     return [n for n in dict.fromkeys([subject["name"], *subject["names"]]) if not several(n)]
 
 def _alike(a, b):
-    """Two properties' values on one item said alike: the same words, or one's within the other's; not numbers
-    alone, which two properties can share by chance."""
+    """Two properties' values on one item said alike: the same words, or one's within the other's, or one the
+    other's start cut short in a word (_cut); not numbers alone, which two properties can share by chance."""
     from .align import NUMERIC
     if any(NUMERIC.match(x) for x in a | b):
         return False
-    return any(x == y or f" {x} " in f" {y} " or f" {y} " in f" {x} " for x in a for y in b)
+    return any(x == y or f" {x} " in f" {y} " or f" {y} " in f" {x} " or _cut(x, y) or _cut(y, x)
+               for x in a for y in b)
+
+def _cut(x, y):
+    """Whether x is y cut short within a word, two words or more of it: a title cut at a tile's edge ("hardwired
+    equipment electrica" of "hardwired equipment electrical plan"; scical's sheet index, once its rows read as one
+    were parted, 2026-11-02: 20 sheets' index titles and their tiles' cut ones unjoined)."""
+    return len(x.split()) >= 2 and len(x) < len(y) and y.startswith(x)
 
 def _joins(gives_):
     """{a property's name: the name it's joined under}: a kind's two properties one where JOIN_ITEMS of its items or

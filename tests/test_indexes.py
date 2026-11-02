@@ -173,6 +173,17 @@ class Subjects(unittest.TestCase):
         page = indexfiles.markdown(index)
         self.assertIn("- **rated power**: 75 kW [said of P-101, P-102, P-103] (a.pdf, page 1)", page)
 
+    def test_a_value_cut_short_in_a_word_joins_properties(self):
+        """A tile's edge cutting a title ("HARDWIRED EQUIPMENT ELECTRICA"): the same property as the whole title the
+        sheet index gives (scical, 2026-11-02)."""
+        titles = {1: "HARDWIRED EQUIPMENT ELECTRICAL PLAN", 2: "PV WIRING PLAN", 3: "ONE-LINE DIAGRAM"}
+        cut = {1: "HARDWIRED EQUIPMENT ELECTRICA", 2: "PV WIRING PLAN", 3: "ONE-LINE DIAG"}
+        evidence = [claim(f"A-{n}", "ca", f"E-10{n}", "sheet name", titles[n], "") for n in titles]
+        evidence += [claim(f"B-{n}", "ca", f"E-10{n}", "drawing title", cut[n], "") for n in cut]
+        (sheets,) = indexes.built(report(evidence))["kinds"]
+        self.assertEqual([p["names"] for p in sheets["properties"]], [["drawing title", "sheet name"]])
+        self.assertFalse(indexes._cut("ONE", "ONE-LINE DIAGRAM"))  # a word alone isn't a title cut short
+
     def test_numbers_alike_dont_join_properties(self):
         evidence = [claim(f"{a}-{n}", "ca", f"P-10{n}", a, "12", "kW") for n in range(1, 4) for a in ("A", "B")]
         evidence = [dict(e, attribute={"A": "rated power", "B": "shaft power"}[e["id"][0]]) for e in evidence]
