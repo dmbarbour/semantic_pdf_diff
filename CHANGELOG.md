@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.30.0 (2026-11-02)
+
+- **The endpoint's key from a variable of its choosing:** `model_key_env` names the environment variable the endpoint's key is read from (default `OPENAI_API_KEY`). The reranker and the embedding model are sent it too, unless `rerank_key_env` or `embed_key_env` name their own. Only the name is kept; a value not shaped as a variable's name is refused without being said back. `config test`, `config show`, `debug` and a run's first line name the variable.
+- **A scan's tiles halved between their lines by default** (`scan_halves: lines`; the owner: "I agree `scan_halves` defaults to `lines`."). A store read before re-reads its image regions on its next run, each unchanged request answered from the cache; only a scan's tiles read again in halves ask anything new.
+
 ## 0.29.0 (2026-11-02)
 
 - **A scan's tiles halved between their lines** (`scan_halves: lines`, off): a tile of a page without a text layer that's read again in halves was cut down the middle of its longer side, through every line of a band. With it, the cut goes between the lines the tile's own image shows (rows of ink, parted at gutters), and where none are found, across the tile's shorter side. A drawing sheet with a text layer keeps its cut. It changes nothing the controlled corpus recorded.
