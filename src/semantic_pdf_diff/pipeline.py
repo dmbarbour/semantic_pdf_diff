@@ -186,6 +186,9 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
     own = client is None
     if own and not options.dry_run:
         require_model(settings, options)
+    if own and not options.fixture:  # the settings checked before anything starts: a feature missed said
+        for line in checkup.guidance(settings, options.mode):
+            log.info(line)
     if options.dry_run:
         if own and not options.fixture:  # a run that would be refused says so; what was measured is used
             settings = checkup.calibrated(settings, checkup.memory_of(cache_of(store, bind=False)))

@@ -207,6 +207,15 @@ def prompt_of(parts):
     """A request's text part, before or after its images (images_first)."""
     return next(part['text'] for part in parts if part['type'] == 'text')
 
+def summed(handler, prompt):
+    """The checks' sum answered (checkup's JSON check, which a run asks first, its ping): True where the prompt was
+    it. For stub models a run in its own process asks, where first_use is the product's."""
+    if not prompt.startswith('Add '):
+        return False
+    a, b = map(int, re.findall(r'\d+', prompt)[:2])
+    chat_answer(handler, {'sum': a + b})
+    return True
+
 def chat_answer(handler, content, finish='stop', usage=None):
     """A chat completion's reply holding content (a string, or JSON-encoded), with usage if given."""
     handler.send_response(200)

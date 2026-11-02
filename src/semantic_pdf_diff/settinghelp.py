@@ -109,7 +109,9 @@ HELP = {
                     "Each alias read as its canonical name when claims are paired.", '{"CHW": "chilled water"}'),
     "rerank_model": Help("comparing", "proposals mode: a reranker scoring candidate pairs before the judge",
                          "Off unless named. Pairs below rerank_threshold aren't judged; the rest are, best first. It's "
-                         "asked at the chat endpoint's /rerank unless rerank_api or rerank_url says otherwise.",
+                         "asked at the chat endpoint's /rerank unless rerank_api or rerank_url says otherwise. Not "
+                         "configured, a comparison says reranking is off before it starts; none goes without, and "
+                         "it isn't said.",
                          "Qwen/Qwen3-Reranker-8B", basic=True),
     "rerank_api": Help("comparing", "the reranker's API: rerank, deepinfra or tei",
                        "rerank: the /rerank most servers take (vLLM, llama.cpp, Infinity, LiteLLM; Cohere's and "
@@ -131,7 +133,8 @@ HELP = {
                         "near:ID finds the claims most like a claim in meaning, and like:ID blends meaning in (the "
                         "page and the command line); meaning:\"...\" from the command line. Each distinct claim "
                         "sentence once, 64 to a request, on the chat endpoint's /embeddings unless embed_url says "
-                        "otherwise. Measured best: Qwen3-Embedding-8B, with embed_dimensions 256.",
+                        "otherwise. Measured best: Qwen3-Embedding-8B, with embed_dimensions 256. Not configured, a "
+                        "run says search by meaning is off before it starts; none goes without, and it isn't said.",
                         "Qwen/Qwen3-Embedding-8B"),
     "embed_url": Help("endpoint", "where the embedding model is asked ({model} filled in); none: the chat endpoint's "
                       "/embeddings", "A model served elsewhere is sent OPENAI_API_KEY too."),

@@ -21,7 +21,7 @@ import pyte
 
 from semantic_pdf_diff import checkup
 from semantic_pdf_diff.settings import Settings
-from stubs import chat_answer, prompt_of, request_body, serving, source_data, text_pdf
+from stubs import chat_answer, prompt_of, request_body, serving, source_data, summed, text_pdf
 
 PAGES = 30
 MESSAGE = 'Interrupted: rerun the same command to resume; finished work is kept.'
@@ -35,6 +35,8 @@ def endpoint(interrupt_at):
 
     def post(handler):
         prompt = prompt_of(request_body(handler)['messages'][1]['content'])
+        if summed(handler, prompt):  # the run's ping, before anything else
+            return
         with state['lock']:
             state['requests'] += 1
             n = state['requests']

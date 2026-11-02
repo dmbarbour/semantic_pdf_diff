@@ -137,6 +137,30 @@ class Command(unittest.TestCase):
         run("config", "import", file, "--store", other)
         self.assertEqual(Store.settings_of(other), {"mode": "revisions", "top_k": 6})
 
+    def test_a_model_a_feature_needs_set_to_none_is_kept_apart_from_unset(self):
+        """The owner, 2026-11-02: "Perhaps we should distinguish 'no model' from 'unconfigured' for things like
+        embedding and reranking, so users don't default to missing out on a feature they didn't know needed to be
+        configured to use it." (levers.declined)"""
+        _, shown, _ = run("config", "show", "--store", self.store)
+        self.assertRegex(shown, r"rerank_model +not set +proposals mode")
+        code, out, _ = run("config", "set", "rerank_model", "none", "--store", self.store)
+        self.assertEqual((code, out), (0, "rerank_model = none\n"))  # off either way: nothing redone, nor checked
+        self.assertEqual(Store.settings_of(self.store), {"rerank_model": None})
+        _, shown, _ = run("config", "show", "--store", self.store)
+        self.assertRegex(shown, r"rerank_model +none \(store\) +proposals mode")
+        self.assertTrue(settings_from(layer=Store.settings_of(self.store)).model_fields_set >= {"rerank_model"})
+        _, out, _ = run("config", "export", "--store", self.store)
+        self.assertEqual(json.loads(out), {"format": 1, "settings": {"rerank_model": "none"}})
+        other = self.store.parent / "other"
+        file = self.store.parent / "settings.json"
+        file.write_text(out)
+        run("config", "import", file, "--store", other)
+        self.assertEqual(Store.settings_of(other), {"rerank_model": None})
+        code, out, _ = run("config", "unset", "rerank_model", "--store", self.store)
+        self.assertEqual(out, "rerank_model = not set (the default)\n")
+        self.assertEqual(Store.settings_of(self.store), {})
+        self.assertIsNone(Settings(embed_model="None").embed_model)  # a --config file's or a flag's, as none
+
 class Layers(unittest.TestCase):
     def test_a_stores_settings_lie_under_a_config_file_and_the_flags(self):
         parser = argparse.ArgumentParser()

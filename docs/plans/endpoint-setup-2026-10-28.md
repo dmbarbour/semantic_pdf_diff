@@ -1,12 +1,16 @@
 # Endpoint setup: choosing a model, trying it, and seeing what's remembered
 
-- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."). [Design question](#design-questions) 1 answered (the environment and the user's settings); 2 and 3 open.
+- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."), [4](#4-guidance-before-each-run-in-place-of-a-guided-setup) and [5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)'s ping 2026-11-02. [Design questions](#design-questions) 1 to 3 answered; 5's probes left to build.
 - **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
 - **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
 - **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
 - **Builds on:** [an endpoint checked and calibrated on first use](endpoint-first-use-2026-10-20.md) ([0034](../decisions/0034-endpoint-checked-and-calibrated-on-first-use.md)), settings in layers ([0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md)).
 
 - **The owner, 2026-11-01, on milestones 2 and 3:** "When trying, seeing, and forgetting model checks, how do we distinguish checking a rerank or embedding model? Or can you list mode and other relevant stats (context size, etc.) upon for `config models`?" Both built the same day ([milestone 2](#2-trying-seeing-and-forgetting-checks), [3](#3-choosing-a-model)).
+
+- **The owner, 2026-11-02, answering design questions 2 and 3:**
+  - "Q2. Interactive mode would be more convenient for someone new to the tool, but I'm not sure it's what we need. More important is guidance: always do a quick check on settings before starting, always let users know if they've missed an important one. Perhaps we should distinguish 'no model' from 'unconfigured' for things like embedding and reranking, so users don't default to missing out on a feature they didn't know needed to be configured to use it."
+  - "Q3. Always test a model that hasn't been tested. If there are calibrations, run those up front. Even if the endpoints are tested in cache, do a lightweight ping to ensure the endpoints are up. This tool takes many hours to run, so it's something that is left to run overnight. Better to fail fast up front even if it costs a little. The engineer's time is measured in tens of dollars per hour. The endpoint is tenths of pennies for a liveness check, or perhaps less."
 
 ## What exists (built 2026-10-20)
 
@@ -98,23 +102,37 @@
     - **Seen on a local proxy** (LiteLLM 1.102.4): six model groups, those whose configuration sets `mode` listed `chat`, `embedding` or `rerank`; `deepinfra/google/gemma-4-26B-A4B-it` given context, prices and vision by the price map; a group neither configured nor in the map (`openai/google/gemma-4-31B-it`) says nothing but its name. So what the owner's proxy shows depends on its configuration.
     - **`config set rerank_model` and `embed_model`** are checked as `model` is: listed, and listed in their mode (`warning: the endpoint lists google/gemma-4-31B-it as a chat model, not an embedding model (embed_model)`). One served apart (`rerank_url`, `embed_url`, DeepInfra's rerank API, which its `/models` doesn't list) says it isn't checked.
 
-### 4. A guided setup
+### 4. Guidance before each run, in place of a guided setup
 
-- **`config setup` walks the steps** in a terminal:
-  - the endpoint, and whether a key is set
-  - the vision models, narrowed by words typed
-  - the candidate tried with `config test`
-  - the choice written to the user's settings
-- **Every step has a command of its own** (milestones 2 and 3), so a script or a person without a terminal reaches the same state.
-- **Whether to build it:** [design question 2](#design-questions).
+- **Planned as `config setup`,** walking the steps in a terminal: the endpoint and key, the vision models narrowed by words typed, the candidate tried, the choice written to the user's settings.
+- **Not built:** [design question 2](#design-questions)'s answer puts guidance first ("I'm not sure it's what we need. More important is guidance"). Every step has a command of its own (milestones 2 and 3).
+- **Done 2026-11-02:**
+  - **A run's settings checked before it starts** (`checkup.guidance`; compare and analyze, a dry run too; not a fixture's replay): one line naming the models it asks and where, then two for each feature off for want of a model no layer names:
+    - `Models: google/gemma-4-31B-it at https://api.deepinfra.com/v1/openai; no reranker (none chosen); no embedding model (not configured)`
+    - `Search by meaning is off: no embed_model is configured. An embedding model finds the claims most like a claim or a phrase (near:ID, meaning:"...").`
+    - `` `semantic-pdf-diff config set --user embed_model NAME` names one (`config models embedding` lists the endpoint's), `none` goes without and stops this.``
+    - Logged as progress is: `-q` quiets them. Each line fits 160 columns, so a terminal doesn't wrap it.
+    - The reranker is named in proposals mode alone, where it's asked.
+  - **"none" kept apart from unset** for `rerank_model` and `embed_model` (`configuration.OPTIONAL_MODELS`, `levers.declined`):
+    - `config set [--user] rerank_model none` keeps an explicit none in the layer (JSON `null`), where `none` had unset it; `config unset` leaves it not configured. `config export` writes it `"none"`, which `config import` reads back as none; `null` still unsets.
+    - The setting's value is none either way, so nothing is redone or checked. A run tells the two apart by whether a layer gives it (`model_fields_set`): a `--config` file's `"none"`, a flag's (`--rerank none`), the user's or a store's.
+    - `config show` says `not set` for one no layer gives, `none (user)` for one gone without; `config test`'s reranker and embedding lines say `not configured, so reranking is off: ...` or `none: rerank_model is none, so reranking is off`.
+  - **Other settings looked at, and left out:** the endpoint and the key are checked on first use already, and a run without a model stops; the context and an image's tokens are measured; nothing else turns a feature off for want of a value.
+  - **Seen live** (DeepInfra, a scratch cache and stores; $0.0002 with the runs): an analysis named the models and warned of search by meaning; a comparison with `--rerank none` said `no reranker (none chosen)`.
 
-### 5. A few probes beyond the checks
+### 5. Failing fast: a ping each run, and probes on first use
 
-- **`config test --probes`:** a short suite run in the product, costing about a cent:
+- **Planned as `config test --probes`,** a short suite run on request, costing about a cent:
   - the eye test's quick cards: random codes at known sizes, so a model without vision scores about 0
   - the smallest legible text measured, in place of gemma-4's constant (`tilechoice.LEGIBLE_PX`)
   - a controlled document's page read against its key
-- **Remembered like the checks,** shown by `config checks`.
+- **Run on a model's first use too,** up front, by [design question 3](#design-questions)'s answer ("Always test a model that hasn't been tested. If there are calibrations, run those up front."). Remembered like the checks, shown by `config checks`.
+- **The ping, done 2026-11-02** (the answer's "Even if the endpoints are tested in cache, do a lightweight ping to ensure the endpoints are up"):
+  - **Each run asks every model a small request before anything else,** remembered or not (`checkup.PING`): the chat model's JSON check (a sum, about 95 tokens), the reranker's and the embedding model's checks (two short documents, three sentences). The image check, which measures, runs on first use alone.
+  - **Passing, it's one line:** `The endpoint answers: json in 4.1 s ($0.00002; asked each run, the first-use checks remembered in .../endpoints.json)`.
+  - **Failing, the run stops at once** with the check's lines, exit 5, as a first-use check failing does, and every check of the run's models is forgotten, so the next run checks and calibrates again.
+  - **Tested on a stub refusing every request:** one request sent (the ping's sum), the run stopped before scanning, nothing remembered. On a stub answering the ping and refusing the run's requests, the run stops after 25 in a row, as before.
+  - **Already up front, unchanged:** an untested model is checked on first use in every role (chat, reranker, embedding model), and the context window and an image's tokens are calibrated there. No other calibration runs in the product: the tiling calibrations (`scripts/calibration.py`, `labelling.py`, `asking.py`) are the lab's, for levers off by default (`tile_choice model`, `region_labels model`, `another_tiling asked`).
 - **Then:** the vision profile, recommending a model per task ([*Model discovery and per-task selection*](README.md#tentative), [*Vision profiles and adaptive slicing*](README.md#tentative)), and keeping only the models a user's globs allow.
 
 ### Later: endpoints as named parts
@@ -131,5 +149,7 @@
 1. **Where the endpoint's URL lives:** answered 2026-10-28 (quoted at the top): the environment and the user's settings, never a store ([milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027)).
 2. **Interactive or config ops only:** you said either would do.
    - **I'd build milestones 2 and 3 first** (commands only), then `config setup` as a thin walk through them, if those still leave the first run awkward.
+   - **Answered 2026-11-02** (quoted at the top): guidance before each run, and "no model" kept apart from "unconfigured"; no guided setup for now ([milestone 4](#4-guidance-before-each-run-in-place-of-a-guided-setup)).
 3. **The probes' cost and when they run:** only on `config test --probes`, or also on a model's first use?
    - **I'd run them on request only.** The first-use checks stay what they are: cheap, and needed before anything is asked.
+   - **Answered 2026-11-02** (quoted at the top): on a model's first use, up front, and a ping each run even where the checks are remembered ([milestone 5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)).

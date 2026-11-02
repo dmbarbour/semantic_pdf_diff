@@ -121,9 +121,15 @@ class ConfigTest(Remembered):
         self.assertIn("  endpoint  FAILED: 1 models listed, not gemma-4 (`config models WORDS` lists those like it)",
                       out)
         self.assertRegex(out, r'  image     FAILED: read "ZZZ-0000", not "[A-Z]{3}-\d{4}"')
-        self.assertIn("  reranker  --: none set (rerank_model)", out)
-        self.assertIn("  embedding --: none set (embed_model)", out)
+        self.assertIn("  reranker  --: not configured, so reranking is off: `config set --user rerank_model NAME` "
+                      "names one (`config models rerank` lists the endpoint's), `none` goes without", out)
+        self.assertIn("  embedding --: not configured, so search by meaning is off: `config set --user embed_model "
+                      "NAME` names one (`config models embedding` lists the endpoint's), `none` goes without", out)
         self.assertTrue(out.endswith("2 check(s) failed: endpoint, image\n"))
+        with endpoint(), user_settings({"model": "gemma-4", "rerank_model": None, "embed_model": None}):
+            code, out = run("config", "test", "--store", self.store, "--only", "reranker,embedding")
+        self.assertIn("  reranker  --: none: rerank_model is none, so reranking is off", out)
+        self.assertIn("  embedding --: none: embed_model is none, so search by meaning is off", out)
 
     def test_no_model_set_fails_and_says_how_to_set_one(self):
         with endpoint(), user_settings({}):

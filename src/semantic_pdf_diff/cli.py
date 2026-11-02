@@ -1213,14 +1213,14 @@ def config_command(argv):
         value, layer = now[name]
         moved = configuration.shown(name, value) != configuration.shown(
             name, configuration.resolved(layers)[name][0])
-        print(f"{name} = {configuration.shown(name, value)}" + (" (the default)" if layer == 'default' else
+        print(f"{name} = {configuration.shown(name, value, layer)}" + (" (the default)" if layer == 'default' else
                                                                 ' (the store\'s)' if args.user and layer == 'store'
                                                                 else ' ($OPENAI_BASE_URL\'s)' if args.user
                                                                 and layer == 'environment' else '')
               + (f"; the next run redoes: {configuration.redoes(name)}" if moved else ''))
         before = configuration.resolved(layers)[name][0]
-        if name in ('model', 'rerank_model', 'embed_model') and changes[name]:  # endpoint setup, milestone 3:
-            from .checkup import name_check  # checked against the endpoint's listing
+        if name in ('model', 'rerank_model', 'embed_model') and changes[name] not in (None, configuration.NONE):
+            from .checkup import name_check  # endpoint setup, milestone 3: checked against the endpoint's listing
             print('\n'.join(name_check(settings_from(layer={k: v for k, v in Store.settings_of(store).items()
                                                             if k not in configuration.RUN_OPTIONS}), changes[name],
                                         name))

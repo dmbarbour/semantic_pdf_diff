@@ -104,14 +104,35 @@ class FirstUse(unittest.TestCase):
             self.assertIn('Calibrated from what was measured: context_tokens 65,536, image_tokens 284 (`config show` '
                           'marks them)', said)
             self.assertEqual(self.extracting(), (65536, 284))
-            code, said = compare(self.root, url)  # remembered: nothing checked
+            code, said = compare(self.root, url)  # remembered: not checked, but asked a sum (the ping)
             self.assertNotIn('First use', said)
-            self.assertEqual(state['checks'], 3)
+            self.assertRegex(said, r'The endpoint answers: json in [\d.]+ s \(\$0\.\d{5}; asked each run, the '
+                                   r'first-use checks remembered in ')
+            self.assertEqual(state['checks'], 4)
 
     def extracting(self):
         """(context_tokens, image_tokens) as the store's extraction was asked with them (evidence.json)."""
         used = json.loads((self.root / 'out' / 'evidence.json').read_text())['interpreters']['extract']['settings']
         return used['context_tokens'], used['image_tokens']
+
+    def test_a_run_says_its_models_and_each_feature_missed_for_want_of_one(self):
+        """The owner, 2026-11-02: "always do a quick check on settings before starting, always let users know if
+        they've missed an important one." (the settings check)"""
+        with endpoint() as (url, state):
+            code, said = compare(self.root, url)
+            self.assertNotEqual(code, 5, said)
+            self.assertIn(f'Models: gemma-4 at {url}; no reranker (not configured); no embedding model (not '
+                          'configured)\n', said)
+            self.assertIn("Reranking is off: no rerank_model is configured. A reranker scores each claim's candidates, "
+                          "and those below rerank_threshold aren't judged.\n  `semantic-pdf-diff config set --user "
+                          "rerank_model NAME` names one (`config models rerank` lists the endpoint's), `none` goes "
+                          "without and stops this.\n", said)
+            self.assertIn("Search by meaning is off: no embed_model is configured.", said)
+            with stubs.user_settings({'model': 'gemma-4', 'rerank_model': None, 'embed_model': 'none'}):
+                code, said = compare(self.root, url)
+        self.assertIn(f'Models: gemma-4 at {url}; no reranker (none chosen); no embedding model (none chosen)\n',
+                      said)
+        self.assertNotIn(' is off', said)
 
     def test_a_value_set_wins_warned_of_where_the_measure_says_its_unsafe(self):
         with endpoint() as (url, state), stubs.user_settings({'model': 'gemma-4', 'image_tokens': 100,
@@ -161,19 +182,47 @@ class FirstUse(unittest.TestCase):
         self.assertIn("the endpoint refused the key: OPENAI_API_KEY holds the one it takes", said)
         self.assertIn('Stopped: endpoint, key, json, image failed their check', said)
 
+    def remember(self, url, **settings):
+        """Every check the settings call for remembered passing, as a run before this one would have left them."""
+        remembered = checkup.keys(Settings(base_url=url, model='gemma-4', **settings))
+        self.memory.parent.mkdir(exist_ok=True)
+        checkup._kept(self.memory, {k: {'at': 'then'} for k in remembered.values()})
+
     def test_requests_failing_in_a_row_forget_what_was_remembered(self):
         for name, power in (('a.pdf', 10), ('b.pdf', 12)):  # 40 pages a side: more requests than the 25 that stop it
             text_pdf(self.root / name, [f'Pump {k} rated power {power + k} kW' for k in range(40)])
         state = {'requests': 0}
-        with serving(failing(state)) as url:
-            remembered = checkup.keys(Settings(base_url=url, model='gemma-4'))
-            self.memory.parent.mkdir()
-            checkup._kept(self.memory, {k: {'at': 'then'} for k in remembered.values()})
+
+        def post(handler):  # the ping's sum answered, every request of the run's refused
+            prompt = prompt_of(request_body(handler)['messages'][1]['content'])
+            if prompt.startswith('Add '):
+                a, b = map(int, re.findall(r'\d+', prompt)[:2])
+                return chat_answer(handler, {'sum': a + b})
+            state['requests'] += 1
+            handler.send_error(404)
+        with serving(post) as url:
+            self.remember(url)
             code, said = compare(self.root, url)
         self.assertEqual(code, 5)
-        self.assertNotIn('First use', said)  # remembered, so not checked: the requests failed instead
+        self.assertNotIn('First use', said)  # remembered, so pinged alone: the requests failed instead
+        self.assertIn('The endpoint answers: json in', said)
         self.assertIn('Sending stopped', said)
         self.assertEqual(json.loads(self.memory.read_text())['passed'], {})
+
+    def test_a_remembered_endpoint_down_stops_the_run_at_once_and_is_checked_again(self):
+        """The owner, 2026-11-02: "Even if the endpoints are tested in cache, do a lightweight ping to ensure the
+        endpoints are up. [...] Better to fail fast up front even if it costs a little." (the ping)"""
+        state = {'requests': 0}
+        with serving(failing(state)) as url:
+            self.remember(url)
+            code, said = compare(self.root, url)
+        self.assertEqual(code, checkup.FAILED)
+        self.assertNotIn('First use', said)
+        self.assertIn('  json      FAILED: ModelFailure: HTTP 404: Not Found', said)
+        self.assertIn('Stopped: json failed its check, so nothing was asked', said)
+        self.assertEqual(state['requests'], 1)  # the ping's sum alone: 404 isn't retried
+        self.assertFalse((self.root / 'out' / 'evidence.json').exists())
+        self.assertEqual(json.loads(self.memory.read_text())['passed'], {})  # all checked again next time
 
     def test_config_test_remembers_too(self):
         with endpoint() as (url, state), patch.dict(os.environ, {'OPENAI_BASE_URL': url}):

@@ -29,7 +29,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from typing import Annotated, ClassVar, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 # Extraction regions (regions.py): a changed setting clears the stored results of the regions it can change.
 from .regions import ALL as ALL_REGIONS, TEXTUAL, VISUAL
@@ -1231,6 +1231,14 @@ class ReadGlossary(Lever):
     def reads_glossary(self):
         return self.glossary
 
+def declined(value):
+    """A model named "none" (rerank_model, embed_model): none, chosen so. The setting is off, as when no layer names
+    one, but a layer gives it, so a run doesn't say the feature is off for want of it (checkup.guidance; the owner,
+    2026-11-02: "Perhaps we should distinguish 'no model' from 'unconfigured' for things like embedding and
+    reranking, so users don't default to missing out on a feature they didn't know needed to be configured to use
+    it.")."""
+    return None if isinstance(value, str) and value.strip().casefold() == "none" else value
+
 class Embed(Lever):
     lever_name, stage, off = "embed", "comparison", {"embed_model": None, "embed_url": None, "embed_dimensions": None}
     # the claims embedded after the comparison, each distinct sentence once, for a search by meaning: near:ID (the
@@ -1244,6 +1252,11 @@ class Embed(Lever):
     # proxy refuses the size for them (the owner: "The configuration allows us to set `embed_dimensions`. The
     # default should probably be unset now, instead of 256.")
     embed_dimensions: Annotated[int | None, _selecting(roles=COMPARE)] = Field(default=None, ge=32, le=4096)
+
+    @field_validator("embed_model", mode="before")
+    @classmethod
+    def _no_embedding_model(cls, value):  # named apart from the reranker's: one class holds both
+        return declined(value)
 
     def embeds(self):
         return bool(self.embed_model)
@@ -1264,6 +1277,11 @@ class Rerank(Lever):
     # the least score a pair is judged with, in hundredths: 1-10 for 0.01-0.10 (the owner: "perhaps 1-10
     # corresponding to 0.01-0.10 ... Default 3?"); measured end to end at 2, 5 and 10, no related finding lost
     rerank_threshold: Annotated[int, _selecting(roles=COMPARE)] = Field(default=3, ge=1, le=10)
+
+    @field_validator("rerank_model", mode="before")
+    @classmethod
+    def _no_reranker(cls, value):
+        return declined(value)
 
     def reranks(self, mode):
         return bool(self.rerank_model) and mode == "proposals"

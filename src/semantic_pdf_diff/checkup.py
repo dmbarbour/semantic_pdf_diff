@@ -184,6 +184,47 @@ def unset_model(settings):
         said.append(f"  and {len(shown) - SHOWN} more: `semantic-pdf-diff config models{' vision' if seeing else ''}`")
     return "\n".join(said)
 
+# A model a feature needs, none by default (configuration.OPTIONAL_MODELS): the feature, and what it does
+FEATURES = {"rerank_model": ("reranking", "A reranker scores each claim's candidates, and those below "
+                             "rerank_threshold aren't judged.", "rerank"),
+            "embed_model": ("search by meaning", "An embedding model finds the claims most like a claim or a phrase "
+                            "(near:ID, meaning:\"...\").", "embedding")}
+
+def unconfigured(settings, mode="proposals"):
+    """The models a run's features need that no layer names, nor goes without ("none": levers.declined): [setting].
+    The reranker is asked in proposals mode alone (reranks)."""
+    named = settings.model_fields_set
+    return [name for name in FEATURES if name in type(settings).model_fields and not getattr(settings, name)
+            and name not in named and (name != "rerank_model" or mode == "proposals")]
+
+def unnamed(settings, name):
+    """A check's line for a model a feature needs that isn't set: not configured, or none chosen."""
+    if name in settings.model_fields_set:
+        return f"none: {name} is none, so {FEATURES[name][0]} is off"
+    return (f"not configured, so {FEATURES[name][0]} is off: `config set --user {name} NAME` names one (`config "
+            f"models {FEATURES[name][2]}` lists the endpoint's), `none` goes without")
+
+def guidance(settings, mode="proposals"):
+    """What a run says of its settings before it starts (the owner, 2026-11-02: "always do a quick check on settings
+    before starting, always let users know if they've missed an important one"): the models it asks, and where; each
+    feature off for want of a model no layer names, with how to name one or go without. [line], logged as a run's
+    progress is (-q quiets them)."""
+    from .llm import redact_url
+    roles = [f"{settings.model or 'no model'} at {redact_url(settings.base_url)}"]
+    for name, said in (("rerank_model", "reranker"), ("embed_model", "embedding model")):
+        if name not in type(settings).model_fields or (name == "rerank_model" and mode != "proposals"):
+            continue
+        value = getattr(settings, name)
+        roles.append(f"{said} {value}" if value else f"no {said}" + (
+            " (none chosen)" if name in settings.model_fields_set else " (not configured)"))
+    out = ["Models: " + "; ".join(roles)]
+    for name in unconfigured(settings, mode):
+        feature, does, listed_as = FEATURES[name]
+        out.append(f"{feature[0].upper() + feature[1:]} is off: no {name} is configured. {does}")
+        out.append(f"  `semantic-pdf-diff config set --user {name} NAME` names one (`config models {listed_as}` lists "
+                   "the endpoint's), `none` goes without and stops this.")
+    return out
+
 def used(settings):
     """{model id: the settings naming it}: what the configuration asks."""
     out = {settings.model: ["model"]}
@@ -321,7 +362,7 @@ def run(settings, rng=None, only=None):
         return first > second, f"scores {first:.2f} for the counterpart, {second:.2f} for the unrelated claim"
     if "reranker" in wanted:
         checks.append(_timed("reranker", reranker) if settings.rerank_model else
-                      Check("reranker", None, "none set (rerank_model)"))
+                      Check("reranker", None, unnamed(settings, "rerank_model")))
 
     def embedding():
         vectors = _asked(embed.request(settings, ["The rated power of the feed pump.",
@@ -336,7 +377,7 @@ def run(settings, rng=None, only=None):
         return a > b, f"cosine {a:.2f} with the counterpart, {b:.2f} with the unrelated claim; {size}"
     if "embedding" in wanted:
         checks.append(_timed("embedding", embedding) if settings.embed_model else
-                      Check("embedding", None, "none set (embed_model)"))
+                      Check("embedding", None, unnamed(settings, "embed_model")))
     refused = next((REFUSED.search(c.said) for c in checks if c.ok is False and "balance" not in c.said), None)
     if refused:  # 401 or 403: the key isn't one the endpoint takes (a provider's balance exhausted aside)
         checks = [c for c in checks if c.name != "key"]
@@ -616,24 +657,36 @@ def forget(path, settings):
             passed.pop(k)
         _kept(path, passed)
 
+PING = ("json", "reranker", "embedding")  # asked each run, remembered or not: a small request a model
+
 def first_use(settings, cache):
     """Before a run's first request, each model the settings name checked as `config test` checks it, unless the
     record beside the answers cache remembers it passing (the owner, 2026-10-20: "we should always auto-test the model
-    endpoint if it isn't tested in memory. Without verbose mode, we can get 13k bad requests without noticing.").
-    Returns the settings calibrated from what the checks measured (calibrated); a check failing raises Unchecked, its
-    lines logged."""
+    endpoint if it isn't tested in memory. Without verbose mode, we can get 13k bad requests without noticing."); and
+    each, remembered or not, asked a small request, so a run left overnight fails at once where an endpoint is down
+    (the owner, 2026-11-02: "Even if the endpoints are tested in cache, do a lightweight ping to ensure the endpoints
+    are up. This tool takes many hours to run, so it's something that is left to run overnight. Better to fail fast up
+    front even if it costs a little."): the chat model's JSON check, the reranker's and the embedding model's; the
+    image check, which measures, on first use alone. Returns the settings calibrated from what the checks measured
+    (calibrated); a check failing raises Unchecked, its lines logged."""
     from .progress import log
     path = memory_of(cache)
     unchecked = missing(settings, path)
-    if not unchecked:
-        return calibrated(settings, path)
-    log.info(f"First use: {', '.join(unchecked)} checked before anything is asked (remembered in {path})")
-    checks, cost = run(settings, only=unchecked)
-    for line in lines(settings, checks, cost)[1:]:
-        log.info(line)
-    record(path, settings, checks)
+    asked = [name for name in keys(settings) if name in unchecked or name in PING]
+    if unchecked:
+        log.info(f"First use: {', '.join(unchecked)} checked before anything is asked (remembered in {path})")
+    checks, cost = run(settings, only=asked)
     failed = [c.name for c in checks if c.ok is False]
+    if unchecked or failed:
+        for line in lines(settings, checks, cost)[1:]:
+            log.info(line)
+    else:
+        log.info("The endpoint answers: " + ", ".join(f"{c.name} in {c.seconds:.1f} s" for c in checks
+                                                      if c.ok and c.name in PING)
+                 + f" (${cost:.5f}; asked each run, the first-use checks remembered in {path})")
+    record(path, settings, checks)
     if failed:
+        forget(path, settings)  # the endpoint changed or down: the next run checks (and calibrates) again
         raise Unchecked(f"{', '.join(failed)} failed {'its' if len(failed) == 1 else 'their'} check, so nothing was "
                         "asked: `semantic-pdf-diff config test` checks again")
     made = calibrated(settings, path)

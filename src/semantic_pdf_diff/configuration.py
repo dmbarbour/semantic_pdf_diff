@@ -24,6 +24,10 @@ from .settinghelp import GROUPS, HELP
 # a store's own, not a run's settings: how it compares, its report, and where its answers are kept ("": not bound yet)
 RUN_OPTIONS = {"mode": "proposals", "report_budget": DEFAULT_BUDGET, "split": False, "answers_cache": ""}
 EXPORT_FORMAT = 1  # of `config export`'s JSON
+# Models a feature needs, none by default: "none" kept as a layer's explicit none (levers.declined), so a run tells
+# the feature off for want of one (checkup.guidance) from one gone without
+OPTIONAL_MODELS = ("rerank_model", "embed_model")
+NONE = "none"
 SWITCH = {"on": True, "true": True, "yes": True, "1": True, "off": False, "false": False, "no": False, "0": False}
 
 def settings_class():
@@ -81,6 +85,8 @@ def parse(name, text):
             value = json.loads(raw)
         except ValueError as e:
             raise ValueError(f"{name} is JSON: {HELP[name].example or 'a list or an object'}") from e
+    elif raw.casefold() == NONE and name in OPTIONAL_MODELS:
+        return NONE  # kept, as none, by applied: not unset
     elif raw.casefold() in ("none", "null") and type(None) in get_args(field.annotation):
         value = None
     else:
@@ -103,10 +109,11 @@ def checked(values):
         out["levers"] = list(values["levers"])
     return out
 
-def shown(name, value):
-    """A value as people read it: on and off, sizes, none, JSON for lists and objects."""
+def shown(name, value, layer=None):
+    """A value as people read it: on and off, sizes, none, JSON for lists and objects; a model a feature needs that
+    no layer names (layer "default"), "not set"."""
     if value is None:
-        return "none"
+        return "not set" if layer == "default" and name in OPTIONAL_MODELS else "none"
     if isinstance(value, bool):
         return "on" if value else "off"
     if name == "report_budget":
@@ -157,8 +164,8 @@ def help_lines(name, layers):
         raise unknown(name)
     h, (value, layer) = HELP[name], resolved(layers)[name]
     lever = lever_of(name)
-    lines = [f"{name}: {h.about}", f"  now: {shown(name, value)} ({layer})" + (
-        f"; default {shown(name, default(name))}" if layer != "default" else "")]
+    lines = [f"{name}: {h.about}", f"  now: {shown(name, value, layer)} ({layer})" + (
+        f"; default {shown(name, default(name), 'default')}" if layer != "default" else "")]
     if h.more:
         lines.append(f"  {h.more}")
     if h.example:
@@ -195,7 +202,7 @@ def show_lines(layers, group=None, everything=False, find=None):
         for n in mine:
             value, layer = values[n]
             mark = "" if layer == "default" else f" ({layer})"
-            lines.append(f"  {n:<{width}}  {shown(n, value) + mark:<22} {HELP[n].about}")
+            lines.append(f"  {n:<{width}}  {shown(n, value, layer) + mark:<22} {HELP[n].about}")
     if not lines:
         lines.append(f"no setting holds {find!r}" if words else "no setting to show")
     return lines
