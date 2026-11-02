@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.26.0 (2026-11-02)
+
+- **A run's settings said before it starts:** the models it asks and where, and each feature off for want of a model no layer names: reranking (comparisons in proposals mode) and search by meaning, with how to name one or go without.
+- **`none` kept apart from not configured** for `rerank_model` and `embed_model`: `config set --user rerank_model none` goes without, and runs stop saying so; `config unset` leaves it not configured again. `config show` says `not set` or `none (user)`, and `config test` says which.
+- **Every run pings its models first,** even those whose checks are remembered: a small request to the chat model, the reranker and the embedding model, about $0.00002 at DeepInfra, said in one line. A model not answering stops the run before anything else is done (exit 5), and its checks are forgotten, so the next run checks and calibrates again.
+
 ## 0.25.0 (2026-11-01)
 
 - **A reranker or an embedding model tried as one:** `config test --rerank NAME` and `--embed NAME` try a candidate in its role, with its role's check alone (scores, or vectors), without setting it; remembered under its role, as `config checks` shows. A chat candidate the endpoint lists as an embedding model or a reranker is said to be one, with the flag that tries it as one.
