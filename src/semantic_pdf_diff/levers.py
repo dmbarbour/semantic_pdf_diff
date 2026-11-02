@@ -843,8 +843,9 @@ class LabelsJoined(Lever):
     # with the line above unless its rules say otherwise: two labels made one ("ADDRESS:" and "DRAWN BY:" in a title
     # block) or one label over two lines (HabEx's "mission" over "time"), which code can't tell apart (the indexes
     # plan's design question 8; the owner, 2026-11-02: "we should also be willing to ask a model what the author is
-    # trying to say if it's confusing. Perhaps an "is this the correct reading of that" question in some form")
-    labels_joined: Annotated[bool, _selecting(frozenset({"table"}))] = False
+    # trying to say if it's confusing. Perhaps an "is this the correct reading of that" question in some form"). A
+    # default since 2026-11-02 (the owner: "Yes, let's turn that on by default.")
+    labels_joined: Annotated[bool, _selecting(frozenset({"table"}))] = True
 
     def shows_joins(self):
         return self.labels_joined
@@ -1419,8 +1420,8 @@ class DedupeRepeated(Lever):
 # tile_choice, another_tiling, halve_parts: docs/decisions/0029-tiles-chosen-by-measures.md), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
-# view_rows, align_hedges, hedges_apart, read_holders, hedge_rule and scan_halves (docs/reviews/levers.md); round 0's
-# settings are benchmarks/round0.json.
+# view_rows, align_hedges, hedges_apart, read_holders, hedge_rule, scan_halves and labels_joined
+# (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
                  ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
                  LeaveFurniture, TableContext, StemContext, References, ReaderGlossary, TileLocator, Decoration,

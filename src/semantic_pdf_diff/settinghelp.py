@@ -248,7 +248,7 @@ HELP = {
     "labels_joined": Help(_L, "a PDF table's lines joined as one row's though each has a first cell are shown to the "
                           "structure query as lines, kept so or regrouped", "Two labels made one (a title block's "
                           "\"ADDRESS:\" and \"DRAWN BY:\") or one label over two lines: code can't tell them apart. "
-                          "With table_structure; off until measured."),
+                          "With table_structure; on by default."),
     # --- levers: after the answers
     "quote_match": Help(_L, "how quotes are checked against the text: exact, fragments, or excerpts"),
     "positions": Help(_L, "a numbered item's label is its claim's position, not part of its conditions"),
