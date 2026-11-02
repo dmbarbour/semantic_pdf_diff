@@ -130,7 +130,7 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/13",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+READERS = {".pdf": "pdf/14",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
            # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
            # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7); 7: rows
            # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2);
@@ -140,8 +140,10 @@ READERS = {".pdf": "pdf/13",  # pdf/2: tables asked how they're read; 3: two-lin
            # crops, a rules task's rows recording its table's crop (portable reports, milestone 4; the owner,
            # 2026-10-20: "Yes, update the version."); 12: each claim's snippet of its source's text (report
            # snippets, milestone 1; read again from the answers cache, with no requests); 13: a table's cells kept in
-           # its record (the export's tables, their blank cells as gaps; the same). Every reader's last version: the
-           # same
+           # its record (the export's tables, their blank cells as gaps; the same; every other reader's last version
+           # the same); 14: rows each starting with their own tag kept apart, and a tag merged with its title across
+           # the columns parted (rows read as one: the owner, 2026-11-02, "If everything fits together neatly, we can
+           # reasonably give that some weight.")
            ".txt": "text/4", ".md": "text/3",  # text/2: "A pump ..." isn't a heading (review B4)
            ".docx": "docx/11",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a

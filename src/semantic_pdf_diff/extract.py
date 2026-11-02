@@ -16,7 +16,8 @@ from .progress import within
 from .regions import crop_name, crop_stem
 from .schema import DerivationStep, PdfLocator, coverage_row
 from .sections import pdf_sections
-from .tables import Marks, column_edges, cut_columns, pdf_grid, pdf_parts, row_boxes, ruled_rows, same_form, split_cuts
+from .tables import (Marks, column_edges, cut_columns, parted_across, pdf_grid, pdf_parts, row_boxes, ruled_rows,
+                     same_form, split_cuts)
 from .tasks import TaskCore, Watch, split_utf8
 from .visuals import Visuals, render
 
@@ -212,7 +213,8 @@ class PdfReading:
             if marks is not None and boxes:  # lines of one row parted by shading, joined (ruled_rows)
                 try:
                     rules = marks.rules(table.bbox)
-                    mended, mended_boxes, _ = ruled_rows(rows, boxes, rules)
+                    parted = parted_across(table, rows, page)  # a row's tag and title in one cell, parted
+                    mended, mended_boxes, _ = ruled_rows(parted, boxes, rules)
                     mended, edges, _ = cut_columns(mended, mended_boxes, column_edges(table), marks)
                     styles = marks.styles(table.bbox, mended_boxes)
                     rows, boxes = mended, mended_boxes

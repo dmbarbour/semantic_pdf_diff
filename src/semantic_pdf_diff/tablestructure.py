@@ -18,6 +18,7 @@ from pydantic import Field, field_validator
 from .schema import DerivationStep, Lenient, as_text, coverage_row
 from .asking import Asking
 from .pages import union
+from .tables import tagged_apart
 from .tablegrid import filled as _filled, joined as _joined, letter, plain as _plain
 
 UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|kw|mw|hp|gpm|psi|psig|rpm|kg|lb|s|ms|hz|khz|"
@@ -54,7 +55,7 @@ def signals(header, body, boxes, styles=None, rules=None, cuts=None):
     out = []
     for i, row in enumerate(body):
         above, cells, tags = lines[i], _filled(row), []
-        if ruled is not None and not ruled[i]:
+        if ruled is not None and not ruled[i] and not tagged_apart(above, row):  # a line of its own tag: a row
             tags.append("no rule above")
         if cells and not _filled(row[:1]):
             tags.append("first cell empty")

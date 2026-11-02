@@ -238,11 +238,58 @@ def cut_columns(rows, boxes, edges, marks):
         out.append(row)
     return out, [x for k, x in enumerate(edges) if k not in join], len(join)
 
+def own_tag(row):
+    """The tag a row's first cell starts with ("A-102", "P-101 ..."), else None."""
+    from .align import TAG
+    found = TAG.match(str(row[0] or "").strip()) if row else None
+    return found[0] if found else None
+
+def tagged_apart(upper, lower):
+    """Two lines each starting with a tag of their own, of one shape ("A-102", "A-201"): two items' rows, not one
+    row's lines. scical's sheet index is ruled at 61 of its 95 boundaries, and the rows between were joined: 21 rows
+    read as one, each sheet's claims counted for none (the owner, 2026-11-02, on rows read as one: "I agree that we
+    can apply heuristics for reading a table and splitting things. If everything fits together neatly, we can
+    reasonably give that some weight.")."""
+    from .align import shape
+    a, b = own_tag(upper), own_tag(lower)
+    return bool(a and b and a != b and shape(a) == shape(b))
+
+def parted_across(table, rows, page):
+    """Rows whose first cell, starting with its own tag, the parser merged across the columns (the others None:
+    "H-101 LIQUID LOCATION AND SPILL CONTAINMENT, & SCHEDULE", a sheet's number and title in one cell), parted at the
+    column lines by where the cell's words are: only where a row beside it holds a tag of that shape alone in its
+    first cell, no word straddles a line, and the tag alone is left in the first column (tagged_apart's note).
+    Else the rows as they are."""
+    edges = column_edges(table)
+    found = [getattr(r, "cells", None) for r in getattr(table, "rows", None) or []]
+    if not edges or None in edges or len(found) != len(rows):
+        return rows
+    from .align import TAG, shape
+    alone = lambda r: bool(r) and r[0] is not None and TAG.fullmatch(str(r[0]).strip()) is not None  # noqa: E731
+    words, out = None, []
+    for i, (cells, row) in enumerate(zip(found, rows)):
+        tag, near = own_tag(row), [rows[j] for j in (i - 1, i + 1) if 0 <= j < len(rows) and alone(rows[j])]
+        if not (tag and len(row) > 1 and all(c is None for c in row[1:]) and cells and cells[0]
+                and cells[0][2] > edges[-1] + 1 and any(shape(str(r[0]).strip()) == shape(tag) for r in near)):
+            out.append(row)
+            continue
+        words = words if words is not None else page.get_text("words")
+        x0, y0, x1, y1 = cells[0]
+        inside = sorted([w for w in words if x0 - 1 <= w[0] and w[2] <= x1 + 1 and y0 <= (w[1] + w[3]) / 2 <= y1],
+                        key=lambda w: (round(w[1]), w[0]))
+        bounds = [x0, *edges, x1]
+        split = [" ".join(w[4] for w in inside if bounds[k] <= (w[0] + w[2]) / 2 < bounds[k + 1])
+                 for k in range(len(bounds) - 1)]
+        neat = inside and not any(w[0] < e < w[2] for w in inside for e in edges)
+        out.append(split if neat and split[0] == tag and sum(1 for c in split if c) > 1 else row)
+    return out
+
 def ruled_rows(rows, boxes, rules, least=3, share=0.4):
     """(rows, boxes, how many joined): a table whose row boundaries are mostly ruled (3 or more, and 40% or more of
     them, drawn across most of its width) has its rows joined across the boundaries without a rule, which are lines
     of one row the parser took for rows (HabEx: each text line shaded with a box of its own). Two rows both labelled
-    and both with a digit in the same column stay apart. Else unchanged."""
+    and both with a digit in the same column stay apart, as do two each starting with a tag of their own
+    (tagged_apart). Else unchanged."""
     if len(rows) < 3 or len(boxes) != len(rows) or any(b is None for b in boxes):
         return rows, boxes, 0
     ruled = [any(abs(boxes[k][1] - y) <= 1.5 for y in rules) for k in range(1, len(rows))]
@@ -251,7 +298,7 @@ def ruled_rows(rows, boxes, rules, least=3, share=0.4):
     def apart(upper, lower):
         digit = lambda c: c is not None and any(ch.isdigit() for ch in str(c))
         return (bool(_filled(upper[:1])) and bool(_filled(lower[:1]))
-                and any(digit(a) and digit(b) for a, b in zip(upper[1:], lower[1:])))
+                and any(digit(a) and digit(b) for a, b in zip(upper[1:], lower[1:]))) or tagged_apart(upper, lower)
     out_rows, out_boxes = [list(rows[0])], [tuple(boxes[0])]
     for k in range(1, len(rows)):
         if ruled[k - 1] or apart(out_rows[-1], rows[k]):

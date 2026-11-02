@@ -316,6 +316,42 @@ class PdfTables(unittest.TestCase):
         self.assertEqual(ruled_rows(rows, boxes, [0, 72])[2], 0)  # too few rules to tell: unchanged
         self.assertEqual(ruled_rows(rows, boxes, [b[1] for b in boxes])[2], 0)  # every boundary ruled
 
+    def test_rows_each_starting_with_their_own_tag_stay_apart_and_a_tag_merged_with_its_title_is_parted(self):
+        """Rows read as one (the indexes plan, design question 6; the owner, 2026-11-02: "I agree that we can apply
+        heuristics for reading a table and splitting things. If everything fits together neatly, we can reasonably
+        give that some weight."): scical's sheet index, ruled at 61 of its 95 boundaries, had the rows between joined
+        ("A-102 A-201" | both titles), and two rows' numbers and titles merged across its columns."""
+        from types import SimpleNamespace
+        from semantic_pdf_diff.tables import parted_across, ruled_rows
+        from semantic_pdf_diff.tablestructure import signals
+        box = lambda y0, y1: (0, y0, 300, y1)
+        rows = [["SHEET NO", "SHEET NAME"], ["A-101", "FLOOR PLAN"], ["A-102", "MODULE (B) FLOOR,"], ["", "ROOF PLAN"],
+                ["A-201", "EXTERIOR ELEVATIONS"], ["A-401", "INTERIOR ELEVATIONS"], ["A-501", "DETAILS"]]
+        boxes = [box(10 * k, 10 * k + 10) for k in range(len(rows))]
+        joined, _, n = ruled_rows(rows, boxes, [0, 10, 20, 50, 60, 70])  # none above ROOF PLAN or A-201
+        self.assertEqual(n, 1)  # the wrapped title alone
+        self.assertEqual([r[0] for r in joined], ["SHEET NO", "A-101", "A-102", "A-201", "A-401", "A-501"])
+        self.assertEqual(joined[2], ["A-102", "MODULE (B) FLOOR, ROOF PLAN"])
+        mixed = [["", "Flow"], ["P-1", "450"], ["CV12", "Sump"], ["P-2", "120"], ["P-3", "95"]]  # shapes differ
+        self.assertEqual(ruled_rows(mixed, boxes[:5], [0, 10, 30, 40])[0][1], ["P-1 CV12", "450 Sump"])
+        tags = signals(joined[0], joined[1:], [box(10, 20), box(20, 40), box(40, 50), box(50, 60), box(60, 70)],
+                       rules=[0, 10, 20, 50, 60])
+        self.assertEqual(tags[2], [])  # A-201: no rule above it, but a row of its own tag, so no suspect
+
+        def word(x0, x1, y, text):
+            return (x0, y, x1, y + 8, text, 0, 0, 0)
+        cell = lambda x0, x1, y: (x0, y, x1, y + 10)  # noqa: E731
+        table = SimpleNamespace(rows=[SimpleNamespace(cells=[cell(0, 100, 0), cell(100, 300, 0)]),
+                                      SimpleNamespace(cells=[cell(0, 300, 10), None]),
+                                      SimpleNamespace(cells=[cell(0, 100, 20), cell(100, 300, 20)]),
+                                      SimpleNamespace(cells=[cell(0, 300, 30), None])])
+        page = SimpleNamespace(get_text=lambda kind: [
+            word(10, 50, 11, "H-101"), word(105, 160, 11, "LIQUID"), word(165, 220, 11, "LOCATION"),
+            word(10, 50, 31, "S-001"), word(90, 130, 31, "DRAWING")])  # its title straddles the column line
+        rows = [["G-101", "SITE"], ["H-101 LIQUID LOCATION", None], ["S-002", "NOTES"], ["S-001 DRAWING", None]]
+        self.assertEqual(parted_across(table, rows, page), [["G-101", "SITE"], ["H-101", "LIQUID LOCATION"],
+                                                            ["S-002", "NOTES"], ["S-001 DRAWING", None]])
+
     def test_drawn_rules_and_row_styles_read_from_the_page(self):
         import pymupdf
         from semantic_pdf_diff.tables import Marks
