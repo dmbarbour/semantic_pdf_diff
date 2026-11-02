@@ -2,7 +2,7 @@
 
 ## Endpoint
 
-When no environment variable or override is supplied, the default endpoint is `http://localhost:8000/v1`. There is no default model: a run that would ask one stops before anything changes, saying how to name one (`config set --user model NAME`) and listing the endpoint's models that read images (`config models vision` lists them all). The server must support Chat Completions with base64 PNG `image_url` inputs and JSON text responses. Use your provider's actual model identifier. API credentials come only from `OPENAI_API_KEY` and are not written to output. A warning is printed if the key would be sent over plain HTTP to a non-local host, and credentials embedded in `base_url` are redacted from reports.
+When no environment variable or override is supplied, the default endpoint is `http://localhost:8000/v1`. There is no default model: a run that would ask one stops before anything changes, saying how to name one (`config set --user model NAME`) and listing the endpoint's models that read images (`config models vision` lists them all). The server must support Chat Completions with base64 PNG `image_url` inputs and JSON text responses. Use your provider's actual model identifier. API credentials come only from `OPENAI_API_KEY`, or the variable `model_key_env` names, and are not written to output. A warning is printed if the key would be sent over plain HTTP to a non-local host, and credentials embedded in `base_url` are redacted from reports.
 
 ## Precedence and environment variables
 
@@ -14,7 +14,7 @@ Four environment variables, as the owner listed them ([decision 0032](decisions/
 
 | Environment variable | What it is |
 | --- | --- |
-| `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere) |
+| `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere); `model_key_env` names another variable to read it from |
 | `OPENAI_BASE_URL` | Chat Completions API base URL, including `/v1` when required |
 | `SEMANTIC_PDF_DIFF_STORE` | The store every command works on without `--store` (`compare`, `source`, `show`, `report`, `gc`, `search`, `config`, `settings`, `cache`, `debug`; unset: `./diff-output`) |
 | `SEMANTIC_PDF_DIFF_CACHE` | The answers cache's folder for stores not bound to one yet (a store's first run binds it: `answers_cache`): every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
@@ -59,7 +59,7 @@ A store keeps its own settings, set once for every run in it; the user's are sha
 
 **Asked each run, remembered or not** (the owner, 2026-11-02: "Better to fail fast up front even if it costs a little."): before anything else, every model the run asks gets a small request: the chat model a sum (the JSON check), the reranker and the embedding model their checks. One line says the endpoint answers and what it cost (about $0.00002 at DeepInfra); a failure stops the run there, exit 5, and forgets the run's remembered checks, so the next run checks and calibrates again. The image and acuity checks, which measure, run on first use alone.
 
-**A reranker's or an embedding model's own key:** `config set --user rerank_key_env RERANK_API_KEY` (or `embed_key_env`) names the environment variable its key is read from, as each request is made; unset, it's sent `OPENAI_API_KEY`. Only the name is kept, never the key (the owner, 2026-11-02: "the key must never be stored"): a value not shaped as a variable's name (capitals, digits, `_`) is refused, without being said back.
+**A model's key from a variable of its own:** `config set --user model_key_env DEEPINFRA_API_KEY` names the environment variable the endpoint's key is read from (default `OPENAI_API_KEY`); `rerank_key_env` and `embed_key_env` name the reranker's and the embedding model's, and unset, they're sent the endpoint's (the owner, 2026-11-02: "For consistency, we should add a `model_env_key` option. The others default to this one, and it defaults to `OPENAI_API_KEY` IIRC."; named as the others are). The key is read as each request is made. Only the name is kept, never the key (the owner, 2026-11-02: "the key must never be stored"): a value not shaped as a variable's name (capitals, digits, `_`) is refused, without being said back. A run's first line names a variable other than `OPENAI_API_KEY`, and says when it isn't set; `config show` says whether it's set.
 
 **A run's settings, said before it starts:** the models it asks and where, and each feature off for want of a model no layer names, with how to name one: reranking (proposals mode: `rerank_model`) and search by meaning (`embed_model`). `config set --user rerank_model none` goes without, and it isn't said; `config unset` leaves it not configured again. `config show` tells the two apart: `not set`, or `none (user)`.
 
@@ -88,6 +88,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `rerank_key_env` | `null` | endpoint | rerank | - | - |
 | `model` | `""` | endpoint |  | extract, triage, compare | all |
 | `base_url` | `"http://localhost:8000/v1"` | endpoint |  | - | - |
+| `model_key_env` | `"OPENAI_API_KEY"` | endpoint |  | - | - |
 | `max_calls` | `100000` | endpoint |  | - | - |
 | `max_cost` | `null` | endpoint |  | - | - |
 | `retries` | `2` | endpoint |  | - | - |

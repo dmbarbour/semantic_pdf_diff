@@ -439,6 +439,41 @@ class KeysOfTheirOwn(Remembered):
         self.assertIn("reranker r (its key from $RERANK_KEY, which isn't set: asked without a key)",
                       checkup.guidance(s)[0])
 
+    def test_the_endpoints_key_from_model_key_env_and_the_others_given_it(self):
+        """model_key_env (the owner, 2026-11-02: "For consistency, we should add a `model_env_key` option. The others
+        default to this one, and it defaults to `OPENAI_API_KEY` IIRC.")."""
+        from semantic_pdf_diff.llm import Client
+        sent = {}
+
+        def post(handler):
+            request_body(handler)
+            sent[handler.path.rsplit("/", 1)[-1]] = handler.headers.get("Authorization")
+            handler.send_response(200)
+            handler.end_headers()
+            handler.wfile.write(json.dumps([{"index": 1, "score": 0.02}, {"index": 0, "score": 0.91}]).encode())
+        keys = {"OPENAI_API_KEY": "default-key-1", "CHAT_KEY": "chat-key-2"}
+        with serving(post) as url, patch.dict(os.environ, {"OPENAI_BASE_URL": url, **keys}), \
+                user_settings({"model": "gemma-4", "model_key_env": "CHAT_KEY", "rerank_model": "r",
+                               "rerank_api": "tei", "rerank_url": url + "/rerank"}):
+            code, out = self.config("test", "--only", "reranker")
+            kept = saved_settings()
+            refused = self.config("set", "--user", "model_key_env", "chat-key-2")[1]
+            shown = self.config("show")[1]
+            asked = (Client(Settings(model_key_env="CHAT_KEY"), None).api_key, Client(Settings(), None).api_key)
+        self.assertEqual(code, 0, out)
+        self.assertEqual(sent, {"rerank": "Bearer chat-key-2"})  # no key of its own: the endpoint's
+        self.assertEqual(asked, ("chat-key-2", "default-key-1"))
+        self.assertEqual(kept["model_key_env"], "CHAT_KEY")
+        self.assertFalse(any(k in json.dumps(kept) + shown + refused for k in keys.values()))
+        self.assertIn("this names an environment variable holding a key", refused)
+        self.assertRegex(shown, r"\n  CHAT_KEY +set\n")
+        self.assertEqual(Settings().model_key_env, "OPENAI_API_KEY")
+        self.assertIn("m at http://localhost:8000/v1 (its key from $CHAT_KEY, which isn't set: asked without a key)",
+                      checkup.guidance(Settings(model="m", model_key_env="CHAT_KEY"))[0])
+        self.assertNotIn("its key", checkup.guidance(Settings(model="m"))[0])
+        self.assertEqual(checkup.advice([checkup.Check("key", False, "refused (HTTP 401)")], "CHAT_KEY"),
+                         ["the endpoint refused the key: CHAT_KEY holds the one it takes"])
+
 class EyeCards(unittest.TestCase):
     """The acuity check's cards (acuity.py): the eye test's read family, a card a size (the owner, 2026-11-02: "Go
     ahead with the per-size probe cards.")."""

@@ -79,7 +79,7 @@ def gather(folder, cache_path, settings, limit=10):
            "store": str(folder), "cache": str(cache_path), "endpoint": endpoint(settings.model_dump()),
            "endpoint_of": "the store's settings",
            "environment": {name: bool(os.environ.get(name, "").strip()) for name in ("OPENAI_BASE_URL",
-                                                                                      "OPENAI_API_KEY")},
+                                                                                      settings.model_key_env)},
            "steps": [], "comparison": None, "errors": [], "other_errors": 0}
     if not (folder / "store.sqlite").exists():
         return out
@@ -118,8 +118,7 @@ def lines(found):
     out = [f"semantic-pdf-diff {found['version']} (Python {found['python']}"
            + (f", PyMuPDF {found['pymupdf']})" if found["pymupdf"] else ")"),
            f"store: {found['store']}", f"answers cache: {found['cache']}",
-           f"OPENAI_BASE_URL {'set' if env['OPENAI_BASE_URL'] else 'not set'}, "
-           f"OPENAI_API_KEY {'set' if env['OPENAI_API_KEY'] else 'not set'}",
+           ", ".join(f"{name} {'set' if env[name] else 'not set'}" for name in env),
            f"endpoint ({found['endpoint_of']}): {point['base_url']}",
            f"  model      {point['model'] or 'none set'}"]
     reranker, embedding = point["reranker"], point["embedding"]

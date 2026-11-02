@@ -167,10 +167,10 @@ def unset_model(settings):
             "(`config set model NAME` for one store, --model for one run)."]
     where = f"The endpoint at {redact_url(settings.base_url)}"
     try:
-        found = listed(settings, os.getenv("OPENAI_API_KEY", ""))
+        found = listed(settings, os.getenv(settings.model_key_env, ""))
     except (OSError, ValueError) as e:
         failure = f"{type(e).__name__}: {e}"
-        hint = (" It refused the key: OPENAI_API_KEY holds the one it takes." if REFUSED.search(failure) else
+        hint = (f" It refused the key: {settings.model_key_env} holds the one it takes." if REFUSED.search(failure) else
                 f" {WHERE}." if _unreachable(failure) else "")
         return "\n".join(said + [f"{where} can't be asked for its models ({failure}).{hint} `semantic-pdf-diff "
                                  "config test` checks it."])
@@ -210,7 +210,10 @@ def guidance(settings, mode="proposals"):
     feature off for want of a model no layer names, with how to name one or go without. [line], logged as a run's
     progress is (-q quiets them)."""
     from .llm import redact_url
-    roles = [f"{settings.model or 'no model'} at {redact_url(settings.base_url)}"]
+    variable = settings.model_key_env
+    roles = [f"{settings.model or 'no model'} at {redact_url(settings.base_url)}" + (
+        f" (its key from ${variable}" + ("" if os.getenv(variable) else ", which isn't set: asked without a key") + ")"
+        if variable != type(settings).model_fields["model_key_env"].default else "")]
     for name, said, env in (("rerank_model", "reranker", "rerank_key_env"),
                             ("embed_model", "embedding model", "embed_key_env")):
         if name not in type(settings).model_fields or (name == "rerank_model" and mode != "proposals"):
@@ -330,7 +333,7 @@ def run(settings, rng=None, only=None):
             # no models (some servers don't); one turning the key away fails, and the key check says why
             checks[-1] = Check("endpoint", None, "lists no models: " + checks[-1].said, checks[-1].seconds)
         if not key and not is_local(settings.base_url):
-            checks.append(Check("key", None, "OPENAI_API_KEY isn't set (a local server may need none)"))
+            checks.append(Check("key", None, f"{settings.model_key_env} isn't set (a local server may need none)"))
         if not settings.model:
             checks.append(Check("model", False, "none set: `config set --user model NAME` names one (`config models "
                                                 "vision` lists those reading images)"))
@@ -422,7 +425,7 @@ def run(settings, rng=None, only=None):
     if refused:  # 401 or 403: the key isn't one the endpoint takes (a provider's balance exhausted aside)
         checks = [c for c in checks if c.name != "key"]
         at = 1 if checks and checks[0].name == "endpoint" else 0
-        checks.insert(at, Check("key", False, f"refused (HTTP {refused.group(1)}): OPENAI_API_KEY "
+        checks.insert(at, Check("key", False, f"refused (HTTP {refused.group(1)}): {settings.model_key_env} "
                                 + ("isn't set" if not key else "isn't a key this endpoint takes")))
     return checks, client.cost
 
@@ -442,13 +445,14 @@ def _unreachable(said):
 WHERE = ("$OPENAI_BASE_URL names the endpoint, else the user's base_url (`semantic-pdf-diff config set --user base_url "
          "URL`); --base-url for one run")
 
-def advice(checks):
-    """What to set, where the checks found the endpoint out of reach or its key refused: [line]."""
+def advice(checks, variable="OPENAI_API_KEY"):
+    """What to set, where the checks found the endpoint out of reach or its key refused (the key in variable, as
+    model_key_env names it): [line]."""
     out = []
     if any(c.name == "endpoint" and c.ok is False and _unreachable(c.said) for c in checks):
         out.append(f"the endpoint can't be reached: {WHERE}")
     if any(c.name == "key" and c.ok is False for c in checks):
-        out.append("the endpoint refused the key: OPENAI_API_KEY holds the one it takes")
+        out.append(f"the endpoint refused the key: {variable} holds the one it takes")
     return out
 
 def lines(settings, checks, cost):
@@ -463,7 +467,7 @@ def lines(settings, checks, cost):
     out = [f"checking {', '.join(chat + named)} at {redact_url(settings.base_url)}"]
     out += [c.line() for c in checks]
     failed = [c.name for c in checks if c.ok is False]
-    out += advice(checks)
+    out += advice(checks, settings.model_key_env)
     out.append(f"cost: ${cost:.4f}, as the provider reports it")
     out.append(f"{len(failed)} check(s) failed: {', '.join(failed)}" if failed else "every check passed")
     return out
@@ -474,7 +478,7 @@ def listing(settings, words="", as_json=False, memory=None):
     each; those the settings name marked, and those whose checks the record at memory remembers passing at this
     endpoint (endpoint setup, milestone 3)."""
     names, checked = used(settings), checked_here(memory, settings) if memory else {}
-    found = [m for m in listed(settings, os.getenv("OPENAI_API_KEY", ""))
+    found = [m for m in listed(settings, os.getenv(settings.model_key_env, ""))
              if all(w in " ".join((m.id, m.mode) + m.tags).casefold() for w in words.casefold().split())]
     if as_json:
         return [json.dumps([{"id": m.id, "mode": m.mode, "context": m.context, "output": m.output,
@@ -675,7 +679,7 @@ def name_check(settings, name, setting="model", timeout=10):
             at = "its own URL"
         return [f"not checked: {role} served apart, at {at}, isn't among the endpoint's models"]
     try:
-        found = listed(settings, os.getenv("OPENAI_API_KEY", ""), timeout=timeout)
+        found = listed(settings, os.getenv(settings.model_key_env, ""), timeout=timeout)
     except (OSError, ValueError) as e:
         return [f"not checked: the endpoint at {where} can't be asked for its models ({type(e).__name__}: {e})"]
     try_it = f"`semantic-pdf-diff config test {flag} {name}` tries it (a few cents)"

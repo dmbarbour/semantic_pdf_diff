@@ -1247,8 +1247,8 @@ class ReadGlossary(Lever):
     def reads_glossary(self):
         return self.glossary
 
-# An environment variable's name, in capitals as they're named (rerank_key_env, embed_key_env): a key pasted in its
-# place by mistake (mixed case, a dash) is refused, so it's never kept
+# An environment variable's name, in capitals as they're named (model_key_env, rerank_key_env, embed_key_env): a key
+# pasted in its place by mistake (mixed case, a dash) is refused, so it's never kept
 KEY_NAME = re.compile(r"[A-Z_][A-Z0-9_]{0,63}")
 
 def key_variable(value):
@@ -1275,9 +1275,10 @@ class Embed(Lever):
     embed_model: Annotated[str | None, _selecting(roles=COMPARE)] = None  # e.g. Qwen/Qwen3-Embedding-0.6B
     # where it's asked ({model} filled in); none: the chat endpoint's /embeddings
     embed_url: Annotated[str | None, Declared("endpoint")] = None
-    # the environment variable holding the key it's sent; none: OPENAI_API_KEY. A name only, never the key (the
-    # owner, 2026-11-02: "We could enable users to assign reranker and embedding model their own key, but the key
-    # must never be stored; they could specify environment variables where to find the key, though.")
+    # the environment variable holding the key it's sent; none: model_key_env's (OPENAI_API_KEY unless set). A name
+    # only, never the key (the owner, 2026-11-02: "We could enable users to assign reranker and embedding model their
+    # own key, but the key must never be stored; they could specify environment variables where to find the key,
+    # though.")
     embed_key_env: Annotated[str | None, Declared("endpoint")] = None
     # each vector's size, asked of the model (one trained to be cut answers any) and kept in the report; unset, none
     # is asked and the model answers its own. Unset by default since 2026-10-29: most models can't be cut, and a
@@ -1312,7 +1313,7 @@ class Rerank(Lever):
     rerank_api: Annotated[Literal["rerank", "deepinfra", "tei"], _selecting(roles=COMPARE)] = "rerank"
     # where it's asked ({model} filled in); none: beside the chat endpoint, on its host (rerank.endpoint)
     rerank_url: Annotated[str | None, Declared("endpoint")] = None
-    # the environment variable holding the key it's sent; none: OPENAI_API_KEY (embed_key_env's note)
+    # the environment variable holding the key it's sent; none: model_key_env's (embed_key_env's note)
     rerank_key_env: Annotated[str | None, Declared("endpoint")] = None
     # the least score a pair is judged with, in hundredths: 1-10 for 0.01-0.10 (the owner: "perhaps 1-10
     # corresponding to 0.01-0.10 ... Default 3?"); measured end to end at 2, 5 and 10, no related finding lost

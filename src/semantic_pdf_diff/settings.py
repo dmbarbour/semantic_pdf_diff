@@ -7,8 +7,9 @@ import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
-from pydantic import Field, model_validator
-from .levers import DEFAULT_LEVERS, EVERY_ROLE, Declared, compose, lever_marks, setting_classes
+from pydantic import Field, field_validator, model_validator
+from .levers import (DEFAULT_LEVERS, EVERY_ROLE, Declared, compose, key_variable, lever_marks,
+                     setting_classes)
 from .schema import Strict
 
 class RateRule(Strict):
@@ -29,6 +30,11 @@ class Endpoint(Strict):
     # model, just error if one isn't configured"); pipeline.require_model says how, and what the endpoint serves.
     model: Annotated[str, Declared("endpoint", EVERY_ROLE)] = ""
     base_url: Annotated[str, Declared("endpoint")] = "http://localhost:8000/v1"
+    # the environment variable holding the key the model is sent, and the reranker and the embedding model unless
+    # rerank_key_env or embed_key_env name their own. A name only, never the key (the owner, 2026-11-02: "For
+    # consistency, we should add a `model_env_key` option. The others default to this one, and it defaults to
+    # `OPENAI_API_KEY` IIRC."; named as the others are)
+    model_key_env: Annotated[str, Declared("endpoint")] = "OPENAI_API_KEY"
     # A safety stop against runaway runs, not a budget: throughput is governed by rate_limits.
     max_calls: Annotated[int, Declared("endpoint")] = Field(default=100_000, ge=1)
     # Stop sending once the provider-reported cost of this run reaches this many dollars.
@@ -47,6 +53,11 @@ class Endpoint(Strict):
     # Seconds between progress lines when output isn't a terminal.
     heartbeat_seconds: Annotated[float, Declared("endpoint")] = Field(default=30.0, gt=0)
     rate_limits: Annotated[list[RateRule], Declared("endpoint")] = Field(default_factory=list)
+
+    @field_validator("model_key_env")
+    @classmethod
+    def _model_key(cls, value):
+        return key_variable(value)
 
 class SettingsBase(Strict):
     """Loading: the environment, then a file's or a caller's settings. A settings file may name its levers in

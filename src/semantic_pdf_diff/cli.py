@@ -161,7 +161,7 @@ Commands (semantic-pdf-diff COMMAND --help for each, or semantic-pdf-diff help C
 
 START_HELP = """\
 Before a first run, name the endpoint and the model (a .env file isn't read):
-  export OPENAI_API_KEY=...                            the provider's key
+  export OPENAI_API_KEY=...                            the provider's key (model_key_env names another variable)
   export OPENAI_BASE_URL=https://provider.example/v1   default: {base_url}
   semantic-pdf-diff config set --user model provider/vision-model     needed: there's no default
   semantic-pdf-diff config models vision                              the endpoint's models reading images
@@ -962,8 +962,8 @@ def cache_command(argv):
 SETTINGS_HELP = """\
 Print the settings a run would use, as JSON: the defaults, then the user's (`config set --user`), then the store's
 (`config set`; --store, else $SEMANTIC_PDF_DIFF_STORE's, else ./diff-output's), then --config's. The endpoint is
-OPENAI_BASE_URL's; the API key (OPENAI_API_KEY) is never printed. `semantic-pdf-diff config show` lists the
-settings with what each does.
+OPENAI_BASE_URL's; the API key ($OPENAI_API_KEY, or model_key_env's variable) is never printed.
+`semantic-pdf-diff config show` lists the settings with what each does.
 
 Settings that shape what's asked (extraction, levers) are bound to a store: a run with others reads again what they
 change, the queries that didn't change answered from the cache.
@@ -1108,7 +1108,7 @@ def config_command(argv):
         if args.action == 'show':
             print("more: config show GROUP, config show --all, config find WORDS, config help NAME")
             print('environment variables (neither the user\'s nor the store\'s):')
-            for name, value in environment():
+            for name, value in environment(configuration.resolved(layers)['model_key_env'][0]):
                 print(f"  {name:<16} {value}")
         return 0
     if args.action == 'help':
@@ -1233,12 +1233,13 @@ def config_command(argv):
                   f"{store} --cache {new}` brings them")
     return 0
 
-def environment():
-    """The environment variables `config show` lists, with what each is now: never the key, only whether it's set."""
+def environment(key='OPENAI_API_KEY'):
+    """The environment variables `config show` lists, with what each is now: never the key, only whether the variable
+    holding it (model_key_env's: key) is set."""
     from .settings import cache_path
     value = lambda name, unset: os.environ.get(name) or f"not set: {unset}"  # noqa: E731
     return [('OPENAI_BASE_URL', value('OPENAI_BASE_URL', default('base_url'))),
-            ('OPENAI_API_KEY', 'set' if os.environ.get('OPENAI_API_KEY') else 'not set'),
+            (key, 'set' if os.environ.get(key) else 'not set'),
             ('SEMANTIC_PDF_DIFF_STORE', value('SEMANTIC_PDF_DIFF_STORE', './diff-output, without --store')),
             ('SEMANTIC_PDF_DIFF_CACHE', value('SEMANTIC_PDF_DIFF_CACHE', f'answers cached in {cache_path()}'))]
 # Every other setting is the user's or a store's (`config set [--user]`): PDF_DIFF_<NAME> and OPENAI_MODEL are no longer

@@ -36,6 +36,11 @@ HELP = {
                      "Set by $OPENAI_BASE_URL, else the user's settings (`config set --user base_url URL`); "
                      "--base-url beats both for one run. Never kept in a store: the endpoint is the user's.",
                      "https://api.deepinfra.com/v1/openai"),
+    "model_key_env": Help("endpoint", "the environment variable holding the endpoint's key (OPENAI_API_KEY)",
+                          "Its name only: the key is read from it as a run asks, never kept in a store, the user's "
+                          "settings or a report. The reranker and the embedding model are sent it too, unless "
+                          "rerank_key_env or embed_key_env name their own. Not shaped as a variable's name "
+                          "(capitals, digits, _), it's refused without being said back.", "DEEPINFRA_API_KEY"),
     "context_tokens": Help("endpoint", "the model's context window, in tokens: requests are sized to fit",
                            "Measured on first use where the endpoint lists the model's (`config show` marks it "
                            "measured); otherwise set it to the model's: 262144 for gemma-4.", "262144", basic=True),
@@ -121,9 +126,9 @@ HELP = {
     "rerank_url": Help("comparing", "where the reranker is asked ({model} filled in)",
                        "Unset: beside the chat endpoint, on its host: its /rerank, or with rerank_api deepinfra "
                        "DeepInfra's inference API (.../v1/inference/MODEL). A reranker served elsewhere is sent "
-                       "OPENAI_API_KEY too, unless rerank_key_env names another variable.",
+                       "model_key_env's key too, unless rerank_key_env names another variable.",
                        "http://localhost:8080/rerank"),
-    "rerank_key_env": Help("endpoint", "the environment variable holding the reranker's key (none: OPENAI_API_KEY)",
+    "rerank_key_env": Help("endpoint", "the environment variable holding the reranker's key (none: model_key_env's)",
                            "Its name only: the key is read from it as a run asks, never kept in a store, the user's "
                            "settings or a report. Unset where a run starts, the reranker is asked without a key, and "
                            "the run says so first.", "RERANK_API_KEY"),
@@ -142,10 +147,10 @@ HELP = {
                         "run says search by meaning is off before it starts; none goes without, and it isn't said.",
                         "Qwen/Qwen3-Embedding-8B"),
     "embed_url": Help("endpoint", "where the embedding model is asked ({model} filled in); none: the chat endpoint's "
-                      "/embeddings", "A model served elsewhere is sent OPENAI_API_KEY too, unless embed_key_env names "
-                      "another variable."),
+                      "/embeddings", "A model served elsewhere is sent model_key_env's key too, unless embed_key_env "
+                      "names another variable."),
     "embed_key_env": Help("endpoint", "the environment variable holding the embedding model's key (none: "
-                          "OPENAI_API_KEY)", "Its name only: the key is read from it as a run asks, never kept in a "
+                          "model_key_env's)", "Its name only: the key is read from it as a run asks, never kept in a "
                           "store, the user's settings or a report. Unset where a run starts, the model is asked "
                           "without a key, and the run says so first.", "EMBED_API_KEY"),
     "embed_dimensions": Help("comparing", "each claim's vector's size, asked of the embedding model and kept in the "

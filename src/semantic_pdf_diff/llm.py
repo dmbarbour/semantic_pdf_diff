@@ -62,8 +62,9 @@ def redact_url(url):
 
 def key_named(variable):
     """The key the environment variable named holds ("" where it's unset), or None where none is named: the
-    transport's, OPENAI_API_KEY's. A setting names the variable; the key itself is never kept (the owner,
-    2026-11-02: "the key must never be stored; they could specify environment variables where to find the key")."""
+    transport's, the variable model_key_env names (OPENAI_API_KEY unless set). A setting names the variable; the key
+    itself is never kept (the owner, 2026-11-02: "the key must never be stored; they could specify environment
+    variables where to find the key")."""
     return os.getenv(variable, "") if variable else None
 
 def is_local(url):
@@ -262,7 +263,7 @@ class Request:
     # A body to send instead, once, where the server refuses this one (HTTP 400): an embedding request with the model
     # and the input alone, for a model that can't be cut to the dimensions asked (embed.request)
     instead: Callable[[], bytes] | None = None
-    # The key sent with it, where not the transport's (OPENAI_API_KEY's): the variable rerank_key_env or embed_key_env
+    # The key sent with it, where not the transport's (model_key_env's): the variable rerank_key_env or embed_key_env
     # names (key_named); read as the request is made, never kept
     api_key: str | None = None
 
@@ -313,7 +314,7 @@ class Transport:
 
     def __init__(self, settings, api_key=None):
         self.s = settings
-        self.api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY", "")
+        self.api_key = api_key if api_key is not None else os.getenv(settings.model_key_env, "")
         self.calls = 0              # attempts posted, retries included (how the run went: run.json)
         self.admitted = 0           # requests admitted under max_calls, retries not counted
         self.usage = {"prompt_tokens": 0, "completion_tokens": 0}
@@ -329,7 +330,7 @@ class Transport:
         self.limiter = RateLimiter(settings.rate_limits)
         self.gate = AdaptiveGate(settings.concurrency)
         if self.api_key and settings.base_url.lower().startswith("http://") and not is_local(settings.base_url):
-            print(f"Warning: sending OPENAI_API_KEY over unencrypted HTTP to {redact_url(settings.base_url)}",
+            print(f"Warning: sending {settings.model_key_env} over unencrypted HTTP to {redact_url(settings.base_url)}",
                   file=sys.stderr)
 
     def send(self, request):

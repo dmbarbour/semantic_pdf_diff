@@ -174,6 +174,7 @@
 - **A role names its endpoint,** and a user overrides one part without restating the rest.
 - **This answers the deferred key question** when the owner takes it up. Until then, every URL is sent `OPENAI_API_KEY`.
 - **A key of their own, built 2026-11-02** (the owner: "We could enable users to assign reranker and embedding model their own key, but the key must never be stored; they could specify environment variables where to find the key, though."): `rerank_key_env` and `embed_key_env`, each a variable's name, the key read from it as each request is made (`llm.key_named`, `Request.api_key`) and cut from what a server says back. A name not in capitals, digits and `_` is refused without being said back. Named endpoints stay for later.
+  - **The endpoint's own, built 2026-11-02** (the owner, 2026-11-02: "For consistency, we should add a `model_env_key` option. The others default to this one, and it defaults to `OPENAI_API_KEY` IIRC."): `model_key_env`, default `OPENAI_API_KEY`, named as the others are (`model_key_env`, not `model_env_key`). The chat model is sent the key its variable holds, and so are the reranker and the embedding model where they name none of their own. `config test`, `config show`, `debug` and the help name the variable set, and a run's first line names one other than `OPENAI_API_KEY`.
 
 ## Design questions
 
