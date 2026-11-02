@@ -26,7 +26,7 @@ import json
 import logging
 
 from .failures import BudgetExceeded
-from .llm import Request
+from .llm import Request, key_named
 from .progress import NoProgress
 from .recipes import Recipe
 from .schema import Ranking
@@ -99,7 +99,7 @@ def request(s, query, documents, key=None):
     return Request(body, Recipe(key) if key is not None else None, Ranking, words, prompt, (), query=name,
                    description={"template": "rerank", "source_type": "", "text_chars": len(prompt), "image_bytes": [],
                                 "params": {"rerank": s.rerank_model}},
-                   url=endpoint(s), model=s.rerank_model, read=read)
+                   url=endpoint(s), model=s.rerank_model, read=read, api_key=key_named(s.rerank_key_env))
 
 def ranked(pairs, dispatch, client, mode, label, progress=None):
     """The candidate pairs ((retrieval score, a, b), best first) the judge takes, reranked: each claim's candidates

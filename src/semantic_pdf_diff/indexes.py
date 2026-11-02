@@ -23,10 +23,11 @@ document that would be useful, and it seems deeply related to the problem of com
   or more, with how many of its items give each property (what one of them leaves out shows: siblings' gaps).
   Grouped by what their items are (milestone 3, 2026-11-01; the owner: "Let's try your recommendations on the
   decisions."): a drawing set's sheets one kind, "sheet", by the shape its title blocks print their numbers in
-  (G-001: letters, a dash, three digits), whatever their letters; a claim naming several items ("A-102 A-201": rows
-  read as one, or a statement about several) counted for none of them, and a subject whose claims all do left out of
-  kinds and marked; two of a kind's properties one where three of its items or more give both, alike each time
-  ("sheet name" and "drawing title"). Where the confirm_kinds lever ran (kindcheck.py), the model's names and moves.
+  (G-001: letters, a dash, three digits), whatever their letters; a claim naming several items as rows read as one
+  ("A-102 A-201") counted for none of them, and a subject whose claims all do left out of kinds and marked; a list's
+  ("SRB0, SRB1 and SRB3": a statement about each) counted for each, an item named only in it a subject of its own;
+  two of a kind's properties one where three of its items or more give both, alike each time ("sheet name" and
+  "drawing title"). Where the confirm_kinds lever ran (kindcheck.py), the model's names and moves.
 - **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
   each source's, a term the sources define differently marked.
 - **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): a property
@@ -191,22 +192,62 @@ def matched(found, findings, sources, alias=lambda name: None):
 
 LISTING = re.compile(r"\s*(?:,\s*(?:and|or)|,|;|&|and|or)\s*", re.IGNORECASE)  # between a list's items
 
-def several(entity):
-    """The items a name names, where it names two or more: their tags, else []. Rows read as one ("A-102 A-201",
-    "H-101 TITLE S-001 TITLE"): tags of one shape, apart by spaces or their titles; a list ("SRB0, SRB1 and SRB3"):
-    tags apart by commas, "and" or "or". Not one thing's name holding two tags ("L2 U2N Relay UE", "L1/L2 Triggered
-    Mobility": tags of other shapes, or joined by a slash), which TS 38.300's are. Such a claim is a row read as one,
-    or a statement about several: counted for none of them in kinds."""
+def _named(entity):
+    """(the items a name names, where it names two or more: their tags; "rows" or "list"), else ([], ""). Rows read as
+    one ("A-102 A-201", "H-101 TITLE S-001 TITLE"): tags of one shape, apart by spaces or their titles; a list ("SRB0,
+    SRB1 and SRB3"): tags apart by commas, "and" or "or". Not one thing's name holding two tags ("L2 U2N Relay UE",
+    "L1/L2 Triggered Mobility": tags of other shapes, or joined by a slash), which TS 38.300's are."""
     from .align import TAG
     text = str(entity)
     found = list(TAG.finditer(text))
     tags = list(dict.fromkeys(m[0] for m in found))
     if len(tags) < 2:
-        return []
+        return [], ""
     between = [text[a.end():b.start()] for a, b in zip(found, found[1:])]
     if all(LISTING.fullmatch(gap) for gap in between):
-        return tags
-    return tags if len({shape(t) for t in tags}) == 1 and not any("/" in gap for gap in between) else []
+        return tags, "list"
+    if len({shape(t) for t in tags}) == 1 and not any("/" in gap for gap in between):
+        return tags, "rows"
+    return [], ""
+
+def several(entity):
+    """The items a name names where it's rows read as one ("A-102 A-201"): their tags, else []. Such a claim is
+    counted for none of them in kinds: each row would give the other's title (_named)."""
+    tags, how = _named(entity)
+    return tags if how == "rows" else []
+
+def listing(entity):
+    """The items a list names ("SRB0, SRB1, SRB3 and other MAC CEs", "Pumps P-101 and P-102"): their tags, else [].
+    A statement about each, so its claims are counted for each (listed; indexes plan, design question 6's follow-up:
+    the owner, 2026-11-02, "Let's go with your recommendations on the low-hanging fruit.")."""
+    tags, how = _named(entity)
+    return tags if how == "list" else []
+
+def listed(subjects, by_tag, said):
+    """Each claim of a list (listing) given to every item it names, besides the one alignment keyed it by (its first):
+    its value under the property its attribute names (a new one where the item has none), the item made a subject of
+    its own where no claim names it alone. by_tag: {tag: the subject's index}; said: {claim id: its attribute}."""
+    for i in range(len(subjects)):
+        for p in subjects[i]["properties"]:
+            for v in p["values"]:
+                for tag in v.get("listed", []):
+                    if by_tag.get(tag) == i:
+                        continue
+                    if tag not in by_tag:
+                        by_tag[tag] = len(subjects)
+                        subjects.append({"name": tag, "names": [tag], "matched_by": "", "claims": {},
+                                         "properties": []})
+                    other = subjects[by_tag[tag]]
+                    if v["claim"] in other["claims"].get(v["source"], []):
+                        continue
+                    other["claims"].setdefault(v["source"], []).append(v["claim"])
+                    name = said.get(v["claim"], p["name"])
+                    into = next((q for q in other["properties"] if name in q["names"]), None)
+                    if into is None:
+                        into = {"name": name, "names": [name], "values": []}
+                        other["properties"].append(into)
+                        other["properties"].sort(key=lambda q: natural(q["name"]))
+                    into["values"].append(dict(v))
 
 def built(data):
     """The report's index: {"sources", "subjects", "figures"} (as report.json keeps it under "index"). Each subject:
@@ -220,14 +261,17 @@ def built(data):
     alias = aliases(data)
     found = {source: renamed(subjects_of(claims[source]), alias) for source in sources}
     paired = [(f["a"], f["b"]) for f in data.get("findings", []) if f.get("relation") in PAIRING]
-    subjects = []
+    subjects, by_tag = [], {}
     for group in matched(found, data.get("findings", []), sources, alias):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
         properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)
         name = mine[0][1][1]  # alignment's (its claims' most given), else the most given naming it alone
-        if several(name):
-            name = next((n for n in sorted(names, key=lambda n: (-names[n], natural(n))) if not several(n)), name)
+        if several(name) or listing(name):  # else a list's first item by its tag, alignment's key
+            name = next((n for n in sorted(names, key=lambda n: (-names[n], natural(n)))
+                         if not several(n) and not listing(n)), mine[0][1][0] if listing(name) else name)
+        for _, (key, _, _) in mine:
+            by_tag.setdefault(key, len(subjects))
         subjects.append({
             "name": name, "names": sorted(names, key=lambda n: (-names[n], natural(n))),
             **({"several": several(name)} if several(name) else {}),
@@ -238,9 +282,11 @@ def built(data):
                             "values": [{"source": where.source.get(c["content"], ""), "value": c["value"],
                                         "unit": c["unit"], "conditions": c.get("conditions", ""), "claim": c["id"],
                                         "where": where(c),
-                                        **({"several": several(c["entity"])} if several(c["entity"]) else {})}
+                                        **({"several": several(c["entity"])} if several(c["entity"]) else {}),
+                                        **({"listed": listing(c["entity"])} if listing(c["entity"]) else {})}
                                        for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
+    listed(subjects, by_tag, {e["id"]: plain(e["attribute"]) for e in data.get("evidence", [])})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
     regroup = None
     if data.get("kind_check"):  # the model's names and moves (the confirm_kinds lever, kindcheck.py)

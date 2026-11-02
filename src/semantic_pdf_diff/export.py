@@ -26,11 +26,18 @@ feature 2, milestone 2): `semantic-pdf-diff export`. The target ingest tool keep
   history-dependent.").
 - **index.md:** every chunk with its title, and how the export was made (the tool's version, the report's date and
   mode, its models, its coverage).
+- **chunks.json, asked for** (`--json`; the owner, 2026-11-02: "Let's go with your recommendations on the low-hanging
+  fruit."): every chunk as an object, its front matter's fields apart from its text, for a system ingesting JSON (the
+  ingest tool takes JSON, not JSONL); the same chunks, so its names are the files'.
+- **A delta, asked for** (`--since FOLDER`, an earlier export's): only the chunks the earlier one doesn't hold, and in
+  index.md (and chunks.json) the names of its chunks this one doesn't: what a corpus holding the earlier needs added
+  and removed to hold this one. Chunks are named by their text, so a chunk unchanged is in neither.
 """
 import hashlib
 import json
 import re
 from collections import defaultdict
+from pathlib import Path
 
 from .indexfiles import GAP_TITLES, KIND_COLUMNS, cell_md, kind_cell, kind_property
 
@@ -41,6 +48,8 @@ def name_of(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16] + ".md"
 
 NAMED = re.compile(r"[0-9a-f]{16}\.md")  # a chunk's name (name_of)
+JSON = "chunks.json"  # every chunk as JSON, where asked for (as_json)
+LISTED = re.compile(r"^- \[(.*)\]\(([0-9a-f]{16}\.md)\)$", re.MULTILINE)  # a chunk's line in index.md
 
 def written(out, files):
     """files ({name: text}) written into out, an empty folder or an earlier export's, and the earlier export's chunks
@@ -51,19 +60,60 @@ def written(out, files):
     out.mkdir(parents=True, exist_ok=True)
     index = out / "index.md"
     foreign = sorted(p.name for p in out.iterdir() if not p.name.startswith(".") and not (
-        p.is_file() and (NAMED.fullmatch(p.name) or p.name == "index.md")))
+        p.is_file() and (NAMED.fullmatch(p.name) or p.name in ("index.md", JSON))))
     if index.is_file() and not index.read_text(encoding="utf-8").startswith("# Export\n"):
         foreign.append(index.name)
     if foreign:
         raise ValueError(f"{out} holds files an export doesn't write ({', '.join(foreign[:3])}"
                          f"{', ...' if len(foreign) > 3 else ''}): export into an empty folder, or an earlier "
                          "export's; nothing was written")
-    stale = [p for p in out.iterdir() if NAMED.fullmatch(p.name) and p.name not in files]
+    stale = [p for p in out.iterdir() if (NAMED.fullmatch(p.name) or p.name == JSON) and p.name not in files]
     for name, text in files.items():
         (out / name).write_text(text, encoding="utf-8")
     for p in stale:
         p.unlink()
     return len(stale)
+
+def chunks_of(files):
+    """[(name, title)] of an export's chunks, in its index.md's order."""
+    return [(name, title) for title, name in LISTED.findall(files.get("index.md", ""))]
+
+def as_json(files, version="", gone=()):
+    """chunks.json's text: {"format", "made_by", "chunks": [{"name", "title", "fields": the front matter's, "text":
+    below it}], and "gone" in a delta}."""
+    chunks = []
+    for name, title in chunks_of(files):
+        head, body, fields = "", files[name], {}
+        if body.startswith("---\n"):
+            head, _, body = body[4:].partition("---\n")
+        for line in head.splitlines():
+            key, _, value = line.partition(": ")
+            fields[key] = json.loads(value)
+        chunks.append({"name": name, "title": title, "fields": fields, "text": body})
+    return json.dumps({"format": 1, "made_by": f"semantic-pdf-diff {version}".strip(), "chunks": chunks,
+                       **({"gone": list(gone)} if gone else {})}, indent=1, ensure_ascii=False) + "\n"
+
+def earlier(folder):
+    """The chunks an earlier export holds: the names its index.md lists, and its chunks' files."""
+    folder = Path(folder)
+    index = folder / "index.md"
+    if not folder.is_dir() or not (index.is_file() and index.read_text(encoding="utf-8").startswith("# Export\n")):
+        raise ValueError(f"{folder} isn't an export's folder (no index.md an export wrote)")
+    listed = {name for _, name in LISTED.findall(index.read_text(encoding="utf-8"))}
+    return listed | {p.name for p in folder.iterdir() if NAMED.fullmatch(p.name)}
+
+def delta(files, before, since):
+    """{file name: text}: the chunks of files an earlier export (before: its chunks' names, from the folder since)
+    doesn't hold, and an index.md listing them, then the earlier's chunks gone; and the names gone."""
+    new = [(name, title) for name, title in chunks_of(files) if name not in before]
+    gone = sorted(before - set(files))
+    head = files["index.md"].split("## Chunks\n", 1)[0].rstrip("\n")
+    index = (head + f"\n- A delta against the export in {since}: {len(new)} chunks new, {len(gone)} of its "
+             "chunks gone; the chunks it holds alike aren't here\n\n"
+             + "## Chunks\n\n" + "".join(f"- [{title}]({name})\n" for name, title in new)
+             + ("\n## Gone\n\nThe earlier export's chunks this one doesn't hold: remove them from a corpus holding "
+                "it.\n\n" + "".join(f"- {name}\n" for name in gone) if gone else ""))
+    return {**{name: files[name] for name, _ in new}, "index.md": index}, gone
 
 def front(**fields):
     return "---\n" + "".join(f"{k}: {json.dumps(v, ensure_ascii=False)}\n" for k, v in fields.items() if v) + "---\n"

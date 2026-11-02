@@ -211,11 +211,14 @@ def guidance(settings, mode="proposals"):
     progress is (-q quiets them)."""
     from .llm import redact_url
     roles = [f"{settings.model or 'no model'} at {redact_url(settings.base_url)}"]
-    for name, said in (("rerank_model", "reranker"), ("embed_model", "embedding model")):
+    for name, said, env in (("rerank_model", "reranker", "rerank_key_env"),
+                            ("embed_model", "embedding model", "embed_key_env")):
         if name not in type(settings).model_fields or (name == "rerank_model" and mode != "proposals"):
             continue
-        value = getattr(settings, name)
-        roles.append(f"{said} {value}" if value else f"no {said}" + (
+        value, variable = getattr(settings, name), getattr(settings, env, None)
+        key = (f" (its key from ${variable}" + ("" if os.getenv(variable) else ", which isn't set: asked without a key")
+               + ")") if variable and value else ""
+        roles.append(f"{said} {value}{key}" if value else f"no {said}" + (
             " (none chosen)" if name in settings.model_fields_set else " (not configured)"))
     out = ["Models: " + "; ".join(roles)]
     for name in unconfigured(settings, mode):
@@ -236,6 +239,10 @@ def used(settings):
 
 CODE = ('The image shows one code: letters, a dash and digits. Return only the JSON object {"code": "..."} with the '
         'code exactly as written.')
+
+# The acuity cards in flight at once: eight at once met Llama-4-Scout's "Model busy" at DeepInfra (HTTP 429) on every
+# card, and an endpoint of a few servers (the owner's) would rather not be asked eight images at once by a check
+CARDS_AT_ONCE = 2
 
 def card(folder, rng, side=None):
     """(an eye-test card's PNG path, its code): a random code ("HXR-4027") drawn large on white; side: on a square of
@@ -353,14 +360,14 @@ def run(settings, rng=None, only=None):
         checks.append(Check("image", None, "skipped: no model is set") if not settings.model else
                       _timed("image", image) if settings.vision else Check("image", None, "not checked: vision is off"))
 
-    def eye_test():  # a card a size, sent together; a failed answer read nothing, as the eye test counts it
+    def eye_test():  # a card a size, two at a time; a failed answer read nothing, as the eye test counts it
         from . import acuity as cards
         from .dispatch import Dispatcher
         from .tilechoice import LEGIBLE_PX
         shares, failures = {}, []
         with tempfile.TemporaryDirectory(prefix="semantic-pdf-diff-check-") as folder:
             drawn = cards.cards(folder, rng, settings.image_side)
-            with Dispatcher(client) as dispatch:
+            with Dispatcher(client, workers=CARDS_AT_ONCE) as dispatch:
                 for size, path, lines in drawn:
                     def done(value, error, size=size, lines=lines):
                         shares[size] = cards.score(lines, value.lines) if error is None else 0.0

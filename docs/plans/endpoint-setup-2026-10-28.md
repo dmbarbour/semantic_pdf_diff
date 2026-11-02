@@ -160,6 +160,7 @@
 
   - **So the measure orders models as the eye test did,** a little finer for the two weaker ones, and repeats on gemma-4 to within 0.4 px. The warning's 7.7 px sits between gemma-4's checks and the others'.
   - **A busy model fails the check,** as it would the JSON check: eight requests at once met Llama-4-Scout's 429s, which the retries didn't outlast. Run again, it's asked again.
+  - **Two cards at a time since** (2026-11-02, with the low-hanging fruit: the owner, "Let's go with your recommendations on the low-hanging fruit."; `checkup.CARDS_AT_ONCE`), gentler on an endpoint of a few servers. It didn't save Llama-4-Scout: refused every card again, and its JSON check alone too, DeepInfra's model busy whatever is asked. gemma-4 at two at a time: 6.9 px ($0.0014).
   - **Scored a little apart from the lab:** text is folded (dashes, primes, quotes) before NFKC as well as after. NFKC makes a double prime (″) two primes, so the lab's scoring counts an inch mark written so as misread.
   - **Left too:** a controlled document's page read against its key, which needs a pass mark measured across models.
 - **Then:** the vision profile, recommending a model per task ([*Model discovery and per-task selection*](README.md#tentative), [*Vision profiles and adaptive slicing*](README.md#tentative)), and keeping only the models a user's globs allow.
@@ -172,6 +173,7 @@
   - the models it serves by role: chat, reranker, embedding
 - **A role names its endpoint,** and a user overrides one part without restating the rest.
 - **This answers the deferred key question** when the owner takes it up. Until then, every URL is sent `OPENAI_API_KEY`.
+- **A key of their own, built 2026-11-02** (the owner: "We could enable users to assign reranker and embedding model their own key, but the key must never be stored; they could specify environment variables where to find the key, though."): `rerank_key_env` and `embed_key_env`, each a variable's name, the key read from it as each request is made (`llm.key_named`, `Request.api_key`) and cut from what a server says back. A name not in capitals, digits and `_` is refused without being said back. Named endpoints stay for later.
 
 ## Design questions
 

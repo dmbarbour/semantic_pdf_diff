@@ -61,10 +61,10 @@ ON_SHEETS = {'sheet_details', 'grow_tiles', 'skip_empty', 'table_filter', 'refin
              'tile_cut', 'band_width', 'least_half', 'skip_sheet_tables', 'sheet_records'}
 # Settings these documents can't exercise, and why (each still needs its class checked elsewhere).
 NOT_EXERCISED = {
-    **dict.fromkeys(('rerank_model', 'rerank_api', 'rerank_url', 'rerank_threshold'),
+    **dict.fromkeys(('rerank_model', 'rerank_api', 'rerank_url', 'rerank_key_env', 'rerank_threshold'),
                     "a reranker's endpoint, which the stub model doesn't serve; proposals mode only "
                     '(tests/test_rerank.py)'),
-    **dict.fromkeys(('embed_model', 'embed_url', 'embed_dimensions'),
+    **dict.fromkeys(('embed_model', 'embed_url', 'embed_key_env', 'embed_dimensions'),
                     "an embedding model's endpoint, which the stub model doesn't serve (tests/test_embed.py)"),
     'search_names': "asks the model after the comparison, for the report's search; the stub answers no other names "
                     '(tests/test_search.py)',

@@ -1427,6 +1427,12 @@ def store_parser(command):
         parser.add_argument('--chunk-chars', type=int, default=CHUNK,
                             help=f'Characters of claims a chunk holds, about (default {CHUNK}: some 400 tokens, '
                                  'under an ingest tool\'s 512)')
+        parser.add_argument('--json', action='store_true',
+                            help='Also write chunks.json: every chunk as an object, its front matter\'s fields apart '
+                                 'from its text, for a system ingesting JSON')
+        parser.add_argument('--since', type=Path, metavar='FOLDER',
+                            help='A delta: only the chunks the export in FOLDER doesn\'t hold, and in index.md the '
+                                 'names of its chunks this one doesn\'t (default --out: the store\'s export-delta/)')
     else:
         parser.description = 'Regenerate a report from a saved comparison, without model calls.'
         parser.add_argument('--comparison', type=int, help='Comparison id (see: show comparisons); default: latest')
@@ -1451,11 +1457,22 @@ def store_command(command, argv):
         elif command == 'export':
             from . import __version__, export, indexes
             data = store.comparison(args.comparison)
-            out = args.out or args.store / 'export'
+            out = args.out or args.store / ('export-delta' if args.since else 'export')
             files = export.exported(data, indexes.built(data), __version__, args.chunk_chars)
+            gone = []
+            if args.since:
+                if out.resolve() == args.since.resolve():
+                    raise ValueError(f"--since names the folder written into ({out}): a delta goes elsewhere "
+                                     "(--out FOLDER)")
+                files, gone = export.delta(files, export.earlier(args.since), args.since)
+            if args.json:
+                files[export.JSON] = export.as_json(files, __version__, gone)
             removed = export.written(out, files)
-            print(f"Export: {out} ({len(files) - 1} chunks and index.md"
-                  + (f"; {removed} of the last export's chunks removed" if removed else "") + ")")
+            chunks = len(export.chunks_of(files))
+            print(f"Export: {out} ({chunks} chunks" + (f" new since {args.since}, {len(gone)} of its chunks gone"
+                                                       if args.since else "")
+                  + f", index.md{' and ' + export.JSON if args.json else ''}"
+                  + (f"; {removed} of the last export's files removed" if removed else "") + ")")
         else:
             out = args.out or args.store
             from .settings import user_settings

@@ -30,7 +30,8 @@ def said(v):
     """A value as written: its value, unit (none for "-") and conditions; a claim naming several items says so."""
     unit = "" if v["unit"] in ("", "-") else v["unit"]
     return (" ".join(x for x in (str(v["value"]), unit) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
-            + (f" [of {', '.join(v['several'])}]" if v.get("several") else ""))
+            + (f" [of {', '.join(v['several'])}]" if v.get("several") else "")
+            + (f" [said of {', '.join(v['listed'])}]" if v.get("listed") else ""))
 
 def counted(n, one, many=None):
     """ "1 claim", "2 claims"."""

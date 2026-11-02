@@ -10,6 +10,7 @@ import unittest
 from pathlib import Path
 
 from semantic_pdf_diff import indexes, indexfiles
+from semantic_pdf_diff.align import TAG
 from semantic_pdf_diff.schema import Evidence, PdfLocator
 from semantic_pdf_diff.report import unpacked
 from stubs import serving
@@ -145,13 +146,32 @@ class Subjects(unittest.TestCase):
     def test_one_things_name_holding_two_tags_names_one_item(self):
         """Rows read as one name items of one shape; a list, items apart by commas, "and" or "or"; but TS 38.300's
         "L2 U2N Relay UE" is one thing (477 of its claims had been counted for none, 2026-11-02)."""
-        for name, tags in [("A-102 A-201", ["A-102", "A-201"]), ("E-102 E-103 E-601", ["E-102", "E-103", "E-601"]),
-                           ("H-101 SPILL CONTAINMENT, & SCHEDULE S-001 DRAWING", ["H-101", "S-001"]),
-                           ("SRB0, SRB1, SRB3 and other MAC CEs", ["SRB0", "SRB1", "SRB3"]),
-                           ("Pumps P-101 and P-102", ["P-101", "P-102"]), ("L2 U2N Relay UE", []),
-                           ("L2 U2N Relay UE and L2 U2N Remote UE", []), ("L1/L2 Triggered Mobility", []),
-                           ("PC5 U2U Relay RLC Channel", []), ("pump P-101", [])]:
-            self.assertEqual(indexes.several(name), tags, name)
+        rows, lists = ["A-102 A-201", "E-102 E-103 E-601", "H-101 SPILL CONTAINMENT, & SCHEDULE S-001 DRAWING"], [
+            "SRB0, SRB1, SRB3 and other MAC CEs", "Pumps P-101 and P-102"]
+        for name in rows + lists + ["L2 U2N Relay UE", "L2 U2N Relay UE and L2 U2N Remote UE",
+                                    "L1/L2 Triggered Mobility", "PC5 U2U Relay RLC Channel", "pump P-101"]:
+            tags = TAG.findall(name)
+            self.assertEqual((indexes.several(name), indexes.listing(name)),
+                             (tags if name in rows else [], tags if name in lists else []), name)
+
+    def test_a_lists_claims_count_for_each_item_it_names(self):
+        """Design question 6's follow-up (the owner, 2026-11-02: "Let's go with your recommendations on the
+        low-hanging fruit."): a statement about several holds for each; rows read as one still count for none."""
+        evidence = [claim(f"F-{n}", "ca", f"pump P-10{n}", "flow", str(9 + n), "l/s") for n in (1, 2, 3)]
+        evidence += [claim("L-1", "ca", "Pumps P-101, P-102 and P-103", "rated power", "75", "kW"),
+                     claim("L-2", "ca", "P-102 and P-104", "duty", "standby", "")]
+        index = indexes.built(report(evidence))
+        by_name = {s["name"]: s for s in index["subjects"]}
+        self.assertEqual(sorted(by_name), ["P-104", "pump P-101", "pump P-102", "pump P-103"])
+        for name in ("pump P-101", "pump P-102", "pump P-103"):
+            power = next(p for p in by_name[name]["properties"] if p["name"] == "rated power")
+            self.assertEqual([(v["claim"], v["listed"]) for v in power["values"]],
+                             [("L-1", ["P-101", "P-102", "P-103"])])
+        self.assertEqual(by_name["P-104"]["claims"], {"a": ["L-2"]})  # an item named only in a list (source a)
+        self.assertEqual([g["subject"] for g in index["gaps"] if g["property"] == "rated power"],
+                         ["P-104"])  # the list gives the three their power: P-104 alone lacks it
+        page = indexfiles.markdown(index)
+        self.assertIn("- **rated power**: 75 kW [said of P-101, P-102, P-103] (a.pdf, page 1)", page)
 
     def test_numbers_alike_dont_join_properties(self):
         evidence = [claim(f"{a}-{n}", "ca", f"P-10{n}", a, "12", "kW") for n in range(1, 4) for a in ("A", "B")]

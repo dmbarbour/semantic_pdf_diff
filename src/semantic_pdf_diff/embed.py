@@ -21,7 +21,7 @@ import logging
 import math
 
 from .failures import BudgetExceeded
-from .llm import Request
+from .llm import Request, key_named
 from .rerank import sentence
 
 VERSION = 1  # of how a request is built
@@ -78,7 +78,8 @@ def request(s, texts, key=None, query=False):
     return Request(body, None if key is None else key, Vectors, words, prompt, (), query=name,
                    description={"template": "embed", "source_type": "", "text_chars": len(prompt), "image_bytes": [],
                                 "params": {"embed": s.embed_model, "dimensions": s.embed_dimensions}},
-                   url=endpoint(s), model=s.embed_model, read=read, instead=lambda: body(cut=False))
+                   url=endpoint(s), model=s.embed_model, read=read, instead=lambda: body(cut=False),
+                   api_key=key_named(s.embed_key_env))
 
 def embedded(evidence, dispatch, s, label, progress=None):
     """The claims' vectors, as a report keeps them: {"model", "dimensions", "vectors": [kept vectors], "of": {claim's

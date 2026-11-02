@@ -121,7 +121,12 @@ HELP = {
     "rerank_url": Help("comparing", "where the reranker is asked ({model} filled in)",
                        "Unset: beside the chat endpoint, on its host: its /rerank, or with rerank_api deepinfra "
                        "DeepInfra's inference API (.../v1/inference/MODEL). A reranker served elsewhere is sent "
-                       "OPENAI_API_KEY too.", "http://localhost:8080/rerank"),
+                       "OPENAI_API_KEY too, unless rerank_key_env names another variable.",
+                       "http://localhost:8080/rerank"),
+    "rerank_key_env": Help("endpoint", "the environment variable holding the reranker's key (none: OPENAI_API_KEY)",
+                           "Its name only: the key is read from it as a run asks, never kept in a store, the user's "
+                           "settings or a report. Unset where a run starts, the reranker is asked without a key, and "
+                           "the run says so first.", "RERANK_API_KEY"),
     "rerank_threshold": Help("comparing", "the least reranker score a pair is judged with, in hundredths (1-10)",
                              "3 is 0.03. Measured at 2, 5 and 10: no related finding lost.", "5", basic=True),
     "search_names": Help("comparing", "the model groups the names the documents give one thing, so a search for one "
@@ -137,7 +142,12 @@ HELP = {
                         "run says search by meaning is off before it starts; none goes without, and it isn't said.",
                         "Qwen/Qwen3-Embedding-8B"),
     "embed_url": Help("endpoint", "where the embedding model is asked ({model} filled in); none: the chat endpoint's "
-                      "/embeddings", "A model served elsewhere is sent OPENAI_API_KEY too."),
+                      "/embeddings", "A model served elsewhere is sent OPENAI_API_KEY too, unless embed_key_env names "
+                      "another variable."),
+    "embed_key_env": Help("endpoint", "the environment variable holding the embedding model's key (none: "
+                          "OPENAI_API_KEY)", "Its name only: the key is read from it as a run asks, never kept in a "
+                          "store, the user's settings or a report. Unset where a run starts, the model is asked "
+                          "without a key, and the run says so first.", "EMBED_API_KEY"),
     "embed_dimensions": Help("comparing", "each claim's vector's size, asked of the embedding model and kept in the "
                              "report (unset: none asked, the model's own)", "A model trained to be cut "
                              "(Qwen3-Embedding) answers any; most can't be, and some servers refuse the size for them "

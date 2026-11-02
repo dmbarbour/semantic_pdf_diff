@@ -752,7 +752,8 @@ def subjects_html(subjects, sources):
     many = len(sources) > 1
     def values(vs):  # a claim naming several items says which (indexes.several)
         return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">{esc(said_of(v))}</a> <small>{esc(v["where"])}'
-                           + (f'; of {esc(", ".join(v["several"]))}' if v.get('several') else '') + '</small>'
+                           + (f'; of {esc(", ".join(v["several"]))}' if v.get('several') else '')
+                           + (f'; said of {esc(", ".join(v["listed"]))}' if v.get('listed') else '') + '</small>'
                            for v in vs) or '—'
     out = []
     for s in subjects:

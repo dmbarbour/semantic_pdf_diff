@@ -59,6 +59,8 @@ A store keeps its own settings, set once for every run in it; the user's are sha
 
 **Asked each run, remembered or not** (the owner, 2026-11-02: "Better to fail fast up front even if it costs a little."): before anything else, every model the run asks gets a small request: the chat model a sum (the JSON check), the reranker and the embedding model their checks. One line says the endpoint answers and what it cost (about $0.00002 at DeepInfra); a failure stops the run there, exit 5, and forgets the run's remembered checks, so the next run checks and calibrates again. The image and acuity checks, which measure, run on first use alone.
 
+**A reranker's or an embedding model's own key:** `config set --user rerank_key_env RERANK_API_KEY` (or `embed_key_env`) names the environment variable its key is read from, as each request is made; unset, it's sent `OPENAI_API_KEY`. Only the name is kept, never the key (the owner, 2026-11-02: "the key must never be stored"): a value not shaped as a variable's name (capitals, digits, `_`) is refused, without being said back.
+
 **A run's settings, said before it starts:** the models it asks and where, and each feature off for want of a model no layer names, with how to name one: reranking (proposals mode: `rerank_model`) and search by meaning (`embed_model`). `config set --user rerank_model none` goes without, and it isn't said; `config unset` leaves it not configured again. `config show` tells the two apart: `not set`, or `none (user)`.
 
 Besides the settings below, a store keeps three run options the same way: `mode` (proposals or revisions), and the report's `report_budget` and `split`.
@@ -81,7 +83,9 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | Setting | Default | Class | Lever | Bound by | Regions |
 |---|---|---|---|---|---|
 | `embed_url` | `null` | endpoint | embed | - | - |
+| `embed_key_env` | `null` | endpoint | embed | - | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |
+| `rerank_key_env` | `null` | endpoint | rerank | - | - |
 | `model` | `""` | endpoint |  | extract, triage, compare | all |
 | `base_url` | `"http://localhost:8000/v1"` | endpoint |  | - | - |
 | `max_calls` | `100000` | endpoint |  | - | - |
@@ -198,10 +202,12 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `second_pass` | `true` | selecting | second_pass | compare | - |
 | `embed_model` | `null` | selecting | embed | compare | - |
 | `embed_url` | `null` | endpoint | embed | - | - |
+| `embed_key_env` | `null` | endpoint | embed | - | - |
 | `embed_dimensions` | `null` | selecting | embed | compare | - |
 | `rerank_model` | `null` | selecting | rerank | compare | - |
 | `rerank_api` | `"rerank"` | selecting | rerank | compare | - |
 | `rerank_url` | `null` | endpoint | rerank | - | - |
+| `rerank_key_env` | `null` | endpoint | rerank | - | - |
 | `rerank_threshold` | `3` | selecting | rerank | compare | - |
 <!-- end of settings table -->
 

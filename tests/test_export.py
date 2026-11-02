@@ -168,6 +168,33 @@ class Command(unittest.TestCase):
         self.assertGreater(removed, 0)
         self.assertEqual(after, files)  # refused: nothing written
 
+    def test_every_chunk_as_json_and_a_delta_against_an_earlier_export(self):
+        """The low-hanging fruit of 2026-11-02 (the owner: "Let's go with your recommendations on the low-hanging
+        fruit."): chunks.json, and a delta's chunks new and gone."""
+        files = export.exported(pumps(3), indexes.built(pumps(3)), "9.9")
+        data = json.loads(export.as_json(files, "9.9"))
+        self.assertEqual(data["made_by"], "semantic-pdf-diff 9.9")
+        self.assertEqual([c["name"] for c in data["chunks"]], [n for n in files if n != "index.md"])
+        first = data["chunks"][0]
+        self.assertEqual(files[first["name"]], export.front(**first["fields"]) + first["text"])
+        self.assertTrue(first["title"] and first["fields"]["title"])
+        with tempfile.TemporaryDirectory() as d:
+            before = Path(d) / "export"
+            export.written(before, files)
+            later = export.exported(pumps(2), indexes.built(pumps(2)), "9.9")
+            changed, gone = export.delta(later, export.earlier(before), before)
+            with self.assertRaisesRegex(ValueError, "isn't an export's folder"):
+                export.earlier(Path(d))
+        new = set(later) - set(files)
+        self.assertTrue(new and gone)
+        self.assertEqual(set(changed), new | {"index.md"})  # the chunks held alike aren't in it
+        self.assertEqual(gone, sorted(set(files) - set(later)))
+        self.assertIn(f"- A delta against the export in {before}: {len(new)} chunks new, {len(gone)} of its chunks "
+                      "gone", changed["index.md"])
+        self.assertIn("\n## Gone\n", changed["index.md"])
+        self.assertIn(f"- {gone[0]}\n", changed["index.md"])
+        self.assertEqual(json.loads(export.as_json(changed, gone=gone))["gone"], gone)
+
     def test_an_analysis_exported_beside_its_store(self):
         state = {"embedded": [], "names": 0}
         with tempfile.TemporaryDirectory() as d, serving(asked(state)) as url:
@@ -180,11 +207,17 @@ class Command(unittest.TestCase):
             code, out, _ = run("export", "--store", root / "out")
             written = sorted(p.name for p in (root / "out" / "export").iterdir())
             index = (root / "out" / "export" / "index.md").read_text()
+            self.assertEqual(code, 0)
+            code, again, _ = run("export", "--store", root / "out", "--since", root / "out" / "export", "--json")
+            delta = sorted(p.name for p in (root / "out" / "export-delta").iterdir())
         self.assertEqual(code, 0)
         self.assertEqual(len(state.get("prompts", [])), asked_before)  # no model calls
-        self.assertIn("chunks and index.md)", out)
+        self.assertRegex(out, r"\(\d+ chunks, index\.md\)")
         self.assertIn("index.md", written)
         self.assertIn("- [Blowers](", index)  # a chunk a section: the blowers' file's heading
+        self.assertIn(f"(0 chunks new since {root / 'out' / 'export'}, 0 of its chunks gone, index.md and chunks.json)",
+                      again)  # the same report: nothing to add or remove
+        self.assertEqual(delta, ["chunks.json", "index.md"])
 
 if __name__ == "__main__":
     unittest.main()

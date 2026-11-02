@@ -16,7 +16,7 @@ from unittest.mock import patch
 
 from stubs import chat_answer, prompt_of, request_body, serving, user_settings
 from semantic_pdf_diff import acuity, checkup, cli
-from semantic_pdf_diff.settings import user_settings as saved_settings
+from semantic_pdf_diff.settings import Settings, user_settings as saved_settings
 
 def run(*argv):
     with contextlib.redirect_stdout(io.StringIO()) as out, contextlib.redirect_stderr(io.StringIO()):
@@ -399,6 +399,45 @@ class ChoosingAModel(Remembered):
         self.assertEqual({k: sorted(v) for k, v in listed[1]["checked"].items()},
                          {"json": ["at", "context_tokens"], "image": ["at", "image_tokens", "side"],
                           "acuity": ["at", "legible_px", "read", "side"]})
+
+class KeysOfTheirOwn(Remembered):
+    """A reranker's and an embedding model's keys from variables of their own (the owner, 2026-11-02: "We could enable
+    users to assign reranker and embedding model their own key, but the key must never be stored; they could specify
+    environment variables where to find the key, though.")."""
+    def test_each_model_sent_the_key_its_variable_holds_and_none_kept(self):
+        sent = {}
+
+        def post(handler):
+            body = request_body(handler)
+            sent[handler.path.rsplit("/", 1)[-1]] = handler.headers.get("Authorization")
+            if handler.path.endswith("/rerank"):
+                handler.send_response(200)
+                handler.end_headers()
+                handler.wfile.write(json.dumps([{"index": 1, "score": 0.02}, {"index": 0, "score": 0.91}]).encode())
+            else:
+                rows = [{"index": i, "embedding": [float("pump" in t), float("door" in t), 0.1]}
+                        for i, t in enumerate(body["input"])]
+                handler.send_response(200)
+                handler.end_headers()
+                handler.wfile.write(json.dumps({"data": rows}).encode())
+        keys = {"OPENAI_API_KEY": "chat-key-1", "RERANK_KEY": "rerank-key-2"}
+        with serving(post) as url, patch.dict(os.environ, {"OPENAI_BASE_URL": url, **keys}), \
+                user_settings({"model": "gemma-4", "rerank_model": "r", "rerank_api": "tei",
+                               "rerank_url": url + "/rerank", "rerank_key_env": "RERANK_KEY", "embed_model": "e",
+                               "embed_key_env": "EMBED_KEY"}):
+            code, out = self.config("test", "--only", "reranker,embedding")
+            kept = saved_settings()
+            remembered = self.memory.read_text()
+            refused = self.config("set", "--user", "embed_key_env", "rerank-key-2")[1]
+        self.assertEqual(code, 0, out)
+        self.assertEqual(sent, {"rerank": "Bearer rerank-key-2", "embeddings": None})  # EMBED_KEY unset: no key
+        self.assertEqual((kept["rerank_key_env"], kept["embed_key_env"]), ("RERANK_KEY", "EMBED_KEY"))
+        self.assertFalse(any(k in json.dumps(kept) + remembered for k in keys.values()))
+        self.assertIn("this names an environment variable holding a key", refused)
+        self.assertNotIn("rerank-key-2", refused)  # a key given in its place isn't said back
+        s = Settings(model="m", rerank_model="r", rerank_key_env="RERANK_KEY")
+        self.assertIn("reranker r (its key from $RERANK_KEY, which isn't set: asked without a key)",
+                      checkup.guidance(s)[0])
 
 class EyeCards(unittest.TestCase):
     """The acuity check's cards (acuity.py): the eye test's read family, a card a size (the owner, 2026-11-02: "Go

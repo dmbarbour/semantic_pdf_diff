@@ -60,6 +60,12 @@ def redact_url(url):
     netloc = host + (f":{parts.port}" if parts.port else "")
     return urllib.parse.urlunsplit(parts._replace(netloc=netloc))
 
+def key_named(variable):
+    """The key the environment variable named holds ("" where it's unset), or None where none is named: the
+    transport's, OPENAI_API_KEY's. A setting names the variable; the key itself is never kept (the owner,
+    2026-11-02: "the key must never be stored; they could specify environment variables where to find the key")."""
+    return os.getenv(variable, "") if variable else None
+
 def is_local(url):
     host = (urllib.parse.urlsplit(url).hostname or "").lower()
     return host in ("localhost", "::1") or host.startswith("127.")
@@ -256,6 +262,9 @@ class Request:
     # A body to send instead, once, where the server refuses this one (HTTP 400): an embedding request with the model
     # and the input alone, for a model that can't be cut to the dimensions asked (embed.request)
     instead: Callable[[], bytes] | None = None
+    # The key sent with it, where not the transport's (OPENAI_API_KEY's): the variable rerank_key_env or embed_key_env
+    # names (key_named); read as the request is made, never kept
+    api_key: str | None = None
 
     @cached_property
     def raw(self):
@@ -348,6 +357,12 @@ class Transport:
             self.in_a_row.pop(url, None)
         return value
 
+    def redacted(self, text, request=None):
+        """Text a server sent back, any key it echoes (the transport's, or the request's own) cut out."""
+        for key in {self.api_key, getattr(request, "api_key", None)} - {None, ""}:
+            text = text.replace(key, "...")
+        return text
+
     def failed_at(self, url, error):
         """A request failed at url, after its retries. Once stop_after_failures have in a row, sending stops as the
         cost cap stops it: what isn't sent isn't attempted, and the next run asks it again. Before, every request
@@ -364,11 +379,11 @@ class Transport:
         last = "Unknown model failure"
         if not request.admitted:  # a caller that didn't admit it as it asked
             self.admit(request)
+        key = request.api_key if request.api_key is not None else self.api_key
         for attempt in range(self.s.retries + 1):
             wait = min(2 ** attempt, 8)
             http = urllib.request.Request(url, data=request.raw,
-                headers={"Content-Type": "application/json",
-                         **({"Authorization": "Bearer " + self.api_key} if self.api_key else {})})
+                headers={"Content-Type": "application/json", **({"Authorization": "Bearer " + key} if key else {})})
             entry = self.limiter.acquire(request.estimate)
             self.gate.acquire()
             started, throttled, generated = time.monotonic(), False, 0
@@ -511,11 +526,11 @@ class Transport:
         body = raw.decode(errors="replace").lower()
         said = server_said(raw, (e.headers.get("Content-Type") if e.headers is not None else None) or "")
         if said:
-            last += ": " + (said.replace(self.api_key, "...") if self.api_key else said)
+            last += ": " + self.redacted(said, request)
         if requests_log.isEnabledFor(logging.DEBUG):
             answered = raw.decode(errors="replace")
             requests_log.debug("  sent to %s: %s\n  answered: %s", redact_url(url), shown(request.raw),
-                               answered.replace(self.api_key, "...") if self.api_key else answered)
+                               self.redacted(answered, request))
         if e.code == 402 or (e.code in (400, 403) and any(word in body for word in BILLING)) \
                 or (e.code == 429 and any(word in body for word in BILLING_429)):
             with self.lock:
