@@ -836,6 +836,19 @@ class TableStructure(Lever):
     def asks_structure(self):
         return self.table_structure
 
+class LabelsJoined(Lever):
+    lever_name, stage, off = "labels_joined", "segmentation", {"labels_joined": False}
+    # a PDF table's lines the mending joined as one row's (tables.ruled_rows: no rule between them), though each has
+    # a first cell, are shown to the structure query (table_structure) as lines, with the table's image, and read
+    # with the line above unless its rules say otherwise: two labels made one ("ADDRESS:" and "DRAWN BY:" in a title
+    # block) or one label over two lines (HabEx's "mission" over "time"), which code can't tell apart (the indexes
+    # plan's design question 8; the owner, 2026-11-02: "we should also be willing to ask a model what the author is
+    # trying to say if it's confusing. Perhaps an "is this the correct reading of that" question in some form")
+    labels_joined: Annotated[bool, _selecting(frozenset({"table"}))] = False
+
+    def shows_joins(self):
+        return self.labels_joined
+
 class VisualTextLayer(Lever):
     lever_name, stage, off = "visual_text_layer", "inclusion", {"visual_text_layer": 0}
     marks = {"visual_text_layer": re.compile("^" + re.escape(LAYER_NOTE) + "\n(.*)$", re.M)}
@@ -1415,7 +1428,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty,
                  SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, ScanHalves, RenderArea,
                  FigureTasks,
-                 TableRules, TableReview, TableStructure, VisualTextLayer, TableCuts, TextCuts, TextSpans, RepeatedText,
+                 TableRules, TableReview, TableStructure, LabelsJoined, VisualTextLayer, TableCuts, TextCuts, TextSpans,
+                 RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
@@ -1737,6 +1751,12 @@ class Platform(Composable):
     @chosen
     def asks_structure(self):
         """Whether a PDF table with suspect lines is asked how its lines group into rows (tablestructure.py)."""
+        return False
+
+    @chosen
+    def shows_joins(self):
+        """Whether the structure query is shown a PDF table's lines that the mending joined though each has a first
+        cell, as lines (labels_joined)."""
         return False
 
     @chosen

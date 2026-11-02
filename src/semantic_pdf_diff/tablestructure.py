@@ -29,6 +29,9 @@ UNIT = re.compile(r"^[(\[]?\s*(µm|μm|nm|mm|cm|m|km|in|ft|mas|%|°|°c|°f|k|w|
 SIGNALS = ("no rule above", "first cell empty", "only its first cell", "units only", "words under numbers",
            "half height", "a word cut by a column line")
 CUT = "a word cut by a column line"
+# Lines the mending joined to the line above, each with a first cell (labels_joined): shown apart, read so unless a
+# rule says otherwise. Named only to a part holding such lines, so every other part is asked as before.
+JOINED = "read with the line above"
 COLUMN_ACTIONS = ("split column", "join columns")  # acting on columns, in every row
 ACTIONS = ("join above", "join header", "section", "new table", "not table", "keep") + COLUMN_ACTIONS
 
@@ -109,7 +112,7 @@ parser can be wrong about where a row ends: a cell's text over two lines may com
 lines as a header and a row, a label as a row of its own. The table's image is attached: read its rows there.
 
 THE LINES (numbered; H is the header; cells parted by " | "). Tags in [brackets] are signals that a line may not be
-a row of its own:
+a row of its own:{joined}
 {lines}
 
 Answer with rules that regroup the lines into the table's real rows. A rule has an action and says which lines it
@@ -117,7 +120,7 @@ acts on: the lines its "lines" names (line numbers), and any line where all of i
 both. The signals: {signals}.
 A line named in a rule's "lines" follows that rule; any other line follows the first rule whose "when" all hold; \
 a line no rule
-fits stays a row. Actions:
+fits stays a row{fits}. Actions:
 - "join above": the line's cells join the line above's, cell by cell (a wrapped cell, a unit under its value)
 - "join header": the line joins the header, cell by cell (a header over two lines)
 - "section": the line names a section of the rows under it
@@ -142,6 +145,10 @@ Compare it with the table's image. Answer "keep" if the rows are right; else "re
 revised answer in full ("structure": the same form as before).
 Return JSON only: {"verdict": "keep" | "revise", "problems": ["..."], "structure": {...}}
 """
+
+JOINED_NOTE = (f'\nThe parser read each line tagged "{JOINED}" as the next line of the row above (no rule between '
+               "them), though both have a first cell: see in the image whether they are one row, or rows of their own.")
+JOINED_FITS = f' (one tagged "{JOINED}" stays so: "keep" makes it a row of its own)'
 
 def _letter(k):
     """Column k's letter, from 0 (the spreadsheet's naming, past "AZ" too: code review 2026-10-08, B10)."""
@@ -203,17 +210,18 @@ def _example_line(example):
     line = re.sub(r"(?i)^\s*line\s*", "", example.line).strip()
     return 0 if line.upper() == "H" else _number(line)
 
-def problems(answer, n, width, tags):
-    """What's wrong with structure rules, before they're applied: unknown actions, signals, lines or columns."""
+def problems(answer, n, width, tags, known=SIGNALS):
+    """What's wrong with structure rules, before they're applied: unknown actions, signals (known: those the lines
+    were shown with), lines or columns."""
     wrong = []
     for k, rule in enumerate(answer.rules, 1):
         action = rule.action.strip().lower()
         if action not in ACTIONS:
             wrong.append(f"rule {k}: unknown action {rule.action!r}")
             continue
-        unknown = [w for w in rule.when if w.strip().lower() not in SIGNALS]
+        unknown = [w for w in rule.when if w.strip().lower() not in known]
         if unknown:
-            wrong.append(f"rule {k}: unknown signals {unknown} (known: {', '.join(SIGNALS)})")
+            wrong.append(f"rule {k}: unknown signals {unknown} (known: {', '.join(known)})")
         bad = [x for x in rule.lines
                if x.strip().upper() != "H" and (_number(x) is None or not 1 <= _number(x) <= n)]  # H: ignored
         if bad:
@@ -231,20 +239,22 @@ def problems(answer, n, width, tags):
             wrong.append(f"rule {k}: it says neither \"when\" nor \"lines\"")
     return wrong
 
-def apply(answer, header, body, boxes, tags, cuts=None):
-    """Structure rules applied to a part's lines. cuts: as signals takes them, to join cut words without a space. In
-    three phases: each line's action, the lines into rows and parts, then the columns joined and split in every part,
-    each named as shown, so mapped through the joins and splits before it (code review 2026-10-08, B3)."""
+def apply(answer, header, body, boxes, tags, cuts=None, held=()):
+    """Structure rules applied to a part's lines. cuts: as signals takes them, to join cut words without a space;
+    held: the lines read with the line above where no rule says otherwise (JOINED). In three phases: each line's
+    action, the lines into rows and parts, then the columns joined and split in every part, each named as shown, so
+    mapped through the joins and splits before it (code review 2026-10-08, B3)."""
     out = Applied()
-    _rows_applied(out, _line_actions(answer, body, tags), header, body, boxes)
+    _rows_applied(out, _line_actions(answer, body, tags, held), header, body, boxes)
     width = max(len(r) for r in [header] + list(body))
     index = list(range(width))  # each column's place after joins (splits name columns as they were shown)
     index = _columns_joined(out, answer, width, index, cuts)
     _columns_split(out, answer, width, index)
     return out
 
-def _line_actions(answer, body, tags):
-    """{line: (action, rule)}: a rule naming the line, else the first rule whose "when" tags the line all has."""
+def _line_actions(answer, body, tags, held=()):
+    """{line: (action, rule)}: a rule naming the line, else the first rule whose "when" tags the line all has, else
+    for a held line "join above" (no rule)."""
     act, named = {}, {}
     for rule in answer.rules:
         action = rule.action.strip().lower()
@@ -262,6 +272,9 @@ def _line_actions(answer, body, tags):
             if rule.action.strip().lower() not in COLUMN_ACTIONS and when and all(w in tags[i - 1] for w in when):
                 act[i] = (rule.action.strip().lower(), rule)
                 break
+        else:
+            if i in held:
+                act[i] = ("join above", None)
     return act
 
 def _rows_applied(out, act, header, body, boxes):
@@ -420,6 +433,15 @@ def cells_parted_otherwise(answer, applied, body):
             out.append(f"line {number}'s cells parted otherwise in the image: {' | '.join(theirs)[:120]}")
     return out
 
+def joins_kept(applied, held):
+    """(kept, parted): the held lines read with the line above by the rules, and those read otherwise."""
+    together = set()
+    for p, (origins, heads) in enumerate(zip(applied.origins, applied.heads)):
+        for lines in [([0] if p == 0 else []) + heads, *origins]:
+            together.update(zip(lines, lines[1:]))
+    kept = sorted(i for i in held if (i - 1, i) in together)
+    return kept, sorted(set(held) - set(kept))
+
 def describe(applied):
     """The rules in words, each with the lines it acted on."""
     out = []
@@ -454,23 +476,30 @@ def review_question(asked, answer, applied, header, body, tags):
         lines.append("not applied: " + "; ".join(applied.misfits[:6]))
     return "\n".join(lines)
 
-def read(core, page, task, header, body, boxes, styles, rules, images, then, cuts=None):
+def read(core, page, task, header, body, boxes, styles, rules, images, then, cuts=None, held=(), as_read=None):
     """Ask a part's structure when a line is suspect, then call then(parts, step, apart, table): parts as
     tables.pdf_parts gives them, step a DerivationStep saying how the structure was settled (None: as the heuristics
     left it), apart the body lines read by themselves ("not table"), table False where the model reads no table
     (rules leaving no rows: a chart, a floor plan). images: a callable giving the table's crop(s), relative to the
-    output folder, rendered only for a part that's asked."""
+    output folder, rendered only for a part that's asked. held: the lines (from 1) the mending joined to the line
+    above, each with a first cell, shown apart (JOINED); as_read: the part as the heuristics read it, those lines
+    joined, given where the model's rules aren't used."""
     tags = signals(header, body, boxes, styles, rules, cuts)
+    for i in held:
+        tags[i - 1].insert(0, JOINED)
+    known = SIGNALS + (JOINED,) if held else SIGNALS
+    as_read = as_read or (header, body, boxes)
     flagged = [i + 1 for i, (t, row) in enumerate(zip(tags, body)) if suspect(t, row)]
     if cuts and cuts.get(0):  # the header's words cut by a column line
         flagged.append(0)
     if not flagged:
-        return then([(header, body, boxes)], None, [], True)
+        return then([as_read], None, [], True)
     worst = max(flagged, key=lambda i: (len(tags[i - 1]) if i else 1, -i))
     images = images()
     width = max(len(r) for r in [header] + list(body))
-    asked = STRUCTURE.format(lines=show_lines(header, body, tags, cuts),
-                             signals=", ".join(f'"{s}"' for s in SIGNALS), worst="H" if worst == 0 else worst)
+    asked = STRUCTURE.format(lines=show_lines(header, body, tags, cuts), signals=", ".join(f'"{s}"' for s in known),
+                             worst="H" if worst == 0 else worst, joined=JOINED_NOTE if held else "",
+                             fits=JOINED_FITS if held else "")
     span = boxes and all(boxes) and (min(b[0] for b in boxes), min(b[1] for b in boxes), max(b[2] for b in boxes),
                                      max(b[3] for b in boxes))
 
@@ -481,13 +510,13 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
 
     def heuristic(name, status, why, table=True):
         record(name, status, [f"Structure as the heuristics left it: {why}"[:500]])
-        then([(header, body, boxes)], None, [], table)
+        then([as_read], None, [], table)
 
     def check(answer):
-        wrong = problems(answer, len(body), width, tags)
+        wrong = problems(answer, len(body), width, tags, known)
         if wrong:
             return wrong, None
-        applied = apply(answer, header, body, boxes, tags, cuts)
+        applied = apply(answer, header, body, boxes, tags, cuts, held)
         if not applied.parts:
             return [NO_ROWS], None
         if applied.unsupported:  # a column join the page's words don't bear out
@@ -515,7 +544,7 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
 
         def not_reached(self, name, error):
             record(name, "not_reached", [str(error)])
-            then([(header, body, boxes)], None, [], True)
+            then([as_read], None, [], True)
 
         def failed(self, name, error):
             heuristic(name, "failed", f"the structure query failed ({error})")
@@ -539,7 +568,13 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
     def use(named, answer, applied, notes):
         said = describe(applied) or "every line a row as it is"
         parted = cells_parted_otherwise(answer, applied, body)
-        record(named, "complete", [f"Structure by rules: {said}"[:500]] + notes[:6] + applied.misfits[:4] + parted[:2])
+        joins = []
+        if held:  # how the lines the parser joined were read
+            kept, apart_ = joins_kept(applied, held)
+            joins = [f"Lines the parser read with the line above: {len(kept)} kept so, {len(apart_)} read otherwise"
+                     + (f" ({', '.join(map(str, apart_[:12]))})" if apart_ else "")]
+        record(named, "complete", [f"Structure by rules: {said}"[:500]] + joins + notes[:6] + applied.misfits[:4]
+               + parted[:2])
         step = DerivationStep(step="table-structure", detail=f"by rules a model wrote: {said}"[:400])
         then(applied.parts, step, applied.apart, True)
 

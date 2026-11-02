@@ -316,6 +316,18 @@ class PdfTables(unittest.TestCase):
         self.assertEqual(ruled_rows(rows, boxes, [0, 72])[2], 0)  # too few rules to tell: unchanged
         self.assertEqual(ruled_rows(rows, boxes, [b[1] for b in boxes])[2], 0)  # every boundary ruled
 
+    def test_the_lines_of_two_labels_joined_are_told(self):
+        """Lines joined though each has a first cell (labels_joined): two labels made one, or one over two lines."""
+        from semantic_pdf_diff.tables import labels_joined, ruled_groups
+        box = lambda y0, y1: (0, y0, 100, y1)
+        rows = [["Item", "Value"], ["ADDRESS:", "1 Grand Ave"], ["DRAWN BY:", "JD"], ["SCALE", "1:20"],
+                ["Detector", "1×1"], ["", "CCD201"], ["Mission", "5 yr"], ["", ""], ["time", ""]]
+        boxes = [box(10 * k, 10 * k + 10) for k in range(len(rows))]
+        groups = ruled_groups(rows, boxes, [0, 10, 30, 40, 60, 90])  # none above DRAWN BY, CCD201, the blank, time
+        self.assertEqual(groups, [[0], [1, 2], [3], [4, 5], [6, 7, 8]])
+        self.assertEqual(labels_joined(rows, groups), [[1, 2], [6, 7, 8]])  # an empty first cell between: still
+        self.assertIsNone(ruled_groups(rows, boxes, [0, 90]))  # too few rules: unchanged
+
     def test_rows_each_starting_with_their_own_tag_stay_apart_and_a_tag_merged_with_its_title_is_parted(self):
         """Rows read as one (the indexes plan, design question 6; the owner, 2026-11-02: "I agree that we can apply
         heuristics for reading a table and splitting things. If everything fits together neatly, we can reasonably

@@ -271,6 +271,77 @@ class Asked(unittest.TestCase):
                 lambda parts, step, apart, table: out.update(parts=parts, step=step))
         self.assertEqual(out, {"parts": [(HEADER, BODY[:2], BOXES[:2])], "step": None})
 
+class LabelsJoined(unittest.TestCase):
+    """Lines the mending joined though each has a first cell, shown apart and read with the line above unless the
+    rules say otherwise (labels_joined; the indexes plan, design question 8; the owner, 2026-11-02: "we should also
+    be willing to ask a model what the author is trying to say if it's confusing")."""
+    HEADER, BODY = ["Item", "Value"], [["ADDRESS:", "1 Grand Ave"], ["DRAWN BY:", "JD"], ["SCALE", "1:20"]]
+
+    def tags(self):
+        tags = ts.signals(self.HEADER, self.BODY, BOXES[:3], None, [10, 30, 40, 50])
+        tags[1].insert(0, ts.JOINED)
+        return tags
+
+    def test_a_held_line_is_read_with_the_line_above_unless_a_rule_keeps_it(self):
+        tags = self.tags()
+        got = ts.apply(answer(), self.HEADER, self.BODY, BOXES[:3], tags, None, {2})
+        self.assertEqual(got.parts[0][1], [["ADDRESS: DRAWN BY:", "1 Grand Ave JD"], ["SCALE", "1:20"]])
+        self.assertEqual(ts.joins_kept(got, {2}), ([2], []))
+        kept = answer(rules=[{"action": "keep", "when": [ts.JOINED]}])
+        got = ts.apply(kept, self.HEADER, self.BODY, BOXES[:3], tags, None, {2})
+        self.assertEqual(got.parts[0][1], self.BODY)
+        self.assertEqual(ts.joins_kept(got, {2}), ([], [2]))
+        held_header = ts.apply(answer(), self.HEADER, self.BODY, BOXES[:3], tags, None, {1})  # the header's next line
+        self.assertEqual(held_header.parts[0][0], ["Item ADDRESS:", "Value 1 Grand Ave"])
+        self.assertEqual(ts.joins_kept(held_header, {1}), ([1], []))
+
+    def test_the_signal_is_known_only_where_lines_are_held(self):
+        rule = answer(rules=[{"action": "keep", "when": [ts.JOINED]}])
+        self.assertEqual(ts.problems(rule, 3, 2, self.tags(), ts.SIGNALS + (ts.JOINED,)), [])
+        self.assertIn("unknown signals", ts.problems(rule, 3, 2, self.tags())[0])
+
+    def run_with(self, answers, held):
+        asked, recorded, out = [], [], {}
+
+        def submit(prompt, model, images, key, finish):
+            asked.append(prompt)
+            said = answers.pop(0)
+            finish(*((None, said) if isinstance(said, Exception) else (model.model_validate(said), None)))
+
+        core = SimpleNamespace(content="c", output=__import__("pathlib").Path("/tmp"), state={"pending": 0},
+                               progress=SimpleNamespace(add=lambda: None, finish=lambda status: None),
+                               dispatch=SimpleNamespace(submit=submit), s=SimpleNamespace(reviews_tables=lambda: 1),
+                               record=lambda row, claims: recorded.append(row))
+        core.ask = partial(TaskCore.ask, core)
+        as_read = (self.HEADER, [["ADDRESS: DRAWN BY:", "1 Grand Ave JD"], ["SCALE", "1:20"]], [BOXES[0], BOXES[2]])
+        ts.read(core, 1, "structure:p1:0", self.HEADER, self.BODY, BOXES[:3], None, [10, 30, 40, 50], lambda: [],
+                lambda parts, step, apart, table: out.update(parts=parts), None, held, as_read)
+        return asked, recorded, out
+
+    def test_asked_with_the_lines_apart_and_the_heuristics_reading_kept_on_failure(self):
+        kept = {"rules": [{"action": "keep", "lines": ["2"]}],
+                "examples": [{"line": "2", "cells": ["DRAWN BY:", "JD"]}]}
+        asked, recorded, out = self.run_with([kept, {"verdict": "keep"}], {2})
+        self.assertIn("2:  DRAWN BY: | JD   [read with the line above]", asked[0])
+        self.assertIn('The parser read each line tagged "read with the line above" as the next line', asked[0])
+        self.assertIn('"half height", "a word cut by a column line", "read with the line above".', asked[0])
+        self.assertEqual(out["parts"][0][1], self.BODY)
+        self.assertIn("Lines the parser read with the line above: 0 kept so, 1 read otherwise (2)",
+                      recorded[-1]["issues"])
+        asked, _, out = self.run_with([RuntimeError("down")], {2})
+        self.assertEqual(out["parts"][0][1], [["ADDRESS: DRAWN BY:", "1 Grand Ave JD"], ["SCALE", "1:20"]])
+        asked, _, out = self.run_with([], set())  # nothing held, nothing suspect: not asked, read as it is
+        self.assertEqual((asked, out["parts"][0][1]),
+                         ([], [["ADDRESS: DRAWN BY:", "1 Grand Ave JD"], ["SCALE", "1:20"]]))
+
+    def test_a_part_without_held_lines_is_asked_as_before(self):
+        tags = ts.signals(HEADER, BODY, BOXES, None, [10, 20, 40, 60, 80])
+        shown = ts.STRUCTURE.format(lines=ts.show_lines(HEADER, BODY, tags), signals=", ".join(f'"{s}"' for s in
+                                    ts.SIGNALS), worst=7, joined="", fits="")
+        self.assertNotIn(ts.JOINED, shown)
+        self.assertIn("a line no rule\nfits stays a row. Actions:", shown)
+        self.assertIn("a row of its own:\n    A | B | C\n", shown)
+
 class Extracted(unittest.TestCase):
     """The structure query in a PDF's extraction."""
     def test_a_late_answer_reads_its_own_pages_table(self):
@@ -631,6 +702,93 @@ class Detection(unittest.TestCase):
         asked, coverage = self.extract(None)
         row = next(r for r in coverage if r["task"] == "table-detection:p1")
         self.assertEqual((row["status"], row["issues"]), ("failed", ["RuntimeError: PyMuPDF's own"]))
+
+class LabelsJoinedRead(unittest.TestCase):
+    """A ruled table's lines joined though each has a first cell, through a PDF's extraction (labels_joined)."""
+    ROWS = [["Item", "Value"], ["ADDRESS:", "1 Grand Ave"], ["DRAWN BY:", "JD"], ["SCALE", "1:20"], ["DATE", "2015"]]
+
+    def extract(self, labels_joined, structure, rows=None, rules=(20, 40, 80, 100, 120)):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import pymupdf
+        from semantic_pdf_diff.jobs import extract_pdf
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.settings import Settings
+        from semantic_pdf_diff.provenance import content_id
+        from stubs import situating_answer
+        rows = rows or self.ROWS
+
+        class Table:
+            bbox, cells = (20, 20, 280, 140), []
+            def extract(self): return [list(r) for r in rows]
+
+        class Client:
+            s = Settings(vision=False, table_rules=None, refinement_depth=1, labels_joined=labels_joined)
+            calls, cache_hits, usage = 0, 0, {}
+
+            def __init__(self):
+                self.asked, self.prompts = [], {}
+
+            def ask(self, prompt, schema, images=(), key=None):
+                self.asked.append(key[3])
+                self.prompts[key[3]] = prompt
+                if situating_answer(prompt):
+                    return schema.model_validate(situating_answer(prompt))
+                if key[0] == "key-value":
+                    return schema(reading="table")
+                if key[0] == "table-structure":
+                    return schema.model_validate(structure)
+                if key[0] == "table-structure-review":
+                    return schema.model_validate({"verdict": "keep"})
+                return Extraction(claims=[], complete=True)
+
+        boxes = lambda table, found: [(20, 20 + 20 * i, 280, 40 + 20 * i) for i in range(len(found))]
+        found = lambda page, *a, **k: type("T", (), {"tables": [Table()]})()
+        with tempfile.TemporaryDirectory() as d, patch.object(pymupdf.Page, "find_tables", found), \
+                patch("semantic_pdf_diff.extract.row_boxes", boxes), \
+                patch("semantic_pdf_diff.tables.Marks.rules", lambda self, bbox, cover=0.6: list(rules)):
+            doc = pymupdf.open()
+            doc.new_page(width=300, height=300)
+            path = Path(d) / "t.pdf"
+            doc.save(path)
+            client = Client()
+            extract_pdf(path, content_id(path.read_bytes(), path.name), Path(d), client)
+        return client
+
+    def test_the_lines_shown_apart_and_kept_apart_or_read_as_the_mending_joined_them(self):
+        keep = {"rules": [{"action": "keep", "when": ["read with the line above"]}],
+                "examples": [{"line": "2", "cells": ["DRAWN BY:", "JD"]}]}
+        client = self.extract(True, keep)
+        self.assertIn("2:  DRAWN BY: | JD   [read with the line above; no rule above]",
+                      client.prompts["structure:p1:0"])
+        self.assertEqual(sorted(t for t in client.asked if t.startswith("table:")),
+                         ["table:p1:0:0", "table:p1:0:1", "table:p1:0:2", "table:p1:0:3"])
+        self.assertIn("DRAWN BY:", client.prompts["table:p1:0:1"])
+        self.assertNotIn("ADDRESS:", client.prompts["table:p1:0:1"])
+        same = {"rules": [], "examples": [{"line": "2", "cells": ["ADDRESS: DRAWN BY:", "1 Grand Ave JD"]}]}
+        client = self.extract(True, same)  # the model reads it as the mending did
+        self.assertEqual(sorted(t for t in client.asked if t.startswith("table:")),
+                         ["table:p1:0:0", "table:p1:0:1", "table:p1:0:2"])
+        self.assertIn("ADDRESS: DRAWN BY:", client.prompts["table:p1:0:0"])
+        client = self.extract(False, keep)  # off: joined, nothing suspect, not asked
+        self.assertNotIn("structure:p1:0", client.asked)
+        self.assertEqual(sorted(t for t in client.asked if t.startswith("table:")),
+                         ["table:p1:0:0", "table:p1:0:1", "table:p1:0:2"])
+
+    def test_a_header_joined_with_the_first_row_is_shown_apart_too(self):
+        # eia's "Section" over "13105": no rule under the header
+        rows = [["Section", "Title"], ["13105", "Nuclear"], ["13403", "Vehicles"], ["50144", "Grid"], ["50145", "Wind"],
+                ["50146", "Solar"]]
+        keep = {"rules": [{"action": "keep", "lines": ["1"]}],
+                "examples": [{"line": "1", "cells": ["13105", "Nuclear"]}]}
+        client = self.extract(True, keep, rows, (20, 60, 80, 100, 120, 140))
+        self.assertIn("H:  Section | Title\n1:  13105 | Nuclear   [read with the line above; no rule above]",
+                      client.prompts["structure:p1:0"])
+        self.assertEqual(len([t for t in client.asked if t.startswith("table:")]), 5)
+        client = self.extract(False, keep, rows, (20, 60, 80, 100, 120, 140))
+        self.assertEqual(len([t for t in client.asked if t.startswith("table:")]), 4)
+        self.assertIn("Section 13105", client.prompts["table:p1:0:0"])
 
 if __name__ == "__main__":
     unittest.main()

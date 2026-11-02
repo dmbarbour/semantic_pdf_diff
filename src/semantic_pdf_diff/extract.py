@@ -11,13 +11,13 @@ import pymupdf
 
 from . import keyvalue
 from .context import Context
-from .pages import native, native_page, on_crop, reading_blocks, shown
+from .pages import native, native_page, on_crop, reading_blocks, shown, union
 from .progress import within
 from .regions import crop_name, crop_stem
 from .schema import DerivationStep, PdfLocator, coverage_row
 from .sections import pdf_sections
-from .tables import (Marks, column_edges, cut_columns, parted_across, pdf_grid, pdf_parts, row_boxes, ruled_rows,
-                     same_form, split_cuts)
+from .tables import (Marks, column_edges, cut_boundaries, cut_columns, labels_joined, parted_across, pdf_grid,
+                     pdf_parts, row_boxes, ruled_groups, ruled_rows, same_form, split_cuts)
 from .tasks import TaskCore, Watch, split_utf8
 from .visuals import Visuals, render
 
@@ -189,7 +189,9 @@ class PdfReading:
         self.visuals.task(number, page, tag, rect, text=note, tiling=tiling)
 
     def detect(self, number, page):
-        """The page's tables as detected and mended: ([(bbox, rows, boxes, styles, rules, edges)], its drawn marks)."""
+        """The page's tables as detected and mended: ([(bbox, rows, boxes, styles, rules, edges, joins)], its drawn
+        marks). joins: {a row's box: (its lines, their boxes)} for each row the mending joined from lines of two
+        labels, where the structure query is shown them (labels_joined)."""
         s, content, record = self.s, self.content, self.record
         # Table detection works in displayed coordinates; locators are unrotated. Only PyMuPDF's calls are
         # detection failures (it raises assorted internal errors); our mending's errors are named as ours, and the
@@ -209,22 +211,31 @@ class PdfReading:
         for ti_found, (table, rows) in enumerate(detected):
             if not s.keep_table(self.context_of, page, table, rows):
                 continue
-            boxes, styles, rules, edges = row_boxes(table, rows), None, None, None
+            boxes, styles, rules, edges, joins = row_boxes(table, rows), None, None, None, {}
             if marks is not None and boxes:  # lines of one row parted by shading, joined (ruled_rows)
                 try:
                     rules = marks.rules(table.bbox)
                     parted = parted_across(table, rows, page)  # a row's tag and title in one cell, parted
                     mended, mended_boxes, _ = ruled_rows(parted, boxes, rules)
-                    mended, edges, _ = cut_columns(mended, mended_boxes, column_edges(table), marks)
+                    found_edges = column_edges(table)
+                    cut = cut_boundaries(mended, mended_boxes, found_edges, marks)
+                    mended, edges, _ = cut_columns(mended, mended_boxes, found_edges, marks, cut)
                     styles = marks.styles(table.bbox, mended_boxes)
+                    if s.shows_joins() and s.asks_structure():  # two labels' lines joined: the model shown them
+                        for group in labels_joined(parted, ruled_groups(parted, boxes, rules)):
+                            lines, _, _ = cut_columns([parted[k] for k in group], [boxes[k] for k in group],
+                                                      found_edges, marks, cut)
+                            joins[unrotated(union(boxes[k] for k in group))] = (lines,
+                                                                                 [unrotated(boxes[k]) for k in group])
                     rows, boxes = mended, mended_boxes
                 except Exception as e:  # noqa: BLE001 (a bug of ours: the table is still read, as detected)
                     rules = styles = edges = None
+                    joins = {}
                     record(coverage_row(content=content, page=number, bbox=list(native(page, table.bbox)),
                                         task=f"table-detection:p{number}:{ti_found}:mending", status="partial",
                                         issues=[f"Table mending failed (a bug: {type(e).__name__}: {e}); "
                                                 "the table read as detected"]))
-            found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules, edges))
+            found.append((unrotated(table.bbox), rows, [unrotated(b) for b in boxes], styles, rules, edges, joins))
         return found, marks
 
     def tables(self, number, page, found, marks):
@@ -232,10 +243,10 @@ class PdfReading:
         continuing, self.carried = self.carried, None
         self.context_of.tables_on[number] = [found_[0] for found_ in found]
         self.context_of.table_rows_on[number] = [found_[:3] for found_ in found]
-        for ti, (bbox, rows, boxes, styles, rules, edges) in enumerate(found):
+        for ti, (bbox, rows, boxes, styles, rules, edges, joins) in enumerate(found):
             if not rows:
                 continue
-            table = PdfTable(self, number, page, ti, bbox, rows, boxes, styles, rules, edges, marks, continuing)
+            table = PdfTable(self, number, page, ti, bbox, rows, boxes, styles, rules, edges, marks, continuing, joins)
             table.read()
             if table.displayed.y1 - page.rect.y0 > 0.8 * page.rect.height:
                 self.carried = (table.header, table.width)
@@ -269,9 +280,11 @@ class PdfTable:
     functools.partial: an answer coming pages later reads this table (code review 2026-10-08, A9: callbacks bound by
     default arguments, a missed one B1's bug)."""
 
-    def __init__(self, reading, number, page, ti, bbox, rows, boxes, styles, rules, edges, marks, continuing):
+    def __init__(self, reading, number, page, ti, bbox, rows, boxes, styles, rules, edges, marks, continuing,
+                 joins=None):
         self.reading, self.number, self.page, self.ti = reading, number, page, ti
         self.bbox, self.rows, self.boxes, self.rules, self.edges, self.marks = bbox, rows, boxes, rules, edges, marks
+        self.joins = joins or {}  # a row's box: its lines and their boxes (labels_joined; Reading.detect)
         self.displayed = shown(page, bbox)  # continuation is judged as displayed
         self.header, self.body, self.derivation = rows[0], rows[1:] or rows, None
         self.body_boxes = boxes[1:] if len(rows) > 1 else boxes
@@ -309,19 +322,50 @@ class PdfTable:
             label = f", part {pi + 1}" if len(self.parts) > 1 else ""
             if r.s.asks_structure():  # a part with suspect lines asked how they group into rows
                 from . import tablestructure
+                header, body, boxes, looks, held, head_box = self.unfolded(pi, part_header, part_body, part_boxes)
                 cuts = None
                 if self.marks is not None and self.edges:  # words a column line splits, by line (0: the header)
                     cuts = {i + 1: split_cuts(row, b, self.edges, self.marks) for i, (row, b) in
-                            enumerate(zip(part_body, part_boxes))}
-                    if pi == 0 and self.header is self.rows[0] and self.boxes:
-                        cuts[0] = split_cuts(self.header, self.boxes[0], self.edges, self.marks)
-                tablestructure.read(
-                    r.core, number, f"structure:p{number}:{base}", part_header, part_body, part_boxes,
-                    [self.look.get(tuple(b)) if b else None for b in part_boxes] if self.look else None,
-                    self.rules, lambda: [self.image()],
-                    partial(self.proceed, base=base, original=(part_header, part_body, part_boxes), label=label), cuts)
+                            enumerate(zip(body, boxes))}
+                    if head_box is not None:
+                        cuts[0] = split_cuts(header, head_box, self.edges, self.marks)
+                then = partial(self.proceed, base=base, original=(header, body, boxes), label=label)
+                tablestructure.read(r.core, number, f"structure:p{number}:{base}", header, body, boxes, looks,
+                                    self.rules, lambda: [self.image()], then, cuts, held,
+                                    (part_header, part_body, part_boxes))
             else:
                 self.proceed([(part_header, part_body, part_boxes)], None, [], base=base, original=None, label=label)
+
+    def unfolded(self, pi, header, body, boxes):
+        """A part's lines as the structure query is shown them: each row the mending joined from lines of two labels
+        (self.joins) as its lines, styled as the row, those after its first held: read with the line above unless the
+        model says otherwise; the header too, where it's the table's first row. (header, body, boxes, styles, held
+        line numbers from 1, the header's box where it's the table's first line, else None)."""
+        head_box = self.boxes[0] if pi == 0 and self.header is self.rows[0] and self.boxes else None
+        looks = [self.look.get(tuple(b)) if b else None for b in boxes] if self.look else None
+        if not self.joins:
+            return header, body, boxes, looks, set(), head_box
+        out, out_boxes, out_looks, held = [], [], [], set()
+
+        def add(lines, line_boxes, look, first_held):
+            for j, (line, box) in enumerate(zip(lines, line_boxes)):
+                out.append(list(line))
+                out_boxes.append(box)
+                out_looks.append(look)
+                if j or first_held:
+                    held.add(len(out))
+
+        if head_box is not None and list(header) == list(self.header) and tuple(head_box) in self.joins:
+            lines, line_boxes = self.joins[tuple(head_box)]
+            header, head_box = list(lines[0]), line_boxes[0]
+            add(lines[1:], line_boxes[1:], None, True)
+        for k, (row, box) in enumerate(zip(body, boxes)):
+            look = looks[k] if looks else None
+            if box and tuple(box) in self.joins:
+                add(*self.joins[tuple(box)], look, False)
+            else:
+                add([row], [box], look, False)
+        return header, out, out_boxes, out_looks if self.look else None, held, head_box
 
     def proceed(self, parts, step, apart, table=True, *, base, original, label):
         """Each part read: by rules where tables are, else row by row; lines apart read by themselves; a part the

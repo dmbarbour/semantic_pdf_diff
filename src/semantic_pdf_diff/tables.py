@@ -314,6 +314,20 @@ def ruled_groups(rows, boxes, rules, least=3, share=0.4):
             row = _joined(row, rows[k])
     return groups
 
+def labels_joined(rows, groups):
+    """The groups (ruled_groups's) joining a line labelled in its first cell to a row labelled so far: two labels made
+    one, or one label over two lines, which neither the lines nor the rules tell apart ("ADDRESS:" and "DRAWN BY:" in
+    a title block, eia's "Section" header and its first row's "13105"; HabEx's "mission" over "time")."""
+    out = []
+    for group in groups or []:
+        labelled = bool(_filled(rows[group[0]][:1]))
+        for k in group[1:]:
+            if labelled and _filled(rows[k][:1]):
+                out.append(group)
+                break
+            labelled = labelled or bool(_filled(rows[k][:1]))
+    return out
+
 def ruled_rows(rows, boxes, rules, least=3, share=0.4):
     """(rows, boxes, how many joined): a table whose row boundaries are mostly ruled (3 or more, and 40% or more of
     them, drawn across most of its width) has its rows joined across the boundaries without a rule, which are lines

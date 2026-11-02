@@ -162,6 +162,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_rules` | `0` | selecting | table_rules | extract | table |
 | `table_review` | `10` | shaping | table_review | extract | table |
 | `table_structure` | `true` | selecting | table_structure | extract | table |
+| `labels_joined` | `false` | selecting | labels_joined | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
 | `table_cuts` | `false` | shaping | table_cuts | extract | figure, overview, tile, vision |
 | `text_cuts` | `"bytes"` | shaping | text_cuts | extract | figure, overview, text, tile, vision |

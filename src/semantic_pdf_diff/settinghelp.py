@@ -245,6 +245,10 @@ HELP = {
                             "table; none: row by row)"),
     "table_review": Help(_L, "times a table's rules, applied, are shown to the model for review (0: never)"),
     "table_structure": Help(_L, "a PDF table with suspect lines is asked how its lines group into rows"),
+    "labels_joined": Help(_L, "a PDF table's lines joined as one row's though each has a first cell are shown to the "
+                          "structure query as lines, kept so or regrouped", "Two labels made one (a title block's "
+                          "\"ADDRESS:\" and \"DRAWN BY:\") or one label over two lines: code can't tell them apart. "
+                          "With table_structure; off until measured."),
     # --- levers: after the answers
     "quote_match": Help(_L, "how quotes are checked against the text: exact, fragments, or excerpts"),
     "positions": Help(_L, "a numbered item's label is its claim's position, not part of its conditions"),
