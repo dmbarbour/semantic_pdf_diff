@@ -8,6 +8,7 @@ import io
 import logging
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -82,7 +83,8 @@ class Bars(unittest.TestCase):
             "extract  nrel-5mw.pdf ███████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  97/561 pages",
             "         team-b       █████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░   1/3   files",
             "         4 answered, 0 in flight, 1 queued",  # too long for one line at 80 columns: two
-            "         120k tokens/min · $0.42 · about 5 min left"])  # the slowest bar's rate
+            "         120k tokens/min · $0.42 · about 5 min left · last answer 60 s ago"])  # the slowest bar's rate;
+        # the time since the last answer, said once it's 10 s
 
     def test_a_terminal_of_no_size_draws_as_wide_as_the_default(self):
         # a pseudo-terminal with no size set says 0 columns (script's, 2026-11-03): every line was cut to 10
@@ -490,6 +492,62 @@ class Heartbeats(unittest.TestCase):
         self.assertRegex(logs.output[0], r'extract: a\.pdf 2/4 pages; requests 2 answered, 0 in flight, 2 queued, '
                                          r'1 failed, (5,999|6,000) tokens/min, about 31 s left')
         self.assertIn('extract: 2 requests answered, 1 failed in 31s', logs.output[1])
+
+class Waits(unittest.TestCase):
+    """A wait shows as one (the owner, 2026-11-02: "there is no progress bar on initial testing or calibration. So it's
+    unclear whether my system is frozen or just moving slowly."): the status says how long no answer has come, and a
+    ticker draws it again each second, or says a heartbeat off a terminal, while nothing changes."""
+    def setUp(self):
+        setup_logging()
+        self.addCleanup(setup_logging)
+        self.addCleanup(setattr, module, '_board', None)
+
+    def test_the_status_says_how_long_no_answer_has_come(self):
+        t = [0.0]
+        stage = Progress('check', None, bar=False, heartbeat=1e9, clock=lambda: t[0])
+        stage.add(2)
+        t[0] = 9.0
+        self.assertNotIn('answer in', ' · '.join(stage.status()))
+        t[0] = 10.0
+        self.assertEqual(stage.status()[-1], 'no answer in 10 s')
+        stage.finish()
+        t[0] = 18.0
+        self.assertFalse(stage.status()[-1].startswith('last answer'))
+        t[0] = 60.0
+        self.assertEqual(stage.status()[-1], 'last answer 50 s ago')
+        t[0] = 160.0
+        self.assertEqual(stage.status()[-1], 'last answer 2 min 30 s ago')
+
+    def test_off_a_terminal_the_ticker_says_heartbeats_while_nothing_changes(self):
+        stage = Progress('check', None, bar=False, heartbeat=0.05, ticker=0.01)
+        stage.add()
+        with self.assertLogs('semantic_pdf_diff', level='INFO') as logs:
+            deadline = time.monotonic() + 5
+            while len(logs.output) < 2 and time.monotonic() < deadline:
+                time.sleep(0.01)
+            stage.close(said=False)
+        self.assertGreaterEqual(len(logs.output), 2)
+        self.assertTrue(all(line.endswith('check: requests 0 answered, 0 in flight, 1 queued, 0 tokens/min')
+                            for line in logs.output), logs.output)
+        self.assertFalse(stage.ticking.is_alive())
+
+    def test_on_a_terminal_the_ticker_draws_the_wait_again(self):
+        term, clock = Terminal(), Clock()
+        setup_logging()
+        log.handlers[0].setStream(term)
+        stage = Progress('check', None, bar=True, clock=clock, stream=term, width=lambda: term.columns, ticker=0.01)
+        stage.bar('json', 1, 'answer')
+        stage.add()
+        clock.now = 45.0  # nothing changed: only the ticker draws it
+        deadline = time.monotonic() + 5
+        while not any('no answer in 45 s' in row for row in term.rows()) and time.monotonic() < deadline:
+            time.sleep(0.01)
+        self.assertIn('         0 answered, 0 in flight, 1 queued · 0 tokens/min · no answer in 45 s', term.rows())
+        self.assertTrue(module.abandon())  # Ctrl+C: the bars erased, and the ticker draws them no more
+        stage.ticking.join(5)
+        self.assertFalse(stage.ticking.is_alive())
+        self.assertEqual(term.rows(), [])
+        stage.close(said=False)
 
 class Verbosity(unittest.TestCase):
     def tearDown(self):

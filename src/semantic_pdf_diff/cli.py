@@ -1148,7 +1148,7 @@ def config_command(argv):
                 print(f"every check asked for is remembered passing in {memory} (`config checks` lists them): "
                       "nothing was asked")
                 return 0
-        checks, cost = checkup.run(settings, only=only)
+        checks, cost = checkup.run(settings, only=only, shown=True)
         print('\n'.join(checkup.lines(settings, checks, cost)))
         try:  # remembered, so a run needn't check again (checkup.first_use)
             if memory is not None:

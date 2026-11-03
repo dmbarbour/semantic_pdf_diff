@@ -290,18 +290,59 @@ def _prompted(client, prompt, schema, images, quietly=False):
         got = None
     return got, client.usage["prompt_tokens"] - before
 
-def run(settings, rng=None, only=None):
+# Each check's bar: what it asks, known before anything is (its listing, its answers, its cards)
+ASKS = (("endpoint", 1, "listing"), ("json", 1, "answer"), ("image", 2, "answers"), ("acuity", 0, "cards"),
+        ("reranker", 1, "ranking"), ("embedding", 1, "request"))
+
+def run(settings, rng=None, only=None, shown=False):
     """Every check, in order (only: those named, of json, image, acuity, reranker and embedding; the endpoint's
     listing with the chat model's): [Check], and what they cost (dollars, as the provider reports it). The chat check
     measures the model's context window, where the listing gives it, and the image check an image's tokens at
-    image_side (calibrate keeps them); acuity, the smallest capitals the model reads there (acuity.py)."""
-    from .llm import Client, is_local
-    from . import embed
-    from .rerank import request as rerank_request
-    rng = rng or random.Random()
+    image_side (calibrate keeps them); acuity, the smallest capitals the model reads there (acuity.py). shown: a bar
+    for each check and the requests' status as they go (progress.Progress), as a run's first use and `config test`
+    show them (the owner, 2026-11-02: "there is no progress bar on initial testing or calibration. So it's unclear
+    whether my system is frozen or just moving slowly.")."""
+    from .llm import Client
+    from .progress import NoProgress, Progress
     wanted = set(only) if only is not None else {"json", "image", "acuity", "reranker", "embedding"}
     client = Client(settings, None)
+    progress = Progress("check", client, heartbeat=settings.heartbeat_seconds) if shown else NoProgress()
+    try:
+        return _checked(settings, rng or random.Random(), wanted, client, progress)
+    finally:
+        progress.close(said=False)  # each check's line says it
+
+def _checked(settings, rng, wanted, client, progress):
+    """run's checks, each with its bar, made before any is run, and each request counted as it's asked and answered."""
+    from .llm import is_local
+    from . import embed
+    from .acuity import SIZES
+    from .progress import NoBar
+    from .rerank import request as rerank_request
     key = client.api_key
+    asked = {"endpoint": bool(wanted & {"json", "image", "acuity"}),
+             **dict.fromkeys(("json", "image", "acuity"), bool(settings.model)),
+             "reranker": bool(settings.rerank_model), "embedding": bool(settings.embed_model)}
+    if not settings.vision:
+        asked["image"] = asked["acuity"] = False
+    bars = {name: progress.bar(name, total or len(SIZES), unit) for name, total, unit in ASKS
+            if asked[name] and (name == "endpoint" or name in wanted)}
+
+    def timed(name, check, measured=None):  # a check run, its bar full after
+        try:
+            return _timed(name, check, measured)
+        finally:
+            bars.get(name, NoBar()).fill()
+
+    def counted(ask):  # a request, in the status as it's asked and answered
+        progress.add()
+        status = "failed"
+        try:
+            got = ask()
+            status = "complete"
+            return got
+        finally:
+            progress.finish(status)
     checks = []
     ids = []  # the endpoint's models
     chat = {}  # what the listing says of the model, for the chat check's measures
@@ -325,7 +366,7 @@ def run(settings, rng=None, only=None):
                 f" (`config test {flag} {settings.model}` tries it as one)" if flag else "")
         return True, said
     if wanted & {"json", "image", "acuity"}:
-        checks.append(_timed("endpoint", endpoint))
+        checks.append(timed("endpoint", endpoint))
         if checks[-1].ok is False and not ids and _unreachable(checks[-1].said):
             return checks + [Check(name, None, "skipped: the endpoint isn't reachable") for name in
                              ("json", "image", "acuity", "reranker", "embedding") if name in wanted], client.cost
@@ -340,18 +381,20 @@ def run(settings, rng=None, only=None):
 
     def answer():
         a, b = rng.randint(11, 89), rng.randint(11, 89)
-        got = client.ask(f'Add {a} and {b}. Return only the JSON object {{"sum": N}}.', Sum)
+        got = counted(lambda: client.ask(f'Add {a} and {b}. Return only the JSON object {{"sum": N}}.', Sum))
         return got.sum == a + b, f"{a} + {b} = {got.sum}" + ("" if got.sum == a + b else f", not {a + b}")
     if "json" in wanted:
         checks.append(Check("json", None, "skipped: no model is set") if not settings.model else
-                      _timed("json", answer, chat))
+                      timed("json", answer, chat))
 
     def image():
         measured = {}
         with tempfile.TemporaryDirectory(prefix="semantic-pdf-diff-check-") as folder:
             path, code = card(folder, rng, side=settings.image_side)  # as large as an image is sent
-            got, shown = _prompted(client, CODE, Code, (path,))
-            _, alone = _prompted(client, CODE, Code, (), quietly=True)  # the same prompt, its image's tokens apart
+            got, shown = counted(lambda: _prompted(client, CODE, Code, (path,)))
+            bars.get("image", NoBar()).tick()
+            # the same prompt, its image's tokens apart
+            _, alone = counted(lambda: _prompted(client, CODE, Code, (), quietly=True))
         if shown and alone and shown > alone:
             measured["image_tokens"] = shown - alone
         read = "".join(got.code.split()).upper()
@@ -361,7 +404,7 @@ def run(settings, rng=None, only=None):
         return read == code, said, measured
     if "image" in wanted:
         checks.append(Check("image", None, "skipped: no model is set") if not settings.model else
-                      _timed("image", image) if settings.vision else Check("image", None, "not checked: vision is off"))
+                      timed("image", image) if settings.vision else Check("image", None, "not checked: vision is off"))
 
     def eye_test():  # a card a size, two at a time; a failed answer read nothing, as the eye test counts it
         from . import acuity as cards
@@ -373,9 +416,12 @@ def run(settings, rng=None, only=None):
             with Dispatcher(client, workers=CARDS_AT_ONCE) as dispatch:
                 for size, path, lines in drawn:
                     def done(value, error, size=size, lines=lines):
+                        progress.finish("complete" if error is None else "failed")
+                        bars.get("acuity", NoBar()).tick()
                         shares[size] = cards.score(lines, value.lines) if error is None else 0.0
                         if error is not None:
                             failures.append(f"{type(error).__name__}: {error}")
+                    progress.add()
                     dispatch.submit(cards.PROMPT, cards.Lines, (path,), ("acuity", size), done)
                 dispatch.drain()
         if len(failures) == len(drawn):
@@ -393,25 +439,25 @@ def run(settings, rng=None, only=None):
                                                                                                "read": read}
     if "acuity" in wanted:
         checks.append(Check("acuity", None, "skipped: no model is set") if not settings.model else
-                      _timed("acuity", eye_test) if settings.vision else
+                      timed("acuity", eye_test) if settings.vision else
                       Check("acuity", None, "not checked: vision is off"))
 
     def reranker():
-        ranking = _asked(rerank_request(settings, "The rated power of the feed pump.",
-                                        ["The feed pump is rated at 75 kW.",
-                                         "The door of the control room is painted blue."]),
-                         "rerank_api and rerank_url")(client.transport)
+        ranking = counted(lambda: _asked(rerank_request(settings, "The rated power of the feed pump.",
+                                                        ["The feed pump is rated at 75 kW.",
+                                                         "The door of the control room is painted blue."]),
+                                         "rerank_api and rerank_url")(client.transport))
         first, second = ranking.scores
         return first > second, f"scores {first:.2f} for the counterpart, {second:.2f} for the unrelated claim"
     if "reranker" in wanted:
-        checks.append(_timed("reranker", reranker) if settings.rerank_model else
+        checks.append(timed("reranker", reranker) if settings.rerank_model else
                       Check("reranker", None, unnamed(settings, "rerank_model")))
 
     def embedding():
-        vectors = _asked(embed.request(settings, ["The rated power of the feed pump.",
-                                                  "The feed pump is rated at 75 kW.",
-                                                  "The door of the control room is painted blue."]),
-                         "embed_url")(client.transport)
+        vectors = counted(lambda: _asked(embed.request(settings, ["The rated power of the feed pump.",
+                                                                  "The feed pump is rated at 75 kW.",
+                                                                  "The door of the control room is painted blue."]),
+                                         "embed_url")(client.transport))
         query, near, far = (embed.unpacked(v) for v in vectors.vectors)
         a, b = embed.cosine(query, near), embed.cosine(query, far)
         size = (f"{len(query)} dimensions, the model's own" if not settings.embed_dimensions else
@@ -419,7 +465,7 @@ def run(settings, rng=None, only=None):
                 f"{len(query)} dimensions, the model's own (not cut to {settings.embed_dimensions})")
         return a > b, f"cosine {a:.2f} with the counterpart, {b:.2f} with the unrelated claim; {size}"
     if "embedding" in wanted:
-        checks.append(_timed("embedding", embedding) if settings.embed_model else
+        checks.append(timed("embedding", embedding) if settings.embed_model else
                       Check("embedding", None, unnamed(settings, "embed_model")))
     refused = next((REFUSED.search(c.said) for c in checks if c.ok is False and "balance" not in c.said), None)
     if refused:  # 401 or 403: the key isn't one the endpoint takes (a provider's balance exhausted aside)
@@ -725,7 +771,7 @@ def first_use(settings, cache):
     asked = [name for name in keys(settings) if name in unchecked or name in PING]
     if unchecked:
         log.info(f"First use: {', '.join(unchecked)} checked before anything is asked (remembered in {path})")
-    checks, cost = run(settings, only=asked)
+    checks, cost = run(settings, only=asked, shown=True)
     failed = [c.name for c in checks if c.ok is False]
     if unchecked or failed:
         for line in lines(settings, checks, cost)[1:]:

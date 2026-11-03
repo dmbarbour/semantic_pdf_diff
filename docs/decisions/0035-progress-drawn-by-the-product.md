@@ -1,6 +1,9 @@
 # 0035. Progress is drawn by the product, in bars of fixed total
 
-- **Status:** Accepted (2026-10-21)
+- **Status:** Accepted (2026-10-21); amended 2026-11-03 (the checks shown, and a wait shown as one)
+- **Amended 2026-11-03** (the owner, 2026-11-02: "there is no progress bar on initial testing or calibration. So it's unclear whether my system is frozen or just moving slowly."):
+  - **The checks a stage of their own** (`check`): a run's first-use checks and `config test`, a bar for each check of what it asks, known before any is run (the endpoint's listing, the JSON answer, the image check's two answers, the acuity test's eight cards, the reranker's ranking, the embedding model's request), its requests in the status. Before, one line said the checks had begun, then nothing until they ended: the acuity test alone took 30 s at DeepInfra.
+  - **A wait shown as one:** once no answer has come for 10 s, the status says how long ("no answer in 45 s", "last answer 1 min 05 s ago"). A ticker on its own thread draws it again each second while nothing changes, and off a terminal says heartbeats when they're due; it stops when the stage closes or its bars are abandoned. Before, the bars were drawn only as something changed, and heartbeats said only then.
 - **Source:** [progress in stacked bars of fixed size](../plans/progress-display-2026-10-20.md), milestones 1 to 7; the [trials review](../plans/README.md#retired), findings 3 and 4
 
 ## Context

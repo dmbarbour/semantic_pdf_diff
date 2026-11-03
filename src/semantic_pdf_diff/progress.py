@@ -14,6 +14,11 @@ handlers do.
 The status counts the answers that came from the cache (a fixture's, in a replay) rather than the model: the dispatcher
 says which each answer is as its handler runs (handling). The owner, 2026-10-21: "it would be convenient if we also
 mention how many were answered from cache, e.g. 1234 answered (1179 from cache) or similar".
+
+A wait shows as one: once no answer has come for QUIET seconds, the status says how long, drawn again each second (a
+ticker, on its own thread) and, off a terminal, in heartbeat lines even while nothing changes. The owner, 2026-11-02:
+"there is no progress bar on initial testing or calibration. So it's unclear whether my system is frozen or just moving
+slowly."
 """
 import contextlib
 import logging
@@ -30,6 +35,8 @@ requests_log = logging.getLogger("semantic_pdf_diff.requests")
 DONE, LEFT = "█", "░"
 EVERY = 0.1  # seconds between redraws at most
 COLUMNS = 80  # a terminal's width where none is known
+TICK = 1.0  # seconds between redraws while nothing changes (Progress's ticker)
+QUIET = 10.0  # seconds without an answer before the status says how long
 
 _current = None  # the item being worked on (the calling thread's)
 _board = None    # the terminal's bars, while a stage draws them
@@ -273,6 +280,14 @@ def tokens(n):
     """A count of tokens, short: 9,500; 120k; 12M."""
     return f"{n:,}" if n < 10_000 else f"{n / 1000:.0f}k" if n < 10_000_000 else f"{n / 1_000_000:.0f}M"
 
+def span(seconds):
+    """A time elapsed, to the second: 45 s; 3 min 05 s; 1.5 h."""
+    if seconds < 90:
+        return f"{seconds:.0f} s"
+    if seconds < 5400:
+        return f"{seconds // 60:.0f} min {seconds % 60:02.0f} s"
+    return f"{seconds / 3600:.1f} h"
+
 def minutes(seconds):
     if seconds < 90:
         return f"about {max(1, round(seconds))} s left"
@@ -283,11 +298,16 @@ def minutes(seconds):
 class Progress:
     """One stage of a run: its requests counted as they're asked and answered (add, finish), and its bars."""
 
-    def __init__(self, stage, client=None, bar=None, heartbeat=30.0, clock=time.monotonic, stream=None, width=None):
+    def __init__(self, stage, client=None, bar=None, heartbeat=30.0, clock=time.monotonic, stream=None, width=None,
+                 ticker=None):
+        """ticker: seconds between redraws (or heartbeats) while nothing changes; by default TICK on the real clock,
+        none on another (a test's, which moves it itself)."""
         self.stage, self.client, self.heartbeat, self.clock = stage, client, heartbeat, clock
         self.total = self.done = self.failed = self.cached = 0
         self.wrapped = False  # the status in two lines, once it didn't fit one (lines)
         self.started = self.last_beat = clock()
+        self.answered = None  # when the last answer came (finish)
+        self.beat_lock = threading.Lock()  # the ticker's thread and the calling thread both beat
         self.tokens_at_start = self._tokens()
         self.bars = []
         stream = stream or sys.stderr
@@ -298,6 +318,27 @@ class Progress:
             global _board
             _board = self.board
             self.board.attach()
+        if ticker is None:
+            ticker = TICK if clock is time.monotonic else 0
+        self.stop = threading.Event()
+        self.ticking = None
+        if ticker:
+            self.ticking = threading.Thread(target=self.tick, args=(ticker,), name="progress", daemon=True)
+            self.ticking.start()
+
+    def tick(self, every):
+        """The status drawn again each `every` seconds (a heartbeat said, off a terminal, when it's due), whether or
+        not anything changed, so its time without an answer counts up (waited); until the stage closes, or its bars
+        are abandoned (Ctrl+C)."""
+        while not self.stop.wait(every):
+            board = self.board
+            if board is None:
+                self.changed()
+                continue
+            with board.lock:
+                if _board is not board:
+                    return
+                board.show(now=True)
 
     def _tokens(self):
         usage = getattr(self.client, "usage", None) or {}
@@ -320,6 +361,7 @@ class Progress:
     def finish(self, status="complete"):
         """A request answered (or failed), in its handler: its item's; from the cache, if the dispatcher says so."""
         self.done += 1
+        self.answered = self.clock()
         self.failed += status == "failed"
         self.cached += _cached and status != "failed"
         if _current is not None:
@@ -329,9 +371,12 @@ class Progress:
     def changed(self, now=False):
         if self.board is not None:
             self.board.show(now)
-        elif self.clock() - self.last_beat >= self.heartbeat:
+            return
+        with self.beat_lock:
+            if self.clock() - self.last_beat < self.heartbeat:
+                return
             self.last_beat = self.clock()
-            log.info(self.line())
+        log.info(self.line())
 
     def rates(self):
         minutes_ = max(self.clock() - self.started, 1e-6) / 60
@@ -383,7 +428,7 @@ class Progress:
 
     def status(self):
         """The status's parts: the requests (counts, with no total: theirs grows as answers ask more); tokens a minute;
-        cost; time left."""
+        cost; time left; time without an answer (waited)."""
         parts = [self.requests(), f"{tokens(self.rates()['tokens/min'])} tokens/min"]
         cost = getattr(self.client, "cost", 0) or 0
         if cost:
@@ -391,15 +436,29 @@ class Progress:
         left = self.left()
         if left is not None:
             parts.append(minutes(left))
+        quiet = self.waited()
+        if quiet:
+            parts.append(quiet)
         return parts
+
+    def waited(self):
+        """How long no answer has come, once it's QUIET seconds or more: since the last, or since the stage began."""
+        since = self.clock() - (self.started if self.answered is None else self.answered)
+        if since < QUIET:
+            return None
+        return f"no answer in {span(since)}" if self.answered is None else f"last answer {span(since)} ago"
 
     def line(self):
         """The heartbeat line: the bars' counts, then the status."""
         bars = ", ".join(f"{b.label} {b.done:,}/{b.total:,} {b.unit}" for b in self.bars if not b.full)
         return f"{self.stage}: " + (bars + "; " if bars else "") + "requests " + ", ".join(self.status())
 
-    def close(self):
+    def close(self, said=True):
+        """The ticker stopped and the bars erased; said: the stage's requests counted in a line."""
         global _board
+        self.stop.set()
+        if self.ticking is not None:
+            self.ticking.join(5)
         if self.board is not None:
             self.board.erase()
             self.board.detach()
@@ -408,7 +467,9 @@ class Progress:
             self.board = None
         cached = f" ({self.cached:,} from cache)" if self.cached else ""
         failed = f", {self.failed:,} failed" if self.failed else ""
-        log.info(f"{self.stage}: {self.done:,} requests answered{cached}{failed} in {self.clock() - self.started:.0f}s")
+        if said:
+            log.info(f"{self.stage}: {self.done:,} requests answered{cached}{failed} in "
+                     f"{self.clock() - self.started:.0f}s")
 
 class NoBar:
     """A bar counting nothing (NoProgress's)."""
@@ -424,5 +485,5 @@ class NoBar:
 class NoProgress:
     def add(self, n=1): pass
     def finish(self, status="complete"): pass
-    def close(self): pass
+    def close(self, said=True): pass
     def bar(self, label, total, unit, keep=True): return NoBar()

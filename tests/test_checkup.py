@@ -14,6 +14,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+import pyte
+
 from stubs import chat_answer, prompt_of, request_body, serving, user_settings
 from semantic_pdf_diff import acuity, checkup, cli
 from semantic_pdf_diff.settings import Settings, user_settings as saved_settings
@@ -118,6 +120,26 @@ class ConfigTest(Remembered):
         self.assertIn("cost: $0.0000, as the provider reports it", out)
         self.assertTrue(out.endswith("every check passed\n"))
         self.assertFalse(self.store.exists())  # a check makes no store
+
+    def test_each_check_is_a_bar_while_it_runs(self):
+        # the owner, 2026-11-02: "there is no progress bar on initial testing or calibration. So it's unclear whether
+        # my system is frozen or just moving slowly."
+        class Screen(io.StringIO):  # a terminal, as far as the bars can tell
+            def isatty(self):
+                return True
+        with endpoint() as url, user_settings({"model": "gemma-4", "rerank_model": "Qwen/Qwen3-Reranker-8B",
+                                               "rerank_api": "tei", "rerank_url": url + "/rerank"}), \
+                contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(Screen()) as err:
+            code = cli.main(["config", "test", "--store", str(self.store)])
+        self.assertEqual(code, 0)
+        drawn = err.getvalue()
+        for row in ("check    endpoint ", "1/1 listing", "1/1 answer", "2/2 answers", "8/8 cards", "1/1 ranking"):
+            self.assertIn(row, drawn)
+        self.assertNotIn("embedding ", drawn)  # no embedding model: no bar
+        screen = pyte.Screen(200, 40)
+        pyte.Stream(screen).feed(drawn.replace("\n", "\r\n"))
+        self.assertFalse([row for row in screen.display if "█" in row or "░" in row])  # erased once done
+        self.assertNotIn("check: ", drawn)  # nor a line counting its requests: each check's line says it
 
     def test_very_verbose_logs_each_request(self):
         with endpoint(), user_settings({"model": "gemma-4"}), \
