@@ -230,9 +230,11 @@ class Board:
         if self.width is not None:
             return self.width()
         try:
-            return os.get_terminal_size(self.stream.fileno()).columns
+            columns = os.get_terminal_size(self.stream.fileno()).columns
         except (AttributeError, OSError, ValueError):
-            return shutil.get_terminal_size().columns
+            columns = 0
+        return columns or shutil.get_terminal_size().columns  # a terminal of no size set (a bare pseudo-terminal's,
+        # 2026-11-03: every line was cut to 10 columns): COLUMNS, or 80
 
     def show(self, now=False):
         with self.lock:

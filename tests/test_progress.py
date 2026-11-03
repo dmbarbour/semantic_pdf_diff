@@ -84,6 +84,17 @@ class Bars(unittest.TestCase):
             "         4 answered, 0 in flight, 1 queued",  # too long for one line at 80 columns: two
             "         120k tokens/min · $0.42 · about 5 min left"])  # the slowest bar's rate
 
+    def test_a_terminal_of_no_size_draws_as_wide_as_the_default(self):
+        # a pseudo-terminal with no size set says 0 columns (script's, 2026-11-03): every line was cut to 10
+        import os
+        import pty
+        import shutil
+        master, slave = pty.openpty()
+        self.addCleanup(os.close, master)
+        with os.fdopen(slave, 'w') as stream:
+            self.assertEqual(os.get_terminal_size(slave).columns, 0)
+            self.assertEqual(module.Board(stream, lambda width: []).columns(), shutil.get_terminal_size().columns)
+
     def test_log_lines_print_above_the_bars(self):
         term = Terminal()
         stage = staged(term)
