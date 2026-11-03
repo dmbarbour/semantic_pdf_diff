@@ -55,6 +55,18 @@ def settings_from(config=None, layer=None, **overrides):
     layer = {k: v for k, v in (layer or {}).items() if k not in USERS_ONLY}
     return Settings.from_env(**{**layer, **options, **overrides})
 
+def from_interrupt(error):
+    """Whether an error is Ctrl+C's: the KeyboardInterrupt cli.first_interrupt raises while a C extension's call runs
+    (PyMuPDF's) comes out of it as SystemError, the interrupt its cause (the quick suite, 2026-10-31: a traceback and
+    exit 1, not the resume note and 130)."""
+    seen = set()
+    while error is not None and id(error) not in seen:
+        if isinstance(error, KeyboardInterrupt):
+            return True
+        seen.add(id(error))
+        error = error.__cause__ or error.__context__
+    return False
+
 def attempt(run_it, *args, **kwargs):
     """A run's exit code, an error reported as the CLI reports one (exit 1)."""
     try:

@@ -20,8 +20,8 @@ import signal
 import sys
 from pathlib import Path
 from . import __version__, configuration, crops, fixtures, manifest
-from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, limits, require_model,
-                       run, settings_from)
+from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, from_interrupt, limits,
+                       require_model, run, settings_from)
 from .schema import Source
 from .progress import abandon, log, setup_logging
 from .report import SPLIT, write_report
@@ -60,18 +60,6 @@ def main(argv=None, client=None):
         if not from_interrupt(e):
             raise
         interrupted(sys.argv[1:])
-
-def from_interrupt(error):
-    """Whether an error is Ctrl+C's: the KeyboardInterrupt first_interrupt raises while a C extension's call runs
-    (PyMuPDF's) comes out of it as SystemError, the interrupt its cause (the quick suite, 2026-10-31: a traceback and
-    exit 1, not the resume note and 130)."""
-    seen = set()
-    while error is not None and id(error) not in seen:
-        if isinstance(error, KeyboardInterrupt):
-            return True
-        seen.add(id(error))
-        error = error.__cause__ or error.__context__
-    return False
 
 def first_interrupt(signum, frame):
     """Ctrl+C: KeyboardInterrupt, as Python's own handler raises it, and a second Ctrl+C ends the process where it is,
