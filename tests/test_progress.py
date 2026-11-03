@@ -89,11 +89,17 @@ class Bars(unittest.TestCase):
         import os
         import pty
         import shutil
+        from unittest.mock import patch
         master, slave = pty.openpty()
         self.addCleanup(os.close, master)
         with os.fdopen(slave, 'w') as stream:
             self.assertEqual(os.get_terminal_size(slave).columns, 0)
-            self.assertEqual(module.Board(stream, lambda width: []).columns(), shutil.get_terminal_size().columns)
+            with patch.dict(os.environ, {'COLUMNS': '123'}):
+                self.assertEqual(module.Board(stream, lambda width: []).columns(), 123)
+            # where standard output is such a terminal too, Python 3.10's shutil says 0 as well (its fallback came in
+            # 3.11)
+            with patch.object(shutil, 'get_terminal_size', return_value=os.terminal_size((0, 0))):
+                self.assertEqual(module.Board(stream, lambda width: []).columns(), 80)
 
     def test_log_lines_print_above_the_bars(self):
         term = Terminal()

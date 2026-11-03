@@ -29,6 +29,7 @@ requests_log = logging.getLogger("semantic_pdf_diff.requests")
 
 DONE, LEFT = "█", "░"
 EVERY = 0.1  # seconds between redraws at most
+COLUMNS = 80  # a terminal's width where none is known
 
 _current = None  # the item being worked on (the calling thread's)
 _board = None    # the terminal's bars, while a stage draws them
@@ -233,8 +234,9 @@ class Board:
             columns = os.get_terminal_size(self.stream.fileno()).columns
         except (AttributeError, OSError, ValueError):
             columns = 0
-        return columns or shutil.get_terminal_size().columns  # a terminal of no size set (a bare pseudo-terminal's,
-        # 2026-11-03: every line was cut to 10 columns): COLUMNS, or 80
+        # a terminal of no size set (a bare pseudo-terminal's, 2026-11-03: every line was cut to 10 columns): COLUMNS,
+        # or 80, which Python 3.10's shutil doesn't fall back to when standard output is that terminal too
+        return columns or shutil.get_terminal_size().columns or COLUMNS
 
     def show(self, now=False):
         with self.lock:
