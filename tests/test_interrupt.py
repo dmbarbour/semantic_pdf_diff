@@ -6,6 +6,7 @@ Each runs the command in its own process, as a user does: Ctrl+C is a signal to 
 group."""
 import stubs  # noqa: F401 (the environment: a user config naming a model)
 import contextlib
+import io
 import json
 import os
 import signal
@@ -190,6 +191,25 @@ class FromInterrupt(unittest.TestCase):
             c_call()
         self.assertTrue(from_interrupt(raised.exception))
         self.assertFalse(from_interrupt(SystemError("a bug of its own")))
+
+    def test_a_lock_left_untaken_as_the_interrupt_came_is_the_interrupt(self):
+        # Ctrl+C while a wait takes its lock back leaves the lock released, and leaving its block raises RuntimeError
+        # in the interrupt's place (the commit gate, 2026-11-03: "Error: release unlocked lock", exit 1)
+        from semantic_pdf_diff.pipeline import attempt
+
+        def waiting():
+            try:
+                raise KeyboardInterrupt
+            except KeyboardInterrupt:
+                raise RuntimeError("release unlocked lock")
+
+        def failing():
+            raise RuntimeError("a bug of its own")
+        with self.assertRaises(KeyboardInterrupt):
+            attempt(waiting)
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            self.assertEqual(attempt(failing), 1)
+        self.assertEqual(err.getvalue(), "Error: a bug of its own\n")
 
 if __name__ == '__main__':
     unittest.main()

@@ -58,7 +58,8 @@ def settings_from(config=None, layer=None, **overrides):
 def from_interrupt(error):
     """Whether an error is Ctrl+C's: the KeyboardInterrupt cli.first_interrupt raises while a C extension's call runs
     (PyMuPDF's) comes out of it as SystemError, the interrupt its cause (the quick suite, 2026-10-31: a traceback and
-    exit 1, not the resume note and 130)."""
+    exit 1, not the resume note and 130); raised while a lock was being taken back, leaving the lock raises
+    RuntimeError ("release unlocked lock"), the interrupt its context (attempt)."""
     seen = set()
     while error is not None and id(error) not in seen:
         if isinstance(error, KeyboardInterrupt):
@@ -68,10 +69,14 @@ def from_interrupt(error):
     return False
 
 def attempt(run_it, *args, **kwargs):
-    """A run's exit code, an error reported as the CLI reports one (exit 1)."""
+    """A run's exit code, an error reported as the CLI reports one (exit 1); one Ctrl+C's interrupt came out as raised
+    again as the interrupt, which the CLI ends a run on (from_interrupt; the commit gate, 2026-11-03: "Error: release
+    unlocked lock", exit 1, not the resume note and 130)."""
     try:
         return run_it(*args, **kwargs)
     except (OSError, ValueError, RuntimeError) as e:
+        if from_interrupt(e):
+            raise KeyboardInterrupt from e
         print(f"Error: {e}", file=sys.stderr)
         return 1
 
