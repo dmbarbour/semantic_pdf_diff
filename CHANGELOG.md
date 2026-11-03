@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.33.0 (2026-11-03)
+
+- **Progress while the endpoint is checked:** a run's first-use checks and `config test` show a bar for each check, of what it asks: the endpoint's listing, the JSON answer, the image check's two answers, the acuity test's eight cards, the reranker's ranking and the embedding model's request, with the requests' status below (the owner: "it's unclear whether my system is frozen or just moving slowly."). Before, one line said the checks had begun, then nothing until they ended; the acuity test alone takes about 30 s at DeepInfra.
+- **A wait shows as one:** once no answer has come for 10 s, the status says how long ("no answer in 45 s", "last answer 1 min 05 s ago"), drawn again each second. Without a terminal, a heartbeat line comes every `heartbeat_seconds` whether or not anything changed.
+- **Fixed: a terminal of no size set drew the bars 10 columns wide** (a bare pseudo-terminal's, `script`'s): it takes the default width now, `COLUMNS` or 80.
+- **Fixed: Ctrl+C sometimes ended a run with "Error: release unlocked lock" and exit 1,** not the note on resuming and 130: an interrupt arriving while a wait took its lock back came out as that error. It now ends the run as Ctrl+C does.
+
 ## 0.32.0 (2026-11-02)
 
 - **A ruled table's lines of two labels joined shown to the model by default** (`labels_joined: true`; the owner: "Yes, let's turn that on by default."). A store read before reads its tables again on its next run, each unchanged request answered from the cache; only a table part with such a join asks the structure query anew.
