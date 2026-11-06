@@ -253,6 +253,8 @@ HELP = {
                           "\"ADDRESS:\" and \"DRAWN BY:\") or one label over two lines: code can't tell them apart. "
                           "With table_structure; on by default."),
     # --- levers: after the answers
+    "unquoted": Help(_L, "a text or table claim whose quote isn't found in its text kept, marked as unverified "
+                         "(kept), or dropped"),
     "quote_match": Help(_L, "how quotes are checked against the text: exact, fragments, or excerpts"),
     "positions": Help(_L, "a numbered item's label is its claim's position, not part of its conditions"),
     "records": Help(_L, "lists, notes and legends kept once as context records claims reference"),

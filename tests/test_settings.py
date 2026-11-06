@@ -122,6 +122,7 @@ NOT_EXERCISED = {
                 "(tests/test_refinement.py)",
     'whole_lines': "only a region cutting a line sideways; these documents' tiles are bands, holding whole lines "
                    "(tests/test_refinement.py)",
+    'unquoted': "only a claim whose quote isn't in its text; the stub's quote theirs (tests/test_quality.py)",
     'base_url': 'the stub model is the endpoint',
     'model_key_env': "the stub model takes any key, or none (tests/test_checkup.py)",
     'rescan': 'reads sources, not the documents given on the command line',

@@ -236,7 +236,9 @@ class Cards:
         verified = {True: '<p>Quote found in the file\'s text.</p>' if e['locator'].get('format') in PLACES
                     else '<p>Quote found in PDF text layer.</p>',
                     False: '<p class="warning">Quote not found in the PDF text layer for this region; possible misread '
-                           'or raster-only label.</p>'
+                           'or raster-only label.</p>' if e.get('image') else
+                           '<p class="warning">Quote not found in the text it was read from: kept in the model\'s '
+                           'words (unquoted), weaker than a quoted claim until another says the same.</p>'
                     }.get(e.get('quote_verified'), '')
         loc = e['locator']
         basis = f"<p>Basis: {esc(e['basis'])}</p>" if e.get('basis', 'unknown') != 'unknown' else ''

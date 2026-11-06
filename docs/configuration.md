@@ -178,6 +178,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `skip_sheet_tables` | `false` | selecting | skip_sheet_tables | extract | figure, table, table-detection |
 | `leave_text` | `"tables"` | shaping | leave_text | extract | table, text |
 | `quote_match` | `"fragments"` | post | quote_match | extract | table, text |
+| `unquoted` | `"dropped"` | post | unquoted | extract | table, text |
 | `positions` | `"provenance"` | post | positions | extract | table, text |
 | `records` | `true` | post | records | extract | all |
 | `sheet_records` | `true` | post | sheet_records | extract | all |

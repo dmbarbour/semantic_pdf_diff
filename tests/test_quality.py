@@ -49,7 +49,7 @@ class Counted(unittest.TestCase):
         one = found[(A, 1)]
         self.assertEqual(one["counts"], {"dropped": 2, "short": 1, "cut": 1, "unverified": 1, "reread": 1})
         self.assertEqual([quality.said(one, k) for k in ("dropped", "short", "cut", "unverified")],
-                         ["2 of 3", "1 of 3", "1 of 2", "1 of 2"])  # 1 kept from text; 2 tiles; 2 checked
+                         ["2 of 3", "1 of 3", "1 of 2", "1 of 3"])  # 1 kept from text; 2 tiles; 3 checked
         self.assertEqual(found[(A, 2)]["counts"], {"failed": 1, "tables": 1})  # continued: not cut short
         self.assertEqual(found[(A, 3)]["counts"], {"cut": 1})  # the edges an answer named
         self.assertEqual(found[(A, 4)]["counts"], {"doubted": 1})  # a contradiction is the document's, not ours
@@ -74,6 +74,42 @@ class Counted(unittest.TestCase):
         self.assertIn('<a href="#claims&q=file%3A%22dir%2Fa%20file.pdf%22%20page%3A1" title="Its claims">3</a>',
                       page_one)  # its claims, by a search for its file and page
         self.assertEqual(quality_html({"coverage": [], "evidence": [], "files": []}, str), ('', 0))
+
+class Unquoted(unittest.TestCase):
+    """A claim whose quote isn't in its text: dropped, a note on its row, or kept, its quote unverified (unquoted;
+    docs/plans/run-quality-2026-11-06.md, milestone 4)."""
+    def test_dropped_or_kept_marked(self):
+        import tempfile
+        from pathlib import Path
+        from semantic_pdf_diff.jobs import extract_pdf
+        from semantic_pdf_diff.report import Cards
+        from semantic_pdf_diff.schema import Extraction
+        from semantic_pdf_diff.tasks import UNQUOTED
+        from test_robustness import CID, GOOD, Recorder, pdf
+        quoted = {**GOOD, 'quote': 'rated at 10 kW'}
+        unquoted = {**GOOD, 'entity': 'standby pump', 'value': '12', 'quote': 'the standby pump gives 12 kW'}
+
+        def build(page):
+            page.insert_text((40, 60), 'The primary pump is rated at 10 kW; the standby pump at 12 kW.', fontsize=11)
+        found = {}
+        for mode in ('dropped', 'kept'):
+            with tempfile.TemporaryDirectory() as d:
+                client = Recorder(lambda source, prompt: Extraction(claims=[quoted, unquoted] if source == 'text'
+                                                                   else [], complete=True),
+                                  unquoted=mode, vision=False)
+                found[mode] = extract_pdf(pdf(Path(d) / 'p.pdf', build), CID, Path(d), client)
+        evidence, coverage = found['dropped']
+        self.assertEqual([e.entity for e in evidence], ['primary pump'])
+        self.assertEqual([r['issues'] for r in coverage if r['task'].startswith('text')], [[REJECTED]])
+        evidence, coverage = found['kept']
+        self.assertEqual(sorted((e.entity, e.quote_verified) for e in evidence),
+                         [('primary pump', True), ('standby pump', False)])
+        row = next(r for r in coverage if r['task'].startswith('text'))
+        self.assertEqual((row['status'], row['issues']), ('partial', [UNQUOTED]))  # read again in parts too
+        data = {'evidence': [e.model_dump() for e in evidence], 'coverage': coverage, 'files': []}
+        self.assertEqual(quality.pages(data)[0]['counts'], {'unverified': 1})
+        card = Cards(data).card(next(e.id for e in evidence if e.entity == 'standby pump'))
+        self.assertIn('Quote not found in the text it was read from: kept in the model', card)
 
 if __name__ == "__main__":
     unittest.main()

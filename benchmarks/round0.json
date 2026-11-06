@@ -49,6 +49,7 @@
     "skip_sheet_tables",
     "leave_text",
     "quote_match",
+    "unquoted",
     "positions",
     "records",
     "sheet_records",

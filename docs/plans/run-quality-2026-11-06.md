@@ -1,6 +1,6 @@
 # The run's reading, counted: where the report deserves less trust
 
-- **Status:** Active (2026-11-06): [milestone 1](#1-a-pages-reading-counted) built 2026-11-06; 2 and 3 not begun; [4](#4-claims-whose-quote-isnt-found-why-and-kept) investigated 2026-11-06, being built.
+- **Status:** Active (2026-11-06): [milestone 1](#1-a-pages-reading-counted) built 2026-11-06; 2 and 3 not begun; [4](#4-claims-whose-quote-isnt-found-why-and-kept) investigated and built 2026-11-06 (the matcher fixed; `unquoted`, off).
 - **The owner, 2026-10-09:** "I'm beginning to believe that having some sort of quality heuristics spot-check for runtime behavior would be useful for both confidence decisions and part of the report."
 - **Chosen 2026-11-02** from the review of open items, where Claude offered it as "How well the run read, shown in the report": the owner, "cited summaries, quality reports, and cut-text work are probably the most valuable to me in the short term"; then, 2026-11-06, "we should finish the quality reports and cut-text work, too."
 - **Takes over** the tentative row *Runtime quality spot checks*, kept whole [below](#moved-in-runtime-quality-spot-checks).
@@ -71,6 +71,11 @@ The tentative row *Claims kept whose quote isn't found*, moved in 2026-11-06 (th
 - **What to change:**
   - **The matcher, a fix:** a line-end hyphen breaking a word read both ways ("con-\nditions" as "con-ditions" and "conditions"), and spacing ignored where only spacing differs (OCR layers lose and add spaces). On the corpus, 19 of the 24 such claims are right, none misbound.
   - **Kept, marked, as a setting (`unquoted`, off):** a claim whose quote isn't found kept with its quote unverified, as a picture's is: its card warns, the Reading view counts it, and what reads it (the second pass, the index, comparisons) can weigh it below a verified claim. Not words-in-order as verified: those claims are misbound three times as often as kept ones.
+- **Built 2026-11-06, both measured on the corpus's recorded answers replayed (no requests):**
+  - **The matcher's fix** (`quotes.excerpted`; every reader's version raised, stores checking their quotes again from the cache): 15 claims more kept (11 on the scanned OCR page), one more right, none misbound or misread.
+  - **`unquoted: kept`:** 712 claims more (unverified 405 → 1,117), facts found 10,312 → 10,326 (the 14 the investigation counted); among the claims, right 11,355 → 11,396, misbound 223 → 285, misread 35 → 50, inexact 124 → 138.
+    - First built with a kept claim's task answered complete: then its text wasn't read again in parts (bounded refinement), which a dropped claim's partial task had been, and recovered quoted claims; facts found fell to 10,303. Its task stays partial either way now, and is read again in parts as before.
+    - Off: the corpus gains 14 facts for some 90 claims more misbound, misread or inexact, each marked. On real documents more may be at stake (the IEA report's materials table, 71 claims).
 
 ## Moved in: *Runtime quality spot checks*
 

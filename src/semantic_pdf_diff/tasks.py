@@ -20,6 +20,7 @@ from .retiling import CUT_NOTE
 from .stance import VIEW_COLUMN, is_yes_no
 
 REJECTED = "Rejected claim with unsupported literal quote"  # a coverage row's note of a claim dropped (quality.py)
+UNQUOTED = "Kept a claim its quote wasn't found for (unquoted)"  # or of one kept, its quote unverified
 
 # Text shorter than this is not split further during refinement.
 # Bump when prompt assembly or task construction changes, not only the template text;
@@ -428,10 +429,13 @@ class TaskCore:
                 claims.append(made.view)  # its row's yes or no, which the reader didn't give (the view_rows lever)
             for claim in claims:
                 verified = check(claim.quote) if check else None
-                if not image and not verified:
-                    row["status"] = "partial"
-                    row["issues"].append(REJECTED)
-                    continue
+                if not image and not verified:  # partial either way: its text is read again in parts, where a
+                    row["status"] = "partial"  # quote may be found (bounded refinement)
+                    if not s.keeps_unquoted():
+                        row["issues"].append(REJECTED)
+                        continue
+                    row["issues"].append(UNQUOTED)
+                    verified = False
                 position_of = made.position or self.position_by_quote(page_no)
                 claim_read = claim
                 claim, position = s.positioned(claim, position_of(claim.quote) if position_of else None)

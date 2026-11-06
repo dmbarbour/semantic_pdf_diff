@@ -1005,6 +1005,17 @@ class QuoteMatch(Lever):
         from .quotes import excerpted
         return self.quote_match != "exact" and excerpted(quote, text, in_order=self.quote_match == "excerpts")
 
+class Unquoted(Lever):
+    lever_name, stage, off = "unquoted", "matching", {"unquoted": "dropped"}
+    # a text or table claim whose quote isn't found in its text kept, its quote unverified as a picture's is, not
+    # dropped (docs/plans/run-quality-2026-11-06.md, milestone 4; the owner, 2026-11-06: "Filtering the claims before
+    # they reach the database seems like a way to lose useful information."): its card warns, the Reading view counts
+    # it, the export says so. Applied as answers are stored: bound.
+    unquoted: Annotated[Literal["dropped", "kept"], Declared("post", EXTRACT, TEXTUAL)] = "dropped"
+
+    def keeps_unquoted(self):
+        return self.unquoted == "kept"
+
 class Positions(Lever):
     lever_name, stage, off = "positions", "matching", {"positions": "conditions"}
     # provenance: a text block opening with an item's label ("Condition 2:", "(b)") in a sequence the source numbers
@@ -1465,8 +1476,9 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  RenderArea, FigureTasks,
                  TableRules, TableReview, TableStructure, LabelsJoined, VisualTextLayer, WholeLines, TableCuts,
                  TextCuts, TextSpans, RepeatedText,
-                 LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
-                 TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
+                 LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Unquoted, Positions, Records,
+                 SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
+                 DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds, ReadTogether, Embed,
                  Rerank)
@@ -1712,6 +1724,12 @@ class Platform(Composable):
     @chained
     def loose_match(self, quote, text):
         """Whether a quote that isn't in its source exactly (extract.quoted) is accepted all the same."""
+        return False
+
+    @chosen
+    def keeps_unquoted(self):
+        """Whether a text or table claim whose quote isn't found in its text is kept, its quote unverified: the
+        platform's, never (dropped, a note left on its coverage row)."""
         return False
 
     @chosen

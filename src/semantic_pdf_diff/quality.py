@@ -9,7 +9,7 @@ import re
 from .retiling import CUT_NOTE, says_cut
 from .tablerules import ALONE
 from .tablestructure import AS_LEFT
-from .tasks import REJECTED
+from .tasks import REJECTED, UNQUOTED
 
 # each kind counted: (key, its column, what it counts)
 KINDS = (
@@ -18,8 +18,8 @@ KINDS = (
     ("short", "Cut short", "answers the model said were incomplete (of the page's requests)"),
     ("dropped", "Quotes not found", "claims dropped, their quote not in the text they were read from (of the claims "
                                     "its text gave, kept or dropped)"),
-    ("unverified", "Quotes unverified", "claims read from a picture, kept, their quote not in the page's text layer "
-                                        "(of its pictures' claims checked against it)"),
+    ("unverified", "Quotes unverified", "claims kept, their quote not in the page's text layer (a picture's) or in "
+                                        "their text (unquoted) (of the page's claims checked)"),
     ("cut", "Text cut", "image tiles whose answer said text was cut at their edges (of the page's images)"),
     ("tables", "Tables as mended", "table parts read without the model's structure, or rows without its rules"),
     ("doubted", "Doubted", "claims the second pass suspected misread, about another subject or out of place (of the "
@@ -44,7 +44,8 @@ def _row_counts(r):
         out["failed"] = 1
     elif r["status"] == "not_reached":
         out["unread"] = 1
-    elif r["status"] == "partial" and not dropped and not any(i.startswith("Continued: ") for i in issues):
+    elif r["status"] == "partial" and not dropped and not any(i.startswith("Continued: ") or i == UNQUOTED
+                                                              for i in issues):
         out["short"] = 1  # a row a quote failed made partial is counted as its drops (the two aren't told apart)
     if says_cut(issues) or any(i.startswith(CUT_NOTE) for i in issues):
         out["cut"] = 1
@@ -79,9 +80,9 @@ def pages(data):
     for e in evidence.values():
         place = at(e["content"], e["locator"].get("page"))
         place["claims"] += 1
-        base(place, "claims", *(["checked"] if e.get("image") and e.get("quote_verified") is not None else
-                                ["from text"] if not e.get("image") else []))
-        if e.get("quote_verified") is False and e.get("image"):
+        base(place, "claims", *(["checked"] if e.get("quote_verified") is not None else []),
+             *(["from text"] if not e.get("image") else []))
+        if e.get("quote_verified") is False:
             add(place, {"unverified": 1})
     for c in (data.get("commentary") or {}).get("entries", []):
         kind = ("doubted" if c["kind"] == "suspicion" else
