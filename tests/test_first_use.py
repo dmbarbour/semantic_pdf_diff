@@ -120,8 +120,12 @@ class FirstUse(unittest.TestCase):
             code, said = compare(self.root, url)  # remembered: not checked, but asked a sum (the ping)
             self.assertNotIn('First use', said)
             self.assertRegex(said, r'The endpoint answers: json in [\d.]+ s \(\$0\.\d{5}; asked each run, the '
-                                   r'first-use checks remembered in ')
+                                   r'first-use checks remembered in \S+, what they measured used: context_tokens '
+                                   r'65,536, image_tokens 284\)')
+            self.assertNotIn('Calibrated', said)  # (the owner, 2026-11-06: "token mentions at the start even when
+            # I've already run calibration previously")
             self.assertEqual(state['checks'], 12)  # the ping's sum alone
+            self.assertEqual(self.extracting(), (65536, 284))  # used all the same
 
     def extracting(self):
         """(context_tokens, image_tokens) as the store's extraction was asked with them (evidence.json)."""

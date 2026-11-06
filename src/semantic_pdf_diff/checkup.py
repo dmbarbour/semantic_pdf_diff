@@ -776,10 +776,6 @@ def first_use(settings, cache):
     if unchecked or failed:
         for line in lines(settings, checks, cost)[1:]:
             log.info(line)
-    else:
-        log.info("The endpoint answers: " + ", ".join(f"{c.name} in {c.seconds:.1f} s" for c in checks
-                                                      if c.ok and c.name in PING)
-                 + f" (${cost:.5f}; asked each run, the first-use checks remembered in {path})")
     record(path, settings, checks)
     if failed:
         forget(path, settings)  # the endpoint changed or down: the next run checks (and calibrates) again
@@ -787,8 +783,16 @@ def first_use(settings, cache):
                         "asked: `semantic-pdf-diff config test` checks again")
     made = calibrated(settings, path)
     changed = [f"{k} {getattr(made, k):,}" for k in MEASURES if getattr(made, k) != getattr(settings, k)]
-    if changed:
-        log.info(f"Calibrated from what was measured: {', '.join(changed)} (`config show` marks them)")
+    if unchecked:
+        if changed:
+            log.info(f"Calibrated from what was measured: {', '.join(changed)} (`config show` marks them)")
+    else:  # what was measured before, used: said as remembered, not as calibrated anew (the owner, 2026-11-06: "I see
+        # several seconds spent on 'acuity' lines and token mentions at the start even when I've already run
+        # calibration previously")
+        log.info("The endpoint answers: " + ", ".join(f"{c.name} in {c.seconds:.1f} s" for c in checks
+                                                      if c.ok and c.name in PING)
+                 + f" (${cost:.5f}; asked each run, the first-use checks remembered in {path}"
+                 + (f", what they measured used: {', '.join(changed)})" if changed else ")"))
     return made
 
 # --- calibration: what the checks measured, used where no layer sets it
