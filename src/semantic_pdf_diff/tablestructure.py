@@ -32,6 +32,7 @@ CUT = "a word cut by a column line"
 # Lines the mending joined to the line above, each with a first cell (labels_joined): shown apart, read so unless a
 # rule says otherwise. Named only to a part holding such lines, so every other part is asked as before.
 JOINED = "read with the line above"
+AS_LEFT = "Structure as the heuristics left it"  # a part's coverage note where the query's structure isn't used
 COLUMN_ACTIONS = ("split column", "join columns")  # acting on columns, in every row
 ACTIONS = ("join above", "join header", "section", "new table", "not table", "keep") + COLUMN_ACTIONS
 
@@ -509,7 +510,7 @@ def read(core, page, task, header, body, boxes, styles, rules, images, then, cut
         core.progress.finish(status)
 
     def heuristic(name, status, why, table=True):
-        record(name, status, [f"Structure as the heuristics left it: {why}"[:500]])
+        record(name, status, [f"{AS_LEFT}: {why}"[:500]])
         then([as_read], None, [], table)
 
     def check(answer):

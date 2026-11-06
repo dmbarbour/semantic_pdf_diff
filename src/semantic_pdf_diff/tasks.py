@@ -19,6 +19,8 @@ from .regions import region_of
 from .retiling import CUT_NOTE
 from .stance import VIEW_COLUMN, is_yes_no
 
+REJECTED = "Rejected claim with unsupported literal quote"  # a coverage row's note of a claim dropped (quality.py)
+
 # Text shorter than this is not split further during refinement.
 # Bump when prompt assembly or task construction changes, not only the template text;
 # it is part of the extraction interpreter. 2: section heading path in prompts.
@@ -428,7 +430,7 @@ class TaskCore:
                 verified = check(claim.quote) if check else None
                 if not image and not verified:
                     row["status"] = "partial"
-                    row["issues"].append("Rejected claim with unsupported literal quote")
+                    row["issues"].append(REJECTED)
                     continue
                 position_of = made.position or self.position_by_quote(page_no)
                 claim_read = claim

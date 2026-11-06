@@ -52,6 +52,7 @@ SENTENCE = 6        # or this many words: sentences (requirements, titles), whos
 FEW_ROWS, MANY_ROWS = 20, 100  # our opinion of a summary: graded, weak under FEW_ROWS, strong from MANY_ROWS
 CATEGORIES = 12     # a category's values counted one by one; the rest counted together
 RETRY_SHARE = 0.2   # rules failing more of the rows than this are asked for again
+ALONE = "read by itself"  # a row's (or every row's) coverage note where the rules didn't read it
 CONFIDENCE = 0.9    # a claim made by rules: as sure as the rules
 
 PLACEHOLDER = re.compile(r"\{([^{}]*)\}")
@@ -797,7 +798,7 @@ def read(core, page, g, task, by_itself, source, image=None, mark=None):
         notes = possible_notes(g) if notes is None else notes
         for key in g.keys:
             by_itself(key)
-        return f"every row read by itself: {why}" + read_notes(notes)
+        return f"every row {ALONE}: {why}" + read_notes(notes)
 
     def read_notes(notes):
         for r in notes:
@@ -896,7 +897,7 @@ def read(core, page, g, task, by_itself, source, image=None, mark=None):
                 made = row_claims(answer, g_, i)
             except (Misfit, Broken) as error:
                 misfits.append(i)
-                issues.append(f"Row {g.names[i]} read by itself: {error}")
+                issues.append(f"Row {g.names[i]} {ALONE}: {error}")
                 continue
             stance = core.s.table_holder(g.labels, g.rows[i], g.rows[:i])  # its holder column's cell (table_holders)
             for fields, used, rule in made:
