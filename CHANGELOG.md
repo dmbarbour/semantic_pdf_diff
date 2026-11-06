@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.34.0 (2026-11-06)
+
+- **A run checking its models again says why** (the owner: "It seems the initial calibration queries aren't cached?"). Checks are remembered in `endpoints.json` beside the answers cache, so with one cache a second run asks only the ping ($0.00002 at DeepInfra; the first use took 41 s, acuity's eight cards 37.5 s of it). Where a run checks again, its `First use:` line now says why: no record there yet (each answers cache keeps its own), forgotten (when, and why: a check failed, a run's requests failed in a row, `config checks --forget`), remembered at another `image_side`, or never passed there; and where the user's cache's record remembers them all, that it does, though a run reads only its own.
+- **Fixed: a run said "Calibrated from what was measured: context_tokens …, image_tokens …" each time,** though only its first use measured. A remembered run says what was measured on the ping's line, as remembered.
+- **The search helps show a file's name with spaces quoted** (the owner: "Most filenames have spaces, so we should support quotes there perhaps."): `file:"pump spec sheet"`, a whole name or a part of it, already worked; on the command line, quote the query whole for the shell: `semantic-pdf-diff search 'file:"Pump Spec Sheet.pdf" page:3-5'`.
+
 ## 0.33.1 (2026-11-06)
 
 - **Fixed: the report's other views took the search's language as plain text.** The Subjects, Kinds, Figures and tables, Glossary, Gaps and Inconsistencies views filtered their rows by the search's text as typed, so `file:`, `page:`, phrases, `-word`, `OR` and values compared found nothing there (the owner: "the search doesn't work properly for things like `file:` or `page:` as described in the search help"). They now read it as the Claims view does: a row's own words for the words, and its claims for the rest, one claim all of it (`file:a.pdf page:12` finds the subjects with a claim on that page of that file); a figure's and a glossary term's own file and page too.
