@@ -19,23 +19,40 @@ FOLD = str.maketrans({"‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-"
 ELLIPSIS = re.compile(r"\s*(?:\.\s?\.\s?\.|…|\s\|\s)\s*")  # "a ... b", and table cells "a | b"
 
 LINE_HYPHEN = re.compile(r"(\w)-\s+(?=\w)")  # "linear-\nspring": a compound broken at a line end
+BARE_PART = 6  # characters a part needs, its spaces left out, to be found with spacing aside (excerpted)
 
-def _folded(text):
+def _folded(text, joined=False):
+    """Text as quotes are found in it: Unicode forms, soft hyphens, dash, quote-mark and bullet variants, case and
+    spacing folded; a line-end hyphen kept, as a compound's ("linear-\nspring"), or with joined dropped, as a word's
+    broken at the line's end ("con-\nditions")."""
     text = unicodedata.normalize("NFKC", text).replace("\u00ad", "").translate(FOLD)
-    return " ".join(LINE_HYPHEN.sub(r"\1-", text).casefold().split())
+    return " ".join(LINE_HYPHEN.sub(r"\1" if joined else r"\1-", text).casefold().split())
 
 def excerpted(quote, text, in_order=True):
     """The quote is excerpts of text: its parts between ellipses ("...", "…") or cell bars
     (" | ") each appear in order, up to case, whitespace, Unicode forms, line-end hyphenation
-    ("linear-\nspring") and dash, quote-mark and bullet variants; with in_order, a part may also
-    be words read in order across a pseudo-table (a header and its value), within about three
-    times its length (round 9: that window let chart-axis labels through as values).
-    A third of text claims were rejected by the verbatim check for such quotes (overall review,
-    2026-09-28); paraphrases and quotes from the context still fail."""
+    ("linear-\nspring", and "con-\nditions" quoted "conditions") and dash, quote-mark and bullet
+    variants, and spacing where only spacing differs; with in_order, a part may also be words
+    read in order across a pseudo-table (a header and its value), within about three times its
+    length (round 9: that window let chart-axis labels through as values). A third of text claims
+    were rejected by the verbatim check for such quotes (overall review, 2026-09-28); paraphrases
+    and quotes from the context still fail."""
     parts = [p for p in (_folded(p) for p in ELLIPSIS.split(quote)) if p]
     if not parts:
         return False
-    haystack, at = _folded(text), 0
+    # the text with a line-end hyphen kept and dropped (a word broken at a line's end, quoted whole: the run's
+    # reading investigated, 2026-11-06); then spacing aside, where only spacing differs (an OCR layer's
+    # "59,045cfm" quoted "59,045 cfm"), each part long enough not to be found inside another word or number
+    texts = list(dict.fromkeys((_folded(text), _folded(text, joined=True))))
+    if any(_in_turn(parts, t, in_order) for t in texts):
+        return True
+    bare = [p.replace(" ", "") for p in parts]
+    return all(len(p) >= BARE_PART for p in bare) and any(_in_turn(bare, t.replace(" ", ""), False) for t in texts)
+
+def _in_turn(parts, haystack, in_order):
+    """Whether the parts are found in the haystack one after another (with in_order, a part also as words read in
+    order: _in_order)."""
+    at = 0
     for part in parts:
         found = haystack.find(part, at)
         end = found + len(part) if found >= 0 else (_in_order(part.split(), haystack, at, 3 * len(part) + 40)

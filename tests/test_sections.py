@@ -358,6 +358,20 @@ class SectionContext(unittest.TestCase):
         self.assertFalse(excerpted('gelcoat E1 [Pa] 3.440E+09', text, in_order=False))  # fragments only
         self.assertTrue(excerpted('22.0 | 12.1 | 19.94 | -105.90E+6', text, in_order=False))
 
+    def test_a_word_broken_at_a_line_end_and_spacing_an_ocr_layer_lost(self):
+        # the run's reading investigated (docs/plans/run-quality-2026-11-06.md, milestone 4): an IEA report's
+        # "con-\nditions" quoted "conditions"; a scanned page's OCR layer "59,045cfm" quoted "59,045 cfm"
+        from semantic_pdf_diff.quotes import excerpted
+        text = ('computed at Reynolds numbers representative of normal operating con-\nditions for the spanwise '
+                'locations of each airfoil\nAHU-3 supplies 59,045cfm. Option2, a VAVbaseline: 1,067 tons')
+        for quote in ['representative of normal operating conditions for the spanwise locations',
+                      'normal operating con-ditions', 'AHU-3 supplies 59,045 cfm', 'Option 2, a VAV baseline']:
+            with self.subTest(quote=quote):
+                self.assertTrue(excerpted(quote, text, in_order=False))
+        for quote in ['59 cfm', '1 067 tons', 'normal operating conditions for the airfoil']:
+            with self.subTest(quote=quote):  # too short for spacing aside; words that aren't there
+                self.assertFalse(excerpted(quote, text, in_order=False))
+
     def displayed_page(self, path, rotated, caption=False):
         """One page as displayed (600 x 400): a heading, a paragraph, a lead-in over a ruled table, a note
         beside it, a figure with text around it. Stored upright, or sideways with /Rotate 90."""
