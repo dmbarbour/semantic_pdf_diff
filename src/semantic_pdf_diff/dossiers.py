@@ -39,7 +39,7 @@ second-pass recommendations": the subject's dossier, a stage, text first).
 import hashlib
 import json
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 import pymupdf
 
@@ -386,6 +386,7 @@ def rereads(data, commentary, store, client, mode, label, side, progress=None):
     assets = store.folder / "assets"
     assets.mkdir(parents=True, exist_ok=True)
     docs = {}
+    bar = progress.bar("reread", len(doubted), "claims") if doubted else None  # its own: hours on a large source
     try:
         with Dispatcher(client) as dispatch:
             for n, (x, c) in enumerate(doubted.items()):
@@ -394,6 +395,7 @@ def rereads(data, commentary, store, client, mode, label, side, progress=None):
                 loc = (e or {}).get("locator", {})
                 if f is None or loc.get("format") != "pdf" or not loc.get("page") or not loc.get("bbox"):
                     counts["skipped"] += 1
+                    bar.tick()
                     continue
                 if e["content"] not in docs:
                     docs[e["content"]] = pymupdf.open(stream=read_origin(store.origin(f["source"], f["path"])),
@@ -402,6 +404,7 @@ def rereads(data, commentary, store, client, mode, label, side, progress=None):
                 rect = region(e, page)
                 if rect.is_empty:
                     counts["skipped"] += 1
+                    bar.tick()
                     continue
                 scale = min(ZOOM, side / max(rect.width, rect.height, 1))
                 name = crop_name(crop_stem(e["content"]), f"reread:{e['id']}")
@@ -411,6 +414,7 @@ def rereads(data, commentary, store, client, mode, label, side, progress=None):
 
                 def done(answer, error, n=n, c=c, e=e, key=key):
                     progress.finish("failed" if error is not None else "complete")
+                    bar.tick()
                     if error is not None:
                         counts["failed"] += 1
                         return
@@ -552,11 +556,13 @@ def looks(data, index, store, client, mode, label, side, progress=None):
             docs[content] = pymupdf.open(stream=read_origin(store.origin(f["source"], f["path"])), filetype="pdf")
             for n, page in enumerate(docs[content], 1):
                 pages[content, n] = (page, fold(page.get_text()))
+        bar = progress.bar("look", len(wanted), "gaps")
         with Dispatcher(client) as dispatch:
             for n, g in enumerate(wanted):
                 at = where_to_look(g, index, evidence, files, pages)
                 if at is None or at[1].is_empty:
                     counts["skipped"] += 1
+                    bar.tick()
                     continue
                 (content, number), rect = at
                 page = pages[content, number][0]
@@ -571,6 +577,7 @@ def looks(data, index, store, client, mode, label, side, progress=None):
 
                 def done(answer, error, n=n, g=g, key=key, where=where):
                     progress.finish("failed" if error is not None else "complete")
+                    bar.tick()
                     if error is not None:
                         counts["failed"] += 1
                         return
@@ -599,6 +606,8 @@ def read_together(data, index, client, mode, label, progress=None):
              for source, subject, named, dossier in dossiers(data, index)]
     asked += [("kinds", ("kind", mode, label, source, kind), kind_prompt(dossier), source, kind, named, dossier)
               for source, kind, named, dossier in kind_dossiers(data, index)]
+    bars = {what: progress.bar("second pass" if what == "subjects" else "kinds", n, what)  # its own: hours
+            for what, n in Counter(a[0] for a in asked).items()}
     with Dispatcher(client) as dispatch:
         for n, (what, key, text, source, subject, named, dossier) in enumerate(asked):
             counts[what] += 1
@@ -606,6 +615,7 @@ def read_together(data, index, client, mode, label, progress=None):
             def done(answer, error, n=n, what=what, source=source, subject=subject, named=named, dossier=dossier,
                      key=key):
                 progress.finish("failed" if error is not None else "complete")
+                bars[what].tick()
                 if error is not None:
                     counts["failed"] += 1
                     return

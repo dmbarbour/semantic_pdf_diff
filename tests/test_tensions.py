@@ -107,6 +107,13 @@ class Shown(unittest.TestCase):
         self.assertIn('data-claims="A-1 A-2"', rows)  # found by the search as its claims are
         self.assertEqual(suspects_html([], Cards(d)), ('', 0))
 
+class Drawn(unittest.TestCase):
+    def test_a_bar_of_the_subjects_asked(self):
+        from stubs import Asks, Board
+        board, d = Board(), data()
+        found = tensions.read(d, indexes.built(d), Asks(), "analysis", "x", progress=board)
+        self.assertEqual((board.drawn(), found["subjects"]), ([("tensions", 1, "subjects", 1)], 1))
+
 class Analyzed(unittest.TestCase):
     def test_an_analysis_asks_each_subject_once_when_on(self):
         state = {"embedded": [], "names": 0}

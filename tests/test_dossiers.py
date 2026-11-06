@@ -137,6 +137,22 @@ class Dossier(unittest.TestCase):
         self.assertIn("Read with its subject's other claims", card)
         self.assertIn("Contradicts page 7: 45 m (42 m and 45 m at one point)", card)
 
+class Shown(unittest.TestCase):
+    def test_the_second_pass_draws_bars_of_its_own(self):
+        # the owner, 2026-11-06: "it seems the second pass doesn't have its own progress bar? Mine's been on `embed`
+        # with 10,296/10,296 sentences but has been doing reread steps for hours now."
+        from stubs import Asks, Board
+        board, d = Board(), data()
+        dossiers.read_together(d, indexes.built(d), Asks(), "analysis", "x", board)
+        self.assertEqual(board.drawn(), [("second pass", 2, "subjects", 2), ("kinds", 1, "kinds", 1)])
+        board = Board()
+        log = {"entries": [{"kind": "suspicion", "relation": "misread", "claims": ["A-9"], "source": "a",
+                            "subject": "P-101 pump", "why": "x"}]}
+        with tempfile.TemporaryDirectory() as folder:
+            store = type("Store", (), {"folder": Path(folder)})()
+            found = dossiers.rereads(d, log, store, Asks(), "analysis", "x", 1000, board)
+        self.assertEqual((board.drawn(), found["skipped"]), ([("reread", 1, "claims", 1)], 1))  # none: skipped
+
 class Analyzed(unittest.TestCase):
     def test_an_analysis_reads_each_subjects_claims_together_once(self):
         state = {"embedded": [], "names": 0}

@@ -105,9 +105,11 @@ def confirmed(data, index, client, mode, label, progress=None):
     if not kinds:
         return {"kinds": [], "asked": 0, "failed": 0, "dropped": 0}
     found = {"kinds": [], "asked": 1, "failed": 0, "dropped": 0}
+    bar = progress.bar("kinds named", 1, "request")
 
     def done(answer, error):
         progress.finish("failed" if error is not None else "complete")
+        bar.tick()
         if error is not None:
             found["failed"] = 1
             return

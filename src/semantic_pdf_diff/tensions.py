@@ -178,9 +178,10 @@ def read(data, index, client, mode, label, concerns=(), progress=None):
     from .dispatch import Dispatcher
     progress = progress or NoProgress()
     found_, counts = {}, {"subjects": 0, "dropped": 0, "failed": 0}
-    said = {}
+    said, subjects = {}, asked(data, index)
+    bar = progress.bar("tensions", len(subjects), "subjects") if subjects else None
     with Dispatcher(client) as dispatch:
-        for n, (source, subject, named, dossier) in enumerate(asked(data, index)):
+        for n, (source, subject, named, dossier) in enumerate(subjects):
             counts["subjects"] += 1
             if source not in said:
                 said[source] = places(data, source)
@@ -188,6 +189,7 @@ def read(data, index, client, mode, label, concerns=(), progress=None):
 
             def done(answer, error, n=n, source=source, subject=subject, named=named, key=key):
                 progress.finish("failed" if error is not None else "complete")
+                bar.tick()
                 if error is not None:
                     counts["failed"] += 1
                     return

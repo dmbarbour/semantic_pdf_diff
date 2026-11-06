@@ -253,3 +253,39 @@ def serving(post, threaded=False, get=None):
         server.shutdown()
         server.server_close()
         thread.join()
+
+class Board:
+    """A progress (progress.Progress) recording the bars it's asked to draw: [(label, total, unit, ticks)]."""
+    def __init__(self):
+        self.bars = []
+
+    def bar(self, label, total, unit, keep=True):
+        made = _Bar(label, total, unit)
+        self.bars.append(made)
+        return made
+
+    def drawn(self):
+        return [(b.label, b.total, b.unit, b.ticks) for b in self.bars]
+
+    def add(self, n=1):
+        pass
+
+    def finish(self, status="complete"):
+        pass
+
+class _Bar:
+    def __init__(self, label, total, unit):
+        self.label, self.total, self.unit, self.ticks = label, total, unit, 0
+
+    def tick(self, n=1):
+        self.ticks += n
+
+    def fill(self):
+        self.ticks = self.total
+
+class Asks:
+    """A model answering every request with its schema's empties, inline (dispatch.Dispatcher runs a client without
+    the prepare/send split on the asking thread)."""
+    def ask(self, prompt, schema, images=(), key=None):
+        return schema.model_validate({})
+
