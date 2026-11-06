@@ -239,7 +239,7 @@ def run(options, settings, store, names, out, force_rescan=False, client=None):
         reported = compare_and_report if len(names) > 1 else analyze_and_report
         code = reported(options, settings, store, client, names, read, document, out)
         if code == checkup.FAILED and cache is not None:  # requests failed in a row: checked again next time
-            checkup.forget(checkup.memory_of(cache.path), settings)
+            checkup.forget(checkup.memory_of(cache.path), settings, "a run's requests failed in a row")
         return code
     finally:  # also on failure, so the answers this run used stay marked as used
         if own and getattr(client, 'replay', None) is not None:

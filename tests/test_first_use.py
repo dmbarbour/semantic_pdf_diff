@@ -98,7 +98,7 @@ class FirstUse(unittest.TestCase):
             code, said = compare(self.root, url)
             self.assertNotEqual(code, 5, said)
             self.assertIn(f'First use: json, image, acuity checked before anything is asked (remembered in '
-                          f'{self.memory})',
+                          f'{self.memory}): no record there yet (each answers cache keeps its own)',
                           said)
             self.assertIn('  endpoint  ok: 1 models listed, gemma-4 among them (65,536 tokens of context)', said)
             self.assertRegex(said, r'  json      ok: \d+ \+ \d+ = \d+')
@@ -225,6 +225,16 @@ class FirstUse(unittest.TestCase):
         self.assertIn('The endpoint answers: json in', said)
         self.assertIn('Sending stopped', said)
         self.assertEqual(json.loads(self.memory.read_text())['passed'], {})
+        with endpoint() as (url, _):  # checked again, saying why (the owner, 2026-11-06: "It seems the initial
+            # calibration queries aren't cached?")
+            self.remember(url)
+            checkup.forget(self.memory, Settings(base_url=url, model='gemma-4'), "a run's requests failed in a row")
+            _, said = compare(self.root, url)
+        self.assertRegex(said, r'First use: json, image, acuity checked before anything is asked \(remembered in '
+                               r'\S+\): forgotten \d{4}-\d\d-\d\d \d\d:\d\d UTC: a run\'s requests failed in a row\n')
+        gone = json.loads(self.memory.read_text())['forgotten']
+        self.assertFalse([k for k in gone if url in k])  # passed since (the stopped run's endpoint's stay)
+        self.assertTrue(gone)
 
     def test_a_remembered_endpoint_down_stops_the_run_at_once_and_is_checked_again(self):
         """The owner, 2026-11-02: "Even if the endpoints are tested in cache, do a lightweight ping to ensure the
@@ -245,10 +255,32 @@ class FirstUse(unittest.TestCase):
         with endpoint() as (url, state), patch.dict(os.environ, {'OPENAI_BASE_URL': url}):
             with contextlib.redirect_stdout(io.StringIO()) as out:
                 code = cli.main(['config', 'test', '--store', str(self.root / 'none')])
+            memory = Path(os.environ['SEMANTIC_PDF_DIFF_CACHE']) / 'endpoints.json'  # the cache in effect's
+            self.addCleanup(memory.unlink)
+            _, said = compare(self.root, url)  # a store with an answers cache of its own (the tests'): its own record
         self.assertEqual(code, 0, out.getvalue())
-        memory = Path(os.environ['SEMANTIC_PDF_DIFF_CACHE']) / 'endpoints.json'  # the cache in effect's
-        self.addCleanup(memory.unlink)
         self.assertIn(f'chat {url} gemma-4', json.loads(memory.read_text())['passed'])
+        self.assertIn(f'First use: json, image, acuity checked before anything is asked (remembered in {self.memory}):'
+                      f' no record there yet (each answers cache keeps its own); {memory} remembers them, but a run '
+                      "reads only its own answers cache's record", said)
+
+    def test_why_a_check_is_asked_again(self):
+        url = 'http://127.0.0.1:9/v1'
+        self.remember(url, image_side=1000)
+        wider = Settings(base_url=url, model='gemma-4', image_side=1200)
+        self.assertEqual(checkup.why_missing(wider, self.memory, ['image', 'acuity']),
+                         ['remembered at image_side 1000, not 1200'])
+        other = Settings(base_url=url, model='gemma-3')
+        self.assertEqual(checkup.why_missing(other, self.memory, ['json']), ['never passed there'])
+        checkup.record(self.memory, wider, [checkup.Check('image', False, 'read nothing')])
+        self.assertEqual([re.sub(r'\d{4}-.* UTC', 'WHEN', x) for x in
+                          checkup.why_missing(wider, self.memory, ['image', 'acuity'])],
+                         ['image forgotten WHEN: image failed its check',
+                          'acuity remembered at image_side 1000, not 1200'])
+        self.assertEqual(checkup.forget_model(self.memory, 'gemma-4'), 3)
+        self.assertEqual([re.sub(r'\d{4}-.* UTC', 'WHEN', x) for x in checkup.why_missing(
+            Settings(base_url=url, model='gemma-4'), self.memory, ['json'])],
+            ['forgotten WHEN: `config checks --forget` forgot it'])
 
 if __name__ == '__main__':
     unittest.main()

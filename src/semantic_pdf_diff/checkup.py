@@ -559,24 +559,39 @@ def memory_of(cache):
     its own, and nothing about its endpoint reaches another's."""
     return Path(cache).parent / MEMORY
 
-def recalled(path):
-    """{check's key: what it passed with ({"at": when, and what it measured})}; none without the file, or with one
-    unreadable (a record of checks, which are asked again)."""
+def _part(path, name):
+    """One of the record's parts, a dict; none without the file, or with one unreadable (a record of checks, which
+    are asked again)."""
     try:
         data = json.loads(Path(path).read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
-    passed = data.get("passed") if isinstance(data, dict) else None
-    return passed if isinstance(passed, dict) else {}
+    part = data.get(name) if isinstance(data, dict) else None
+    return part if isinstance(part, dict) else {}
 
-def _kept(path, passed):
-    """The record written whole, owner-only as the cache beside it is."""
+def recalled(path):
+    """{check's key: what it passed with ({"at": when, and what it measured})}."""
+    return _part(path, "passed")
+
+def forgotten(path):
+    """{check's key: {"at": when, "why"}}: the checks forgotten since they last passed, and why, so the next run can
+    say why it checks again."""
+    return _part(path, "forgotten")
+
+def _kept(path, passed, gone=None):
+    """The record written whole, owner-only as the cache beside it is: passed, and what was forgotten (gone; as it
+    was, if not given) that hasn't passed since."""
     path = Path(path)
+    gone = forgotten(path) if gone is None else gone
+    record = {"format": 1, "passed": passed, "forgotten": {k: v for k, v in gone.items() if k not in passed}}
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_name(path.name + ".tmp")
-    temp.write_text(json.dumps({"format": 1, "passed": passed}, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    temp.write_text(json.dumps(record, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     os.chmod(temp, 0o600)
     os.replace(temp, path)
+
+def _now():
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 def keys(settings):
     """{check: its key, what its passing depends on}, for the checks the settings call for: the chat model's by the
@@ -601,8 +616,7 @@ def keys(settings):
 
 def record(path, settings, checks):
     """The record updated from checks run: each passed remembered, with what it measured; each failed forgotten."""
-    wanted, passed = keys(settings), recalled(path)
-    now = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    wanted, passed, gone, now = keys(settings), recalled(path), forgotten(path), _now()
     for c in checks:
         if c.name not in wanted:
             continue
@@ -610,9 +624,11 @@ def record(path, settings, checks):
             passed[wanted[c.name]] = {"at": now, **c.measured}
         elif c.ok is False:
             passed.pop(wanted[c.name], None)
+            gone[wanted[c.name]] = {"at": now, "why": f"{c.name} failed its check"}
     if any(c.name == "endpoint" and c.ok is False for c in checks):  # the model isn't listed
         passed.pop(wanted["json"], None)
-    _kept(path, passed)
+        gone[wanted["json"]] = {"at": now, "why": "the endpoint didn't list the model"}
+    _kept(path, passed, gone)
 
 # a key's word: its check
 KINDS = {"chat": "json", "image": "image", "acuity": "acuity", "reranker": "reranker", "embedding": "embedding"}
@@ -693,18 +709,53 @@ def checks_lines(path, settings):
 def forget_model(path, model=""):
     """Remembered checks forgotten: every one, or a model's at any endpoint, so the next run checks (and calibrates)
     again: how many."""
-    passed = recalled(path)
+    passed, forgot = recalled(path), forgotten(path)
     gone = [k for k in passed if not model or ((p := _parts(k)) and p["model"] == model)]
     if gone:
         for k in gone:
             passed.pop(k)
-        _kept(path, passed)
+            forgot[k] = {"at": _now(), "why": "`config checks --forget` forgot it"}
+        _kept(path, passed, forgot)
     return len(gone)
 
 def missing(settings, path):
     """The checks the settings call for that the record doesn't remember passing (keys' names)."""
     passed = recalled(path)
     return [name for name, key in keys(settings).items() if key not in passed]
+
+def elsewhere(path):
+    """The other records a run of the user's may have left: the cache in effect's ($SEMANTIC_PDF_DIFF_CACHE's, else
+    the user's) and the user's own (settings.cache_path's, without the variable), this one aside."""
+    from .settings import cache_path
+    home = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "semantic-pdf-diff" / MEMORY
+    here = Path(path).resolve()
+    return [p for p in dict.fromkeys([memory_of(cache_path()), home]) if Path(p).resolve() != here]
+
+def why_missing(settings, path, names, others=()):
+    """Why checks the record doesn't remember are asked (the owner, 2026-11-06: "It seems the initial calibration
+    queries aren't cached?"): [phrase], each with its checks' names where they differ. No record yet (each answers
+    cache keeps its own), forgotten (when, and why: a check failed, a run's requests failed in a row), remembered at
+    another image_side, or never passed there; and another record (others: elsewhere's) that remembers them all,
+    which a run of this cache doesn't read."""
+    wanted, passed, gone = keys(settings), recalled(path), forgotten(path)
+    reasons = {}
+    for name in names:
+        key, parts = wanted[name], _parts(wanted[name])
+        sides = sorted(p["side"] for k in passed if (p := _parts(k)) and "side" in p and parts
+                       and (p["check"], p["url"], p["model"]) == (parts["check"], parts["url"], parts["model"]))
+        if not Path(path).exists():
+            said = "no record there yet (each answers cache keeps its own)"
+        elif key in gone:
+            said = f"forgotten {_when(gone[key].get('at', ''))}: {gone[key].get('why') or 'why not kept'}"
+        elif sides:
+            said = f"remembered at image_side {', '.join(sides)}, not {settings.image_side}"
+        else:
+            said = "never passed there"
+        reasons.setdefault(said, []).append(name)
+    out = [said if len(reasons) == 1 else f"{', '.join(found)} {said}" for said, found in reasons.items()]
+    out += [f"{other} remembers them, but a run reads only its own answers cache's record" for other in others
+            if names and all(wanted[n] in recalled(other) for n in names)]
+    return out
 
 def name_check(settings, name, setting="model", timeout=10):
     """What `config set` says of a model's name (setting: model, rerank_model or embed_model), the endpoint's listing
@@ -744,14 +795,14 @@ def name_check(settings, name, setting="model", timeout=10):
                 + try_it]
     return []
 
-def forget(path, settings):
-    """Every check the settings call for forgotten (their requests failed in a row): the next run checks again."""
-    passed = recalled(path)
-    gone = [k for k in keys(settings).values() if k in passed]
-    if gone:
-        for k in gone:
-            passed.pop(k)
-        _kept(path, passed)
+def forget(path, settings, why):
+    """Every check the settings call for forgotten, and why (their requests failed in a row, a check failed): the next
+    run checks again, saying why."""
+    passed, forgot = recalled(path), forgotten(path)
+    for k in keys(settings).values():
+        passed.pop(k, None)
+        forgot[k] = {"at": _now(), "why": why}
+    _kept(path, passed, forgot)
 
 PING = ("json", "reranker", "embedding")  # asked each run, remembered or not: a small request a model
 
@@ -770,7 +821,8 @@ def first_use(settings, cache):
     unchecked = missing(settings, path)
     asked = [name for name in keys(settings) if name in unchecked or name in PING]
     if unchecked:
-        log.info(f"First use: {', '.join(unchecked)} checked before anything is asked (remembered in {path})")
+        log.info(f"First use: {', '.join(unchecked)} checked before anything is asked (remembered in {path}): "
+                 + "; ".join(why_missing(settings, path, unchecked, elsewhere(path))))
     checks, cost = run(settings, only=asked, shown=True)
     failed = [c.name for c in checks if c.ok is False]
     if unchecked or failed:
@@ -778,9 +830,9 @@ def first_use(settings, cache):
             log.info(line)
     record(path, settings, checks)
     if failed:
-        forget(path, settings)  # the endpoint changed or down: the next run checks (and calibrates) again
-        raise Unchecked(f"{', '.join(failed)} failed {'its' if len(failed) == 1 else 'their'} check, so nothing was "
-                        "asked: `semantic-pdf-diff config test` checks again")
+        said = f"{', '.join(failed)} failed {'its' if len(failed) == 1 else 'their'} check"
+        forget(path, settings, said)  # the endpoint changed or down: the next run checks (and calibrates) again
+        raise Unchecked(f"{said}, so nothing was asked: `semantic-pdf-diff config test` checks again")
     made = calibrated(settings, path)
     changed = [f"{k} {getattr(made, k):,}" for k in MEASURES if getattr(made, k) != getattr(settings, k)]
     if unchecked:
