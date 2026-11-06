@@ -59,10 +59,9 @@ class Visuals:
         # one text page for the layer and the blocks, their flags the same (code review 2026-10-08, A6)
         textpage = (page.get_textpage(clip=native_rect, flags=pymupdf.TEXTFLAGS_TEXT) if not depth or box is None
                     else None)
-        # a refined half's by whole lines (review item 6)
-        layer = (page.get_text("text", textpage=textpage) if not depth
-                 else "".join(line + "\n" for line_box, line in self.context_of.lines(page)
-                              if (line_box.tl + line_box.br) / 2 in rect))
+        # a refined half's by whole lines (review item 6); every tile's, where whole_lines says
+        layer = s.tile_layer(self.context_of, page, rect, depth,
+                             page.get_text("text", textpage=textpage) if textpage is not None else "")
         check = (lambda q: covered(q, layer, fold=True)) if layer.strip() else None
         if box is None:
             blocks = [(tuple(b[:4]), b[4]) for b in page.get_text("blocks", textpage=textpage) if b[6] == 0]
@@ -87,7 +86,8 @@ class Visuals:
         # Refine only local tiles; an overview or a whole figure may be incomplete because
         # it spans many facts, and all its areas already have tile coverage.
         s = self.s
-        if (status not in ("partial", "failed") or region_of(tag) in ("overview", "figure")
+        if ((status not in ("partial", "failed") and not (status == "complete" and s.refines_complete(done)))
+                or region_of(tag) in ("overview", "figure")
                 or depth >= s.refinement_depth or min(rect.width, rect.height) < MIN_REFINE_POINTS):
             return
         for child_tag, child, again in s.refined_tile(self.context_of, page, tag, rect, done):

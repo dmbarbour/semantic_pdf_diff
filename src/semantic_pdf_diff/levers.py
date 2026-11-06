@@ -722,6 +722,21 @@ class AnotherTiling(Lever):
                 return [(t, r, {"depth": 1}) for t, r in found]
         return super().refined_tile(reader, page, tag, rect, done)
 
+class SaidCut(Lever):
+    lever_name, stage, off = "said_cut", "segmentation", {"said_cut": "noted"}
+    # a tile answered complete whose answer says its text was cut (its notes, or the edges a rule asked it to name) is
+    # read again as a partial one is, under the page's next cut (another_tiling), not only noted
+    # (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2: "A tile that says its text is cut is read again under
+    # another cut, as a partial one is, even when it's answered complete.")
+    said_cut: Annotated[Literal["noted", "read again"], _shaping(VISUAL)] = "noted"
+
+    def refines_complete(self, done):
+        if self.said_cut != "read again":
+            return super().refines_complete(done)
+        from .retiling import CUT_NOTE, says_cut
+        issues = done["row"].get("issues", ())
+        return says_cut(issues) or any(i.startswith(CUT_NOTE) for i in issues)
+
 class FigureRefinement(Lever):
     lever_name, stage, off = "figure_refinement", "segmentation", {"refine_figures": "halves"}
     # a partial tile mostly one figure it holds whole (a chart or drawing no figure task reads, since the tile does) is
@@ -868,6 +883,25 @@ class VisualTextLayer(Lever):
             return text
         return (text + "\n" if text else "") + LAYER_NOTE + "\n" + self.cut_layer(" ".join(layer.split()),
                                                                                  self.visual_text_layer)
+
+class WholeLines(Lever):
+    lever_name, stage, off = "whole_lines", "inclusion", {"whole_lines": False}
+    # an image region's text layer (its quotes' check, and what visual_text_layer sends) holds every line the region
+    # touches whole, half its height or more inside it, not the words it clips: a tile cutting a line sideways is
+    # given the line's words beyond its edges (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2: "Whole
+    # lines in every tile's text layer: each line the tile touches in full, as refined halves get them")
+    whole_lines: Annotated[bool, _shaping(VISUAL)] = False
+
+    def tile_layer(self, reader, page, rect, depth, layer):
+        layer = super().tile_layer(reader, page, rect, depth, layer)
+        if not self.whole_lines:
+            return layer
+        return "".join(line + "\n" for box, line in reader.lines(page) if touches(box, rect))
+
+def touches(box, rect):
+    """Whether a line (its box) is half its height or more inside a region, at any of its width."""
+    inside = box & rect
+    return not inside.is_empty and inside.height >= box.height / 2
 
 class TableCuts(Lever):
     lever_name, stage, off = "table_cuts", "inclusion", {"table_cuts": False}
@@ -1427,10 +1461,10 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  LeaveFurniture, TableContext, StemContext, References, ReaderGlossary, TileLocator, Decoration,
                  Tiling, TileCut,
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty,
-                 SkipTextOnly, RegionLabels, AnotherTiling, FigureRefinement, HalveParts, ScanHalves, RenderArea,
-                 FigureTasks,
-                 TableRules, TableReview, TableStructure, LabelsJoined, VisualTextLayer, TableCuts, TextCuts, TextSpans,
-                 RepeatedText,
+                 SkipTextOnly, RegionLabels, AnotherTiling, SaidCut, FigureRefinement, HalveParts, ScanHalves,
+                 RenderArea, FigureTasks,
+                 TableRules, TableReview, TableStructure, LabelsJoined, VisualTextLayer, WholeLines, TableCuts,
+                 TextCuts, TextSpans, RepeatedText,
                  LoneRows, TableFilter, SkipSheetTables, LeaveText, QuoteMatch, Positions, Records, SheetRecords,
                  TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile, DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
@@ -1935,6 +1969,21 @@ class Platform(Composable):
         found = halves(page, rect, reader.lines(page), reader.graphics(page), self.least_half,
                        parts=self.tile_parts(reader, page), inked=self.image_lines(reader, page, rect))
         return [(f"{tag}-r{i}", r, {}) for i, r in enumerate(found)]
+
+    @chosen
+    def refines_complete(self, done):
+        """Whether a tile answered complete is refined as a partial one is (done, as refined_tile's): the platform's,
+        never."""
+        return False
+
+    @chained
+    def tile_layer(self, reader, page, rect, depth, layer):
+        """An image region's text layer, its quotes' check and its text's (region_text), from the words it clips
+        (layer, at the top): the platform's, those; a refined tile's, the lines whose middle it holds, whole (review
+        item 6)."""
+        if not depth:
+            return layer
+        return "".join(line + "\n" for box, line in reader.lines(page) if (box.tl + box.br) / 2 in rect)
 
     @chained
     def tile_parts(self, reader, page):

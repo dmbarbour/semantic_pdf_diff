@@ -157,6 +157,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `skip_text_only` | `"wide_pages"` | selecting | skip_text_only | extract | figure, overview, tile, vision |
 | `region_labels` | `"off"` | selecting | region_labels | extract | figure, overview, tile, vision |
 | `another_tiling` | `"measures"` | shaping | another_tiling | extract | figure, overview, tile, vision |
+| `said_cut` | `"noted"` | shaping | said_cut | extract | figure, overview, tile, vision |
 | `refine_figures` | `"halves"` | selecting | figure_refinement | extract | figure, overview, tile, vision |
 | `halve_parts` | `true` | selecting | halve_parts | extract | figure, overview, tile, vision |
 | `scan_halves` | `"lines"` | selecting | scan_halves | extract | figure, overview, tile, vision |
@@ -167,6 +168,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_structure` | `true` | selecting | table_structure | extract | table |
 | `labels_joined` | `true` | selecting | labels_joined | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
+| `whole_lines` | `false` | shaping | whole_lines | extract | figure, overview, tile, vision |
 | `table_cuts` | `false` | shaping | table_cuts | extract | figure, overview, tile, vision |
 | `text_cuts` | `"bytes"` | shaping | text_cuts | extract | figure, overview, text, tile, vision |
 | `text_spans` | `"page"` | shaping | text_spans | extract | text |

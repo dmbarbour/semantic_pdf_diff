@@ -208,6 +208,7 @@ HELP = {
                                 "document defines them"),
     "tile_locator": Help(_L, "with each tile, a page thumbnail outlining where it sits"),
     "visual_text_layer": Help(_L, "characters of a region's PDF text sent with its image"),
+    "whole_lines": Help(_L, "an image region's text layer holds every line it touches whole, not the words it clips"),
     "table_cuts": Help(_L, "an image region cutting a table is sent the table's header and the rows it touches"),
     "text_cuts": Help(_L, "where a long text is cut: where the bytes run out, or at a sentence's end"),
     "text_spans": Help(_L, "a text task's blocks: a page's up to the byte budget, or one section's"),
@@ -229,6 +230,8 @@ HELP = {
                                    "bands, sent after all where the page's text gives no claim (wide_pages)"),
     "region_labels": Help(_L, "the model labels a page's tiles; text, decoration and blank ones aren't sent"),
     "another_tiling": Help(_L, "a partial tile is read again under the page's next cut, rather than in halves"),
+    "said_cut": Help(_L, "a tile answered complete that says its text was cut is read again (read again) under the "
+                         "page's next cut, as a partial one is, or only noted"),
     "refine_figures": Help(_L, "a partial tile mostly one figure is looked at again whole, rather than in halves"),
     "halve_parts": Help(_L, "a refined tile's halves are cut around the figures it holds"),
     "scan_halves": Help(_L, "a scan's refined tile (no text layer) halved between the lines its image shows: lines, "

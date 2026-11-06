@@ -232,5 +232,42 @@ class Refined(unittest.TestCase):
                              f'Image tiles read: {len(tiles)} (bands {len(first)}, halves {len(halved)} ({len(halved)} '
                              f'down the middle)); {len(tiles)} on pages without a text layer')
 
+class CutText(unittest.TestCase):
+    """Text cut by tiles, milestone 2 (docs/plans/text-cut-by-tiles-2026-10-28.md): a tile's text layer by whole
+    lines (whole_lines), and a tile saying its text was cut read again though answered complete (said_cut)."""
+    def test_a_tile_cutting_a_line_sideways_is_given_the_line_whole(self):
+        from semantic_pdf_diff.context import Context
+        from semantic_pdf_diff.settings import Settings
+        doc = pymupdf.open()
+        page = doc.new_page(width=600, height=200)
+        page.insert_text((40, 60), 'the feed pump delivers 75 kW at its rated point', fontsize=12)
+        page.insert_text((40, 120), 'the fan runs at 3 kW', fontsize=12)
+        left = pymupdf.Rect(0, 40, 200, 70)  # the first line's start, and none of the second
+        clipped = page.get_text('text', clip=left)
+        for whole, expected in ((False, clipped), (True, 'the feed pump delivers 75 kW at its rated point\n')):
+            s = Settings(whole_lines=whole)
+            self.assertEqual(s.tile_layer(Context(doc, s), page, left, 0, clipped), expected)
+        self.assertNotIn('rated point', clipped)
+        s = Settings(whole_lines=True)  # a sliver of a line's height isn't touching it
+        self.assertEqual(s.tile_layer(Context(doc, s), page, pymupdf.Rect(0, 60, 600, 115), 0, ''), '')
+
+    def test_a_tile_saying_its_text_was_cut_is_read_again_though_complete(self):
+        def build(page):
+            paragraph(page, top=60, count=16)
+            page.draw_rect(pymupdf.Rect(20, 60, 24, 240))  # a side bar, so the band is sent
+        said = ['The text is clipped at the right edge']
+        counts = {}
+        for mode in ('noted', 'read again'):
+            with tempfile.TemporaryDirectory() as d:
+                client = Recorder(lambda source, prompt: Extraction(claims=[], complete=True, issues=said),
+                                  refinement_depth=1, said_cut=mode, **TILING_BEFORE)
+                _, coverage = extract_pdf(pdf(Path(d) / 't.pdf', build, width=500, height=500), CID, Path(d), client)
+            tiles = [r for r in coverage if r['task'].startswith('tile')]
+            counts[mode] = (sum(1 for r in tiles if r['tiling']['depth'] == 0),
+                            sum(1 for r in tiles if r['tiling']['depth'] > 0))
+        self.assertEqual(counts['noted'][1], 0)
+        self.assertEqual(counts['read again'][0], counts['noted'][0])
+        self.assertGreater(counts['read again'][1], 0)  # read again under the page's next cut
+
 if __name__ == '__main__':
     unittest.main()

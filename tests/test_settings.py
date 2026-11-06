@@ -118,6 +118,10 @@ NOT_EXERCISED = {
                    "is the sheet (tests/test_refinement.py)",
     'scan_halves': "only a refined tile without a text layer, a scan's; these documents have one "
                    "(tests/test_refinement.py)",
+    'said_cut': "only a tile answered complete saying its text was cut; the stub's never say so "
+                "(tests/test_refinement.py)",
+    'whole_lines': "only a region cutting a line sideways; these documents' tiles are bands, holding whole lines "
+                   "(tests/test_refinement.py)",
     'base_url': 'the stub model is the endpoint',
     'model_key_env': "the stub model takes any key, or none (tests/test_checkup.py)",
     'rescan': 'reads sources, not the documents given on the command line',
