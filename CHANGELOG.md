@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.33.1 (2026-11-06)
+
+- **Fixed: the report's other views took the search's language as plain text.** The Subjects, Kinds, Figures and tables, Glossary, Gaps and Inconsistencies views filtered their rows by the search's text as typed, so `file:`, `page:`, phrases, `-word`, `OR` and values compared found nothing there (the owner: "the search doesn't work properly for things like `file:` or `page:` as described in the search help"). They now read it as the Claims view does: a row's own words for the words, and its claims for the rest, one claim all of it (`file:a.pdf page:12` finds the subjects with a claim on that page of that file); a figure's and a glossary term's own file and page too.
+- **Fixed: a part named with a space after its colon was searched as a word** (`file: a.pdf`, `page: 12`, finding nothing or the wrong claims): it's now read as `file:a.pdf`, in the report's search box and `semantic-pdf-diff search`.
+
 ## 0.33.0 (2026-11-03)
 
 - **Progress while the endpoint is checked:** a run's first-use checks and `config test` show a bar for each check, of what it asks: the endpoint's listing, the JSON answer, the image check's two answers, the acuity test's eight cards, the reranker's ranking and the embedding model's request, with the requests' status below (the owner: "it's unclear whether my system is frozen or just moving slowly."). Before, one line said the checks had begun, then nothing until they ended; the acuity test alone takes about 30 s at DeepInfra.
