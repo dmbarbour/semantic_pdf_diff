@@ -1,6 +1,9 @@
 import stubs  # noqa: F401 (a clean environment)
 from stubs import user_settings
 import argparse
+import contextlib
+import io
+import json
 import os
 import tempfile
 import unittest
@@ -66,6 +69,25 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(cache_path(), Path('/x/semantic-pdf-diff/answers.sqlite'))
             del os.environ['XDG_CACHE_HOME']
             self.assertEqual(cache_path(), Path('/h/.cache/semantic-pdf-diff/answers.sqlite'))
+
+    def test_a_folder_for_the_users_in_place_of_the_home_folders(self):
+        """$SEMANTIC_PDF_DIFF_USER (the owner, 2026-11-06: "I open a fresh container every day, so the user is lost
+        unless I make a heroic effort to save and restore the user. Perhaps enable a `SEMANTIC_PDF_DIFF_USER`
+        environment variable to act as an alternative HOME for this role?")."""
+        from semantic_pdf_diff import cli, settings
+        with tempfile.TemporaryDirectory() as d, patch.object(settings, 'user_path', stubs.per_user_settings), \
+                patch.dict(os.environ, {'SEMANTIC_PDF_DIFF_USER': d, 'XDG_CACHE_HOME': '/x', 'XDG_CONFIG_HOME': '/y',
+                                        'HOME': '/h'}):
+            os.environ.pop('SEMANTIC_PDF_DIFF_CACHE', None)
+            self.assertEqual(settings.cache_path(), Path(d) / 'cache' / 'answers.sqlite')
+            self.assertEqual(settings.user_path(), Path(d) / 'settings.json')
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(cli.main(['config', 'set', '--user', 'concurrency', '7']), 0)
+            self.assertEqual(json.loads((Path(d) / 'settings.json').read_text())['settings'], {'concurrency': 7})
+            self.assertEqual(Settings.from_env().concurrency, 7)
+            os.environ['SEMANTIC_PDF_DIFF_CACHE'] = '/c'  # a cache named still wins: a project's own
+            self.assertEqual(settings.cache_path(), Path('/c/answers.sqlite'))
+            self.assertEqual(settings.user_cache(), Path(d) / 'cache' / 'answers.sqlite')
 
     def test_empty_fallback_and_invalid_values(self):
         with patch.dict(os.environ, {'OPENAI_BASE_URL':'  '}, clear=True):

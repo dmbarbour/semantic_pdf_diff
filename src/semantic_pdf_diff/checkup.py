@@ -725,11 +725,10 @@ def missing(settings, path):
 
 def elsewhere(path):
     """The other records a run of the user's may have left: the cache in effect's ($SEMANTIC_PDF_DIFF_CACHE's, else
-    the user's) and the user's own (settings.cache_path's, without the variable), this one aside."""
-    from .settings import cache_path
-    home = Path(os.environ.get("XDG_CACHE_HOME") or Path.home() / ".cache") / "semantic-pdf-diff" / MEMORY
+    the user's) and the user's own (settings.user_cache), this one aside."""
+    from .settings import cache_path, user_cache
     here = Path(path).resolve()
-    return [p for p in dict.fromkeys([memory_of(cache_path()), home]) if Path(p).resolve() != here]
+    return [p for p in dict.fromkeys([memory_of(cache_path()), memory_of(user_cache())]) if Path(p).resolve() != here]
 
 def why_missing(settings, path, names, others=()):
     """Why checks the record doesn't remember are asked (the owner, 2026-11-06: "It seems the initial calibration

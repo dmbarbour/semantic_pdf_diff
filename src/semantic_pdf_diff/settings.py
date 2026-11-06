@@ -117,10 +117,21 @@ class SettingsBase(Strict):
         values.update(overrides)
         return target(**values)
 
+def user_folder():
+    """$SEMANTIC_PDF_DIFF_USER: the folder holding what's the user's, their settings and their answers cache, in place
+    of the home folder's (the owner, 2026-11-06: "I open a fresh container every day, so the user is lost unless I
+    make a heroic effort to save and restore the user. Perhaps enable a `SEMANTIC_PDF_DIFF_USER` environment variable
+    to act as an alternative HOME for this role?"); None, unset."""
+    named = variable("USER")
+    return Path(os.path.abspath(Path(named).expanduser())) if named else None
+
 def user_path():
-    """The user's settings (`config set --user`): $XDG_CONFIG_HOME/semantic-pdf-diff/settings.json, else under
-    ~/.config: what belongs to the user's endpoint and machine (the model and its context, concurrency, a reranker),
-    shared by every store."""
+    """The user's settings (`config set --user`): $SEMANTIC_PDF_DIFF_USER/settings.json, else
+    $XDG_CONFIG_HOME/semantic-pdf-diff/settings.json, else under ~/.config: what belongs to the user's endpoint and
+    machine (the model and its context, concurrency, a reranker), shared by every store."""
+    folder = user_folder()
+    if folder is not None:
+        return folder / "settings.json"
     base = os.environ.get("XDG_CONFIG_HOME") or os.path.join(os.path.expanduser("~"), ".config")
     return Path(base) / "semantic-pdf-diff" / "settings.json"
 
@@ -138,12 +149,20 @@ def user_settings():
     return dict(data["settings"])
 
 def cache_path():
-    """The answers cache: $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else under $XDG_CACHE_HOME/semantic-pdf-diff, else
-    ~/.cache/semantic-pdf-diff. Every answer the user's runs were given, in the fixture format, shared by every store
-    (the owner, 2026-10-08: "The per-user default is tempting. Let's go with that instead.")."""
-    folder = variable("CACHE") or os.path.join(
-        os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache"), "semantic-pdf-diff")
-    return Path(folder) / "answers.sqlite"
+    """The answers cache: $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else the user's (user_cache). Every answer the
+    user's runs were given, in the fixture format, shared by every store (the owner, 2026-10-08: "The per-user default
+    is tempting. Let's go with that instead.")."""
+    named = variable("CACHE")
+    return Path(named) / "answers.sqlite" if named else user_cache()
+
+def user_cache():
+    """The user's own answers cache, whatever $SEMANTIC_PDF_DIFF_CACHE names: $SEMANTIC_PDF_DIFF_USER/cache, else
+    $XDG_CACHE_HOME/semantic-pdf-diff, else ~/.cache/semantic-pdf-diff; answers.sqlite in it."""
+    folder = user_folder()
+    if folder is not None:
+        return folder / "cache" / "answers.sqlite"
+    base = os.environ.get("XDG_CACHE_HOME") or os.path.join(os.path.expanduser("~"), ".cache")
+    return Path(base) / "semantic-pdf-diff" / "answers.sqlite"
 
 def cache_file(path):
     """An answers cache named as its folder (holding answers.sqlite) or as the file itself; ~ is the home folder."""

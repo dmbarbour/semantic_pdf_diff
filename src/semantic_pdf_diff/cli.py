@@ -167,8 +167,10 @@ Examples:
 A comparison's --store folder ($SEMANTIC_PDF_DIFF_STORE unless named, else diff-output) holds what was read, and
 receives report.html (one file to keep or send, its crops inside as --report-budget allows), report.json and
 evidence.json. A comparison into it again reuses what was read, and resumes one interrupted. Every command takes
---store, with the same default. The model's answers are cached ($SEMANTIC_PDF_DIFF_CACHE, else
-~/.cache/semantic-pdf-diff; a store keeps the cache its first run used): what was asked once isn't paid for again.
+--store, with the same default. The model's answers are cached ($SEMANTIC_PDF_DIFF_CACHE, else the user's:
+$SEMANTIC_PDF_DIFF_USER/cache, else ~/.cache/semantic-pdf-diff; a store keeps the cache its first run used): what
+was asked once isn't paid for again. $SEMANTIC_PDF_DIFF_USER names a folder for what's the user's, in place of the
+home folder's: their settings (settings.json) and answers (cache/), kept where a fresh machine finds them.
 
 Exit codes: 0 complete (uncertainty may remain); 2 incomplete coverage or processing failures; 1 an error
 (a mistyped command or option too); 3 paused for budget (run again to resume); 5 the endpoint failed: a check of
@@ -740,11 +742,11 @@ def search_command(argv):
 
 CACHE_HELP = """\
 The answers cache keeps every answer the model gave a run, by the query asked, so what was asked once isn't paid
-for again. It's $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else the user's (under $XDG_CACHE_HOME or ~/.cache). A
-store keeps the cache its first run used (answers_cache), so each action works on the cache the stores it names use
-(--store; prune's --keep), else on $SEMANTIC_PDF_DIFF_STORE's (else ./diff-output's); --cache names another. A
-project whose documents mustn't mix with others' keeps a cache of its own: point SEMANTIC_PDF_DIFF_CACHE at it
-before its first run, or `config set answers_cache` after.
+for again. It's $SEMANTIC_PDF_DIFF_CACHE/answers.sqlite, else the user's ($SEMANTIC_PDF_DIFF_USER/cache, else under
+$XDG_CACHE_HOME or ~/.cache). A store keeps the cache its first run used (answers_cache), so each action works on
+the cache the stores it names use (--store; prune's --keep), else on $SEMANTIC_PDF_DIFF_STORE's (else
+./diff-output's); --cache names another. A project whose documents mustn't mix with others' keeps a cache of its
+own: point SEMANTIC_PDF_DIFF_CACHE at it before its first run, or `config set answers_cache` after.
 
 A store logs every query its runs asked, however each was answered, so naming a project's stores (--store) picks
 out its answers: to copy them from another cache into this one, or to remove them from this one. Removed answers
@@ -1186,7 +1188,7 @@ def config_command(argv):
         values = configuration.applied(own, changes)
     if args.user and 'answers_cache' in changes:
         raise ValueError("answers_cache is a store's: the user's cache is $SEMANTIC_PDF_DIFF_CACHE's, else "
-                         "~/.cache/semantic-pdf-diff")
+                         "$SEMANTIC_PDF_DIFF_USER/cache, else ~/.cache/semantic-pdf-diff")
     from .store import USERS_ONLY
     if not args.user and any(changes.get(name) is not None for name in USERS_ONLY):
         raise ValueError("base_url is the user's, never a store's: `semantic-pdf-diff config set --user base_url URL` "
@@ -1227,12 +1229,13 @@ def config_command(argv):
 def environment(key='OPENAI_API_KEY'):
     """The environment variables `config show` lists, with what each is now: never the key, only whether the variable
     holding it (model_key_env's: key) is set."""
-    from .settings import cache_path
+    from .settings import cache_path, user_path
     value = lambda name, unset: os.environ.get(name) or f"not set: {unset}"  # noqa: E731
     return [('OPENAI_BASE_URL', value('OPENAI_BASE_URL', default('base_url'))),
             (key, 'set' if os.environ.get(key) else 'not set'),
             ('SEMANTIC_PDF_DIFF_STORE', value('SEMANTIC_PDF_DIFF_STORE', './diff-output, without --store')),
-            ('SEMANTIC_PDF_DIFF_CACHE', value('SEMANTIC_PDF_DIFF_CACHE', f'answers cached in {cache_path()}'))]
+            ('SEMANTIC_PDF_DIFF_CACHE', value('SEMANTIC_PDF_DIFF_CACHE', f'answers cached in {cache_path()}')),
+            ('SEMANTIC_PDF_DIFF_USER', value('SEMANTIC_PDF_DIFF_USER', f"the user's settings in {user_path()}"))]
 # Every other setting is the user's or a store's (`config set [--user]`): PDF_DIFF_<NAME> and OPENAI_MODEL are no longer
 # read, and warn when set (settings.retired), as PDF_DIFF_STORE and PDF_DIFF_CACHE do (settings.variable).
 

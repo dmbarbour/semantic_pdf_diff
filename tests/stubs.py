@@ -21,6 +21,7 @@ _atexit.register(_shutil.rmtree, _CONFIG, True)
 os.environ["XDG_CONFIG_HOME"] = _CONFIG
 from semantic_pdf_diff import settings as _settings  # noqa: E402
 # a test clearing the environment (patch.dict(..., clear=True)) still reads the empty folder's, not ~/.config's
+per_user_settings = _settings.user_path  # the product's, for the tests of where the user's settings are
 _settings.user_path = lambda: Path(os.environ.get("XDG_CONFIG_HOME") or _CONFIG) / "semantic-pdf-diff" / "settings.json"
 # ...where a model is named, as a user names one (`config set --user model`): there's no default (2026-10-20). The stub
 # models answer whatever model is asked; "gemma-4" is the name the tests were written with.

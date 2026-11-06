@@ -6,18 +6,19 @@ When no environment variable or override is supplied, the default endpoint is `h
 
 ## Precedence and environment variables
 
-Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > what first-use checks measured (`context_tokens`, `image_tokens`) > built-in defaults**. The user's settings (`config set --user`, kept in `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `semantic-pdf-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `semantic-pdf-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
+Configuration precedence, highest first: **CLI flags > JSON config file > the store's own settings > the user's settings > what first-use checks measured (`context_tokens`, `image_tokens`) > built-in defaults**. The user's settings (`config set --user`, kept in `$SEMANTIC_PDF_DIFF_USER/settings.json`, else `$XDG_CONFIG_HOME/semantic-pdf-diff/settings.json`, else `~/.config/...`) belong to an endpoint and a machine: the model and its context, image tokens, concurrency, timeout, a reranker. Every store shares them. A store keeps its own settings for its comparison, set with `semantic-pdf-diff config` (below). A run's flags and a `--config` file override them for that run only. After naming the endpoint and the model once, you can normally run just `semantic-pdf-diff compare a.pdf b.pdf`. A config file only overrides fields it contains.
 
 The endpoint's URL is the exception: `--base-url` or a `--config` file for one run, then `$OPENAI_BASE_URL`, then the user's `base_url` (`config set --user base_url URL`). A store never keeps one: `config set` and `config import` refuse it (the owner, 2026-10-28: "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."). A store that kept one before then is read without it, with a warning saying how to remove it. When the endpoint can't be reached or turns the key away, the first-use checks and `config test` say which variable to set.
 
-Four environment variables, as the owner listed them ([decision 0032](decisions/0032-settings-in-layers-and-one-answers-cache.md)):
+Five environment variables: the four the owner listed ([decision 0032](decisions/0032-settings-in-layers-and-one-answers-cache.md)), and the user's folder:
 
 | Environment variable | What it is |
 | --- | --- |
 | `OPENAI_API_KEY` | API authentication (never included in settings/reports, never written anywhere); `model_key_env` names another variable to read it from |
 | `OPENAI_BASE_URL` | Chat Completions API base URL, including `/v1` when required |
 | `SEMANTIC_PDF_DIFF_STORE` | The store every command works on without `--store` (`compare`, `source`, `show`, `report`, `gc`, `search`, `config`, `settings`, `cache`, `debug`; unset: `./diff-output`) |
-| `SEMANTIC_PDF_DIFF_CACHE` | The answers cache's folder for stores not bound to one yet (a store's first run binds it: `answers_cache`): every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
+| `SEMANTIC_PDF_DIFF_CACHE` | The answers cache's folder for stores not bound to one yet (a store's first run binds it: `answers_cache`): every answer the user's runs were given, in `answers.sqlite`, shared by every store (unset: the user's, `$SEMANTIC_PDF_DIFF_USER/cache`, else `$XDG_CACHE_HOME/semantic-pdf-diff`, else `~/.cache/semantic-pdf-diff`) |
+| `SEMANTIC_PDF_DIFF_USER` | A folder for what's the user's, in place of the home folder's: their settings (`settings.json`, `config set --user`) and their answers cache (`cache/`, with its record of checks passed), kept where a fresh machine finds them (the owner, 2026-11-06: "I open a fresh container every day, so the user is lost unless I make a heroic effort to save and restore the user. Perhaps enable a `SEMANTIC_PDF_DIFF_USER` environment variable to act as an alternative HOME for this role?"). Unset: `~/.config` and `~/.cache` (or `$XDG_CONFIG_HOME`, `$XDG_CACHE_HOME`). `$SEMANTIC_PDF_DIFF_CACHE` still names the cache where set |
 
 Two more variables aren't settings:
 
