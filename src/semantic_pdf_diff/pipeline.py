@@ -451,9 +451,10 @@ def saved_and_written(options, settings, store, client, data, out, incomplete):
     split = out / SPLIT / 'index.html'
     page = split if options.split and split.exists() else out / 'report.html'
     print(f"Report: {page}" + (' (incomplete source coverage)' if incomplete else ''))
+    from .quality import lines as reading
     from .retiling import tile_lines
-    for line in tile_lines(coverage):  # how the image tiles were cut, and which said their text was
-        log.info(line)
+    for line in tile_lines(coverage) + reading(data):  # how the image tiles were cut, which said their text was, and
+        log.info(line)  # the pages read with a problem
     omitted = data['retrieval'].get('omitted_by_pair_limit')  # (an analysis compares none)
     if omitted:
         print(f"{omitted} of {data['retrieval']['candidate_pairs']} candidate pairs weren't judged: --max-pairs sets "

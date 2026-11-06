@@ -194,7 +194,7 @@
       if (!x.hidden) n += 1;
     }
     for (const tab of tabs) tab.textContent = labels.get(tab);
-    const what = {figures: 'figures and tables', glossary: 'terms'}[view] || view;  // (kinds, subjects)
+    const what = {figures: 'figures and tables', glossary: 'terms', reading: 'pages'}[view] || view;  // (kinds...)
     $('count').textContent = `${n} of ${items.length} ${what}` + noted(groups);
     main.textContent = '';
     listed = [];

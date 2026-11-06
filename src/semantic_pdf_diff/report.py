@@ -655,6 +655,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     index = data.get('index') or {}
     subjects, figures, terms = index.get('subjects', []), index.get('figures', []), index.get('glossary', [])
     kinds, gaps, clashes = index.get('kinds', []), index.get('gaps', []), index.get('inconsistencies', [])
+    reading, troubled = quality_html(data, card.where)
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
@@ -664,6 +665,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              + (f'<button data-view="glossary">Glossary {len(terms)}</button>' if terms else '')
              + (f'<button data-view="gaps">What it doesn\'t give {len(gaps)}</button>' if gaps else '')
              + (f'<button data-view="inconsistencies">Inconsistencies {len(clashes)}</button>' if clashes else '')
+             + (f'<button data-view="reading" title="The pages read with a problem">Reading {troubled}</button>'
+                if reading else '')
              + '</div>')
     page += ('<span data-for="findings"><label>Show <select id="filter"><option value="all">All relations</option>'
              + ''.join('<option>' + r + '</option>' for r in ['different', 'equivalent', 'complementary', 'uncertain'])
@@ -712,7 +715,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     sources, paths = index.get('sources', []), {f['path'] for f in data['files']}
     page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
              + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources, paths)
-             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources))
+             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources) + reading)
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -922,6 +925,52 @@ def item_kinds_html(kinds, subjects, sources):
 def said_of(v):
     unit = '' if v['unit'] in ('', '-') else v['unit']  # "-": none
     return ' '.join(x for x in (str(v['value']), unit) if x) + (f" ({v['conditions']})" if v['conditions'] else '')
+
+def quality_html(data, where):
+    """The Reading view (quality.py): each page the run read with something gone wrong, each kind counted apart, its
+    claims a link away (a search by its file and page); a file's pages summed above. A search finds pages by file: and
+    page:, and by the kinds' names. With how many pages were troubled ('' and 0 where the run read none)."""
+    from urllib.parse import quote
+    from .quality import KINDS, NAMES, pages, said, totals
+    found = pages(data)
+    if not found:
+        return '', 0
+    counted, troubled = totals(found)
+    kinds = [(k, name, said) for k, name, said in KINDS if counted.get(k)]
+    files = {}
+    for f in sorted(data['files'], key=lambda f: (f['source'], f['path'])):
+        files.setdefault(f['content'], []).append(f)
+    rows, by_file = [], {}
+    for p in found:
+        by_file.setdefault(p['content'], []).append(p)
+        if not p['counts']:
+            continue
+        mine = files.get(p['content'], [])
+        path = mine[0]['path'] if mine else p['content']
+        asked = f'file:"{path}"' + (f" page:{p['page']}" if p['page'] is not None else '')
+        claims = (f'<a href="#claims&q={esc(quote(asked, safe=""))}" title="Its claims">{p["claims"]}</a>'
+                  if p['claims'] else '0')
+        text = ' '.join([path, *(NAMES[k] for k in p['counts'])])
+        places = [placed(f['source'], f['path'], [f['path']], p['page']) for f in mine]
+        rows.append(f'<tr {searched(text, (), places)}><td>{esc(where(p["content"]))}</td>'
+                    f'<td>{"" if p["page"] is None else p["page"]}</td>'
+                    + ''.join(f'<td>{said(p, k)}</td>' for k, _, _ in kinds) + f'<td>{claims}</td></tr>')
+    summary = []
+    for content, mine in by_file.items():
+        bad = sorted((p for p in mine if p['counts']), key=lambda p: -sum(p['counts'].values()))
+        if bad:
+            most = ', '.join(f"{p['page']} ({sum(p['counts'].values())})" for p in bad[:5] if p['page'] is not None)
+            summary.append(f"<li>{esc(where(content))}: {len(bad)} of {len(mine)} pages"
+                           + (f"; the most on pages {esc(most)}" if most else '') + '</li>')
+    heads = ''.join(f'<th title="{esc(said)}">{esc(name)}</th>' for _, name, said in kinds)
+    note = ('<p class="meta">What the run recorded of its own reading, counted by page: where to look first, not a '
+            'verdict (no model was asked, and the counts aren\'t weighed into a score). Each column counts:</p><ul>'
+            + ''.join(f'<li><b>{esc(name)}</b>: {esc(said)}</li>' for _, name, said in kinds) + '</ul>'
+            if kinds else '<p class="meta">The run recorded no problem in its reading of any page.</p>')
+    return (f'<section data-for="reading" class="index" hidden>{note}'
+            + (f'<p class="meta">Pages with a problem:</p><ul>{"".join(summary)}</ul>' if summary else '')
+            + (f'<div class="wide"><table><thead><tr><th>File</th><th>Page</th>{heads}<th>Claims</th></tr></thead>'
+               f'<tbody>{"".join(rows)}</tbody></table></div>' if rows else '') + '</section>'), troubled
 
 def figures_html(figures, many):
     """The Figures and tables view: each figure, drawing sheet and table, where it is, what it's about, and its
