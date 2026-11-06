@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.38.0 (2026-11-06)
+
+- **A tile's text layer by whole lines, by default** (`whole_lines: true`; the owner: "Let's go with your recommendations."). Checked on held-out drawing sheets and posters first: as much read (651 numbers against 641, within the model's own variation), for 9% fewer requests; tiles complain of cut text far less. A store read before reads its image regions again on its next run, unchanged requests answered from the cache.
+- **Claims whose quote isn't found kept, marked, as a setting** (`unquoted: kept`, off; the owner: "Filtering the claims before they reach the database seems like a way to lose useful information."). Such a claim is kept with its quote unverified, its card warning that it's in the model's words; the Reading view counts it, the export says so. On the controlled corpus it finds 14 more facts among 712 more claims, 62 more of them misbound.
+- **Fixed: a quote missed a word broken at a line end, or spacing an OCR layer lost** ("con-\nditions" quoted "conditions"; "59,045cfm" quoted "59,045 cfm"), so such claims were dropped. Stores check their quotes again, from the answers cache. Why quotes fail was investigated on the corpus's recorded answers: mostly words that are there but not as one run, not paraphrase; dropped claims are 64% right and 16% misbound, against kept ones' 77% and 5%.
+
 ## 0.37.0 (2026-11-06)
 
 - **A tile's text layer by whole lines, as a setting** (`whole_lines`, off): an image region's text layer holds every line it touches whole, not the words it clips. On 11 pages where tiles cut lines it read as many numbers (within the model's own variation), with the same keyed facts, for 7% fewer requests: tiles complained of cut text far less (a poster's 65 to 8), so fewer were read again.
