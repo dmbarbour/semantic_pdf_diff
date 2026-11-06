@@ -54,26 +54,45 @@ class Asked(unittest.TestCase):
             d = data(galvanized)
             _, subject, named, _ = tensions.asked(d, indexes.built(d))[0]
             entries, dropped = tensions.logged(
-                answer(STEEL, {**STEEL, "claims": ["C9"]}, {**STEEL, "level": "maybe"}, {**STEEL, "why": " "}),
+                answer(STEEL, {**STEEL, "claims": ["C9"]}, {**STEEL, "level": "maybe"}, {**STEEL, "why": " "},
+                       {**STEEL, "claims": ["C1"], "why": "NEMA 1 enclosures are for indoor use"}),  # not its claim's
                 "a", subject, named, ("tensions", "analysis", "x"), tensions.places(d, "a"))
-            self.assertEqual(dropped, 3)
+            self.assertEqual(dropped, 4)
             self.assertEqual([(e["kind"], e["claims"], e["relation"], e.get("reconciled", [])) for e in entries],
                              [("tension", ["A-1", "A-2"], "reason", reconciled)])
             self.assertEqual(entries[0]["why"], "“low-alloy steel” (page 2) isn't corrosion-resistant on its own")
 
-    def test_reconciling_words_are_a_words_forms_not_any_word(self):
-        said = [("A", "claim", set(tensions._words("hot-dip galvanised and epoxy coated after fabrication")))]
+    def test_reconciling_words_are_a_words_forms_near_one_another_not_the_tensions_own(self):
+        said = [("A", "claim", tensions._words("hot-dip galvanised and epoxy coated after fabrication")),
+                ("B", "claim", tensions._words("the pump control panel is a NEMA 1 enclosure")),
+                ("C", "claim", tensions._words("additional storage is provided in the wet well; the pumps run "
+                                               "together at peak flow"))]
         self.assertEqual(tensions.found(["hot-dip galvanized"], said), [("A", "claim")])
         self.assertEqual(tensions.found(["epoxy coating"], said), [("A", "claim")])
         self.assertEqual(tensions.found(["cathodic protection"], said), [])
         self.assertEqual(tensions.found(["the", "of a"], said), [])  # no word asked for
+        self.assertEqual(tensions.found(["NEMA 3R"], said), [])  # its number asked for too: not NEMA 1's
+        self.assertEqual(tensions.found(["NEMA 1 enclosure"], said, own={"B"}), [])  # not where asked not to
+        self.assertEqual(tensions.found(["additional pumps"], said), [])  # words far apart
+        about = set(tensions._words("force main ductile iron pipe"))
+        self.assertEqual(tensions.found(["epoxy coating"], said, about=about), [])  # the coating of something else
+
+    def test_a_subject_asked_with_its_parts(self):
+        d = report([claim("A-1", "ca", "wet well access hatch frame", "material", "low-alloy steel", ""),
+                    claim("A-2", "ca", "wet well access hatch", "corrosion resistance", "resistant", ""),
+                    claim("A-3", "ca", "wet well", "diameter", "12", "ft")])
+        found = tensions.asked(d, indexes.built(d))
+        self.assertEqual([(subject, sorted(c["id"] for c in named.values())) for _, subject, named, _ in found],
+                         [("wet well", ["A-2", "A-3"]), ("wet well access hatch", ["A-1", "A-2"])])  # the frame
+        # adds three words to the wet well's name: the hatch's part, not the wet well's
 
 class Shown(unittest.TestCase):
     def test_the_cards_and_the_suspects_view(self):
         d = data()
         _, subject, named, _ = tensions.asked(d, indexes.built(d))[0]
-        entries, _ = tensions.logged(answer(STEEL, {"claims": ["C2"], "level": "look", "why": "a rare claim",
-                                                    "reconcile": ["stainless steel"]}),
+        rare = {"claims": ["C2"], "level": "look", "why": "hydrogen sulfide resistance is rare",
+                "reconcile": ["stainless steel"]}
+        entries, _ = tensions.logged(answer(STEEL, rare),
                                      "a", subject, named, ("tensions", "analysis", "x"), tensions.places(d, "a"))
         d["commentary"] = {"entries": entries}
         card = Cards(d).card("A-1")
