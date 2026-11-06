@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.37.0 (2026-11-06)
+
+- **A tile's text layer by whole lines, as a setting** (`whole_lines`, off): an image region's text layer holds every line it touches whole, not the words it clips. On 11 pages where tiles cut lines it read as many numbers (within the model's own variation), with the same keyed facts, for 7% fewer requests: tiles complained of cut text far less (a poster's 65 to 8), so fewer were read again.
+- **A tile answered complete that says its text was cut, read again, as a setting** (`said_cut: read again`, off): as a partial one is, under the page's next cut. On the same pages it changed one, gaining a poster's colour-bar ticks: most such tiles are already answered partial and read again.
+
 ## 0.36.0 (2026-11-06)
 
 - **How well each page was read, in the report's Reading view** (the owner, 2026-10-09: "some sort of quality heuristics spot-check for runtime behavior would be useful for both confidence decisions and part of the report"). What a run recorded of its own reading, counted by file and page, each kind apart and with what it's counted of: requests that failed, weren't sent or came back incomplete; claims dropped because their quote isn't in their text; a picture's claims whose quote isn't in the text layer; image tiles that said their text was cut; tables read without their rules; claims the second pass doubted or read again otherwise. No model is asked and no score made of them. Each page's claims are a link away, and the search finds pages by `file:` and `page:`. A run ends with one line of the totals ("Read with problems: 9 of 9 pages (cut short 48, …)").
