@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.36.0 (2026-11-06)
+
+- **How well each page was read, in the report's Reading view** (the owner, 2026-10-09: "some sort of quality heuristics spot-check for runtime behavior would be useful for both confidence decisions and part of the report"). What a run recorded of its own reading, counted by file and page, each kind apart and with what it's counted of: requests that failed, weren't sent or came back incomplete; claims dropped because their quote isn't in their text; a picture's claims whose quote isn't in the text layer; image tiles that said their text was cut; tables read without their rules; claims the second pass doubted or read again otherwise. No model is asked and no score made of them. Each page's claims are a link away, and the search finds pages by `file:` and `page:`. A run ends with one line of the totals ("Read with problems: 9 of 9 pages (cut short 48, …)").
+
 ## 0.35.0 (2026-11-06)
 
 - **`SEMANTIC_PDF_DIFF_USER`: a folder for what's the user's** (the owner: "I open a fresh container every day, so the user is lost unless I make a heroic effort to save and restore the user. Perhaps enable a `SEMANTIC_PDF_DIFF_USER` environment variable to act as an alternative HOME for this role?"). Set, it holds the user's settings (`settings.json`, `config set --user`) and the user's answers cache (`cache/`, with its record of checks passed), in place of `~/.config` and `~/.cache`. `SEMANTIC_PDF_DIFF_CACHE` still names the cache where set, and a store already bound to a cache keeps it (`config set answers_cache` binds it to another). `config show` lists it.
