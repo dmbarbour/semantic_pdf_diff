@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.39.0 (2026-11-06)
+
+- **Tensions: claims hard to hold together on engineering grounds, with levels of suspicion, as a setting** (`tensions`, off, analyses; the owner: "We'll need to also look for qualitative inconsistencies, with levels of suspicion. E.g. claiming low-alloy steel combined with a claim of corrosion resistance without a clear mitigating factor."). Each subject (with its parts) holding a word value is asked which of its claims are hard to hold together (a material and a service it doesn't suit, a rating and where it's used), at a level (can't both hold; needs a reason; worth a look), why, and what would reconcile them. Those words are then looked for in what the source's claims say: found, the tension is shown reconciled, citing where; not found, it stands. On both claims' cards, and in a new Suspects view, those standing first by level ("worth a look" marked low priority). `reviewer_concerns` adds a reviewer's own things to watch for; it works without them. On planted reports: all 6 planted tensions found, none standing where the document reconciles them, each reconciled by the right statement.
+
 ## 0.38.0 (2026-11-06)
 
 - **A tile's text layer by whole lines, by default** (`whole_lines: true`; the owner: "Let's go with your recommendations."). Checked on held-out drawing sheets and posters first: as much read (651 numbers against 641, within the model's own variation), for 9% fewer requests; tiles complain of cut text far less. A store read before reads its image regions again on its next run, unchanged requests answered from the cache.
