@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.35.0 (2026-11-06)
+
+- **`SEMANTIC_PDF_DIFF_USER`: a folder for what's the user's** (the owner: "I open a fresh container every day, so the user is lost unless I make a heroic effort to save and restore the user. Perhaps enable a `SEMANTIC_PDF_DIFF_USER` environment variable to act as an alternative HOME for this role?"). Set, it holds the user's settings (`settings.json`, `config set --user`) and the user's answers cache (`cache/`, with its record of checks passed), in place of `~/.config` and `~/.cache`. `SEMANTIC_PDF_DIFF_CACHE` still names the cache where set, and a store already bound to a cache keeps it (`config set answers_cache` binds it to another). `config show` lists it.
+
 ## 0.34.0 (2026-11-06)
 
 - **A run checking its models again says why** (the owner: "It seems the initial calibration queries aren't cached?"). Checks are remembered in `endpoints.json` beside the answers cache, so with one cache a second run asks only the ping ($0.00002 at DeepInfra; the first use took 41 s, acuity's eight cards 37.5 s of it). Where a run checks again, its `First use:` line now says why: no record there yet (each answers cache keeps its own), forgotten (when, and why: a check failed, a run's requests failed in a row, `config checks --forget`), remembered at another `image_side`, or never passed there; and where the user's cache's record remembers them all, that it does, though a run reads only its own.
