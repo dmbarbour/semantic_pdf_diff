@@ -148,7 +148,10 @@ SEARCH_HELP = ('<details class="search-help"><summary>How to search</summary><ul
                'names are offered.</li>'
                '<li>Found items come most relevant first: words in what a claim is about count most, then its value, '
                'conditions and section, then its quote. The page\'s address keeps the search, to bookmark or send.'
-               '</li></ul></details>')
+               '</li><li>The other views (subjects, kinds, figures and tables, glossary, gaps) show the rows whose own '
+               'words hold the search\'s words, and whose claims hold the rest of it, one claim all of it: '
+               '<code>file:</code>, <code>page:</code>, a value compared, <code>entity:</code> and the other parts '
+               '(a figure\'s and a glossary term\'s own file and page too).</li></ul></details>')
 
 class Cards:
     """A report's claims as cards: each with where it is, what it says, its quote and how it was read. Called with a
@@ -705,10 +708,10 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                  + ''.join(f'<button data-topic="{t}" title="{esc(", ".join(words))}">{esc(name)} <small></small>'
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
-    sources = index.get('sources', [])
+    sources, paths = index.get('sources', []), {f['path'] for f in data['files']}
     page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
-             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources) + gaps_html(gaps, sources)
-             + inconsistencies_html(clashes, sources))
+             + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources, paths)
+             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources))
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -743,10 +746,33 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
             f'<script type="application/json" id="report-crops">{images}</script><script>{SCRIPT}</script>')
     return html_page('Source analysis' if one else 'Semantic PDF comparison', body, STYLE)
 
+PAGED = re.compile(r", (?:pages?|slide) (\d+)(?:–(\d+))?(?=,|$)")  # a place's page, as indexes and glossary write it
+
+def searched(text, claims=(), places=()):
+    """A row of the index's views as the page's search reads it (search.js's rows): its own words (data-text), the
+    claims it links (data-claims) and its own places (data-places, each placed's)."""
+    out = f'data-text="{esc(text.casefold())}"'
+    claims = list(dict.fromkeys(c for c in claims if c))
+    if claims:
+        out += f' data-claims="{esc(" ".join(claims))}"'
+    if places:
+        out += f' data-places="{esc(json.dumps(places, ensure_ascii=False, separators=(",", ":")))}"'
+    return out
+
+def placed(source, where, paths=(), page=None):
+    """A place as the search reads it: [its source and file, as a card's heading names them, its first page, its
+    last] (no page: null), from where it's written ("a.pdf, page 2", "pages 2–3", "slide 4"; paths, the report's
+    files', find one named with a comma) or its page."""
+    path = max((p for p in paths if where == p or where.startswith(p + ", ")), key=len,
+               default=where.split(", ")[0])
+    found = PAGED.search(where, len(path)) if page is None else None
+    low, high = (int(found.group(1)), int(found.group(2) or found.group(1))) if found else (page, page)
+    return [f"{source} / {path}" if source else path, low, high]
+
 def subjects_html(subjects, sources):
     """The Subjects view (indexes.py): each subject, its other names and its properties, each value linked to its
     claim's card; in a comparison a column a source, "—" where one gives nothing (weak: not saying isn't absence).
-    A search shows the subjects whose words it has (data-text)."""
+    A search shows the subjects it finds by their words and claims (searched)."""
     if not subjects:
         return ''
     many = len(sources) > 1
@@ -771,8 +797,9 @@ def subjects_html(subjects, sources):
             + "</td>"
             + (''.join(f"<td>{values([v for v in p['values'] if v['source'] == src])}</td>" for src in sources)
                if many else f"<td>{values(p['values'])}</td>") + '</tr>' for p in s['properties'])
-        words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties'])]).casefold()
-        out.append(f'<div class="subject" data-text="{esc(words)}"><h3>{esc(s["name"])}</h3>'
+        words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties'])])
+        claims = [v['claim'] for p in s['properties'] for v in p['values']]
+        out.append(f'<div class="subject" {searched(words, claims)}><h3>{esc(s["name"])}</h3>'
                    + (f'<p class="meta">{esc("; ".join(meta))}</p>' if meta else '')
                    + f'<table><thead><tr><th>Property</th>{heads}</tr></thead><tbody>{rows}</tbody></table></div>')
     return ('<section data-for="subjects" class="index" hidden><p class="meta">Each subject as its claims name it '
@@ -788,16 +815,20 @@ def where_said(m):
     from .indexes import where_said as said
     return said(m)
 
-def glossary_html(terms, sources):
+def glossary_html(terms, sources, paths=()):
     """The Glossary view: each term, its kind and meanings, where each is given; in a comparison a column a source,
-    "—" where one defines it not, and a term the sources define differently marked."""
+    "—" where one defines it not, and a term the sources define differently marked. A search finds a term by its
+    words and meanings' places."""
     if not terms:
         return ''
     many = len(sources) > 1
     def meanings(ms):
         return '<br>'.join(f'{esc(m["meaning"])} <small>{esc(where_said(m))}</small>' for m in ms) or '—'
+    def found(t):  # a term as the search reads it
+        return searched(" ".join([t["term"], *(m["meaning"] for m in t["meanings"])]), (),
+                        [placed(m["source"], m["where"], paths) for m in t["meanings"] if m["where"]])
     rows = ''.join(
-        f'<tr data-text="{esc(" ".join([t["term"], *(m["meaning"] for m in t["meanings"])]).casefold())}">'
+        f'<tr {found(t)}>'
         f'<td><b>{esc(t["term"])}</b>' + (' <small class="warning">defined differently</small>' if t.get('differs')
                                           else '')
         + (f' <small>{esc(reach_said(t))}</small>' if reach_said(t) else '') + f'</td><td>{esc(t["kind"])}</td>'
@@ -810,7 +841,7 @@ def glossary_html(terms, sources):
             f'claims too.</p><table><thead><tr><th>Term</th><th>Kind</th>{heads}</tr></thead><tbody>{rows}</tbody>'
             '</table></section>')
 
-def gaps_html(gaps, sources):
+def gaps_html(gaps, sources, paths=()):
     """The view "What it doesn't give" (indexes.gaps): each gap found by code, by kind, where it was expected and why,
     linked to a claim of its subject where it has one; weak, as its note says."""
     if not gaps:
@@ -818,8 +849,11 @@ def gaps_html(gaps, sources):
     from .indexfiles import GAP_TITLES, GAPS_NOTE
     many = len(sources) > 1
     looked = any(g.get("looked") for g in gaps)  # the second pass's looks (dossiers.looks), where it ran
+    def found(g):  # a gap as the search reads it
+        return searched(" ".join([g["subject"], g["property"], g["why"], g["where"]]), g["claims"],
+                        [placed(g["source"], g["where"], paths)] if g["where"] else [])
     rows = ''.join(
-        f'<tr data-text="{esc(" ".join([g["subject"], g["property"], g["why"], g["where"]]).casefold())}">'
+        f'<tr {found(g)}>'
         f'<td>{esc(GAP_TITLES[g["kind"]])}</td>' + (f'<td>{esc(g["source"])}</td>' if many else '')
         + '<td>' + (f'<a href="#claim={esc(g["claims"][0])}">{esc(g["subject"])}</a>' if g['claims']
                     else esc(g['subject'])) + f'</td><td>{esc(g["property"])}</td><td>{esc(g["where"])}</td>'
@@ -843,7 +877,7 @@ def inconsistencies_html(found, sources):
         return (f'<a href="#claim={esc(x["claims"][k])}">{esc(x["said"][k])}</a> <small>{esc(x["where"][k])}'
                 + (f'; read again: {esc(again)}' if again else '') + '</small>')
     rows = ''.join(
-        f'<tr data-text="{esc(" ".join([x["subject"], *x["said"], x["why"]]).casefold())}">'
+        f'<tr {searched(" ".join([x["subject"], *x["said"], x["why"]]), x["claims"])}>'
         + (f'<td>{esc(x["source"])}</td>' if many else '') + f'<td>{esc(x["subject"])}</td><td>{link(x, 0)}</td>'
         f'<td>{link(x, 1)}</td><td>{esc(x["why"])}</td></tr>' for x in found)
     heads = ('<th>Source</th>' if many else '') + '<th>Item</th><th>Says</th><th>Against</th><th>Why</th>'
@@ -868,8 +902,9 @@ def item_kinds_html(kinds, subjects, sources):
         items = [subjects[i] for i in k['subjects']]
         from .indexfiles import kind_property
         names = [kind_property(p) for p in k['properties']]
-        words = ' '.join([k['kind'], *(s['name'] for s in items), *names]).casefold()
-        out.append(f'<div class="subject" data-text="{esc(words)}"><h3>{esc(k["kind"])}</h3><p class="meta">'
+        words = ' '.join([k['kind'], *(s['name'] for s in items), *names])
+        claims = [v['claim'] for s in items for p in s['properties'] for v in p['values']]
+        out.append(f'<div class="subject" {searched(words, claims)}><h3>{esc(k["kind"])}</h3><p class="meta">'
                    f'{len(items)} items; given by: ' + esc('; '.join(f"{n} {p['given']} of {len(items)}"
                                                                       for n, p in zip(names, k['properties'])))
                    + '</p><div class="wide"><table><thead><tr><th>Item</th>'
@@ -892,8 +927,11 @@ def figures_html(figures, many):
     claims (the first linked)."""
     if not figures:
         return ''
+    def found(f):  # a figure as the search reads it: by its own file and page too
+        return searched(" ".join([f["label"], f["title"], f["about"], f["file"]]), f["claims"],
+                        [placed(f["source"], f["file"], [f["file"]], f["page"])])
     rows = ''.join(
-        f'<tr data-text="{esc(" ".join([f["label"], f["title"], f["about"], f["file"]]).casefold())}">'
+        f'<tr {found(f)}>'
         + (f'<td>{esc(f["source"])}</td>' if many else '')
         + f'<td>{esc(f["file"])}</td><td>{esc(f["page"] if f["page"] is not None else "")}</td>'
         f'<td>{esc(f["kind"])}</td><td>{esc(f["label"])}</td><td>{esc(f["title"])}</td><td>{esc(f["about"])}</td>'

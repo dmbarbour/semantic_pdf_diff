@@ -422,6 +422,27 @@ const Search = (() => {
     const ws = words(text);
     return asked(groups).some((terms) => terms.some((t) => t.words.some((b) => ws.some((w) => asks(w, b)))));
   };
+  // whether words hold a term's, in a row
+  const phrase = (ws, bs) => ws.some((_, i) => bs.every((b, j) => i + j < ws.length && asks(ws[i + j], b)));
+  // the index's views' rows (subjects, kinds, figures and tables, the glossary, gaps, inconsistencies), found as
+  // claims are (the owner, 2026-11-06: "the search doesn't work properly for things like `file:` or `page:` as
+  // described in the search help"): a function telling whether a row is, from its own words, the claims it links
+  // (ids) and its own places ([file, first page, last page]). Its words and one of its claims (or places) are found
+  // together: a term of words, from its own words; any other (a part of a claim, a page, a value, like:), from that
+  // claim, as the claims' search finds it, or that place, by file: and page:.
+  const rows = (groups, idx, claims) => {
+    const own = (t) => t.words !== undefined && t.field === null;
+    const found = groups.map((g) => g.terms.map((t) => (own(t) ? null
+      : new Set([...idx.find([{not: false, terms: [t]}])(claims).keys()].map((c) => c.card)))));
+    const placed = (t, [file, low, high]) => (t.pages !== undefined ? low !== null && low <= t.pages[1]
+      && t.pages[0] <= high : t.words !== undefined && t.field === FILE && phrase(words(file), t.words));
+    return (text, ids, places) => {
+      const ws = words(text), units = [...ids.map((id) => ({id})), ...places.map((place) => ({place}))];
+      return (units.length ? units : [{}]).some((u) => groups.every((g, i) => g.not !== g.terms.some((t, j) => (
+        own(t) ? phrase(ws, t.words) : u.id !== undefined ? found[i][j].has(u.id)
+          : u.place !== undefined && placed(t, u.place)))));
+    };
+  };
 
   // marks, in a part of the page, the words a query found: letters by their beginnings, numbers whole
   const RAW = /\d+(?:,\d{3}(?!\d))*(?:\.\d+)?|\p{L}[\p{L}\p{M}]*/gu;
@@ -464,5 +485,5 @@ const Search = (() => {
     };
   };
 
-  return {index, parse, marker, covers, touches, names, otherNames, unknown, words, GLOSSARY};
+  return {index, parse, marker, covers, touches, names, otherNames, unknown, words, rows, GLOSSARY};
 })();

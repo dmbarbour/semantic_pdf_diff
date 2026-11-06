@@ -171,20 +171,31 @@
   const chips = [...root.querySelectorAll('.topics button')];
   const keyOf = (x) => (x.cards ? x.cards.join('~') : x.card);  // a finding's address, or a claim's
   let listed = [], reach = () => undefined;  // the items shown, and the way to one of them
-  // the index's views (subjects, figures and tables): written in the page, a search showing those holding its words
+  // what a search can't do, said after its count
+  const noted = (groups) => {
+    const strange = Search.unknown(groups);
+    const asked = (key) => groups.some((g) => g.terms.some((t) => t[key] !== undefined));
+    return (strange.length ? ` · units the search doesn't know: ${strange.join(', ')}` : '')
+      + (asked('meaning') ? ' · meaning: is searched from the command line (semantic-pdf-diff search)' : '')
+      + (asked('near') && !index.embedded() ? ' · near: needs the claims embedded (embed_model)' : '');
+  };
+  // the index's views (subjects, kinds, figures and tables, the glossary, gaps, inconsistencies): written in the page,
+  // a search showing the rows it finds, by their words and their claims and places (Search.rows)
   const listOnly = [root.querySelector('.topics'), file && file.closest('label')].filter(Boolean);
   const indexed = (step) => {
     for (const x of listOnly) x.hidden = true;  // (the topics and files filter findings and claims)
-    const words = query.value.toLowerCase().split(/\s+/).filter(Boolean);
+    const groups = Search.parse(query.value, index.unitOf);
+    const found = groups.length ? Search.rows(groups, index, R.claims) : null;
     const items = [...root.querySelectorAll(`[data-for="${view}"] [data-text]`)];
     let n = 0;
     for (const x of items) {
-      x.hidden = !words.every((w) => x.dataset.text.includes(w));
+      x.hidden = found !== null && !found(x.dataset.text, (x.dataset.claims || '').split(' ').filter(Boolean),
+        JSON.parse(x.dataset.places || '[]'));
       if (!x.hidden) n += 1;
     }
     for (const tab of tabs) tab.textContent = labels.get(tab);
     const what = {figures: 'figures and tables', glossary: 'terms'}[view] || view;  // (kinds, subjects)
-    $('count').textContent = `${n} of ${items.length} ${what}`;
+    $('count').textContent = `${n} of ${items.length} ${what}` + noted(groups);
     main.textContent = '';
     listed = [];
     remember(step);
@@ -271,11 +282,7 @@
       count += (how.length ? ` (${how.join(', ')})` : '') + ': '
         + sides.map((name, i) => `${chosen.filter((c) => c.side === i).length} in ${name}`).join('; ');
     }
-    const strange = Search.unknown(groups);
-    if (strange.length) count += ` · units the search doesn't know: ${strange.join(', ')}`;
-    const asked = (key) => groups.some((g) => g.terms.some((t) => t[key] !== undefined));
-    if (asked('meaning')) count += ' · meaning: is searched from the command line (semantic-pdf-diff search)';
-    if (asked('near') && !index.embedded()) count += ' · near: needs the claims embedded (embed_model)';
+    count += noted(groups);
     $('count').textContent = count;
     if (found && view === 'findings') {
       const named = chosen.filter((f) => renamed.has(f)).length;

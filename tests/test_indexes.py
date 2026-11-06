@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from semantic_pdf_diff import indexes, indexfiles
+from semantic_pdf_diff import indexes, indexfiles, report as reports
 from semantic_pdf_diff.align import TAG
 from semantic_pdf_diff.schema import Evidence, PdfLocator
 from semantic_pdf_diff.report import unpacked
@@ -499,6 +499,22 @@ class Files(unittest.TestCase):
         for text in ("007", "1234567890123456", "12 kW", "P-101"):
             self.assertIn('t="inlineStr"', indexfiles.cell("A1", text), text)
 
+class Searched(unittest.TestCase):
+    """The index's views' rows as the page's search reads them (search.js's rows): their claims, and their own
+    places, from where they're written."""
+    def test_a_rows_places_and_claims(self):
+        self.assertEqual(reports.placed("a", "a.pdf, page 2, “Pump schedule”"), ["a / a.pdf", 2, 2])
+        self.assertEqual(reports.placed("a", "set.pdf, pages 3–5"), ["a / set.pdf", 3, 5])
+        self.assertEqual(reports.placed("", "spec.docx, “Table 4 Timers”"), ["spec.docx", None, None])
+        self.assertEqual(reports.placed("b", "Smith, page 9.pdf, page 2", {"Smith, page 9.pdf"}),
+                         ["b / Smith, page 9.pdf", 2, 2])  # a name with a comma, its page not the name's
+        self.assertEqual(reports.placed("b", "deck.pptx, slide 4"), ["b / deck.pptx", 4, 4])
+        self.assertEqual(reports.placed("b", "x.pdf", ["x.pdf"], 7), ["b / x.pdf", 7, 7])  # a figure's own page
+        self.assertEqual(reports.searched("P-101 Feed Pump", ["A-1", "A-2", "A-1"], [["a / a.pdf", 2, 2]]),
+                         'data-text="p-101 feed pump" data-claims="A-1 A-2" '
+                         'data-places="[[&quot;a / a.pdf&quot;,2,2]]"')
+        self.assertEqual(reports.searched("CFD"), 'data-text="cfd"')
+
 class Written(unittest.TestCase):
     def test_an_analysis_writes_its_index_beside_its_report(self):
         state = {"embedded": [], "names": 0}
@@ -518,6 +534,11 @@ class Written(unittest.TestCase):
             book = (out / "index.xlsx").read_bytes()
             shown = unpacked((out / "report.html").read_text())
             searched = drawn((out / "report.html").as_uri() + "#subjects&q=blower")
+            # the search's language on the other views too (the owner, 2026-11-06: "the search doesn't work properly
+            # for things like `file:` or `page:` as described in the search help")
+            by_file = drawn((out / "report.html").as_uri() + "#subjects&q=file%3Amachines")
+            not_by_file = drawn((out / "report.html").as_uri() + "#subjects&q=-file%3Amachines%20page%3A1")
+            by_value = drawn((out / "report.html").as_uri() + "#subjects&q=%22discharge%20head%22%20%3E21m")
         self.assertEqual((code, again), (0, 0))
         self.assertEqual(len(data["index"]["subjects"]), 15)
         self.assertEqual(files, ["claims.csv", "figures.csv", "gaps.csv", "glossary.csv", "kinds.csv",
@@ -527,11 +548,15 @@ class Written(unittest.TestCase):
         self.assertEqual(page, rewritten)
         self.assertEqual(book[:2], b"PK")
         self.assertIn('<button data-view="subjects">Subjects 15</button>', shown)  # the page's views
-        self.assertRegex(shown, r'<div class="subject" data-text="blower0 discharge head"><h3>blower0</h3><table>'
+        self.assertRegex(shown, r'<div class="subject" data-text="blower0 discharge head" data-claims="ev-[0-9a-f]+">'
+                                r'<h3>blower0</h3><table>'
                                 r'<thead><tr><th>Property</th><th>Values</th></tr></thead><tbody><tr><td>discharge '
                                 r'head</td><td><a href="#claim=[^"]+">20 m</a>')
         if searched is not None:  # a search shows the subjects holding its words
             self.assertIn("5 of 15 subjects", searched)
+            self.assertIn("10 of 15 subjects", by_file)  # its claims' files: pumps and fans, not blowers
+            self.assertIn("5 of 15 subjects", not_by_file)
+            self.assertIn("3 of 15 subjects", by_value)  # its own words, and its claims' values: 22, 23 and 24 m
 
 if __name__ == "__main__":
     unittest.main()
