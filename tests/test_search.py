@@ -50,6 +50,8 @@ class Engine(unittest.TestCase):
         # the owner, 2026-11-06: "the search doesn't work properly for things like `file:` or `page:` as described in
         # the search help"
         self.assertEqual(found("file: b"), found("file:b"))
+        self.assertEqual(found('file:"b.pdf"'), found("file:b"))  # a name quoted, as one with spaces is
+        self.assertEqual(found('file:"pdf b"'), [])  # its words in a row
         self.assertEqual(found("page: 4-5"), found("page:4-5"))
         self.assertEqual(found('section: "feed"'), ["A-pump"])
         self.assertEqual(set(found("pump -file: b")), {"A-pump", "A-motor", "A-tank"})

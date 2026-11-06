@@ -538,6 +538,7 @@ store's latest comparison (--comparison picks another, for one store).
   "feed pump"          the words in a row;  -gearbox  without it;  blade OR rotor  either
   entity:pump          one part of a claim: entity, attribute, value (with its unit), conditions, quote, section,
                        file (a file's name is searched only so); page:12 or page:10-20
+  file:"pump spec"     a name with spaces quoted, whole or a part of it (or as one word: file:pump-spec)
   >50kW  value:10-20mm values compared across units (0.075 MW is over 50 kW); <=, >=, <; value:75kW for
                        that value; without a unit, numbers as written
   like:ID              the claims sharing enough of what a claim is about, most alike first; near it in meaning
@@ -550,12 +551,14 @@ Where the model was asked the documents' other names for one thing (search_names
 others' claims too, after the rest, each marked. A term the documents' glossaries define finds its meaning's claims,
 and its meaning the term's, wherever their words are, and the glossary's other names are said.
 
-Quote a query holding a word to leave out, or anything else the shell reads: semantic-pdf-diff search 'pump -gearbox'.
+Quote a query holding a word to leave out, a quoted name, or anything else the shell reads: semantic-pdf-diff search
+'pump -gearbox', semantic-pdf-diff search 'file:"pump spec sheet" page:3' (the shell drops quotes not so held).
 
 Examples:
   semantic-pdf-diff search rated power --store work
   semantic-pdf-diff search 'entity:pump -gearbox' --store bid-a --store bid-b --limit 50
   semantic-pdf-diff search like:ev-00ce8e6f78324812 --store work
+  semantic-pdf-diff search 'file:"Pump Spec Sheet.pdf" page:3-5' --store work
   semantic-pdf-diff search hub height --findings --json
 """
 
