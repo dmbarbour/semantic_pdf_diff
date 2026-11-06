@@ -199,6 +199,15 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
   - **Kept as commentary,** entries of kind "tension" in the second pass's log, never changing a claim; on both claims' cards, and in a **Suspects** view: those not reconciled first, by level, "worth a look" marked low priority; then those reconciled, with what reconciles them.
   - **Measured on planted tensions:** the planted reports gain three (a low-alloy steel hatch frame said to resist the wet well's hydrogen sulfide; a NEMA 1 control panel outdoors; ductile iron pipe in high-sulfate soil), each printed with what reconciles it in the clean twin (galvanized and coated; in a weatherproof kiosk; polyethylene-encased); then by eye on real documents.
   - **A setting, `tensions`** (off, analyses only), and `reviewer_concerns` (a list, none by default).
+  - **Built 2026-11-06, measured on the planted reports** ($0.12):
+    - **Planted twins:** each of the three tensions found and standing in both (6 of 6): the NEMA 1 panel outdoors "can't both hold", the steel hatch and the pipe in corrosive soil "need a reason". Found besides, in both: the three duty pumps' capacity short of the peak wet weather flow (the generator's values drawn apart: a real inconsistency of the document, not planted).
+    - **Clean twins:** none standing. Each tension raised there reconciled, citing the statement that reconciles it (the hatch by "All metal fabrications in the wet well are hot-dip galvanized...", 2 of 2; the pipe by the polyethylene encasement, 2 of 2; the panel raised once, reconciled by the kiosk).
+    - **First built otherwise, fixed before measuring:**
+      - The hatch was read as two subjects (the frame's material, the hatch's corrosion resistance): never asked together. A subject is now asked with its parts, the subjects whose names add a word or two to its own.
+      - Reconciling words were looked for in the passages claims were read from: a passage holds its neighbours' sentences, so every claim of the "6 Electrical and Materials" paragraph was cited for each. Now in what claims say, and context records (a mitigation the text says that no claim holds isn't found: a [levers' idea](../reviews/levers.md#ideas-not-built-yet)).
+      - "NEMA 3R" was looked for as "NEMA" (a word of two characters left out), and found in the NEMA 1 claim: a word with a number now counts, and the words must stand near one another and near something of the tension's claims.
+      - A tension whose reason named nothing of its claims (a NEMA 1 enclosure's reason, cited to the wet well's coating) stood in a clean twin: such an entry is now dropped.
+    - **Not yet measured:** real documents, by eye.
 
 ### 5. Gaps within one document
 

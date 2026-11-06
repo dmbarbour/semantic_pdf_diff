@@ -380,6 +380,10 @@ def score_analyses(out, write=True):
               + f"; not planted {g['unplanted']}")
         print(f"  implied {t['implied']['found']}/{t['implied']['planted']} ({t['implied']['inferences']} inferences); "
               f"suspicions {t['suspicions']}; read again {t['reread']}; gaps looked for {t['looked']}; log {t['log']}")
+        n = t.get("tensions", {})
+        if n.get("levels") or n.get("reconciled") or n.get("elsewhere"):  # asked (the tensions lever)
+            print(f"  tensions: of {n['tensions']}, {n['standing']} standing ({n['levels']}), {n['reconciled']} "
+                  f"reconciled; elsewhere {n['elsewhere']}")
     if write:
         (FOLDER / "analysis.json").write_text(json.dumps(found, indent=1) + "\n", encoding="utf-8")
     return results

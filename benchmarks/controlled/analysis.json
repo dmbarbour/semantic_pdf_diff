@@ -5,7 +5,7 @@
    "contradictions": {
     "planted": 6,
     "found": 6,
-    "false": 0
+    "false": 1
    },
    "condition": {
     "pairs": 4,
@@ -19,8 +19,8 @@
     "sibling": {
      "planted": 4,
      "by code": 4,
-     "as a blank cell": 2,
-     "read together": 4
+     "as a blank cell": 4,
+     "read together": 3
     },
     "placeholder": {
      "planted": 4,
@@ -35,8 +35,8 @@
      "read together": 0
     },
     "unplanted": {
-     "blank (named by a value)": 2,
-     "siblings (named by a value)": 6
+     "likely": 2,
+     "siblings": 2
     }
    },
    "implied": {
@@ -46,30 +46,41 @@
    },
    "suspicions": {
     "misread": {
-     "named by a value": 22,
-     "planted contradiction": 1
+     "planted contradiction": 1,
+     "right": 2
     }
    },
    "reread": {
-    "named by a value": {
-     "as_claimed": 5,
-     "otherwise": 17
+    "misbound": {
+     "as_claimed": 1
     },
     "planted contradiction": {
      "as_claimed": 13
+    },
+    "right": {
+     "otherwise": 1
     }
    },
    "looked": {
-    "likely: planted": {
-     "not_given": 4
+    "likely: not planted": {
+     "given": 2
     },
-    "siblings: named by a value": {
-     "given": 3,
-     "no_place": 3
+    "likely: planted": {
+     "not_given": 3
+    },
+    "siblings: not planted": {
+     "given": 2
     },
     "siblings: planted": {
-     "not_given": 4
+     "not_given": 3
     }
+   },
+   "tensions": {
+    "tensions": 6,
+    "standing": 0,
+    "reconciled": 0,
+    "levels": {},
+    "elsewhere": {}
    },
    "log": {
     "subjects": 30,
@@ -134,10 +145,17 @@
      "no_place": 1
     }
    },
+   "tensions": {
+    "tensions": 6,
+    "standing": 0,
+    "reconciled": 0,
+    "levels": {},
+    "elsewhere": {}
+   },
    "log": {
     "subjects": 30,
     "kinds": 4,
-    "dropped": 1,
+    "dropped": 0,
     "failed": 0
    }
   }
@@ -156,7 +174,6 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity_50": [
-      "differs_by_condition",
       "differs_by_condition"
      ],
      "P-302.capacity / P-302.capacity_runout": [
@@ -219,13 +236,21 @@
      "no_place": 1
     }
    },
+   "tensions": {
+    "tensions": 3,
+    "standing": 0,
+    "reconciled": 0,
+    "levels": {},
+    "elsewhere": {},
+    "twin": "clean"
+   },
    "claims": {
-    "claims": 72,
+    "claims": 80,
     "classes": {
      "loose": 4,
-     "misread": 1,
-     "right": 62,
-     "text": 5
+     "misread": 4,
+     "right": 60,
+     "text": 12
     }
    },
    "log": {
@@ -271,11 +296,9 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity": [
-      "restates"
+      "corroborates"
      ],
-     "P-301.tdh / P-301.tdh": [
-      "restates"
-     ],
+     "P-301.tdh / P-301.tdh": [],
      "forcemain.length / forcemain.length_mi": []
     }
    },
@@ -283,7 +306,7 @@
     "sibling": {
      "planted": 2,
      "by code": 2,
-     "as a blank cell": 1,
+     "as a blank cell": 2,
      "read together": 2
     },
     "placeholder": {
@@ -299,8 +322,8 @@
      "read together": 0
     },
     "unplanted": {
-     "blank (named by a value)": 1,
-     "siblings (named by a value)": 2
+     "likely": 1,
+     "siblings": 1
     }
    },
    "implied": {
@@ -308,39 +331,41 @@
     "found": 1,
     "inferences": 1
    },
-   "suspicions": {
-    "misread": {
-     "named by a value": 11,
-     "planted contradiction": 1
-    }
-   },
+   "suspicions": {},
    "reread": {
-    "named by a value": {
-     "as_claimed": 4,
-     "otherwise": 7
-    },
     "planted contradiction": {
      "as_claimed": 6
     }
    },
    "looked": {
+    "likely: not planted": {
+     "given": 1
+    },
     "likely: planted": {
      "not_given": 2
     },
-    "siblings: named by a value": {
-     "given": 1,
-     "no_place": 1
+    "siblings: not planted": {
+     "given": 1
     },
     "siblings: planted": {
      "not_given": 2
     }
    },
+   "tensions": {
+    "tensions": 3,
+    "standing": 0,
+    "reconciled": 0,
+    "levels": {},
+    "elsewhere": {},
+    "twin": "planted"
+   },
    "claims": {
-    "claims": 85,
+    "claims": 78,
     "classes": {
-     "loose": 34,
-     "right": 45,
-     "text": 6
+     "loose": 3,
+     "misread": 4,
+     "right": 58,
+     "text": 13
     }
    },
    "log": {
@@ -375,11 +400,9 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity": [
-      "corroborates"
+      "restates"
      ],
-     "P-301.tdh / P-301.tdh": [
-      "corroborates"
-     ],
+     "P-301.tdh / P-301.tdh": [],
      "forcemain.length / forcemain.length_mi": [],
      "P-302.motor / P-302.motor": [],
      "P-304.tdh / P-304.tdh": [
@@ -427,19 +450,27 @@
      "given": 1
     }
    },
+   "tensions": {
+    "tensions": 3,
+    "standing": 0,
+    "reconciled": 0,
+    "levels": {},
+    "elsewhere": {},
+    "twin": "clean"
+   },
    "claims": {
-    "claims": 73,
+    "claims": 81,
     "classes": {
-     "loose": 5,
-     "misread": 1,
+     "loose": 4,
+     "misread": 4,
      "right": 62,
-     "text": 5
+     "text": 11
     }
    },
    "log": {
     "subjects": 15,
     "kinds": 2,
-    "dropped": 1,
+    "dropped": 0,
     "failed": 0
    }
   },
@@ -459,15 +490,16 @@
       "contradicts"
      ]
     },
-    "false": 0,
-    "false pairs": []
+    "false": 1,
+    "false pairs": [
+     "V-14.cv / V-14.cv"
+    ]
    },
    "condition": {
     "pairs": 2,
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity_50": [
-      "differs_by_condition",
       "differs_by_condition"
      ],
      "P-302.capacity / P-302.capacity_runout": [
@@ -480,10 +512,10 @@
     "contradicts": 0,
     "said": {
      "P-301.capacity / P-301.capacity": [
-      "restates"
+      "corroborates"
      ],
      "P-301.tdh / P-301.tdh": [
-      "restates"
+      "corroborates"
      ],
      "forcemain.length / forcemain.length_mi": []
     }
@@ -492,8 +524,8 @@
     "sibling": {
      "planted": 2,
      "by code": 2,
-     "as a blank cell": 1,
-     "read together": 2
+     "as a blank cell": 2,
+     "read together": 1
     },
     "placeholder": {
      "planted": 2,
@@ -508,8 +540,8 @@
      "read together": 0
     },
     "unplanted": {
-     "blank (named by a value)": 1,
-     "siblings (named by a value)": 4
+     "likely": 1,
+     "siblings": 1
     }
    },
    "implied": {
@@ -519,36 +551,51 @@
    },
    "suspicions": {
     "misread": {
-     "named by a value": 11
+     "planted contradiction": 1,
+     "right": 2
     }
    },
    "reread": {
-    "named by a value": {
-     "as_claimed": 1,
-     "otherwise": 10
+    "misbound": {
+     "as_claimed": 1
     },
     "planted contradiction": {
      "as_claimed": 7
+    },
+    "right": {
+     "otherwise": 1
     }
    },
    "looked": {
-    "likely: planted": {
-     "not_given": 2
+    "likely: not planted": {
+     "given": 1
     },
-    "siblings: named by a value": {
-     "given": 2,
-     "no_place": 2
+    "likely: planted": {
+     "not_given": 1
+    },
+    "siblings: not planted": {
+     "given": 1
     },
     "siblings: planted": {
-     "not_given": 2
+     "not_given": 1
     }
    },
+   "tensions": {
+    "tensions": 3,
+    "standing": 0,
+    "reconciled": 0,
+    "levels": {},
+    "elsewhere": {},
+    "twin": "planted"
+   },
    "claims": {
-    "claims": 86,
+    "claims": 81,
     "classes": {
-     "loose": 34,
-     "right": 46,
-     "text": 6
+     "loose": 4,
+     "misbound": 1,
+     "misread": 4,
+     "right": 60,
+     "text": 12
     }
    },
    "log": {

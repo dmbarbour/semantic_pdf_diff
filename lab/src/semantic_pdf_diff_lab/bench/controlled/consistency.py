@@ -11,6 +11,11 @@ scored rather than judged by eye).
   doesn't state.
 - **The clean twin** prints the planted places right: its contradictions restated alike, every cell filled, its
   references to tables it has. What's found there is false.
+- **Tensions, in both twins** (the key's "tensions"; tensions.py): a subject's two claims hard to hold together on
+  engineering grounds (a low-alloy steel hatch frame said to resist the wet well's hydrogen sulfide; a NEMA 1 control
+  panel outdoors; ductile iron pipe in corrosive soil). The clean twin also says, of things in general, what
+  reconciles each ("All metal fabrications in the wet well are hot-dip galvanized..."): another subject's claim, out
+  of the tension's dossier, so it's found by the search for reconciling words or not at all.
 - **Scored** (scored()) from an analysis's report.json against its key: each claim bound to its fact as the corpus's
   scorer binds it (score.classify), then each planted item found or not, by the second pass (contradictions, likely
   gaps, inferences) or by code (gaps), each pair's relations, what's found and not planted, and what the second
@@ -157,6 +162,17 @@ def station(seed=1, twin="planted"):
     surge_said = "Surge pressures are given in Table 7." if planted else "Surge pressures are given in Table 4."
     if planted:
         plants += [{"kind": "reference", "label": "Figure 4"}, {"kind": "reference", "label": "Table 7"}]
+    tensions = [{"subject": "access hatch", "names": ["access hatch", "hatch"]},
+                {"subject": "control panel", "names": ["control panel", "panel"]},
+                {"subject": "force main", "names": ["force main", "ductile iron"]}]
+    hatch = ("The wet well's access hatch frame is low-alloy steel (ASTM A588). The access hatch is corrosion "
+             "resistant in the wet well's hydrogen sulfide atmosphere.")
+    panel = "The pump control panel is a NEMA 1 enclosure, mounted outdoors beside the wet well."
+    soil = "The force main is laid in high-sulfate, corrosive soil along the access road."
+    reconciled = [] if planted else [
+        ("p", "All metal fabrications in the wet well are hot-dip galvanized and epoxy coated after fabrication."),
+        ("p", "Electrical enclosures outdoors stand inside a ventilated, weatherproof kiosk."),
+        ("p", "Ductile iron pipe in corrosive soil is polyethylene-encased to AWWA C105.")]
 
     sections = [
         ("1 Design Basis", [
@@ -178,20 +194,23 @@ def station(seed=1, twin="planted"):
             ("datasheet", "Table 2. Wet well", [["Working volume (gal)", said["volume"]],
                                                 ["Diameter (ft)", diameter.value], ["Depth (ft)", depth.value],
                                                 ["High water alarm elevation (ft)", alarm.value]]),
+            ("p", hatch),
         ]),
         ("4 Force Main and Valves", [
             ("p", f"The force main is {main_ft.value} ft of {main_dia.value}-inch ductile iron pipe. {surge_said}"),
             ("table", "Table 3. Valve schedule", ["Tag"] + [VALVE[k][3] for k in VALVE], valve_rows),
             ("table", "Table 4. Surge analysis", ["Case", "Pressure (psi)"],
              [["Maximum transient pressure", surge_max.value], ["Minimum transient pressure", surge_min.value]]),
-            ("p", f"At {main_mi.value} mi, the force main needs no intermediate air release station."),
+            ("p", f"At {main_mi.value} mi, the force main needs no intermediate air release station. {soil}"),
         ]),
         ("5 Odour Control", [
             ("datasheet", "Table 5. Odour control unit", odour),
         ]),
+        ("6 Electrical and Materials", [("p", panel), *reconciled]),
     ]
     project = Project(f"station-s{seed}-{twin}", f"{STATION[0]}: Design Report", F, sections)
     project.planted, project.pairs, project.implied = plants, pairs, implied
+    project.tensions = tensions
     return project
 
 def _named(tag):
@@ -209,7 +228,8 @@ def corpus(seeds=(1, 2)):
 def keyed(project, log):
     """The answer key (corpus.key) with what's planted, the pairs and what's implied."""
     from .corpus import key
-    return {**key(project, log), "planted": project.planted, "pairs": project.pairs, "implied": project.implied}
+    return {**key(project, log), "planted": project.planted, "pairs": project.pairs, "implied": project.implied,
+            "tensions": getattr(project, "tensions", [])}
 
 def write(project, folder):
     """<id>.pdf and <id>.key.json into folder; returns the PDF's path."""
@@ -304,9 +324,38 @@ def scored(key, data):
             seen[g["kind"] + (": planted" if k in matched else ": named by a value" if VALUE_NAMED.match(g["property"])
                               else ": not planted")][found] += 1
     out["looked"] = {k: dict(sorted(v.items())) for k, v in sorted(seen.items())}
+    out["tensions"] = tensions_scored(key, entries, evidence, planted="contradiction" in {p["kind"]
+                                                                                         for p in key["planted"]})
     out["claims"] = {"claims": len(classes), "classes": dict(sorted(Counter(classes.values()).items()))}
     out["log"] = {k: (data.get("commentary") or {}).get(k, 0) for k in ("subjects", "kinds", "dropped", "failed")}
     return out
+
+def tensions_scored(key, entries, evidence, planted):
+    """The tensions found (tensions.py) against the key's: on each tension's subject (its name, or its claims'
+    items, naming one of the tension's names), whether one was found and stands (in the planted twin: found; in the
+    clean twin, whose document reconciles each: a false alarm) or was found reconciled; each found one's level; and
+    what's found on no tension's subject, by level."""
+    tensions = [e for e in entries if e["kind"] == "tension"]
+
+    def about(e, t):
+        items = [str(evidence.get(c, {}).get("entity", "")) for c in e["claims"]]
+        said = fold(" ".join([e.get("subject", ""), *items]))
+        return any(fold(n) in said for n in t["names"])
+    out = {"tensions": len(key.get("tensions", [])), "standing": 0, "reconciled": 0, "levels": Counter(),
+           "elsewhere": Counter()}
+    matched = set()
+    for t in key.get("tensions", []):
+        mine = [k for k, e in enumerate(tensions) if about(e, t)]
+        matched.update(mine)
+        standing = [tensions[k] for k in mine if not (tensions[k].get("reconciled")
+                                                       or tensions[k].get("reconciled_records"))]
+        out["standing"] += bool(standing)
+        out["reconciled"] += bool(mine) and not standing
+        out["levels"].update(e.get("relation", "") for e in standing[:1])
+    out["elsewhere"].update(e.get("relation", "") + (" reconciled" if e.get("reconciled") or e.get("reconciled_records")
+                                                     else "") for k, e in enumerate(tensions) if k not in matched)
+    return {**out, "twin": "planted" if planted else "clean", "levels": dict(sorted(out["levels"].items())),
+            "elsewhere": dict(sorted(out["elsewhere"].items()))}
 
 def gap_matches(gap, plant):
     """Whether a gap found is a planted one: a reference by its label; a sibling's or a placeholder by its subject's
@@ -350,6 +399,10 @@ def totals(results):
             **{part: {kind: dict(sorted(Counter(c for r in mine for c, n in r.get(part, {}).get(kind, {}).items()
                                                 for _ in range(n)).items()))
                       for kind in sorted({k for r in mine for k in r.get(part, {})})} for part in ("reread", "looked")},
+            "tensions": {**{k: add("tensions", k) for k in ("tensions", "standing", "reconciled")},
+                         **{part: dict(sorted(Counter(c for r in mine for c, n in r.get("tensions", {}).get(part, {})
+                                                      .items() for _ in range(n)).items()))
+                            for part in ("levels", "elsewhere")}},
             "log": {k: add("log", k) for k in ("subjects", "kinds", "dropped", "failed")}}
     return out
 
