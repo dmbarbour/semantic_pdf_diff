@@ -39,6 +39,8 @@ Every lever tried: in the [improvement rounds](../plans/query-improvement-2026-0
 | Region labels | `region_labels: model` | Off; measured (2026-10-12, [tile selection](../plans/README.md#retired) milestone 6) | The corpus: 450 → 390 tiles with no fact lost (359 with tile_choice's rule, 3 facts more); 132 questions for 60 tiles fewer; only skips the measures agree with |
 | Another tiling for a partial tile | `another_tiling: measures, said, asked` | Default (2026-10-12, [tile selection](../plans/README.md#retired) milestone 8, by judgement, not a round); `measures`, a tile continued at the claim limit halved | Every tile refined, the corpus: refined reads 197 → 134, their facts right 453 → 479, misbound 38 → 24; real pages: claims bound to other words 246 → 114; asking (said, asked) adds nothing the measures don't know |
 | A scan's halves between its image's lines | `scan_halves` | Default since 2026-11-02 (the owner, 2026-11-02: "I agree `scan_halves` defaults to `lines`."); built the same day, off ([text cut by tiles](../plans/text-cut-by-tiles-2026-10-28.md), milestone 2; the owner: "Let's go with your recommendations on the low-hanging fruit.") | The controlled corpus: no scan's tile was halved (every band answered complete), so nothing recorded moves; synthetic scans: a 16-line band cut between lines, not down all 16 |
+| A tile's text layer by whole lines | `whole_lines: true` | Built 2026-11-06, off ([text cut by tiles](../plans/text-cut-by-tiles-2026-10-28.md), milestone 2) | 11 pages where tiles cut lines (4 keyed, 7 real), against today's arm and today's asked again: numbers read 430 against 436 (9 lost, 3 gained; today's again 10 and 15), keyed facts unchanged; tile requests 539 against 613, refined 124 against 199; tiles saying their text was cut fewer (a poster's 65 → 8) |
+| A tile answered complete that says its text was cut read again | `said_cut: read again` | Built 2026-11-06, off ([text cut by tiles](../plans/text-cut-by-tiles-2026-10-28.md), milestone 2) | The same 11 pages: one page changed, 8 numbers gained, none lost, 9 requests more ($0.004); the 8 a poster's colour-bar ticks, not facts. Most tiles saying their text was cut were already answered partial, and read again |
 | Halves cut around figures | `halve_parts` | Default (2026-10-12, [tile selection](../plans/README.md#retired) milestone 8, by judgement, not a round) | Every tile refined, the corpus: loose claims from halves 93 → 51; with `another_tiling: measures`, 23, and facts right 514 |
 | A figure looked at again | `refine_figures: again` | Off; measured (milestone 7) | Loose 93 → 49 but right 431 → 412: told what it found, the model returns less |
 | Text left to other readers | `leave_text: tables` (and `tables and figures`) | Default `tables` (2026-10-12, by judgement, not a round; the owner: "Yes, let's make this a default."); `tables and figures` off | The corpus: misbound claims 244 → 161, loose 432 → 370, facts 3,439 as before; text tasks 323 → 225. Real documents: the slices' values as before; 16 real pages 965 → 957 values, 8 of the lost on one page whose table the table reader read without its headers ("0.83" for the text task's "0.83 kVA"). Only tables with 60% of their cells numeric (set on the corpus); with every table, 17 facts lost; with figures too, more lost and no misbound claim fewer |
@@ -357,6 +359,31 @@ Built in [tile selection](../plans/README.md#retired) milestone 7, all off by de
 - **Calibrated** (`scripts/asking.py`, gemma-4): asked to name a cut, it names one for 48.8% of tiles that cut content and 0.8% of whole ones; today's prompt, 31.2% and 10.5%. Neither passes (half the cut tiles).
 - **Got** (every tile refined, `scripts/refinement.py`): `measures` with `halve_parts` is the best arm. On the controlled corpus, refined reads 197 → 135, their facts right 453 → 514, loose 93 → 23, misbound 38 → 24; whole documents' facts unchanged. On 16 real pages, refined reads 257 → 151, quotes not in the page 78 → 54, claims bound to other words 246 → 114.
 - **Defaults since milestone 8** (2026-10-12): `another_tiling: measures` and `halve_parts`. A tile continued at the claim limit is halved, not retiled: read under the other cut, HabEx p403's dense table lost 43 of 454 values. Refinement is rare in a normal run, so the forced measure is where they show.
+
+### Text cut by tiles (`whole_lines`, `said_cut`)
+
+Built 2026-11-06, both off ([text cut by tiles](../plans/text-cut-by-tiles-2026-10-28.md), milestone 2; the owner, 2026-11-06: "we should finish the quality reports and cut-text work, too").
+
+- **Mechanism:**
+  - `whole_lines`: an image region's text layer (its quotes' check, and what `visual_text_layer` sends) holds every line the region touches whole, half its height or more inside it, not the words it clips (`levers.WholeLines`, the `tile_layer` hook). Refined halves already had whole lines, those whose middle they hold.
+  - `said_cut: read again`: a tile answered complete whose answer says its text was cut (its notes, or the edges a rule asked for) is read again as a partial one is, under the page's next cut (`levers.SaidCut`, the `refines_complete` hook).
+- **Where lines are still cut** (`scripts/tiling.py measure`, no model, today's defaults): 305 of 1,091 development pages, 8,804 lines cut sideways, most on drawing sheets (grid) and posters (snapped, XY-cut); the corpus 11 of 191 pages, 36 lines (its 16:9 page with charts, its plan sheets).
+- **Expected:** fewer values lost to words cut at a tile's edge; fewer tiles complaining and read again.
+- **Got** (`scripts/tiling.py read`, $0.93 in all): 11 pages, the corpus's 16:9 pages and plan sheets (keyed) and 7 real ones (scical's sheets 7 and 8, ken's 4 and 27, sd15-stevens' 4, two posters), read under today's settings, each lever and both; today's asked again into a fixture of its own for the model's variation.
+
+  | Arm | Requests | Tiles | Refined | Numbers read | Lost, gained against today's |
+  |---|---|---|---|---|---|
+  | Today | 1,036 | 613 | 199 | 436 | |
+  | Today, asked again | 1,023 | 618 | 204 | 441 | 10, 15 |
+  | `whole_lines` | 962 | 539 | 124 | 430 | 9, 3 |
+  | `said_cut: read again` | 1,045 | 622 | 208 | 444 | 0, 8 |
+  | Both | 973 | 550 | 135 | 437 | 9, 10 |
+
+  - Keyed facts the same under every arm (the 16:9 pages 23 of 23; the plan sheets 39 of 45 and 69 of 87); today's asked again gave 64 of 87, so a sheet's facts vary by 5 on their own.
+  - `whole_lines`: tiles saying their text was cut and answers incomplete far fewer (a poster's 65 and 68 → 8 and 10; scical's sheet 7, 25 → 17), so 75 fewer refinements. Its numbers lost and gained by eye: an address, a poster's axis temperatures, a code reference either way.
+  - `said_cut`: one page changed, a poster whose 8 numbers gained are its colour-bar ticks ("sigma Magnitude 200000 … 900000"), not facts. Most tiles saying their text was cut are answered partial, and so already read again.
+- **Why:** with a line's words whole in its text layer, a tile reads it from the text and no longer reports it cut; the image still cuts it, so what the tile sees and what it's told can differ at its edges.
+- **Post-mortem:** `whole_lines` reads as much for 7% fewer requests, within the model's variation for what it finds; `said_cut` has little left to act on. **Tweak:** measure `whole_lines` on the held-out pages where it changes most (sheets, posters) before a default; `said_cut` could act where the measures, not the model, say a tile cuts lines.
 
 ### Continued reading (`continuations`)
 - **Mechanism:** an image task whose answer is incomplete with its claims at the limit, or says the claim limit stopped it ("more steps (17–22) than the 20 claim limit allowed"), is asked again ("<task>-c<n>"), the claims it returned listed by entity, attribute and value, not to be repeated; up to `continuations` times (3; lever `continue_reading`). That's the model asking for more; clipping or illegibility isn't. A first request's bytes are as before, so recorded answers replay.
