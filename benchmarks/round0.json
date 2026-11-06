@@ -113,6 +113,7 @@
   "another_tiling": "off",
   "halve_parts": false,
   "scan_halves": "middle",
+  "whole_lines": false,
   "leave_text": "none",
   "images_first": false,
   "text_spans": "section",

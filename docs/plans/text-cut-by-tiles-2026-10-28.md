@@ -181,7 +181,7 @@ Each item is a lever, judged against null arms on the controlled corpus ([0037](
     - `whole_lines`: as many numbers within that variation (9 lost, 3 gained), keyed facts the same, 7% fewer requests (962 against 1,036): tiles complain of cut text far less and are answered complete, so 75 fewer are read again.
     - `said_cut: read again`: one page changed, 8 numbers gained (a poster's colour-bar ticks, not facts), 9 requests more; most complaining tiles are answered partial and already read again.
     - Details: the [lever index](../reviews/levers.md), *Text cut by tiles*.
-  - **Not made defaults:** the owner's call; `whole_lines` would first be checked on held-out sheets and posters.
+  - **`whole_lines` the default since 2026-11-06** (the owner, on checking it on held-out sheets and posters first: "Let's go with your recommendations."): held out (7 pages, $0.91), 651 numbers read against today's 641 (32 lost, 42 gained; today's asked again 52 and 44), 9% fewer requests (821 against 901). `said_cut` stays off.
 - **Halves of a tile without a text layer** cut between the image's own lines, not down the middle.
   - The lines are found as dark rows in the tile's horizontal projection.
   - Where none are found, the cut goes across the tile's shorter side, crossing at most a line, not every line.

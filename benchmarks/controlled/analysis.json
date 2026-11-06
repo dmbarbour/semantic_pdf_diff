@@ -52,8 +52,8 @@
    },
    "reread": {
     "named by a value": {
-     "as_claimed": 1,
-     "otherwise": 21
+     "as_claimed": 5,
+     "otherwise": 17
     },
     "planted contradiction": {
      "as_claimed": 13
@@ -112,7 +112,10 @@
      "as a blank cell": 0,
      "read together": 0
     },
-    "unplanted": {}
+    "unplanted": {
+     "likely": 2,
+     "siblings": 2
+    }
    },
    "implied": {
     "planted": 2,
@@ -121,11 +124,20 @@
    },
    "suspicions": {},
    "reread": {},
-   "looked": {},
+   "looked": {
+    "likely: not planted": {
+     "given": 1,
+     "no_place": 1
+    },
+    "siblings: not planted": {
+     "given": 1,
+     "no_place": 1
+    }
+   },
    "log": {
     "subjects": 30,
     "kinds": 4,
-    "dropped": 0,
+    "dropped": 1,
     "failed": 0
    }
   }
@@ -187,7 +199,10 @@
      "as a blank cell": 0,
      "read together": 0
     },
-    "unplanted": {}
+    "unplanted": {
+     "likely": 1,
+     "siblings": 1
+    }
    },
    "implied": {
     "planted": 1,
@@ -196,7 +211,14 @@
    },
    "suspicions": {},
    "reread": {},
-   "looked": {},
+   "looked": {
+    "likely: not planted": {
+     "no_place": 1
+    },
+    "siblings: not planted": {
+     "no_place": 1
+    }
+   },
    "claims": {
     "claims": 72,
     "classes": {
@@ -294,7 +316,8 @@
    },
    "reread": {
     "named by a value": {
-     "otherwise": 11
+     "as_claimed": 4,
+     "otherwise": 7
     },
     "planted contradiction": {
      "as_claimed": 6
@@ -384,7 +407,10 @@
      "as a blank cell": 0,
      "read together": 0
     },
-    "unplanted": {}
+    "unplanted": {
+     "likely": 1,
+     "siblings": 1
+    }
    },
    "implied": {
     "planted": 1,
@@ -393,7 +419,14 @@
    },
    "suspicions": {},
    "reread": {},
-   "looked": {},
+   "looked": {
+    "likely: not planted": {
+     "given": 1
+    },
+    "siblings: not planted": {
+     "given": 1
+    }
+   },
    "claims": {
     "claims": 73,
     "classes": {
@@ -406,7 +439,7 @@
    "log": {
     "subjects": 15,
     "kinds": 2,
-    "dropped": 0,
+    "dropped": 1,
     "failed": 0
    }
   },

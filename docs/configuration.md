@@ -168,7 +168,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `table_structure` | `true` | selecting | table_structure | extract | table |
 | `labels_joined` | `true` | selecting | labels_joined | extract | table |
 | `visual_text_layer` | `1500` | shaping | visual_text_layer | extract | figure, overview, tile, vision |
-| `whole_lines` | `false` | shaping | whole_lines | extract | figure, overview, tile, vision |
+| `whole_lines` | `true` | shaping | whole_lines | extract | figure, overview, tile, vision |
 | `table_cuts` | `false` | shaping | table_cuts | extract | figure, overview, tile, vision |
 | `text_cuts` | `"bytes"` | shaping | text_cuts | extract | figure, overview, text, tile, vision |
 | `text_spans` | `"page"` | shaping | text_spans | extract | text |

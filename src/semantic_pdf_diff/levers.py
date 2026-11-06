@@ -889,8 +889,10 @@ class WholeLines(Lever):
     # an image region's text layer (its quotes' check, and what visual_text_layer sends) holds every line the region
     # touches whole, half its height or more inside it, not the words it clips: a tile cutting a line sideways is
     # given the line's words beyond its edges (docs/plans/text-cut-by-tiles-2026-10-28.md, milestone 2: "Whole
-    # lines in every tile's text layer: each line the tile touches in full, as refined halves get them")
-    whole_lines: Annotated[bool, _shaping(VISUAL)] = False
+    # lines in every tile's text layer: each line the tile touches in full, as refined halves get them"). A default
+    # since 2026-11-06 (the owner, on checking it on held-out pages first: "Let's go with your recommendations."): as
+    # much read for 7 to 9% fewer requests, on development and held-out pages
+    whole_lines: Annotated[bool, _shaping(VISUAL)] = True
 
     def tile_layer(self, reader, page, rect, depth, layer):
         layer = super().tile_layer(reader, page, rect, depth, layer)
@@ -1465,7 +1467,7 @@ class DedupeRepeated(Lever):
 # tile_choice, another_tiling, halve_parts: docs/decisions/0029-tiles-chosen-by-measures.md), leave_text's
 # tables, images_first, repeated_text's first, lone_rows, text_spans' page, positions' provenance, records,
 # editorial, record_changes, split_conditions, sheet_records, table_holders, carried_holders, view_attitudes,
-# view_rows, align_hedges, hedges_apart, read_holders, hedge_rule, scan_halves and labels_joined
+# view_rows, align_hedges, hedges_apart, read_holders, hedge_rule, scan_halves, labels_joined and whole_lines
 # (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
                  ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,

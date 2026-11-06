@@ -208,7 +208,9 @@ HELP = {
                                 "document defines them"),
     "tile_locator": Help(_L, "with each tile, a page thumbnail outlining where it sits"),
     "visual_text_layer": Help(_L, "characters of a region's PDF text sent with its image"),
-    "whole_lines": Help(_L, "an image region's text layer holds every line it touches whole, not the words it clips"),
+    "whole_lines": Help(_L, "an image region's text layer holds every line it touches whole, not the words it clips",
+                        "On by default: as much read for 7 to 9% fewer requests, tiles complaining of cut text far "
+                        "less."),
     "table_cuts": Help(_L, "an image region cutting a table is sent the table's header and the rows it touches"),
     "text_cuts": Help(_L, "where a long text is cut: where the bytes run out, or at a sentence's end"),
     "text_spans": Help(_L, "a text task's blocks: a page's up to the byte budget, or one section's"),
