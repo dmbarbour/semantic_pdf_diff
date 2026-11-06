@@ -692,7 +692,7 @@ class SearchInABrowser(unittest.TestCase):
                                          "page:4-5", "pump", "section:feed", "-valve", "output", "pdf", "file:b",
                                          ">70kW", ">70 kW", "value:75kW", "value:0.075MW", "power <20kW",
                                          "value:55L/s", "<40dBA", "value:>40dBA", ">1000", ">1mw", ">1e9 N•m2",
-                                         "value:2.5GN.m2", "drive")]
+                                         "value:2.5GN.m2", "drive", "file: b", "pump -file: b", "page: 4-5")]
         cases += [("claims", "near:A-pump"), ("claims", "near:A-heater"), ("claims", "pump feed", True),
                   ("claims", 'meaning:"pumps"'), ("findings", "pump"), ("claims", "drive", True),
                   ("claims", "NL", True), ("claims", "NL"), ("claims", "output", True)]
@@ -732,6 +732,11 @@ class SearchInABrowser(unittest.TestCase):
         self.assertEqual(self.ids("pdf"), [])  # a file's name only when asked for: "a.pdf", "b.pdf"
         self.assertEqual(set(self.ids("file:b")), {"B-pump", "B-valve", "B-gearbox", "B-heater", "B-drive", "B-limit",
                                                   "B-blade"})
+
+    def test_a_part_named_with_a_space_after_its_colon(self):
+        self.assertEqual(self.ids("file: b"), self.ids("file:b"))
+        self.assertEqual(set(self.ids("pump -file: b")), {"A-pump", "A-motor", "A-tank"})
+        self.assertEqual(set(self.ids("page: 4-5")), {"A-valve", "B-valve", "A-motor"})
 
     def test_numbers_match_whole_however_written(self):
         self.assertEqual(self.ids("75"), ["A-pump"])  # not the tank's 750

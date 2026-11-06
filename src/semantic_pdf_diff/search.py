@@ -337,10 +337,25 @@ def compared(op, a, b, unit_text):
 # a query: groups, each to be found (or, with "-", not), by any of its terms ("a OR b"); a term: words in a row (a
 # phrase), in one field or any; a value compared; page:N or page:N-M; like:ID
 TERM = re.compile(r'(-?)(?:([A-Za-z]+):)?(?:"([^"]*)"?|(\S+))')
+KEYS = set(NAMED) | {"page", "like", "near", "meaning"}  # the parts a query names
+
+def spaced(tokens):
+    """A part named with a space after its colon ("file: a.pdf") read as one without ("file:a.pdf"), as the search
+    help's "file:" invites (the owner, 2026-11-06: "the search doesn't work properly for things like `file:` or
+    `page:` as described in the search help")."""
+    out = []
+    for token in tokens:
+        last = out[-1] if out else None
+        if (last and not last[2] and last[3] is None and last[4].endswith(":") and last[4][:-1].lower() in KEYS
+                and not token[1] and not token[2] and not (token[3] is None and token[4] in ("OR", "|"))):
+            out[-1] = (f"{last[0]} {token[0]}", last[1], last[4][:-1], token[3], token[4])
+        else:
+            out.append(token)
+    return out
 
 def parse(text):
     groups, either = [], False
-    tokens = [(m.group(0), m.group(1), m.group(2), m.group(3), m.group(4)) for m in TERM.finditer(text)]
+    tokens = spaced([(m.group(0), m.group(1), m.group(2), m.group(3), m.group(4)) for m in TERM.finditer(text)])
     i = -1
     while i + 1 < len(tokens):
         i += 1

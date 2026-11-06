@@ -314,6 +314,18 @@ const Search = (() => {
   // a query: groups, each to be found (or, with "-", not), by any of its terms ("a OR b"); a term: words in a row (a
   // phrase), in one field or any; page:N or page:N-M; like:ID
   const TERM = /(-?)(?:([A-Za-z]+):)?(?:"([^"]*)"?|(\S+))/gu;
+  const KEYS = new Set([...NAMED.keys(), 'page', 'like', 'near', 'meaning']);  // the parts a query names
+  // a part named with a space after its colon ("file: a.pdf") read as one without ("file:a.pdf"), as the search
+  // help's "file:" invites
+  const spaced = (tokens) => tokens.reduce((out, t) => {
+    const last = out[out.length - 1];
+    if (last && !last[2] && last[3] === undefined && last[4].endsWith(':')
+        && KEYS.has(last[4].slice(0, -1).toLowerCase()) && !t[1] && !t[2]
+        && !(t[3] === undefined && (t[4] === 'OR' || t[4] === '|'))) {
+      out[out.length - 1] = [`${last[0]} ${t[0]}`, last[1], last[4].slice(0, -1), t[3], t[4]];
+    } else out.push(t);
+    return out;
+  }, []);
   // a value compared (milestone 3: ">50kW", "value:10-20mm", "value:0.075MW"): an operator, a number or a range,
   // and a unit, which may be the next word (">50 kW")
   const NUM = '[+-]?(?:\\d[\\d,]*(?:\\.\\d+)?|\\.\\d+)(?:[eE][+-]?\\d+)?';
@@ -336,7 +348,7 @@ const Search = (() => {
     return {compare: q};
   };
   const parse = (text, unitOf = () => null) => {
-    const groups = [], tokens = [...text.matchAll(TERM)];
+    const groups = [], tokens = spaced([...text.matchAll(TERM)]);
     let either = false;
     for (let i = 0; i < tokens.length; i++) {
       const [whole, not, name, quoted, bare] = tokens[i];

@@ -46,6 +46,18 @@ class Engine(unittest.TestCase):
         self.assertEqual(set(found("15")), {"A-heater", "B-heater"})
         self.assertEqual(set(found("cafe")), {"A-heater", "B-heater"})
 
+    def test_a_part_named_with_a_space_after_its_colon(self):
+        # the owner, 2026-11-06: "the search doesn't work properly for things like `file:` or `page:` as described in
+        # the search help"
+        self.assertEqual(found("file: b"), found("file:b"))
+        self.assertEqual(found("page: 4-5"), found("page:4-5"))
+        self.assertEqual(found('section: "feed"'), ["A-pump"])
+        self.assertEqual(set(found("pump -file: b")), {"A-pump", "A-motor", "A-tank"})
+        self.assertEqual(found("value: >70 kW"), found(">70 kW"))
+        self.assertEqual(search.parse("file:")[0]["terms"][0], {"words": ["file"], "field": None})  # alone: a word
+        self.assertEqual(search.parse("note: pump")[0]["terms"][0], {"words": ["note"], "field": None})  # no part's
+        self.assertEqual(len(search.parse("file: OR pump")), 1)  # (either: "file" or "pump")
+
     def test_values_across_units(self):
         self.assertEqual(set(found(">70 kW")), {"A-pump", "B-pump", "B-drive"})
         self.assertEqual(found("value:0.075MW"), ["A-pump"])
