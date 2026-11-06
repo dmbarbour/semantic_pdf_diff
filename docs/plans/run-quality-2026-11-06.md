@@ -1,6 +1,6 @@
 # The run's reading, counted: where the report deserves less trust
 
-- **Status:** Active (2026-11-06): [milestone 1](#1-a-pages-reading-counted) built 2026-11-06; 2 and 3 not begun.
+- **Status:** Active (2026-11-06): [milestone 1](#1-a-pages-reading-counted) built 2026-11-06; 2 and 3 not begun; [4](#4-claims-whose-quote-isnt-found-why-and-kept) investigated 2026-11-06, being built.
 - **The owner, 2026-10-09:** "I'm beginning to believe that having some sort of quality heuristics spot-check for runtime behavior would be useful for both confidence decisions and part of the report."
 - **Chosen 2026-11-02** from the review of open items, where Claude offered it as "How well the run read, shown in the report": the owner, "cited summaries, quality reports, and cut-text work are probably the most valuable to me in the short term"; then, 2026-11-06, "we should finish the quality reports and cut-text work, too."
 - **Takes over** the tentative row *Runtime quality spot checks*, kept whole [below](#moved-in-runtime-quality-spot-checks).
@@ -47,6 +47,30 @@ From the tentative row (below): three axes kept apart, never one opaque score: r
 ### 3. Reading again where it went wrong
 
 The counts as triggers, code-driven: a page whose text gave claims mostly dropped read again by its tiles; a tile that said its text was cut read under another cut ([text cut by tiles](text-cut-by-tiles-2026-10-28.md), milestone 2). Each a lever, measured.
+
+### 4. Claims whose quote isn't found: why, and kept
+
+The tentative row *Claims kept whose quote isn't found*, moved in 2026-11-06 (the owner, on the recommendation to build it next: "Let's go with your recommendations. We should also investigate to see how we're matching claims, e.g. if it's rejected as paraphrasing, and see if our quote-matching heuristics need work."). The owner, earlier the same day: "I recall that, in several cases, claims were filtered out because of literal quotes. We might want to still record these as claims or evidence with extra provenance where available, reducing to something like 'quoted anonymously', that may weaken claims without corroboration. Filtering the claims before they reach the database seems like a way to lose useful information."
+
+- **Today:** a text or table task's claim whose quote isn't in its text is dropped, a note left on its coverage row ("Rejected claim with unsupported literal quote"); a picture's is kept, marked (`quote_verified`: false). The check: the quote verbatim up to spacing, or a table's words all in its rows, or `quote_match: fragments` (Unicode forms, case, dashes, quote marks, a line-end hyphen kept in a compound; "…" and " | " parts each found, in order).
+- **Investigated 2026-11-06** (no requests: every text and table answer recorded, re-checked as the product checks it, each failing quote sorted by why; the 294 recorded runs of the controlled corpus scored against their keys):
+
+  | Why the quote failed | Corpus | Right | Misbound | Two real analyses |
+  |---|---|---|---|---|
+  | Every word in the text, not as one run: a chart's labels joined by "…", a room's name and its area on two lines | 430 | 276 | 49 | 65 (drawings' labels and values) |
+  | Read from somewhere else: a poll's proposal joined to a row; a table read column by column, its rows named from the context | 247 | 134 | 57 | 28 |
+  | From the context the prompt gives, not its source | 105 | 100 | 0 | 5 |
+  | Three quarters of its words in the text (paraphrase, mostly) | 94 | 47 | 41 | 4 |
+  | Only spacing or symbols differ (an OCR layer's "59,045cfm" for "59,045 cfm") | 24 | 19 | 0 | 4 |
+  | A line-end hyphen breaking a word ("con-\nditions" quoted "conditions") | 0 | | | 2 |
+
+  - **The check earns its keep:** the 900 claims it dropped are 64% right and 16% misbound; the 1,939 text and table claims it kept on the same documents, 77% and 5%.
+  - **Little is lost on the corpus:** 14 of its facts are found by a dropped claim alone; the rest repeat claims other tasks kept (a tile, the neighbouring text's task).
+  - **More on real documents:** an IEA report's materials table, its text layer column by column, gave 71 claims, all dropped (its values all in the text, its rows' names from the context).
+  - **Paraphrase isn't the main cause:** the model mostly quotes words that are there, but not as one run.
+- **What to change:**
+  - **The matcher, a fix:** a line-end hyphen breaking a word read both ways ("con-\nditions" as "con-ditions" and "conditions"), and spacing ignored where only spacing differs (OCR layers lose and add spaces). On the corpus, 19 of the 24 such claims are right, none misbound.
+  - **Kept, marked, as a setting (`unquoted`, off):** a claim whose quote isn't found kept with its quote unverified, as a picture's is: its card warns, the Reading view counts it, and what reads it (the second pass, the index, comparisons) can weigh it below a verified claim. Not words-in-order as verified: those claims are misbound three times as often as kept ones.
 
 ## Moved in: *Runtime quality spot checks*
 
