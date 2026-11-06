@@ -403,6 +403,13 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
                                 progress)  # its gaps, and the index's among siblings, looked for where they'd be
         data['commentary']['entries'] += looked.pop('entries')
         data['commentary']['looked'] = looked
+    if settings.finds_tensions(ONE_SOURCE):  # claims hard to hold together, by level (the tensions lever)
+        from . import indexes, tensions
+        found = tensions.read(data, indexes.built(data), client, ONE_SOURCE, label, settings.reviewer_concerns,
+                              progress)
+        commentary = data.setdefault('commentary', {'entries': []})
+        commentary['entries'] += found.pop('entries')
+        commentary['tensions'] = found
     progress.close()  # its search's requests (topics' names, other names, vectors), and the second pass's
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)

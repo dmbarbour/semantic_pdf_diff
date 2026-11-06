@@ -257,6 +257,10 @@ HELP = {
     # --- levers: after the answers
     "unquoted": Help(_L, "a text or table claim whose quote isn't found in its text kept, marked as unverified "
                          "(kept), or dropped"),
+    "tensions": Help(_L, "analyses: each subject's claims read for those hard to hold together on engineering "
+                         "grounds, by level, what would reconcile them looked for in the source"),
+    "reviewer_concerns": Help(_L, "a reviewer's concerns the tensions are also asked to watch for (a list of "
+                                  "sentences)"),
     "quote_match": Help(_L, "how quotes are checked against the text: exact, fragments, or excerpts"),
     "positions": Help(_L, "a numbered item's label is its claim's position, not part of its conditions"),
     "records": Help(_L, "lists, notes and legends kept once as context records claims reference"),

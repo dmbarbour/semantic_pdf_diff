@@ -195,6 +195,12 @@ class Cards:
             elif c["kind"] == "inference":
                 from .dossiers import sum_said
                 lines.append(f"Inferred: {esc(c['text'])}{esc(sum_said(c))}")
+            elif c["kind"] == "tension":
+                from .tensions import LEVEL_SAID
+                with_ = "; ".join(self.at(x) for x in c["claims"] if x != eid and x in self.evidence)
+                lines.append(esc(LEVEL_SAID.get(c.get('relation'), 'Hard to hold')) + (f" with {esc(with_)}" if with_
+                                                                                        else "")
+                             + f": {esc(c.get('why', ''))} ({esc(reconciled_said(c, self.at))})")
             elif c["kind"] == "reread":
                 from .dossiers import reread_said
                 lines.append(f"Read again from its place: {esc(reread_said(c))}"
@@ -203,6 +209,13 @@ class Cards:
             return ""
         return ('<div class="notes"><b>Read with its subject\'s other claims</b> (ours, not the document\'s):'
                 + "".join(f"<p>{line}</p>" for line in lines) + "</div>")
+
+    def at(self, eid):
+        """Another claim, as a card names it: "page 5: 1.2 m"."""
+        o = self.evidence[eid]
+        unit = o['unit'] if o['unit'] not in ('', '-') else ''
+        return (f"{PAGE_WORDS.get(o['locator'].get('format'), 'page')} {o['locator']['page']}: "
+                f"{o['value']} {unit}".strip())
 
     def context(self, e):
         """Where a claim sits and what reaches it, as its records and position say (the records lever): its name as
@@ -658,6 +671,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     subjects, figures, terms = index.get('subjects', []), index.get('figures', []), index.get('glossary', [])
     kinds, gaps, clashes = index.get('kinds', []), index.get('gaps', []), index.get('inconsistencies', [])
     reading, troubled = quality_html(data, card.where)
+    suspects, unreconciled = suspects_html((data.get('commentary') or {}).get('entries', []), card)
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
@@ -667,6 +681,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
              + (f'<button data-view="glossary">Glossary {len(terms)}</button>' if terms else '')
              + (f'<button data-view="gaps">What it doesn\'t give {len(gaps)}</button>' if gaps else '')
              + (f'<button data-view="inconsistencies">Inconsistencies {len(clashes)}</button>' if clashes else '')
+             + (f'<button data-view="suspects" title="Claims hard to hold together, not reconciled">Suspects '
+                f'{unreconciled}</button>' if suspects else '')
              + (f'<button data-view="reading" title="The pages read with a problem">Reading {troubled}</button>'
                 if reading else '')
              + '</div>')
@@ -717,7 +733,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     sources, paths = index.get('sources', []), {f['path'] for f in data['files']}
     page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
              + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources, paths)
-             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources) + reading)
+             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources) + suspects + reading)
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -870,6 +886,44 @@ def gaps_html(gaps, sources, paths=()):
              + ('<th>Looked for on</th>' if looked else ''))
     return (f'<section data-for="gaps" class="index" hidden><p class="meta">{esc(GAPS_NOTE)}</p><div class="wide">'
             f'<table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div></section>')
+
+def reconciled_said(c, at):
+    """Where a tension's reconciling words were found, in words: "reconciled by page 5: hot-dip galvanized"; or that
+    nothing was (weak: not saying isn't absence). at: a claim's id as words (Cards.at)."""
+    found = [at(x) for x in c.get("reconciled", [])] + [f"“{r}”" for r in c.get("reconciled_records", [])]
+    if found:
+        return "reconciled by " + "; ".join(found)
+    return "nothing that reconciles it found in the document"
+
+def suspects_html(entries, card):
+    """The Suspects view (tensions.py): claims hard to hold together on engineering grounds, those not reconciled
+    first, by level ("worth a look" marked low priority), then those the document reconciles; each claim linked to
+    its card, why, what would reconcile it and where that was found. With how many aren't reconciled."""
+    from .tensions import LEVEL_SAID, LEVELS
+    found = [c for c in entries if c["kind"] == "tension" and all(x in card.evidence for x in c["claims"])]
+    if not found:
+        return '', 0
+    order = lambda c: (bool(c.get("reconciled") or c.get("reconciled_records")),  # noqa: E731
+                       LEVELS.index(c["relation"]) if c.get("relation") in LEVELS else len(LEVELS))
+    rows = []
+    for c in sorted(found, key=order):
+        reconciled = bool(c.get("reconciled") or c.get("reconciled_records"))
+        level = LEVEL_SAID.get(c.get("relation"), c.get("relation", "")) + (
+            " (low priority)" if c.get("relation") == "look" and not reconciled else "")
+        claims = "<br>".join(f'<a href="#claim={esc(x)}">{esc(card.at(x))}</a> <small>{esc(card.evidence[x]["entity"])}'
+                             f' — {esc(card.evidence[x]["attribute"])}</small>' for x in c["claims"])
+        text = " ".join([c.get("subject", ""), c.get("why", ""), *c.get("reconcile", []), level])
+        rows.append(f'<tr {searched(text, c["claims"])}><td>{esc(level)}</td><td>{esc(c.get("subject", ""))}</td>'
+                    f'<td>{claims}</td><td>{esc(c.get("why", ""))}</td>'
+                    f'<td>{esc("; ".join(c.get("reconcile", [])))}</td>'
+                    f'<td>{esc(reconciled_said(c, card.at))}</td></tr>')
+    open_ = sum(1 for c in found if not (c.get("reconciled") or c.get("reconciled_records")))
+    return ('<section data-for="suspects" class="index" hidden><p class="meta">Claims hard to hold together on '
+            'engineering grounds, as the model read each subject\'s claims (ours, not the document\'s): those '
+            'nothing in the document reconciles first, by level, then those it does. "Not found" is weak: not saying '
+            'isn\'t absence.</p><div class="wide"><table><thead><tr><th>Level</th><th>Item</th><th>Claims</th>'
+            '<th>Why</th><th>What would reconcile them</th><th>In the document</th></tr></thead><tbody>'
+            + ''.join(rows) + '</tbody></table></div></section>'), open_
 
 def inconsistencies_html(found, sources):
     """The Inconsistencies view (indexes.inconsistencies): two claims of one subject the second pass says contradict

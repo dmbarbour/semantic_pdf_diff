@@ -67,7 +67,8 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "confirm_kinds", "second_pass", "embed",
+    "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "confirm_kinds", "second_pass",
+    "tensions", "embed",
     "rerank"
   ],
   "table_rules": null,

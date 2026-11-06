@@ -209,6 +209,8 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `glossary` | `true` | selecting | glossary | compare | - |
 | `confirm_kinds` | `false` | selecting | confirm_kinds | compare | - |
 | `second_pass` | `true` | selecting | second_pass | compare | - |
+| `tensions` | `false` | selecting | tensions | compare | - |
+| `reviewer_concerns` | `[]` | shaping | tensions | compare | - |
 | `embed_model` | `null` | selecting | embed | compare | - |
 | `embed_url` | `null` | endpoint | embed | - | - |
 | `embed_key_env` | `null` | endpoint | embed | - | - |

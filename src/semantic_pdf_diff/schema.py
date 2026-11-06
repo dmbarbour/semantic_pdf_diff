@@ -540,6 +540,16 @@ class SecondPass(Lenient):
     inferences: list[Inference] = Field(default_factory=list, max_length=20)
     missing: list[LikelyMissing] = Field(default_factory=list, max_length=20)
 
+class Tension(Lenient):
+    claims: list[str] = Field(default_factory=list, max_length=10)  # their names in the dossier: C1, C2, ...
+    level: str = Field(default="", max_length=20)                    # look, reason or conflict (tensions.LEVELS)
+    why: str = Field(default="", max_length=400)
+    reconcile: list[Annotated[str, Field(max_length=80)]] = Field(default_factory=list, max_length=8)
+
+class Tensions(Lenient):
+    """One subject's claims read for those hard to hold together on engineering grounds (tensions.py)."""
+    tensions: list[Tension] = Field(default_factory=list, max_length=20)
+
 class Reread(Lenient):
     """A claim suspected misread, read again from its place rendered closer (dossiers.rereads)."""
     reads: str = Field(default="", max_length=20)   # as_claimed, otherwise or not_shown (dossiers.READS)

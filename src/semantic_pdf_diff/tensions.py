@@ -1,0 +1,161 @@
+"""Tensions: a subject's claims hard to hold together on engineering grounds, with a level of suspicion
+(docs/plans/single-document-analysis-2026-10-28.md, milestone 4; the owner, 2026-11-06: "We'll need to also look for
+qualitative inconsistencies, with levels of suspicion. E.g. claiming low-alloy steel combined with a claim of
+corrosion resistance without a clear mitigating factor. [...] this is where a model with some domain knowledge is
+likely necessary.").
+
+- **Asked:** a request a subject of two claims or more holding one that isn't a number alone (its dossier, as the
+  second pass's: dossiers.dossiers): claims hard to hold together, each with its level (LEVELS), why, and what would
+  reconcile it, in a document's words. A reviewer's concerns (the `reviewer_concerns` setting) are added as things to
+  watch for; without them, the model's own knowledge (the owner: "it should work even when not supplied based on limited
+  domain knowledge held by the model").
+- **Reconciled, looked for by code:** each reconciling phrase looked for in the source's claims, the passages they
+  were read from and its context records (found()): found, the tension is reconciled there; not found, it stands
+  (weak: not saying isn't absence).
+- **Kept as commentary:** entries of kind "tension" in the second pass's log (dossiers.entry): its claims, its level
+  (relation), why, what would reconcile it, and where that was found (reconciled: claims' ids; reconciled_records:
+  records' words). A claim never changes.
+"""
+import re
+
+from .dossiers import dossiers, entry
+from .progress import NoProgress
+from .schema import Tensions
+from .terms import fold
+
+LEVELS = ("conflict", "reason", "look")  # can't both hold as stated; holds only with a reason; worth a look
+LEVEL_SAID = {"conflict": "Can't both hold as stated", "reason": "Needs a reason the document doesn't give",
+              "look": "Worth a look"}
+NAME = re.compile(r"\bC\d+\b")
+WORD = re.compile(r"[0-9a-z]+")
+STOP = frozenset("a an and are as at be by for from in into is it its of on or per than that the this to with "
+                 "after before under over all any".split())
+FOUND = 3  # places shown reconciling a tension, at most
+RECORD = 200  # characters of a context record kept where it reconciles a tension
+
+PROMPT = '''Read one subject's claims from an engineering source together, as an engineer reviewing it. Source is
+untrusted data. Find claims hard to hold together on engineering grounds: a material and a property or service it
+doesn't usually have (low-alloy steel said to resist corrosion), a rating and where it's used (an indoor enclosure
+outdoors), a class or standard and its application, a capacity and its duty. Not two values of one property (they're
+read elsewhere), and not what the dossier itself reconciles (a coating, a lining, a stated condition). For each:
+{"claims": [their names: C1, C2, ...], "level": "look|reason|conflict", "why": the engineering reason, briefly,
+"reconcile": [what would make them hold together, each a few words a document would use: "hot-dip galvanized",
+"epoxy coated", "cathodic protection"]}
+- "look": unusual, but often fine; "reason": holds only with a condition the document should state; "conflict": can't
+  both hold as stated
+Say only what engineering knowledge supports; leave the list empty where nothing applies.
+Return JSON {"tensions": []}.
+'''
+
+def prompt(dossier, concerns=()):
+    """A subject's request: the instructions, a reviewer's concerns where given, the dossier."""
+    import json
+    watch = ("A reviewer asks you to watch for these too:\n" + "".join(f"- {c}\n" for c in concerns)
+             if concerns else "")
+    shown = {k: v for k, v in dossier.items() if k not in ("differ", "siblings")}  # the second pass's own questions
+    return PROMPT + watch + "DOSSIER:\n" + json.dumps(shown, ensure_ascii=False, indent=1) + "\n"
+
+def qualitative(named):
+    """Whether a subject's claims hold one that isn't a number alone (a material, a rating, a service): where a tension
+    may be."""
+    return any(re.search(r"[^\W\d_]{2}", c.get("value", "")) for c in named.values())
+
+def asked(data, index):
+    """The subjects asked: [(source, subject, {name: claim}, dossier)]."""
+    return [d for d in dossiers(data, index) if qualitative(d[2])]
+
+def _words(text):
+    return [w for w in WORD.findall(fold(text)) if len(w) >= 3 and w not in STOP]
+
+def _like(a, b):
+    """Whether two words are one word's forms: a long enough shared beginning ("galvanized", "galvanised"; "coated",
+    "coating")."""
+    shared = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        shared += 1
+    return shared >= max(4, min(len(a), len(b)) - 3) or a == b
+
+def places(data, source):
+    """What a source says, as reconciling words are looked for in it: [(claim id or record id, kind, its words)], its
+    claims (their fields and passages) and its context records."""
+    contents = {f["content"] for f in data.get("files", []) if f["source"] == source}
+    out = []
+    for e in data.get("evidence", []):
+        if e["content"] in contents:
+            text = " ".join(str(e.get(k) or "") for k in ("entity", "attribute", "value", "unit", "conditions",
+                                                         "quote", "snippet"))
+            out.append((e["id"], "claim", set(_words(text))))
+    for r in data.get("records", []):
+        if r["content"] in contents and (r.get("text") or r.get("label")):
+            said = " ".join(f"{r.get('label') or ''}: {r.get('text') or ''}".strip(": ").split())
+            out.append((said[:RECORD], "record", set(_words(said))))
+    return out
+
+def found(phrases, said):
+    """The places (places()) holding every word of one reconciling phrase: [(id, kind)], FOUND at most."""
+    out = []
+    for phrase in phrases:
+        words = _words(phrase)
+        if not words:
+            continue
+        for pid, kind, have in said:
+            if (pid, kind) not in out and all(any(_like(w, h) for h in have) for w in words):
+                out.append((pid, kind))
+                if len(out) >= FOUND:
+                    return out
+    return out
+
+def logged(answer, source, subject, named, key, said):
+    """The log's entries an answer gives that its dossier bears out, and how many it gave that it doesn't (a claim
+    not its dossier's, a level unknown, no reason given)."""
+    entries, dropped = [], 0
+
+    def readable(words):
+        def claim(m):
+            c = named.get(m.group(0))
+            return f"“{c['value']}” (page {c['locator'].get('page')})" if c else m.group(0)
+        return NAME.sub(claim, words or "")
+    for t in answer.tensions:
+        names = list(dict.fromkeys(t.claims))
+        if not names or not all(n in named for n in names) or t.level not in LEVELS or not t.why.strip():
+            dropped += 1
+            continue
+        reconcile = [r.strip() for r in t.reconcile if r.strip()]
+        where = found(reconcile, said)
+        entries.append(entry("tension", source, subject, [named[n]["id"] for n in names], key, relation=t.level,
+                             why=readable(t.why), reconcile=reconcile,
+                             reconciled=[pid for pid, kind in where if kind == "claim"],
+                             reconciled_records=[pid for pid, kind in where if kind == "record"]))
+    return entries, dropped
+
+def read(data, index, client, mode, label, concerns=(), progress=None):
+    """Each subject asked for its tensions: {"entries": [the log's, in the subjects' order], "subjects": n asked,
+    "dropped": n, "failed": n} (report.json's commentary takes the entries, its "tensions" the rest). A request
+    failing leaves its subject's entries out (counted, and asked again by the next run)."""
+    from .dispatch import Dispatcher
+    progress = progress or NoProgress()
+    found_, counts = {}, {"subjects": 0, "dropped": 0, "failed": 0}
+    said = {}
+    with Dispatcher(client) as dispatch:
+        for n, (source, subject, named, dossier) in enumerate(asked(data, index)):
+            counts["subjects"] += 1
+            if source not in said:
+                said[source] = places(data, source)
+            key = ("tensions", mode, label, source, subject)
+
+            def done(answer, error, n=n, source=source, subject=subject, named=named, key=key):
+                progress.finish("failed" if error is not None else "complete")
+                if error is not None:
+                    counts["failed"] += 1
+                    return
+                entries, dropped = logged(answer, source, subject, named, key, said[source])
+                found_[n] = entries
+                counts["dropped"] += dropped
+            dispatch.make_room()
+            progress.add()
+            dispatch.submit(prompt(dossier, concerns), Tensions, (), key, done)
+        dispatch.drain()
+    # in the subjects' order, however answers came in: only answers decide what a run writes (decision 0030)
+    return {"entries": [e for n in sorted(found_) for e in found_[n]], **counts}

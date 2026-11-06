@@ -1443,6 +1443,20 @@ class ReadTogether(Lever):
     def reads_together(self, mode):
         return self.second_pass and mode == "analysis"
 
+class FindTensions(Lever):
+    lever_name, stage, off = "tensions", "comparison", {"tensions": False, "reviewer_concerns": []}
+    # analyses: each subject's claims read for those hard to hold together on engineering grounds (a material and a
+    # property it doesn't usually have), each with a level of suspicion and what would reconcile it, looked for in
+    # the source by code (tensions.py; docs/plans/single-document-analysis-2026-10-28.md, milestone 4; the owner,
+    # 2026-11-06: "We'll need to also look for qualitative inconsistencies, with levels of suspicion.");
+    # reviewer_concerns: a reviewer's, things to watch for besides what the model knows ("it should work even when not
+    # supplied")
+    tensions: Annotated[bool, _selecting(roles=COMPARE)] = False
+    reviewer_concerns: Annotated[list[str], _shaping(roles=COMPARE)] = Field(default_factory=list)
+
+    def finds_tensions(self, mode):
+        return self.tensions and mode == "analysis"
+
 class ConfirmKinds(Lever):
     lever_name, stage, off = "confirm_kinds", "comparison", {"confirm_kinds": False}
     # analyses: the kinds the rules found (indexes.kinds) shown to the model, one request a source, which names each
@@ -1482,8 +1496,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds, ReadTogether, Embed,
-                 Rerank)
+                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds, ReadTogether,
+                 FindTensions, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1707,6 +1721,12 @@ class Platform(Composable):
     def reads_together(self, mode):
         """Whether a report's subjects are read together, after its claims (dossiers.py): the platform's, never; the
         second_pass lever's, in analyses when on."""
+        return False
+
+    @chosen
+    def finds_tensions(self, mode):
+        """Whether a report's subjects are read for claims hard to hold together (tensions.py): the platform's, never;
+        the tensions lever's, in analyses when on."""
         return False
 
     @chosen
