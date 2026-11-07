@@ -89,6 +89,25 @@ class Shown(unittest.TestCase):
                       'the claims it cites: states 1750, which the claims it cites don&#x27;t give)</small>', shown)
         self.assertEqual(summaries_html({}, Cards(d), str), ('', 0))
 
+class Exported(unittest.TestCase):
+    def test_a_summary_a_chunk_labelled_with_its_model_and_the_claims_it_cites(self):
+        # the owner, 2026-11-06, of summaries in the export: "Yes, with provenance."
+        from semantic_pdf_diff import export
+        d = data(headed=True)
+        d["settings"] = {"model": "gemma-4"}
+        d["summaries"] = {"sections": [{"key": ["ca", "s1", None], "title": "4 Pumps", "sentences": [
+            {"text": "P-101 is rated 75 kW at 42 m.", "claims": ["A-1", "A-2"], "check": ""},
+            {"text": "It runs at 1,750 rpm.", "claims": ["A-1"],
+             "check": "states 1750, which the claims it cites don't give"}]}]}
+        files = {f["content"]: f for f in d["files"]}
+        (title, text), = export.summary_chunks(d, files)
+        self.assertEqual(title, "Summary: 4 Pumps")
+        self.assertIn('kind: "summary, written by the model"\nmodel: "gemma-4"\nfiles: ["a.pdf"]', text)
+        self.assertIn("P-101 is rated 75 kW at 42 m. [1, 2] It runs at 1,750 rpm. [1] (not borne out by the claims it "
+                      "cites: states 1750, which the claims it cites don't give)", text)
+        self.assertIn("[1] P-101 pump rated power: 75 kW [a.pdf, page 2]", text)
+        self.assertEqual(export.runs([1, 2, 3, 4, 7, 9, 10]), "[1–4, 7, 9, 10]")
+
 class Analyzed(unittest.TestCase):
     def test_an_analysis_writes_the_summaries_it_is_asked_for(self):
         state = {"embedded": [], "names": 0}

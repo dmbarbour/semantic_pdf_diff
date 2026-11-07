@@ -1,6 +1,6 @@
 # Single-source outputs: consistency check, RAG export, overviews
 
-- **Status:** Active (export per section, per topic and per finding built 2026-10-31; a JSON file and deltas 2026-11-02); cited summaries (milestone 4) designed 2026-11-06, to be built after the run-quality report and the cut-text work (the owner: "Let's get a design sketched out, but we should finish the quality reports and cut-text work, too."). Since 2026-10-28, `check` (feature 1, milestone 1) and the fact sheet (feature 3, milestone 3) are [single-document analysis](single-document-analysis-2026-10-28.md)'s: inconsistencies found within a subject's claims, confirmed by a second pass, and a one-source report with a Subjects view. They're kept below as written.
+- **Status:** Active (export per section, per topic and per finding built 2026-10-31; a JSON file and deltas 2026-11-02); cited summaries (milestone 4) designed 2026-11-06, built 2026-11-07 (`summaries`, off): in a Summaries view and the export. Since 2026-10-28, `check` (feature 1, milestone 1) and the fact sheet (feature 3, milestone 3) are [single-document analysis](single-document-analysis-2026-10-28.md)'s: inconsistencies found within a subject's claims, confirmed by a second pass, and a one-source report with a Subjects view. They're kept below as written.
 - **Since written (reviewed 2026-10-21):** the portable report's Claims view, topics and search (`search`, the command too) make a claims browser without the model, but only of a two-source comparison; the owner, 2026-10-20: "As a user of the report, it would be convenient to have an easily searchable database of claims even without the comparisons". Milestone 3 would be that report for one source. `export` is taken (`source export`, `config export`), so the RAG export needs another name. Comparing a source with itself compares nothing (shared evidence is never compared with itself), so `check` needs its own pass. Situating's "about" statements exist for PDFs only.
 - **Depends on:** the evidence store (built: [0002](../decisions/0002-evidence-attaches-to-content.md), [0003](../decisions/0003-sqlite-evidence-store.md)); uses section "about" statements from [scheduling-and-triage](scheduling-and-triage-2026-09-23.md) for per-section export chunks and fact-sheet context
 
@@ -127,6 +127,12 @@ The design:
 - **A setting, `summaries`** (off while it's built and judged by eye on scical's 9 sheets and TS 38.300 v19.3.0's clauses 1 to 8): which kinds are asked.
 - **Fresh from the store:** asked through the answers cache, so a report written again asks nothing new; a summary is an output, never a claim, and changes no claim.
 - **Cost, estimated:** for some 1,400 claims (TS 38.300's clauses 1 to 8), a section's request about 2,500 tokens in and 300 out, some 100 of them: about $0.05 at DeepInfra, a few minutes at concurrency 32; subjects' and topics' about as much again.
+- **Built 2026-11-07** (`summaries.py`; `summaries: [sections, files, source, subjects, topics]`, none by default), as designed but where the claims showed otherwise:
+  - **A drawing set's sections:** its one headless section across its pages (scical: 1,199 claims) summarized page by page, a sheet each.
+  - **A tag's numbers:** "P-101" holds a number; the check takes the cited claims' items and properties too, not only their values.
+  - **Citations written into a sentence** ("... (C1, C3)") are taken as cited, and left out of its text and its check.
+  - **The export** (`export`): a chunk a summary, "written by the model" in its front matter with the model and its files, its sentences marked with the claims they cite ("[1–4, 7]"), one not borne out said so, then those claims with where each is read; a long list in parts.
+- **Measured by eye** ($0.08): scical's 9 sheets (9 sheets', 1 file's, 218 subjects', 15 topics': 469 sentences) and the IEA report with a DC drawing set (6 sections', 2 files', the source's, 62 subjects', 15 topics': 225 sentences). Every sentence cites its claims and none states a number they don't give. Read against their claims, a sample said what its claims say: a sheet's footing ("a 1'-0" width, a 4 1/4" base segment"), the airfoils' relative thickness and lift, the beam openings' sections. The source's summary of two unrelated documents covers both, as its files are. A sentence about a whole may cite many claims (43 for the folder's first).
 
 ## Milestones
 
@@ -150,7 +156,7 @@ The design:
      - **`--since FOLDER`:** a delta against an earlier export's folder, written to the store's `export-delta/` unless `--out` says: the chunks the earlier doesn't hold (named by their text, so a chunk unchanged is in neither), and in index.md (and `chunks.json`'s `gone`) the names of its chunks this one doesn't, to remove from a corpus holding it. The earlier's chunks are those its index.md lists and its files; the folder written into can't be it.
    - **Not yet:** `.docx` chunks.
 3. HTML fact sheet (moved 2026-10-28 to single-document analysis, milestones 1 and 2; its milestone 2 since 2026-10-29 [indexes and glossaries](indexes-and-glossaries-2026-10-29.md)').
-4. Cited summaries with citation verification: designed 2026-11-06 (*Cited summaries*, above), after the run-quality report and the cut-text work.
+4. Cited summaries with citation verification: designed 2026-11-06, built 2026-11-07 (*Cited summaries*, above), off.
 
 ## Decisions (2026-09-23)
 

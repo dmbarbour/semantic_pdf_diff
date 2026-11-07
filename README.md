@@ -48,6 +48,10 @@ Open `result/report.html`: it's one file, which can be moved or sent on its own.
 
 **How well each page was read**, in the report's Reading view: what the run recorded of its own reading, counted by file and page, each kind apart and with what it's counted of: requests that failed, weren't sent or came back incomplete; claims dropped because their quote isn't in their text; a picture's claims whose quote isn't in the text layer; image tiles that said their text was cut; tables read without their rules; claims the second pass doubted or read again otherwise. No score is made of them: they say where to look first. Each page's claims are a link away, and a run ends with one line of the totals.
 
+**Summaries, each sentence citing its claims** (`summaries`, off; analyses): a section's (a drawing set's sheets, page by page), a file's, a folder's, a subject's or a topic's, written by the model from the claims alone, each sentence citing the claims it rests on and checked against them by code: one stating a number its claims don't give is marked, never corrected. In a Summaries view, each citation a link to its claim, and in `export`, labelled as written by the model.
+
+**Tensions** (`tensions`, off; analyses): a subject's claims hard to hold together on engineering grounds (low-alloy steel said to resist corrosion), at a level of suspicion (can't both hold, needs a reason, worth a look), with what would reconcile them looked for in the document: in a Suspects view, those not reconciled first. `reviewer_concerns` adds a reviewer's own things to watch for.
+
 **One source on its own**, a file or a folder or zip of documents, is read and reported without comparing: `semantic-pdf-diff analyze spec/ --store spec` writes `spec/report.html`, every claim with where it was read, by topic and file, searched as a comparison's report is (its other names and vectors too). It takes `compare`'s options but those of comparing, and the same store, settings and answers cache: a source analyzed and then compared isn't asked of the model twice.
 
 Either source can also be a folder or a zip archive. For revisions, supply the old version first:

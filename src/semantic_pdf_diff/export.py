@@ -326,6 +326,49 @@ def topic_chunks(data, files, size=CHUNK):
                           topic=name)
     return out
 
+def runs(numbers):
+    """Numbers as a citation: "[1–3, 7]"."""
+    out, ns = [], sorted(set(numbers))
+    for n in ns:
+        if out and n == out[-1][1] + 1:
+            out[-1][1] = n
+        else:
+            out.append([n, n])
+    return "[" + ", ".join(str(a) if a == b else f"{a}, {b}" if b == a + 1 else f"{a}–{b}" for a, b in out) + "]"
+
+SUMMARY_KINDS = (("source", "the source"), ("files", "a file"), ("sections", "a part"), ("subjects", "an item"),
+                 ("topics", "a topic"))
+
+def summary_chunks(data, files, size=CHUNK):
+    """[(title, text)]: a chunk a summary the report holds (summaries.py; the owner, 2026-11-06, of the export: "Yes,
+    with provenance."): labelled as written by the model (which one, from which claims), its sentences each marked
+    with the claims it cites ([1], [2]), one its claims don't bear out said so, then those claims with where each is
+    read; a long list of them in parts, each led alike."""
+    found = data.get("summaries") or {}
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+    model = str((data.get("settings") or {}).get("model") or "")
+    out = []
+    for kind, what in SUMMARY_KINDS:
+        for summary in found.get(kind, []):
+            cited = list(dict.fromkeys(x for s in summary["sentences"] for x in s["claims"] if x in evidence))
+            if not cited:
+                continue
+            number = {x: n for n, x in enumerate(cited, 1)}
+            said = " ".join(s["text"] + (f" {runs(number[x] for x in s['claims'] if x in number)}"
+                                         if any(x in number for x in s["claims"]) else "")
+                            + (f" (not borne out by the claims it cites: {s['check']})" if s.get("check") else "")
+                            for s in summary["sentences"])
+            refs = [f"[{number[x]}] {evidence[x]['entity']} " + claim_line(evidence[x], place(evidence[x], files))[2:]
+                    for x in cited]
+            lead = (f"A summary of {what}, written by the model{f' ({model})' if model else ''} from the claims below "
+                    "alone (ours, not the document's): each sentence cites the claims it rests on, and is checked "
+                    "against them by code.")
+            paths = list(dict.fromkeys(files[evidence[x]["content"]]["path"] for x in cited
+                                       if evidence[x]["content"] in files))
+            out += titled(f"Summary: {summary['title']}", lead, cut([said + "\n\nClaims cited:\n"] + refs, size),
+                          kind="summary, written by the model", model=model, files=paths)
+    return out
+
 def subject_chunks(data, index, files, size=CHUNK, notes=None):
     """[(title, text, subject's name)]: a chunk a subject of two claims or more (the index's subjects, its names
     joined), or a part of one: its claims by property from every file and section, each saying where it's read
@@ -523,7 +566,8 @@ def exported(data, index, version="", size=CHUNK):
         mine[subject].append(name)
     for subject, names in mine.items():
         located[subject] = names + [n for n in located[subject] if n not in names]
-    for title, text in (topic_chunks(data, files_of, size) + found + kind_chunks(index, size)
+    for title, text in (summary_chunks(data, files_of, size) + topic_chunks(data, files_of, size) + found
+                        + kind_chunks(index, size)
                         + table_chunks(data, files_of, size) + discovery_chunks(index, located, size)):
         name = name_of(text)
         files[name] = text
