@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.42.0 (2026-11-07)
+
+- **Summaries of sections, files and the source by default in analyses** (the owner: "Go ahead and turn on summaries."): each sentence citing the claims it rests on and checked against them, in the Summaries view and the export. Subjects' and topics', a request an item or topic, are asked for with `summaries`; `summaries: []` writes none. A store analyzed before writes them on its next run, its claims from the store.
+
 ## 0.41.0 (2026-11-07)
 
 - **Summaries, each sentence citing its claims, as a setting** (`summaries`, none by default; analyses; the owner: "This seems like a good design for milestone 4."). The kinds named are written by the model from the claims alone: a section's (a drawing set's sheets, page by page), a file's from its sections', a folder's from its files', a subject's, a topic's. Each sentence cites the claims it rests on and is checked by code: it cites claims it was given, and states no number they don't give; one failing is kept and marked. In a Summaries view, each citation a link to its claim, and in `export` as chunks labelled as written by the model, with the claims they cite. On two real analyses, 694 sentences, every one citing its claims, none stating a number they don't give.
