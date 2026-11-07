@@ -268,6 +268,15 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         batch += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}",
                    pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "revisions") for p in listed
                   if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
+    # each proposal pair in proposals mode (proposals.py; docs/plans/tentative-matches-2026-11-07.md, milestone 5)
+    from semantic_pdf_diff_lab.bench.controlled import proposals
+    batch += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
+               "proposals") for p in proposals.pairs()]
+    for suffix, folder in REPRESENTATIONS.items():
+        batch += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}",
+                   pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "proposals")
+                  for p in proposals.pairs()
+                  if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
     batch = [job for job in batch if job[4] != "revisions" or not same_document(job[0], job[1])]
     if only:
         batch = [job for job in batch if any(fnmatch.fnmatch(job[0].name, pattern) for pattern in only)]
@@ -284,8 +293,10 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
     _BATCH.update(replay=replay, responder=responder, fixture=fixture, export=export, config=config or settings_file(),
                   overrides=overrides, max_cost=max_cost, before=before)
     worst, capped = 0, 0
-    for mode in ("proposals", "revisions"):
-        for name, code in _each([job for job in batch if job[4] == mode], jobs):
+    alone = lambda job: job[0] == job[1]  # noqa: E731 (a document read alone)
+    for phase in (alone, lambda job: job[4] == "revisions",  # the documents first, then the pairs
+                  lambda job: job[4] == "proposals" and not alone(job)):
+        for name, code in _each([job for job in batch if phase(job)], jobs):
             if code == CAPPED:
                 capped += 1
                 continue
@@ -529,6 +540,10 @@ def score():
         print(f"\n{which} revision pairs: pair                         changes  added  removed  unchanged  false  "
               "precision  findings")
         for pair, r in pairs.items():
+            if "difference_precision" not in r:  # a proposal pair (proposals.py): by role
+                print(f"  {pair:30s} proposals: matching {r.get('matching')}; gaps {r.get('gaps_found')} "
+                      f"{r.get('gaps')}; findings {r['findings']}")
+                continue
             precision = "-" if r["difference_precision"] is None else f"{r['difference_precision']:.2f}"
             print(f"  {pair:30s} {r['changes_found']:>7s} {r['additions_found']:>6s} {r['removals_found']:>8s} "
                   f"{r['unchanged_confirmed']:>10s} {r['false_changes']:6d} {precision:>10s}  {r['findings']}")
@@ -562,7 +577,7 @@ def same_document(earlier, later):
 def compare_pairs():
     """comparisons.json: each revision pair's comparison scored against the two revisions' keys (PDF, and Markdown as
     "<id>.md")."""
-    from semantic_pdf_diff_lab.bench.controlled import comparison, revisions, word
+    from semantic_pdf_diff_lab.bench.controlled import comparison, proposals, revisions, word
     compared = {}
     for which in ("recorded", "replay", "recorded-unaligned", "replay-unaligned", "recorded-rows", "replay-rows"):
         for pair in revisions.pairs() + word.pairs():
@@ -574,6 +589,14 @@ def compare_pairs():
                     keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8"))
                             for d in (pair.earlier, pair.later)]
                     compared.setdefault(which, {})[pair.id + suffix] = comparison.score_comparison(
+                        *keys, json.loads(report.read_text(encoding="utf-8")))
+        for pair in proposals.pairs():  # by role, in proposals mode (proposals.py)
+            for suffix in ("", *REPRESENTATIONS):
+                report = PAIR_RUNS / which / f"{pair.id}{suffix}" / "report.json"
+                if report.exists():
+                    keys = [json.loads(key_path(d + suffix).read_text(encoding="utf-8"))
+                            for d in (pair.earlier, pair.later)]
+                    compared.setdefault(which, {})[pair.id + suffix] = comparison.score_proposals(
                         *keys, json.loads(report.read_text(encoding="utf-8")))
     (FOLDER / "comparisons.json").write_text(json.dumps(compared, indent=1) + "\n", encoding="utf-8")
     return compared

@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): [milestone 1](#1-a-scorer-for-matching) built 2026-11-07. [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching) and [5](#5-a-controlled-proposals-pair) built 2026-11-07 (5 first, so milestone 2 is scored on proposals). [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -87,6 +87,10 @@ The owner: "let's just adapt the normal levers approaches perhaps". Each test a 
 - Two seeds of one domain template: identity is the template's role (each design's tower), values differ, some roles absent or renamed, one decoy role (Fable). Scored by role: the evidence proposals' weights are fitted from, which revisions' pairs can't give.
 - With today's revision knobs: `renamed` (P-101B now P-201B: names fail, values carry the match: plausible's natural test) and `wtp-s1-gaps` (facts filed under other subjects: links within a source).
 - Free to generate, pennies to read.
+- **Built 2026-11-07** (`proposals.py`; `comparison.score_proposals`; recorded $0.14 with the row-by-row runs): Harrow Creek's design basis (`wtp-s1`) against Pine Ridge's (`wtp-s1-proposal`): the template drawn from the next seed (its values its own), its items named its own way (the flash mixer, the clarifiers, intake pumps IP-1 to IP-3, ferric sulfate's feed, a chlorine contact tank), the filters, flocculation and chlorine named alike, the UV option gone, a backwash pump (a decoy), the clarifiers' loading rate not given and the flash mixer's volume given (2 gaps). Compared in proposals mode, every format. A fact's role is its id; a fact only one design gives takes the other's name for its item from their facts in common (`comparison._items`).
+  - **Matching by role:** 12 of 12 right in the PDF (9 of 9 in Word, 12 of 12 elsewhere), none wrong; of the 10 roles both give, 9 matched (Word 5 of 9). The model's other names (`search_names`, on by default) matched the renamed ones (IP-1 and P-101A, the flash mixer and the rapid mix basin, the clarifiers and the sedimentation basins, the contact tank and Option B).
+  - **Left apart:** alum and ferric sulfate (each design's coagulant: its doses in common, no word), the two plants (their names share "water treatment plant"), and the decoy. The links of milestone 2 are scored on these.
+  - **Gaps another source fills:** 2 of 2 in every format.
 
 ### 6. Levels from numbers
 

@@ -6,7 +6,7 @@ from .corpus import CHART_KNOBS, CHART_PROJECTS, PROJECTS, PROSE_KNOBS, PROSE_PR
 def corpus(seeds=(1,), knobs=False, revisions=False):
     """The clean corpus; with knobs, also each table project under every table knob, and each prose project under
     every prose knob (ids "<project>-<knob>"); with revisions, also each revision pair's generated side
-    (revisions.py: the other side is a corpus document)."""
+    (revisions.py: the other side is a corpus document), and each proposal pair's other design (proposals.py)."""
     out = [make(seed) for make in PROJECTS.values() for seed in seeds]
     if knobs:
         from .procedures import PROCEDURE_KNOBS, PROCEDURE_PROJECTS
@@ -23,6 +23,8 @@ def corpus(seeds=(1,), knobs=False, revisions=False):
                         p.id, p.knob = f"{p.id}-{knob}", knob
                         out.append(p)
     if revisions:
+        from .proposals import proposed
         from .revisions import revised
         out += [project for seed in seeds for _, project in revised(seed)]
+        out += [project for seed in seeds for _, project in proposed(seed)]
     return out

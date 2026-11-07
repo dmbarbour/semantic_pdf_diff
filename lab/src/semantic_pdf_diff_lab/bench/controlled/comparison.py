@@ -156,6 +156,31 @@ def score_comparison(earlier, later, report):
             **_matching(report, side, keys, renames, bound),
             "detail": dict(sorted(detail.items()))}
 
+def _items(facts):
+    """A fact's item as the earlier names it (fact ids: the two sides' facts, the later's renamed to the earlier's
+    ids): a fact of both sides by the earlier's name; one of the later alone by the earlier's name for its item, where
+    their facts in common say it (another design's "Flash mixer" is "Rapid mix basin"), else its own."""
+    fold = lambda name: " ".join(name.casefold().split())  # noqa: E731
+    named = {}
+    for fid, f in facts[1].items():
+        if fid in facts[0]:
+            named.setdefault(fold(f["entity"]), fold(facts[0][fid]["entity"]))
+    return lambda fid: (fold(facts[0][fid]["entity"]) if fid in facts[0]
+                        else named.get(fold(facts[1][fid]["entity"]), fold(facts[1][fid]["entity"])))
+
+def score_proposals(a, b, report):
+    """A proposals comparison scored by role (proposals.py; docs/plans/tentative-matches-2026-11-07.md, milestone 5):
+    the index's matches and the gaps another source fills, a fact's role its id (the two designs' facts of one role
+    share it, as a renamed revision's are mapped to the earlier's), the findings' relations counted."""
+    side, keys = sides(report), (a, b)
+    bound = _bound(report, side, keys, {})
+    kinds = changes(a, b)
+    return {"facts": {k: len(v) for k, v in kinds.items()},
+            **_matching(report, side, keys, {}, bound),
+            **_gaps(report, side, keys, {}, kinds, bound),
+            "findings": dict(sorted(Counter(f["relation"] for f in report["findings"]).items())),
+            "unmatched": len(report["unmatched"])}
+
 def _matching(report, side, keys, renames, bound):
     """The index's subjects matched across the revisions, scored by the keys' items (see the module's note):
     {"matching": {"groups", "right", "wrong", "unscorable", "items", "matched"}}, or nothing without an index."""
@@ -165,7 +190,7 @@ def _matching(report, side, keys, renames, bound):
         return {}
     facts = [{(renames.get(f["id"], f["id"]) if k else f["id"]): f for f in key["facts"]
               if f["role"] == "fact" and not f.get("relation")} for k, key in enumerate(keys)]
-    item = lambda fid: " ".join((facts[0].get(fid) or facts[1].get(fid))["entity"].casefold().split())  # noqa: E731
+    item = _items(facts)
     items = [Counter(), Counter()]  # each side's bound claims by item
     for claim, fids in bound.items():
         for fid in fids:
@@ -200,10 +225,10 @@ def _gaps(report, side, keys, renames, kinds, bound):
     from semantic_pdf_diff import indexes
     facts = [{(renames.get(f["id"], f["id"]) if k else f["id"]): f for f in key["facts"]
               if f["role"] == "fact" and not f.get("relation")} for k, key in enumerate(keys)]
-    item = lambda f: " ".join(f["entity"].casefold().split())  # noqa: E731
-    items = [Counter(item(f) for f in fs.values()) for fs in facts]
-    planted = {fid: lacking for kind, given, lacking in (("added", 1, 0), ("removed", 0, 1)) for fid in kinds[kind]
-               if items[lacking][item(facts[given][fid])] >= indexes.OTHER_CLAIMS}
+    item = _items(facts)
+    items = [Counter(item(fid) for fid in fs) for fs in facts]
+    planted = {fid: lacking for kind, lacking in (("added", 0), ("removed", 1)) for fid in kinds[kind]
+               if items[lacking][item(fid)] >= indexes.OTHER_CLAIMS}
     found = [g for g in (report.get("index") or {}).get("gaps", []) if g["kind"] == "other_source"]
     if not planted and not found:
         return {}
