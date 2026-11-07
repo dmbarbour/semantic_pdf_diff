@@ -237,6 +237,21 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
 
 - **The judge** (and alignment's near-ties) shown each claim's subject context from the second pass.
 - **A lever**, measured on the controlled pairs and the real ones (RAN1, TS 38.300, QUIC).
+- **Built 2026-11-07, `judge_notes`, off** (the owner, 2026-11-07: "Proceed with the recommended path."): a comparison reads each source's subjects together before judging (the second pass, over the sources' claims as a report holds them), and each claim judged is shown what that noted of it as a "noted" field, in the export's words (context its passage lacks, its relations to its subject's other claims, doubts), the prompt saying they're ours. Its log is the comparison report's commentary: its cards show the notes, its index the inconsistencies, as an analysis's do.
+- **Measured on the controlled revision pairs** (the 26 PDF pairs, 1,500 findings; $0.59): today's arm (the standard recordings), `judge_notes`, and a null arm (the same requests, the "noted" field empty: a scratch patch in a frozen worktree).
+
+  | Arm | Changes found | Unchanged confirmed | Kinds named right | False changes |
+  |---|---|---|---|---|
+  | Today | 39/39 | 1,005/1,023 | 55/64 | 0 |
+  | Null | 38/39 | 1,005/1,023 | 55/64 | 0 |
+  | `judge_notes` | 38/39 | 1,008/1,023 | 51/60 | 0 |
+
+  - The notes reached 848 of the 1,500 findings (a claim of 1,423 of 2,968 noted: context added 802 times, restatements 391, differs by condition 83, contradictions 46).
+  - **Where they moved a verdict:** the units-note pair's 5 restated values, today uncertain and explained "restated", judged equivalent (the values the same; so 4 fewer kinds scored); 3 more unchanged values confirmed; one change missed (coaster's), as the null arm missed another.
+  - **So:** on clean revision pairs, where a value matches or changes plainly, the notes change little. The comparisons the owner found lacking context are proposals: measured next on one.
+- **A proposals pair, by eye** (the development slices' reference turbines, NREL 5 MW's pages 25 to 36 and IEA 15 MW's 20 to 31; 1,000 pairs judged; $0.41): 309 entries in the log; 27 verdicts changed, most more decisive and right (pitch angles at different wind speeds, a generator's speed and a rotor's, uncertain → unrelated: 17), a few the other way (unrelated → uncertain, "matching conditions were not established": 5); the judge's reasons seldom cite the notes. Uncertain 100 → 88.
+  - **The notes' own worth is on the report:** the second pass doubted the IEA turbine's "14 MW" generator power against its 15 MW (a misread), now on its card in a comparison too.
+- **Not made a default** (the owner's call): as a judge's input it changes little; the second pass in comparisons is worth more for its notes on the cards and its inconsistencies view than for the verdicts.
 
 ### 7. Subjects across documents, and their gaps
 
