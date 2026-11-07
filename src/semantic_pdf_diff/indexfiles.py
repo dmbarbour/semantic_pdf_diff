@@ -54,6 +54,8 @@ def markdown(index):
         if many:
             lines.append("Claims: " + "; ".join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
                          + (f" (matched by {s['matched_by']})" if s["matched_by"] else ""))
+            from .links import link_said  # subjects possibly one, kept apart (links.py)
+            lines += [link_said(x)[0].upper() + link_said(x)[1:] for x in s.get("links", [])]
         lines.append("")
         for p in s["properties"]:
             also = [n for n in p.get("names", []) if n.casefold() != p["name"].casefold()]

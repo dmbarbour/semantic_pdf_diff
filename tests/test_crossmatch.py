@@ -59,8 +59,8 @@ class Asked(unittest.TestCase):
                                                         "why": "each proposal's turbine"},
                          "blade-pitch controller": {"match": "B7", "relation": "same"}})  # not one shown
         found = crossmatch.read(d, indexes.built(d), model, "proposals", "x")
-        self.assertEqual({k: found[k] for k in ("asked", "matched", "dropped", "failed")},
-                         {"asked": 2, "matched": 1, "dropped": 1, "failed": 0})
+        self.assertEqual({k: found[k] for k in ("asked", "matched", "taken", "dropped", "failed")},
+                         {"asked": 2, "matched": 1, "taken": 0, "dropped": 1, "failed": 0})
         (match,) = found["entries"]
         self.assertEqual((match["kind"], match["source"], match["subject"], match["other_source"], match["other"],
                           match["relation"], match["claims"]),
@@ -127,7 +127,7 @@ class Looked(unittest.TestCase):
         self.assertEqual(len(state["looked"]), 2)
         self.assertFalse(any("3 m" in p or "5 lps" in p for p in state["looked"]))  # not the other's value
         log = found["commentary"]
-        self.assertEqual(log["matched"], {"asked": 1, "matched": 1, "dropped": 0, "failed": 0})
+        self.assertEqual(log["matched"], {"asked": 1, "matched": 1, "taken": 0, "dropped": 0, "failed": 0})
         self.assertEqual(log["looked"], {"asked": 2, "failed": 0, "skipped": 0})
         self.assertIn("(matched by model: the corresponding element)", index)
         self.assertIn("### Another source gives it", index)

@@ -9,8 +9,9 @@ start."): what matching by code (indexes.matched: keyed alike, other names) leav
 - **Answered:** the candidate that is the same item, the corresponding element (each proposal's tower: the owner's
   "corresponding elements", 2026-10-28), or a state of it (as designed and as built; phase 1 and phase 2); or none;
   with why.
-- **Checked mechanically:** the candidate one of those shown, the relation one of RELATIONS; one counterpart each,
-  the first asked keeping it (dropped, counted).
+- **Checked mechanically:** the candidate one of those shown, the relation one of RELATIONS (else dropped, counted);
+  one counterpart each, the first asked keeping it: a later answer naming one taken is kept as "taken", evidence of a
+  link, never a match (tentative matches, milestone 2: a taken candidate is a many-to-one, not a miss).
 - **Kept as commentary:** an entry of kind "match" (its source and subject, the other's, the relation, why); the index
   joins the same item and the corresponding element (indexes.MATCHED), a state of it staying apart. A claim never
   changes.
@@ -98,12 +99,13 @@ def asked(data, index):
 
 def read(data, index, client, mode, label, progress=None):
     """Each subject asked its counterpart (asked): {"entries": [the log's "match" entries, in the asking order],
-    "asked": n, "matched": n, "dropped": n, "failed": n} (report.json's commentary takes the entries, its "matched"
+    "asked": n, "matched": n, "taken": n, "dropped": n, "failed": n} (report.json's commentary takes the entries, its
+    "matched"
     the rest). A request failing leaves its subject alone (counted, and asked again by the next run)."""
     from .dispatch import Dispatcher
     progress = progress or NoProgress()
     requests = asked(data, index)
-    answers, counts = {}, {"asked": len(requests), "matched": 0, "dropped": 0, "failed": 0}
+    answers, counts = {}, {"asked": len(requests), "matched": 0, "taken": 0, "dropped": 0, "failed": 0}
     bar = progress.bar("match", len(requests), "subjects") if requests else None
     with Dispatcher(client) as dispatch:
         for n, (source, subject, other, found, text) in enumerate(requests):
@@ -129,13 +131,13 @@ def read(data, index, client, mode, label, progress=None):
         if not pick:
             continue
         number = pick[1:] if pick[:1] in "Bb" else ""
-        if not number.isdigit() or not 1 <= int(number) <= len(found) or answer.relation not in RELATIONS \
-                or found[int(number) - 1]["name"] in taken:
+        if not number.isdigit() or not 1 <= int(number) <= len(found) or answer.relation not in RELATIONS:
             counts["dropped"] += 1
             continue
         chosen = found[int(number) - 1]["name"]
+        again = chosen in taken
         taken.add(chosen)
-        counts["matched"] += 1
+        counts["taken" if again else "matched"] += 1
         entries.append(entry("match", source, subject["name"], [], key, other_source=other, other=chosen,
-                             relation=answer.relation, why=answer.why.strip()))
+                             relation=answer.relation, why=answer.why.strip(), taken=again))
     return {"entries": entries, **counts}

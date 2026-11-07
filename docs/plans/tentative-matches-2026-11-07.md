@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching) and [5](#5-a-controlled-proposals-pair) built 2026-11-07 (5 first, so milestone 2 is scored on proposals). [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals). [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -62,6 +62,22 @@ There's none: milestone 7's "matching, scored against the keys' items" wasn't bu
 - **The rubric** (the owner: "Three levels is a start"): hand thresholds on hand weights, by mode. Plausible needs two independent signals; at most 3 links a subject; possible only the best few by score (Fable: the turbine pair's 21 subjects with up to 8 candidates each would be up to 170 possible links one way).
 - **Shown** (the owner: "links and topics"): the Subjects view's "possibly the same as …" with relation, level and why; a search for one finds the other, marked; topics count a plausible pair's claims as one subject's. No gaps from links, so no looks for them.
 - **No requests.**
+- **Built 2026-11-07** (`links.py`; each subject's `links` in the index):
+  - **Pairs asked:** subjects alone in each source, sharing a name word or a property's name, or paired by the findings, alignment's groupings (ambiguous, split or merge candidates) or the model's answers. `match_subjects` now keeps an answer whose candidate another took ("taken", a link, never a match).
+  - **The rubric** (`rubric/1`), two weighings: a name word counts where it's rare among the subjects' names (four at most; the turbine pair's "blade" and "turbine" name dozens, and linked 42 pairs by it before), or most of two names' words are shared. Values in common count between revisions only. So does the judge's "uncertain", since alignment chose those pairs; between proposals it's doubt. Identifiers that differ rule a pair out (Room 104, Room 105).
+  - **Shown:** the Subjects view's "possibly the counterpart of …" (relation, level, signals), found by a search for either name; index.md's line under the subject.
+  - **Topics:** a plausible link's claims counted with the other's name. Only links from the findings and the glossary, not from the model's other names or matches: those are asked after the topics, and the other names are asked a request a topic, so the topics would shift between being named and being shown.
+  - **Scored** (`comparison._matching`'s `links`, by level; a link across a split the keys record counts right):
+
+    | Format | Plausible | Right | Possible | Right |
+    |---|---|---|---|---|
+    | PDF | 4 | 4 | 1 | 0 (1 unscorable) |
+    | Markdown, Word | 3 each | 3 each | 0 | |
+    | Decks, workbooks | 3 each | 3 each | 1 each | 1 each |
+
+    - The proposals pair's alum and ferric sulfate (their doses in common and the judge's pairing) and its two plants (their names and the judge's pairing), plausible in every format; its decoy linked to nothing. The split revision's P-101C, plausible with each of P-101E and P-101F (a many-to-one, as question 5 answered).
+  - **The turbine pair,** offline (its report as recorded, with the model's matches): 4 possible links, each by one rare name word ("DOWEC turbine" and IEA's "turbine", "Rotor Speed" and "rotor-speed error"): worth a look, at most.
+  - **Recorded again for the topics** ($0.004): the slice runs (12 answers: the other names a topic asks, and two topics' names) and the controlled corpus.
 
 ### 3. More signals: candidates by meaning
 

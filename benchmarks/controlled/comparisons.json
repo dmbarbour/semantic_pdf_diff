@@ -4435,7 +4435,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -4600,7 +4606,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -4765,7 +4777,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -4930,7 +4948,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -5095,7 +5119,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -9807,7 +9837,13 @@
     "wrong": 1,
     "unscorable": 9,
     "items": 14,
-    "matched": 14
+    "matched": 14,
+    "links": {
+     "possible": {
+      "links": 1,
+      "unscorable": 1
+     }
+    }
    },
    "detail": {
     "hallc.D101.height": "confirmed",
@@ -13157,7 +13193,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -13189,7 +13231,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -13197,12 +13245,12 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 22,
+    "different": 21,
     "equivalent": 2,
-    "uncertain": 26,
+    "uncertain": 27,
     "unrelated": 60
    },
-   "unmatched": 23
+   "unmatched": 25
   },
   "wtp-s1-proposals.docx": {
    "facts": {
@@ -13218,7 +13266,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -13226,12 +13280,12 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 20,
+    "different": 19,
     "equivalent": 1,
-    "uncertain": 26,
+    "uncertain": 27,
     "unrelated": 57
    },
-   "unmatched": 23
+   "unmatched": 25
   },
   "wtp-s1-proposals.pptx": {
    "facts": {
@@ -13247,7 +13301,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -13255,12 +13319,12 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 37,
+    "different": 36,
     "equivalent": 1,
-    "uncertain": 9,
+    "uncertain": 10,
     "unrelated": 63
    },
-   "unmatched": 14
+   "unmatched": 16
   },
   "wtp-s1-proposals.xlsx": {
    "facts": {
@@ -13276,7 +13340,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -17729,7 +17803,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -17894,7 +17974,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -18059,7 +18145,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -18224,7 +18316,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -18389,7 +18487,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -23101,7 +23205,13 @@
     "wrong": 1,
     "unscorable": 9,
     "items": 14,
-    "matched": 14
+    "matched": 14,
+    "links": {
+     "possible": {
+      "links": 1,
+      "unscorable": 1
+     }
+    }
    },
    "detail": {
     "hallc.D101.height": "confirmed",
@@ -26451,7 +26561,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -26483,7 +26599,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -26512,7 +26634,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -26541,7 +26669,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -26570,7 +26708,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -30182,7 +30330,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -30347,7 +30501,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -30512,7 +30672,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -30677,7 +30843,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -34537,7 +34709,13 @@
     "wrong": 1,
     "unscorable": 9,
     "items": 14,
-    "matched": 9
+    "matched": 9,
+    "links": {
+     "possible": {
+      "links": 1,
+      "unscorable": 1
+     }
+    }
    },
    "detail": {
     "hallc.D101.height": "confirmed",
@@ -37281,7 +37459,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -37292,12 +37476,12 @@
    },
    "findings": {
     "complementary": 2,
-    "different": 25,
+    "different": 24,
     "equivalent": 5,
-    "uncertain": 26,
+    "uncertain": 27,
     "unrelated": 79
    },
-   "unmatched": 26
+   "unmatched": 27
   },
   "wtp-s1-proposals.docx": {
    "facts": {
@@ -37313,7 +37497,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -37321,12 +37511,12 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 21,
+    "different": 22,
     "equivalent": 2,
-    "uncertain": 27,
+    "uncertain": 26,
     "unrelated": 63
    },
-   "unmatched": 25
+   "unmatched": 23
   },
   "wtp-s1-proposals.pptx": {
    "facts": {
@@ -37342,7 +37532,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -37351,12 +37551,12 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 16,
+    "different": 21,
     "equivalent": 1,
-    "uncertain": 31,
+    "uncertain": 26,
     "unrelated": 59
    },
-   "unmatched": 31
+   "unmatched": 24
   },
   "wtp-s1-proposals.xlsx": {
    "facts": {
@@ -37372,7 +37572,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -37381,9 +37591,9 @@
    },
    "findings": {
     "complementary": 1,
-    "different": 22,
+    "different": 21,
     "equivalent": 1,
-    "uncertain": 25,
+    "uncertain": 26,
     "unrelated": 59
    },
    "unmatched": 24
@@ -40984,7 +41194,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -41149,7 +41365,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -41314,7 +41536,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -41479,7 +41707,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 25,
-    "matched": 25
+    "matched": 25,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -45339,7 +45573,13 @@
     "wrong": 1,
     "unscorable": 9,
     "items": 14,
-    "matched": 9
+    "matched": 9,
+    "links": {
+     "possible": {
+      "links": 1,
+      "unscorable": 1
+     }
+    }
    },
    "detail": {
     "hallc.D101.height": "confirmed",
@@ -48083,7 +48323,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -48115,7 +48361,13 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -48144,7 +48396,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {
@@ -48174,7 +48436,17 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
    },
    "gaps_found": "2/2",
    "gaps": {

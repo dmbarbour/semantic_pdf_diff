@@ -15,7 +15,8 @@ document that would be useful, and it seems deeply related to the problem of com
   recommendations look good as a start."). Then, where the match_subjects lever ran (crossmatch.py), the model's
   matches of what's left. A subject's properties are one where they're named alike or the findings pair their claims
   ("seating capacity" and "rider capacity"). A property one source gives a matched subject and another doesn't is
-  left blank there, and is a gap (below).
+  left blank there, and is a gap (below). Subjects possibly one, by weaker evidence, are linked and kept apart
+  (links.py: plausible or possible; docs/plans/tentative-matches-2026-11-07.md): never merged, never a gap.
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
 - **Other names** (milestone 3): the names one thing goes by, as the run found them (a glossary term reaching its
@@ -287,7 +288,7 @@ def built(data):
     subjects, by_tag = [], {}
     matches = [((c["source"], c["subject"]), (c["other_source"], c["other"]), c["relation"])
                for c in (data.get("commentary") or {}).get("entries", [])
-               if c["kind"] == "match" and c.get("relation") in MATCHED]
+               if c["kind"] == "match" and c.get("relation") in MATCHED and not c.get("taken")]
     for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals", matches):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
@@ -314,6 +315,9 @@ def built(data):
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
     listed(subjects, by_tag, {e["id"]: plain(e["attribute"]) for e in data.get("evidence", [])})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
+    from .links import linked  # subjects possibly one, kept apart (tentative matches, milestone 2)
+    for i, found in linked(data, {"sources": sources, "subjects": subjects}).items():
+        subjects[i]["links"] = found
     regroup = None
     if data.get("kind_check"):  # the model's names and moves (the confirm_kinds lever, kindcheck.py)
         regroup = lambda groups: regrouped(groups, subjects, data["kind_check"])  # noqa: E731

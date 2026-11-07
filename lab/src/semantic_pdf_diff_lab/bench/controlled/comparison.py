@@ -42,6 +42,7 @@ ways), another fact, or unbound; with what each look found, where the look_gaps 
 the revisions (as the run wrote them), each scored by the keys' items its claims are bound to: right where each
 side's most bound item is the same, wrong where it isn't, unscorable where a side's claims are bound to none; and of
 the items both revisions' claims give (OTHER_CLAIMS bound claims or more on each side), how many a right match holds.
+Its links (links.py: subjects possibly one, kept apart; milestone 2) are scored alike, by level.
 """
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -153,7 +154,7 @@ def score_comparison(earlier, later, report):
             **({"echoes": score_echoes_compared(earlier, later, report, side)} if earlier.get("echoes") else {}),
             **({"kinds": _explained(read.kinds_found)} if read.kinds_found else {}),
             **_gaps(report, side, keys, renames, kinds, bound),
-            **_matching(report, side, keys, renames, bound),
+            **_matching(report, side, keys, renames, bound, splits),
             "detail": dict(sorted(detail.items()))}
 
 def _items(facts):
@@ -181,9 +182,10 @@ def score_proposals(a, b, report):
             "findings": dict(sorted(Counter(f["relation"] for f in report["findings"]).items())),
             "unmatched": len(report["unmatched"])}
 
-def _matching(report, side, keys, renames, bound):
+def _matching(report, side, keys, renames, bound, splits=()):
     """The index's subjects matched across the revisions, scored by the keys' items (see the module's note):
-    {"matching": {"groups", "right", "wrong", "unscorable", "items", "matched"}}, or nothing without an index."""
+    {"matching": {"groups", "right", "wrong", "unscorable", "items", "matched", "links"}}, or nothing without an
+    index. splits: the keys' (earlier fact ids, later ones), an item become two: a link between them is right."""
     from semantic_pdf_diff import indexes
     subjects = (report.get("index") or {}).get("subjects")
     if not subjects:
@@ -197,27 +199,38 @@ def _matching(report, side, keys, renames, bound):
             if fid in facts[0] or fid in facts[1]:
                 items[side[claim]][item(fid)] += 1
     names = [x["name"] for x in report["sources"]]
-    counts, matched = Counter(), set()
+    counts, matched, linked = Counter(), set(), defaultdict(Counter)
+
+    def most(claims):  # the items a side's claims are most bound to
+        found = Counter(item(fid) for c in claims for fid in bound.get(c, {}) if fid in facts[0] or fid in facts[1])
+        top = max(found.values(), default=0)
+        return {i for i, n in found.items() if n == top} if top else set()
+
+    related = {(item(a), item(b)) for old, new in splits for a in old for b in new if a in facts[0] and b in facts[1]}
+
+    def read(x, y):
+        return ("unscorable" if not x or not y else "right" if x & y or any((i, j) in related for i in x for j in y)
+                else "wrong")
+    by_name = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}
     for s in subjects:
+        for link in s.get("links", []):
+            other = by_name.get((link["source"], link["other"]))
+            if other is not None and names.index(next(iter(s["claims"]))) == 0:  # each pair once
+                linked[link["level"]]["links"] += 1
+                linked[link["level"]][read(most(next(iter(s["claims"].values()))),
+                                          most(next(iter(other["claims"].values()))))] += 1
         if len(s["claims"]) < 2:
             continue
         counts["groups"] += 1
-        most = []
-        for k, name in enumerate(names):
-            found = Counter(item(fid) for c in s["claims"].get(name, []) for fid in bound.get(c, {})
-                            if fid in facts[0] or fid in facts[1])
-            top = max(found.values(), default=0)
-            most.append({i for i, n in found.items() if n == top} if top else set())
-        if not all(most):
-            counts["unscorable"] += 1
-        elif most[0] & most[1]:
-            counts["right"] += 1
-            matched |= most[0] & most[1]
-        else:
-            counts["wrong"] += 1
+        sides = [most(s["claims"].get(name, [])) for name in names]
+        counts[read(*sides)] += 1
+        if sides[0] & sides[1]:
+            matched |= sides[0] & sides[1]
     both = {i for i in items[0] if items[0][i] >= indexes.OTHER_CLAIMS and items[1][i] >= indexes.OTHER_CLAIMS}
     return {"matching": {**{k: counts[k] for k in ("groups", "right", "wrong", "unscorable")}, "items": len(both),
-                         "matched": len(both & matched)}}
+                         "matched": len(both & matched),
+                         **({"links": {level: dict(sorted(c.items())) for level, c in sorted(linked.items())}}
+                            if linked else {})}}
 
 def _gaps(report, side, keys, renames, kinds, bound):
     """The gaps another revision fills, scored (see the module's note): {"gaps_found": "found/planted", "gaps": {how

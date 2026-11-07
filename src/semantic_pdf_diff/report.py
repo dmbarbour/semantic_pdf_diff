@@ -595,8 +595,26 @@ def report_topics(data):
     for f in data.get('files', []):
         side.setdefault(f['content'], f['source'])
     claims = [{**evidence[x], 'side': side.get(evidence[x]['content'], '')} for x in ids if x in evidence]
-    return (topics.ways(claims, [c['side'] for c in claims], one_source(data), topic_terms(data)) if claims
+    linked = linked_names(data)  # a plausible link's claims counted as one subject's (tentative matches, milestone 2)
+    counted = [{**c, 'entity': f"{c['entity']} {linked[c['id']]}"} if c['id'] in linked else c for c in claims]
+    return (topics.ways(counted, [c['side'] for c in claims], one_source(data), topic_terms(data)) if claims
             else []), claims
+
+def linked_names(data):
+    """{claim id: the names of the subjects its subject is plausibly linked to (links.py)}, which topics count with
+    its own: the owner, 2026-11-07, of plausible matches: "It should feed links and topics for now". The links of the
+    findings and the glossary alone, not of the model's other names nor its matches (asked after the topics, and the
+    other names asked a request a topic): the topics come out the same whenever they're counted."""
+    if one_source(data) or not data.get('findings'):
+        return {}
+    from .indexes import built
+    out = {}
+    for s in built({k: v for k, v in data.items() if k not in ('synonyms', 'commentary')})['subjects']:
+        names = ' '.join(x['other'] for x in s.get('links', []) if x['level'] == 'plausible')
+        if names:
+            for ids in s['claims'].values():
+                out.update(dict.fromkeys(ids, names))
+    return out
 
 def topic_terms(data):
     """The glossary's terms the topics count a meaning written out as (terms.Terms), where the run's settings said so
@@ -799,6 +817,10 @@ def placed(source, where, paths=(), page=None):
     low, high = (int(found.group(1)), int(found.group(2) or found.group(1))) if found else (page, page)
     return [f"{source} / {path}" if source else path, low, high]
 
+def link_said(link):
+    from .links import link_said as said
+    return said(link)
+
 def subjects_html(subjects, sources, gaps=()):
     """The Subjects view (indexes.py): each subject, its other names and its properties, each value linked to its
     claim's card; in a comparison a column a source, "—" where one gives nothing (weak: not saying isn't absence),
@@ -822,7 +844,8 @@ def subjects_html(subjects, sources, gaps=()):
         meta = ([f"also {', '.join(names[:8])}"] if names else []) + (
             [SEVERAL.format(', '.join(s['several']))] if s.get('several') else []) + (
             ['claims: ' + ', '.join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
-             + (f" (matched by {s['matched_by']})" if s['matched_by'] else '')] if many else [])
+             + (f" (matched by {s['matched_by']})" if s['matched_by'] else '')] if many else []) + [
+            link_said(x) for x in s.get('links', [])]  # possibly one, kept apart (links.py)
         heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Values</th>'
         rows = ''.join(
             f"<tr><td>{esc(p['name'])}"
@@ -832,7 +855,8 @@ def subjects_html(subjects, sources, gaps=()):
             + (''.join(f"<td>{values([v for v in p['values'] if v['source'] == src], (src, s['name'], p['name']))}"
                        "</td>" for src in sources)
                if many else f"<td>{values(p['values'])}</td>") + '</tr>' for p in s['properties'])
-        words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties'])])
+        words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties']),
+                          *(x['other'] for x in s.get('links', []))])  # a search for one finds the other
         claims = [v['claim'] for p in s['properties'] for v in p['values']]
         out.append(f'<div class="subject" {searched(words, claims)}><h3>{esc(s["name"])}</h3>'
                    + (f'<p class="meta">{esc("; ".join(meta))}</p>' if meta else '')
