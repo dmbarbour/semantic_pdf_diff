@@ -1448,8 +1448,9 @@ class LookGaps(Lever):
     # comparisons: each gap another source fills (a matched subject's property one source gives and another
     # describing it doesn't: indexes.given_elsewhere) looked for where it'd be in the source lacking it, as an
     # analysis's siblings' gaps are (dossiers.looks): given (the reader's miss; in revisions, a false addition or
-    # removal), not given, no place for it, not shown (milestone 7, as match_subjects)
-    look_gaps: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # removal), not given, no place for it, not shown (milestone 7, as match_subjects). On by default since
+    # 2026-11-07 (the owner: "Go ahead and turn on `look_gaps`.")
+    look_gaps: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def looks_for_gaps(self, mode):
         return self.look_gaps and mode != "analysis"

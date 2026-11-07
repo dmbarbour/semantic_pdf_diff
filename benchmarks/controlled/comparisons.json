@@ -1639,6 +1639,9 @@
    "gaps": {
     "both give it": 1
    },
+   "gap_looks": {
+    "given": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -2390,6 +2393,10 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 6
+   },
+   "gap_looks": {
+    "given": 4,
+    "no_place": 2
    },
    "detail": {
     "D101.height": "confirmed",
@@ -3662,6 +3669,10 @@
     "both give it": 1,
     "unbound": 2
    },
+   "gap_looks": {
+    "given": 1,
+    "not_given": 2
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -4849,6 +4860,9 @@
    "gaps": {
     "both give it": 1
    },
+   "gap_looks": {
+    "given": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -5931,6 +5945,9 @@
     "right": 1,
     "unbound": 2
    },
+   "gap_looks": {
+    "given": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6285,6 +6302,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -9056,6 +9076,11 @@
     "both give it": 1,
     "unbound": 5
    },
+   "gap_looks": {
+    "given": 2,
+    "no_place": 3,
+    "not_shown": 1
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -9187,6 +9212,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -10518,6 +10546,11 @@
     "both give it": 2,
     "unbound": 5
    },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 5,
+    "not_shown": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -10944,6 +10977,9 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "gap_looks": {
+    "no_place": 20
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -11570,6 +11606,11 @@
     "both give it": 1,
     "right": 1,
     "unbound": 2
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1,
+    "not_given": 2
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -13719,6 +13760,9 @@
    "gaps": {
     "both give it": 1
    },
+   "gap_looks": {
+    "given": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -14470,6 +14514,10 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 6
+   },
+   "gap_looks": {
+    "given": 4,
+    "no_place": 2
    },
    "detail": {
     "D101.height": "confirmed",
@@ -15742,6 +15790,10 @@
     "both give it": 1,
     "unbound": 2
    },
+   "gap_looks": {
+    "given": 1,
+    "not_given": 2
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -16929,6 +16981,9 @@
    "gaps": {
     "both give it": 1
    },
+   "gap_looks": {
+    "given": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -18011,6 +18066,9 @@
     "right": 1,
     "unbound": 2
    },
+   "gap_looks": {
+    "given": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18365,6 +18423,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -21136,6 +21197,11 @@
     "both give it": 1,
     "unbound": 5
    },
+   "gap_looks": {
+    "given": 2,
+    "no_place": 3,
+    "not_shown": 1
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -21267,6 +21333,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -22598,6 +22667,11 @@
     "both give it": 2,
     "unbound": 5
    },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 5,
+    "not_shown": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -23024,6 +23098,9 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "gap_looks": {
+    "no_place": 20
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -23650,6 +23727,11 @@
     "both give it": 1,
     "right": 1,
     "unbound": 2
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1,
+    "not_given": 2
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -26093,6 +26175,10 @@
     "both give it": 1,
     "unbound": 6
    },
+   "gap_looks": {
+    "given": 5,
+    "no_place": 2
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -27129,6 +27215,10 @@
     "both give it": 1,
     "unbound": 1
    },
+   "gap_looks": {
+    "given": 1,
+    "not_given": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -28078,6 +28168,9 @@
    "gaps": {
     "both give it": 1
    },
+   "gap_looks": {
+    "given": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -28944,6 +29037,9 @@
     "right": 1,
     "unbound": 2
    },
+   "gap_looks": {
+    "given": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -29235,6 +29331,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -31498,6 +31597,10 @@
     "both give it": 1,
     "unbound": 5
    },
+   "gap_looks": {
+    "no_place": 4,
+    "not_shown": 2
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -31629,6 +31732,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -32696,6 +32802,10 @@
     "both give it": 2,
     "unbound": 5
    },
+   "gap_looks": {
+    "given": 2,
+    "no_place": 5
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -33035,6 +33145,9 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "gap_looks": {
+    "no_place": 20
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -33536,6 +33649,11 @@
     "both give it": 1,
     "right": 1,
     "unbound": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1,
+    "not_given": 1
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -35906,6 +36024,10 @@
     "both give it": 1,
     "unbound": 6
    },
+   "gap_looks": {
+    "given": 5,
+    "no_place": 2
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -36942,6 +37064,10 @@
     "both give it": 1,
     "unbound": 1
    },
+   "gap_looks": {
+    "given": 1,
+    "not_given": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -37891,6 +38017,9 @@
    "gaps": {
     "both give it": 1
    },
+   "gap_looks": {
+    "given": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -38757,6 +38886,9 @@
     "right": 1,
     "unbound": 2
    },
+   "gap_looks": {
+    "given": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -39048,6 +39180,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -41311,6 +41446,10 @@
     "both give it": 1,
     "unbound": 5
    },
+   "gap_looks": {
+    "no_place": 4,
+    "not_shown": 2
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -41442,6 +41581,9 @@
    "gaps_found": "0/0",
    "gaps": {
     "both give it": 1
+   },
+   "gap_looks": {
+    "given": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -42509,6 +42651,10 @@
     "both give it": 2,
     "unbound": 5
    },
+   "gap_looks": {
+    "given": 2,
+    "no_place": 5
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -42848,6 +42994,9 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "gap_looks": {
+    "no_place": 20
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -43349,6 +43498,11 @@
     "both give it": 1,
     "right": 1,
     "unbound": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1,
+    "not_given": 1
    },
    "detail": {
     "P-101A.capacity": "confirmed",

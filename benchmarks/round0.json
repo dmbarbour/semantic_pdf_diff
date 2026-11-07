@@ -117,6 +117,7 @@
   "scan_halves": "middle",
   "whole_lines": false,
   "summaries": [],
+  "look_gaps": false,
   "leave_text": "none",
   "images_first": false,
   "text_spans": "section",
