@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.46.0 (2026-11-07)
+
+- **Links: subjects possibly one, kept apart** (tentative matches, milestone 2; the owner: "Three levels is a start"; plausible matches "should feed links and topics for now"): in a comparison, two sources' subjects linked by weaker evidence, never merged, each with its level (plausible: two signals; possible: one) and its signals (names, properties or values in common, the judge's pairings, alignment's groupings, the model's answers). Shown in the Subjects view and index.md ("possibly the counterpart of …"), found by a search for either; a plausible link's claims share a topic. Revisions' and proposals' evidence weighed apart.
+- `match_subjects` keeps an answer whose candidate another took, as a link.
+
 ## 0.45.0 (2026-11-07)
 
 - **`look_gaps` on by default** (the owner: "Go ahead and turn on `look_gaps`."): each gap another source fills is looked for where it'd be, a request a gap (about $0.0002 each; the 8 development slice comparisons asked 110, $0.016). Round 0's settings keep it off.
