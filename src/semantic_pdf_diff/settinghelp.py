@@ -258,7 +258,7 @@ HELP = {
     "unquoted": Help(_L, "a text or table claim whose quote isn't found in its text kept, marked as unverified "
                          "(kept), or dropped"),
     "summaries": Help(_L, "analyses: the summaries written, each sentence citing the claims it rests on and checked "
-                          "against them: sections, files, source, subjects, topics (none by default)"),
+                          "against them: sections, files, source (by default), subjects, topics; [] for none"),
     "tensions": Help(_L, "analyses: each subject's claims read for those hard to hold together on engineering "
                          "grounds, by level, what would reconcile them looked for in the source"),
     "reviewer_concerns": Help(_L, "a reviewer's concerns the tensions are also asked to watch for (a list of "

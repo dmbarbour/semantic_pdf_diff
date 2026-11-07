@@ -1462,9 +1462,10 @@ class Summaries(Lever):
     # analyses: the kinds of summary asked, each sentence citing the claims it rests on and checked against them by
     # code (summaries.py; docs/plans/single-source-outputs-2026-09-23.md, milestone 4; the owner, 2026-11-06: "This
     # seems like a good design for milestone 4."): sections (a drawing set's pages), files (from their sections'),
-    # source (from its files'), subjects, topics
+    # source (from its files'), subjects, topics. Sections, files and the source by default since 2026-11-07 (the
+    # owner: "Go ahead and turn on summaries."; subjects' and topics', a request an item or topic, asked for)
     summaries: Annotated[list[Literal["sections", "files", "source", "subjects", "topics"]],
-                         _selecting(roles=COMPARE)] = Field(default_factory=list)
+                         _selecting(roles=COMPARE)] = Field(default_factory=lambda: ["sections", "files", "source"])
 
     def summary_kinds(self, mode):
         return list(self.summaries) if mode == "analysis" else []
