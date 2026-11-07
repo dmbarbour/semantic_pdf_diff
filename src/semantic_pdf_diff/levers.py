@@ -1457,6 +1457,18 @@ class FindTensions(Lever):
     def finds_tensions(self, mode):
         return self.tensions and mode == "analysis"
 
+class Summaries(Lever):
+    lever_name, stage, off = "summaries", "comparison", {"summaries": []}
+    # analyses: the kinds of summary asked, each sentence citing the claims it rests on and checked against them by
+    # code (summaries.py; docs/plans/single-source-outputs-2026-09-23.md, milestone 4; the owner, 2026-11-06: "This
+    # seems like a good design for milestone 4."): sections (a drawing set's pages), files (from their sections'),
+    # source (from its files'), subjects, topics
+    summaries: Annotated[list[Literal["sections", "files", "source", "subjects", "topics"]],
+                         _selecting(roles=COMPARE)] = Field(default_factory=list)
+
+    def summary_kinds(self, mode):
+        return list(self.summaries) if mode == "analysis" else []
+
 class ConfirmKinds(Lever):
     lever_name, stage, off = "confirm_kinds", "comparison", {"confirm_kinds": False}
     # analyses: the kinds the rules found (indexes.kinds) shown to the model, one request a source, which names each
@@ -1497,7 +1509,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds, ReadTogether,
-                 FindTensions, Embed, Rerank)
+                 FindTensions, Summaries, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1722,6 +1734,12 @@ class Platform(Composable):
         """Whether a report's subjects are read together, after its claims (dossiers.py): the platform's, never; the
         second_pass lever's, in analyses when on."""
         return False
+
+    @chosen
+    def summary_kinds(self, mode):
+        """The kinds of summary a report asks for (summaries.py): the platform's, none; the summaries lever's, in
+        analyses, those it names."""
+        return []
 
     @chosen
     def finds_tensions(self, mode):

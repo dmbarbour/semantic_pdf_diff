@@ -410,6 +410,10 @@ def analyze_and_report(options, settings, store, client, names, read, document, 
         commentary = data.setdefault('commentary', {'entries': []})
         commentary['entries'] += found.pop('entries')
         commentary['tensions'] = found
+    if settings.summary_kinds(ONE_SOURCE):  # each part summarized from its claims, each sentence citing and checked
+        from . import indexes, summaries
+        data['summaries'] = summaries.read(data, indexes.built(data), client, ONE_SOURCE, label,
+                                           settings.summary_kinds(ONE_SOURCE), progress)
     progress.close()  # its search's requests (topics' names, other names, vectors), and the second pass's
     incomplete = any(r['status'] != 'complete' for r in read.coverage) or not claims
     return saved_and_written(options, settings, store, client, data, out, incomplete)

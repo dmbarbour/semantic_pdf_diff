@@ -10,7 +10,7 @@ import json
 import re
 from importlib import resources
 from pathlib import Path
-from collections import Counter
+from collections import Counter, defaultdict
 
 def how_read(e):
     """How a claim's table was read, from its derivation: ("rules", the template that made it), ("summary", the
@@ -672,9 +672,12 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     kinds, gaps, clashes = index.get('kinds', []), index.get('gaps', []), index.get('inconsistencies', [])
     reading, troubled = quality_html(data, card.where)
     suspects, unreconciled = suspects_html((data.get('commentary') or {}).get('entries', []), card)
+    summarized, summed = summaries_html(data.get('summaries'), card, card.where)
     page += ('<div class="views"><button data-view="findings"' + (' hidden' if one else ' class="on"')
              + '>Findings ' + str(len(findings)) + '</button><button data-view="claims"'
              + (' class="on"' if one else '') + '>Claims ' + str(len(claims)) + '</button>'
+             + (f'<button data-view="summaries" title="Written by the model, each sentence citing its claims">'
+                f'Summaries {summed}</button>' if summarized else '')
              + (f'<button data-view="subjects">Subjects {len(subjects)}</button>' if subjects else '')
              + (f'<button data-view="kinds">Kinds {len(kinds)}</button>' if kinds else '')
              + (f'<button data-view="figures">Figures and tables {len(figures)}</button>' if figures else '')
@@ -733,7 +736,8 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
     sources, paths = index.get('sources', []), {f['path'] for f in data['files']}
     page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
              + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources, paths)
-             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources) + suspects + reading)
+             + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources) + suspects + reading
+             + summarized)
     page += '<main></main>'
     page += groupings_html(data.get('groupings', []), esc)
     page += situating(data.get('situation', {}), data.get('sections', []), card.where, esc)
@@ -886,6 +890,54 @@ def gaps_html(gaps, sources, paths=()):
              + ('<th>Looked for on</th>' if looked else ''))
     return (f'<section data-for="gaps" class="index" hidden><p class="meta">{esc(GAPS_NOTE)}</p><div class="wide">'
             f'<table><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div></section>')
+
+def summaries_html(found, card, where):
+    """The Summaries view (summaries.py): the source's, then each file's with its sections', then subjects' and
+    topics', each sentence followed by links to the claims it cites; one its claims don't bear out marked, with why.
+    Labelled as written by the model. With how many summaries it shows."""
+    if not found:
+        return '', 0
+    count = sum(len(found.get(k, [])) for k in ("source", "files", "sections", "subjects", "topics"))
+    if not count:
+        return '', 0
+
+    def said(summary):
+        out = []
+        for s in summary["sentences"]:
+            cites = [x for x in s["claims"] if x in card.evidence]
+            links = "".join(f' <a href="#claim={esc(x)}" title="{esc(card.at(x))}">[{n}]</a>'
+                            for n, x in enumerate(cites, 1))
+            text = esc(s["text"])
+            if s.get("check"):
+                text = (f'<span class="warning">{text}</span> <small class="warning">(not borne out by the claims it '
+                        f'cites: {esc(s["check"])})</small>')
+            out.append(text + links)
+        return " ".join(out)
+
+    def block(summary, heading="h3"):
+        claims = [x for s in summary["sentences"] for x in s["claims"]]
+        words = " ".join([summary["title"], *(s["text"] for s in summary["sentences"])])
+        return (f'<div class="subject" {searched(words, claims)}><{heading}>{esc(summary["title"])}</{heading}>'
+                f'<p>{said(summary)}</p></div>')
+    parts = [block(s, "h2") for s in found.get("source", [])]
+    sections = defaultdict(list)
+    for s in found.get("sections", []):
+        sections[s["key"][0]].append(s)
+    files = {f["key"][0]: f for f in found.get("files", [])}
+    for content in dict.fromkeys([*files, *sections]):
+        if content in files:
+            parts.append(block({**files[content], "title": where(content)}, "h2"))
+        elif sections[content]:
+            parts.append(f'<h2>{esc(where(content))}</h2>')
+        parts += [block(s) for s in sections[content]]
+    for kind, title in (("subjects", "Subjects"), ("topics", "Topics")):
+        if found.get(kind):
+            parts.append(f'<details><summary>{title} ({len(found[kind])})</summary>'
+                         + "".join(block(s) for s in found[kind]) + '</details>')
+    note = ('<p class="meta">Written by the model from the claims alone (ours, not the document\'s): each sentence '
+            'cites the claims it rests on, and is checked against them by code; one stating a number its claims '
+            'don\'t give is marked.</p>')
+    return f'<section data-for="summaries" class="index" hidden>{note}{"".join(parts)}</section>', count
 
 def reconciled_said(c, at):
     """Where a tension's reconciling words were found, in words: "reconciled by page 5: hot-dip galvanized"; or that

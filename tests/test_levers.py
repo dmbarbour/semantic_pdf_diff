@@ -231,7 +231,7 @@ class Binding(unittest.TestCase):
                                                         "editorial", "record_changes", "judge_context",
                                                         "judge_glossary", "topic_names", "search_names", "glossary",
                                                         "retrieve_glossary", "confirm_kinds", "second_pass", "tensions",
-                                                        "embed",
+                                                        "summaries", "embed",
                                                         "rerank")])
         backwards = extraction_interpreter(settings_class(tuple(reversed(L.DEFAULT_LEVERS)))()).model_dump()
         differences = interpreter_differences(extraction_interpreter(Settings()).model_dump(), backwards)

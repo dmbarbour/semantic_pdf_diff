@@ -68,7 +68,7 @@
     "editorial",
     "record_changes",
     "judge_context", "judge_glossary", "topic_names", "search_names", "glossary", "confirm_kinds", "second_pass",
-    "tensions", "embed",
+    "tensions", "summaries", "embed",
     "rerank"
   ],
   "context_before": 400,

@@ -550,6 +550,14 @@ class Tensions(Lenient):
     """One subject's claims read for those hard to hold together on engineering grounds (tensions.py)."""
     tensions: list[Tension] = Field(default_factory=list, max_length=20)
 
+class SummarySentence(Lenient):
+    text: str = Field(default="", max_length=600)
+    cites: list[Annotated[str, Field(max_length=20)]] = Field(default_factory=list, max_length=30)  # C1, C2, ...
+
+class Summary(Lenient):
+    """A part's summary from its claims, each sentence citing those it rests on (summaries.py)."""
+    sentences: list[SummarySentence] = Field(default_factory=list, max_length=12)
+
 class Reread(Lenient):
     """A claim suspected misread, read again from its place rendered closer (dossiers.rereads)."""
     reads: str = Field(default="", max_length=20)   # as_claimed, otherwise or not_shown (dossiers.READS)
