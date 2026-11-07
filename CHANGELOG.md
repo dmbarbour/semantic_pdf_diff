@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.45.0 (2026-11-07)
+
+- **`look_gaps` on by default** (the owner: "Go ahead and turn on `look_gaps`."): each gap another source fills is looked for where it'd be, a request a gap (about $0.0002 each; the 8 development slice comparisons asked 110, $0.016). Round 0's settings keep it off.
+
 ## 0.44.0 (2026-11-07)
 
 - **Subjects across documents, and the gaps another source fills** (single-document analysis, milestone 7; the owner, answering its design: "All four recommendations look good as a start."):
