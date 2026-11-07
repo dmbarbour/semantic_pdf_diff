@@ -1635,6 +1635,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -1714,6 +1718,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -1791,6 +1799,10 @@
       "changed": 3
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -1873,6 +1885,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -1953,6 +1969,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -2366,6 +2386,10 @@
       "changed": 6
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 6
    },
    "detail": {
     "D101.height": "confirmed",
@@ -3633,6 +3657,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 2
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -4816,6 +4845,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -5547,6 +5580,8 @@
      }
     }
    },
+   "gaps_found": "0/3",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5609,6 +5644,10 @@
    "unmatched": 6,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5671,6 +5710,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5734,6 +5777,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5797,6 +5844,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5874,6 +5925,12 @@
      }
     }
    },
+   "gaps_found": "1/1",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 2
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5933,6 +5990,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5992,6 +6053,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6066,6 +6131,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6140,6 +6207,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6212,6 +6281,10 @@
       "restated": 1
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -8978,6 +9051,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 5
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -9105,6 +9183,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -9432,6 +9514,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9504,6 +9588,10 @@
       "not_same_item": 2
      }
     }
+   },
+   "gaps_found": "0/1",
+   "gaps": {
+    "both give it": 2
    },
    "detail": {
     "ack.borealis": "confirmed",
@@ -9578,6 +9666,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9652,6 +9742,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9726,6 +9818,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -10419,6 +10513,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2,
+    "unbound": 5
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -10502,6 +10601,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -10588,6 +10691,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 4
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -10671,6 +10779,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 4
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -10756,6 +10868,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 4
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -10787,6 +10903,1023 @@
     "plant.raw_turbidity": "confirmed",
     "sed.count": "confirmed",
     "sed.depth": "reported",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-tables-s1-clean-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.md": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-s1-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "31/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 31
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 36
+   },
+   "findings": {
+    "equivalent": 36
+   },
+   "unmatched": 11,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 2
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "reported",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.md": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "31/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 31
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 31,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 32
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1,
+    "unbound": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "reported",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 10,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 10,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
     "sed.length": "confirmed",
     "sed.loading": "confirmed",
     "sed.width": "confirmed"
@@ -10916,6 +12049,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -12578,6 +13715,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -12657,6 +13798,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -12734,6 +13879,10 @@
       "changed": 3
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -12816,6 +13965,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -12896,6 +14049,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -13309,6 +14466,10 @@
       "changed": 6
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 6
    },
    "detail": {
     "D101.height": "confirmed",
@@ -14576,6 +15737,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 2
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -15759,6 +16925,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -16490,6 +17660,8 @@
      }
     }
    },
+   "gaps_found": "0/3",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16552,6 +17724,10 @@
    "unmatched": 6,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16614,6 +17790,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16677,6 +17857,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16740,6 +17924,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16817,6 +18005,12 @@
      }
     }
    },
+   "gaps_found": "1/1",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 2
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16876,6 +18070,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -16935,6 +18133,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -17009,6 +18211,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -17083,6 +18287,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -17155,6 +18361,10 @@
       "restated": 1
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -19921,6 +21131,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 5
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -20048,6 +21263,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -20375,6 +21594,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -20447,6 +21668,10 @@
       "not_same_item": 2
      }
     }
+   },
+   "gaps_found": "0/1",
+   "gaps": {
+    "both give it": 2
    },
    "detail": {
     "ack.borealis": "confirmed",
@@ -20521,6 +21746,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -20595,6 +21822,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -20669,6 +21898,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -21362,6 +22593,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2,
+    "unbound": 5
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -21445,6 +22681,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -21531,6 +22771,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 4
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -21614,6 +22859,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 4
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -21699,6 +22948,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 4
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -21730,6 +22983,1023 @@
     "plant.raw_turbidity": "confirmed",
     "sed.count": "confirmed",
     "sed.depth": "reported",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-tables-s1-clean-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.md": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "record_changes": 1,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-s1-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "31/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 31
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 36
+   },
+   "findings": {
+    "equivalent": 36
+   },
+   "unmatched": 11,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 2
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "reported",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.md": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "31/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 31
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 31,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 32
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1,
+    "unbound": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "reported",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 10,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 10,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
     "sed.length": "confirmed",
     "sed.loading": "confirmed",
     "sed.width": "confirmed"
@@ -21859,6 +24129,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -22027,6 +24301,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -23276,6 +25554,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -23357,6 +25639,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -23437,6 +25723,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -23797,6 +26087,11 @@
       "changed": 6
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 6
    },
    "detail": {
     "D101.height": "confirmed",
@@ -24829,6 +27124,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -25774,6 +28074,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -26355,6 +28659,8 @@
      }
     }
    },
+   "gaps_found": "0/3",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26417,6 +28723,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26480,6 +28790,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26543,6 +28857,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26620,6 +28938,12 @@
      }
     }
    },
+   "gaps_found": "1/1",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 2
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26679,6 +29003,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26753,6 +29081,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26827,6 +29157,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -26899,6 +29231,10 @@
       "restated": 1
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -29157,6 +31493,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 5
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -29284,6 +31625,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -29549,6 +31894,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -29622,6 +31969,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -29695,6 +32044,10 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -29767,6 +32120,10 @@
       "not_same_item": 2
      }
     }
+   },
+   "gaps_found": "0/1",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ack.borealis": "confirmed",
@@ -30334,6 +32691,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2,
+    "unbound": 5
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -30418,6 +32780,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 1
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -30621,6 +32987,833 @@
     "sed.width": "confirmed"
    }
   },
+  "wtp-tables-s1-clean-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "63/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 63,
+    "uncertain": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 63
+   },
+   "findings": {
+    "equivalent": 63,
+    "uncertain": 1
+   },
+   "unmatched": 22,
+   "pairs": 6,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     }
+    }
+   },
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "uncertain",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-s1-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "31/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 31
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 36,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 37
+   },
+   "unmatched": 10,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "reported",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 31
+   },
+   "unmatched": 6,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1,
+    "unbound": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -30671,6 +33864,10 @@
       "changed": 4
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -30745,6 +33942,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -30913,6 +34114,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -32162,6 +35367,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -32243,6 +35452,10 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -32323,6 +35536,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -32683,6 +35900,11 @@
       "changed": 6
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 6
    },
    "detail": {
     "D101.height": "confirmed",
@@ -33715,6 +36937,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -34660,6 +37887,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -35241,6 +38472,8 @@
      }
     }
    },
+   "gaps_found": "0/3",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35303,6 +38536,10 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35366,6 +38603,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35429,6 +38670,10 @@
    "unmatched": 3,
    "pairs": 1,
    "omitted": 0,
+   "gaps_found": "3/3",
+   "gaps": {
+    "right": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35506,6 +38751,12 @@
      }
     }
    },
+   "gaps_found": "1/1",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 2
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35565,6 +38816,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35639,6 +38894,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35713,6 +38970,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -35785,6 +39044,10 @@
       "restated": 1
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ext.field": "confirmed",
@@ -38043,6 +41306,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1,
+    "unbound": 5
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -38170,6 +41438,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ack.1": "reported",
@@ -38435,6 +41707,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -38508,6 +41782,8 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {},
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -38581,6 +41857,10 @@
      }
     }
    },
+   "gaps_found": "0/1",
+   "gaps": {
+    "both give it": 1
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -38653,6 +41933,10 @@
       "not_same_item": 2
      }
     }
+   },
+   "gaps_found": "0/1",
+   "gaps": {
+    "both give it": 1
    },
    "detail": {
     "ack.borealis": "confirmed",
@@ -39220,6 +42504,11 @@
      }
     }
    },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2,
+    "unbound": 5
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -39304,6 +42593,10 @@
       "changed": 2
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 1
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -39507,6 +42800,833 @@
     "sed.width": "confirmed"
    }
   },
+  "wtp-tables-s1-clean-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "63/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 63,
+    "uncertain": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 63
+   },
+   "findings": {
+    "equivalent": 63,
+    "uncertain": 1
+   },
+   "unmatched": 22,
+   "pairs": 6,
+   "omitted": 0,
+   "kinds": {
+    "right": 1,
+    "scored": 1,
+    "value_change_precision": null,
+    "by_claims": {
+     "no change": {
+      "restated": 1
+     }
+    }
+   },
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "uncertain",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-tables-s1-clean-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 0,
+    "removed": 20,
+    "unchanged": 64
+   },
+   "changes_found": "0/0",
+   "additions_found": "0/0",
+   "removals_found": "20/20",
+   "unchanged_confirmed": "64/64",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {},
+   "removed": {
+    "reported": 20
+   },
+   "unchanged": {
+    "confirmed": 64
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 64
+   },
+   "findings": {
+    "equivalent": 64
+   },
+   "unmatched": 20,
+   "pairs": 0,
+   "omitted": 0,
+   "gaps_found": "20/20",
+   "gaps": {
+    "right": 20
+   },
+   "detail": {
+    "B-401.airflow": "confirmed",
+    "B-401.discharge pressure": "confirmed",
+    "B-401.motor power": "confirmed",
+    "B-401.motor speed": "confirmed",
+    "B-402.airflow": "confirmed",
+    "B-402.discharge pressure": "confirmed",
+    "B-402.motor power": "confirmed",
+    "B-402.motor speed": "confirmed",
+    "B-403.airflow": "confirmed",
+    "B-403.discharge pressure": "confirmed",
+    "B-403.motor power": "confirmed",
+    "B-403.motor speed": "confirmed",
+    "P-101A.capacity": "confirmed",
+    "P-101A.motor power": "confirmed",
+    "P-101A.motor speed": "confirmed",
+    "P-101A.total dynamic head": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.motor power": "confirmed",
+    "P-101B.motor speed": "confirmed",
+    "P-101B.total dynamic head": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.motor power": "confirmed",
+    "P-101C.motor speed": "confirmed",
+    "P-101C.total dynamic head": "confirmed",
+    "V-301.flow coefficient": "confirmed",
+    "V-301.pressure rating": "confirmed",
+    "V-301.stroke time": "reported",
+    "V-302.flow coefficient": "confirmed",
+    "V-302.pressure rating": "confirmed",
+    "V-302.stroke time": "reported",
+    "V-303.flow coefficient": "confirmed",
+    "V-303.pressure rating": "confirmed",
+    "V-303.stroke time": "reported",
+    "V-304.flow coefficient": "confirmed",
+    "V-304.pressure rating": "confirmed",
+    "V-304.stroke time": "reported",
+    "V-305.flow coefficient": "confirmed",
+    "V-305.pressure rating": "confirmed",
+    "V-305.stroke time": "reported",
+    "V-306.flow coefficient": "confirmed",
+    "V-306.pressure rating": "confirmed",
+    "V-306.stroke time": "reported",
+    "V-307.flow coefficient": "confirmed",
+    "V-307.pressure rating": "confirmed",
+    "V-307.stroke time": "reported",
+    "V-308.flow coefficient": "confirmed",
+    "V-308.pressure rating": "confirmed",
+    "V-308.stroke time": "reported",
+    "V-309.flow coefficient": "confirmed",
+    "V-309.pressure rating": "confirmed",
+    "V-309.stroke time": "reported",
+    "V-310.flow coefficient": "confirmed",
+    "V-310.pressure rating": "confirmed",
+    "V-310.stroke time": "reported",
+    "V-311.flow coefficient": "confirmed",
+    "V-311.pressure rating": "confirmed",
+    "V-311.stroke time": "reported",
+    "V-312.flow coefficient": "confirmed",
+    "V-312.pressure rating": "confirmed",
+    "V-312.stroke time": "reported",
+    "V-313.flow coefficient": "confirmed",
+    "V-313.pressure rating": "confirmed",
+    "V-313.stroke time": "reported",
+    "V-314.flow coefficient": "confirmed",
+    "V-314.pressure rating": "confirmed",
+    "V-314.stroke time": "reported",
+    "V-315.flow coefficient": "confirmed",
+    "V-315.pressure rating": "confirmed",
+    "V-315.stroke time": "reported",
+    "V-316.flow coefficient": "confirmed",
+    "V-316.pressure rating": "confirmed",
+    "V-316.stroke time": "reported",
+    "V-317.flow coefficient": "confirmed",
+    "V-317.pressure rating": "confirmed",
+    "V-317.stroke time": "reported",
+    "V-318.flow coefficient": "confirmed",
+    "V-318.pressure rating": "confirmed",
+    "V-318.stroke time": "reported",
+    "V-319.flow coefficient": "confirmed",
+    "V-319.pressure rating": "confirmed",
+    "V-319.stroke time": "reported",
+    "V-320.flow coefficient": "confirmed",
+    "V-320.pressure rating": "confirmed",
+    "V-320.stroke time": "reported"
+   }
+  },
+  "wtp-s1-gaps": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "2/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "31/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 2
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 31
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 36,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 37
+   },
+   "unmatched": 10,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "both give it": 1,
+    "right": 1,
+    "unbound": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "reported",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "confirmed",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.docx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30,
+    "unscored": 1
+   },
+   "findings": {
+    "equivalent": 31
+   },
+   "unmatched": 6,
+   "pairs": 2,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1,
+    "unbound": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.pptx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
+  "wtp-s1-gaps.xlsx": {
+   "facts": {
+    "changed": 0,
+    "conditions": 0,
+    "added": 2,
+    "removed": 2,
+    "unchanged": 31
+   },
+   "changes_found": "0/0",
+   "additions_found": "1/2",
+   "removals_found": "2/2",
+   "unchanged_confirmed": "30/31",
+   "false_changes": 0,
+   "difference_precision": null,
+   "changed": {},
+   "conditions": {},
+   "added": {
+    "reported": 1,
+    "unextracted": 1
+   },
+   "removed": {
+    "reported": 2
+   },
+   "unchanged": {
+    "confirmed": 30,
+    "unextracted": 1
+   },
+   "different": {},
+   "equivalent": {
+    "no change": 30
+   },
+   "findings": {
+    "equivalent": 30
+   },
+   "unmatched": 5,
+   "pairs": 1,
+   "omitted": 0,
+   "gaps_found": "1/4",
+   "gaps": {
+    "right": 1
+   },
+   "detail": {
+    "P-101A.capacity": "confirmed",
+    "P-101A.head": "confirmed",
+    "P-101A.motor": "confirmed",
+    "P-101B.capacity": "confirmed",
+    "P-101B.head": "confirmed",
+    "P-101B.motor": "confirmed",
+    "P-101C.capacity": "confirmed",
+    "P-101C.head": "confirmed",
+    "P-101C.motor": "confirmed",
+    "chem.alum": "confirmed",
+    "chem.alum_max": "confirmed",
+    "chem.alum_storage": "unextracted",
+    "chem.chlorine": "confirmed",
+    "filters.area": "confirmed",
+    "filters.count": "confirmed",
+    "filters.rate": "reported",
+    "floc.detention": "confirmed",
+    "floc.stages": "unextracted",
+    "mix.detention": "confirmed",
+    "mix.g": "confirmed",
+    "mix.volume": "reported",
+    "optA.cost": "confirmed",
+    "optA.energy": "confirmed",
+    "optB.contact": "confirmed",
+    "optB.cost": "confirmed",
+    "plant.design_flow": "confirmed",
+    "plant.finished_turbidity": "confirmed",
+    "plant.peak_flow": "confirmed",
+    "plant.population": "confirmed",
+    "plant.raw_turbidity": "reported",
+    "sed.count": "confirmed",
+    "sed.depth": "confirmed",
+    "sed.length": "confirmed",
+    "sed.loading": "confirmed",
+    "sed.width": "confirmed"
+   }
+  },
   "wtp-s1-tracked.docx": {
    "facts": {
     "changed": 4,
@@ -39557,6 +43677,10 @@
       "changed": 4
      }
     }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 2
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -39631,6 +43755,10 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "gaps_found": "1/1",
+   "gaps": {
+    "right": 1
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",

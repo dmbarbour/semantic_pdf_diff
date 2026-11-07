@@ -467,7 +467,10 @@ class Revisions(unittest.TestCase):
                     "views-echo-s1": (0, 0, 0, 0),
                     # names abbreviated as a list defines them; the rapid mix's detention time and the basins'
                     # side water depth revised
-                    "wtp-s1-abbreviated": (2, 0, 0, 0)}
+                    "wtp-s1-abbreviated": (2, 0, 0, 0),
+                    # properties no longer given or given anew of items both keep (single-document analysis,
+                    # milestone 7): the valves' stroke time column dropped; two sentences dropped, two added
+                    "wtp-tables-s1-clean-gaps": (0, 0, 20, 0), "wtp-s1-gaps": (0, 2, 2, 0)}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
         # depths, the coaster's 5 element heights; and a proposal credited to another company, its value kept
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}

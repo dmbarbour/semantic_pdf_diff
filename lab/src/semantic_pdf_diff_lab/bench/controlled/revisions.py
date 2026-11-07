@@ -144,6 +144,27 @@ def add_row(project, like, tag, d, after=None):
                 return
     raise ValueError(f"{project.id}: no row named {like}")
 
+def drop_column(project, attribute):
+    """A schedule's column dropped (its cells' facts' attribute), every row kept: each row's item no longer gives
+    it (a gap another revision fills: single-document analysis, milestone 7)."""
+    dropped = []
+    for _, blocks in project.sections:
+        for block in blocks:
+            if block[0] != "schedule":
+                continue
+            sections = block[1].sections
+            for k, (title, kind, columns, rows) in enumerate(sections):
+                at = next((i for i, c in enumerate(columns) if c.attribute == attribute), None)
+                if at is None:
+                    continue
+                dropped += [f"{tag}.{attribute}" for tag, _ in rows]
+                sections[k] = (title, kind, columns[:at] + columns[at + 1:],
+                               [(tag, cells[:at] + cells[at + 1:]) for tag, cells in rows])
+    if not dropped:
+        raise ValueError(f"{project.id}: no column of {attribute}")
+    project.edits.append({"kind": "removed", "facts": dropped})
+    project.facts[:] = [f for f in project.facts if f.id not in dropped]
+
 def _paragraph(project, fact_id):
     """(blocks, index, sentences, the sentence's index) of the paragraph sentence printing a fact's value."""
     pattern = _pattern(project.fact(fact_id).value)
@@ -339,6 +360,26 @@ def wtp_tables_later(p, d):
         change(p, fid, near(d, p.fact(fid).value))
     add_row(p, "P-101C", "P-101D", d)
     drop_row(p, "V-314")
+
+def wtp_tables_gaps(p, d):
+    """Revision B of the equipment schedules giving the valves' stroke times no longer, every valve kept with its
+    Cv and rating: 20 gaps the earlier revision fills (single-document analysis, milestone 7)."""
+    drop_column(p, "stroke time")
+
+def wtp_gaps(p, d):
+    """Revision B of the treatment plant's design basis giving less of some items and more of others, every item
+    kept with two facts or more: the raw water's turbidity and the filtration rate with a filter out no longer given;
+    the rapid mix basin's volume and alum's storage given (gaps another revision fills: single-document analysis,
+    milestone 7)."""
+    drop_sentence(p, "plant.raw_turbidity")
+    drop_sentence(p, "filters.rate")
+    mix, alum = p.fact("mix.g"), p.fact("chem.alum")
+    add_sentence(p, "mix.g", "Its volume is {v} gal.",
+                 Fact("mix.volume", mix.entity, mix.aliases, "volume", ("basin volume",), d.number(8000, 20000),
+                      "gal"))
+    add_sentence(p, "chem.alum", "Its day tanks hold {v} days of alum at the average dose.",
+                 Fact("chem.alum_storage", alum.entity, alum.aliases, "storage", ("storage time", "days of storage"),
+                      d.number(18, 45), "days"))
 
 def lcc_later(p, d):
     """Revision B of Hall C's design basis, in its trap phrasings: the noise limit tightened ("shall not exceed"),
@@ -707,7 +748,11 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          (PROJECTS["views-echo"], None, views_echo_later, False, "revised"),
          # names abbreviated as an abbreviations list defines them, two abbreviated values revised (indexes and
          # glossaries, milestone 5)
-         (PROJECTS["wtp"], None, abbreviated_later, False, "abbreviated"))
+         (PROJECTS["wtp"], None, abbreviated_later, False, "abbreviated"),
+         # properties no longer given, or given anew, of items both revisions keep: gaps another revision fills
+         # (single-document analysis, milestone 7)
+         (TABLE_PROJECTS["wtp-tables"], "clean", wtp_tables_gaps, False, "gaps"),
+         (PROJECTS["wtp"], None, wtp_gaps, False, "gaps"))
 
 def _base(make, knob, seed):
     p = make(seed)

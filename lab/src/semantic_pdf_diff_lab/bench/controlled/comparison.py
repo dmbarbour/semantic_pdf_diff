@@ -31,6 +31,12 @@ A revision's key logs its edits from its base (revisions.py), read in the direct
   one of its claims; else as a conditions change
 - **a split** (one item become two) is reported as its removed and added facts, how the report's groupings viewed
   it (a split candidate, or apart), and whether the old item's claims were compared with the new items' at all
+
+**Gaps another revision fills** (single-document analysis, milestone 7; indexes.given_elsewhere): an added or
+removed fact of an item the revision lacking it still gives OTHER_CLAIMS facts or more of is a planted gap there. The
+report's index (as the run wrote it) is read for its gaps of that kind: right (its claims bound to a planted
+gap, on the side lacking it), both give it (a fact both revisions give: the reader's miss, or a property named two
+ways), another fact, or unbound; with what each look found, where the look_gaps lever ran.
 """
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -141,7 +147,33 @@ def score_comparison(earlier, later, report):
             **({"views": score_compared(earlier, later, report, side)} if earlier.get("views") else {}),
             **({"echoes": score_echoes_compared(earlier, later, report, side)} if earlier.get("echoes") else {}),
             **({"kinds": _explained(read.kinds_found)} if read.kinds_found else {}),
+            **_gaps(report, side, keys, renames, kinds, bound),
             "detail": dict(sorted(detail.items()))}
+
+def _gaps(report, side, keys, renames, kinds, bound):
+    """The gaps another revision fills, scored (see the module's note): {"gaps_found": "found/planted", "gaps": {how
+    each reported one reads}, "gap_looks": {what each look found}}, or nothing where there's neither."""
+    from semantic_pdf_diff import indexes
+    facts = [{(renames.get(f["id"], f["id"]) if k else f["id"]): f for f in key["facts"]
+              if f["role"] == "fact" and not f.get("relation")} for k, key in enumerate(keys)]
+    item = lambda f: " ".join(f["entity"].casefold().split())  # noqa: E731
+    items = [Counter(item(f) for f in fs.values()) for fs in facts]
+    planted = {fid: lacking for kind, given, lacking in (("added", 1, 0), ("removed", 0, 1)) for fid in kinds[kind]
+               if items[lacking][item(facts[given][fid])] >= indexes.OTHER_CLAIMS}
+    found = [g for g in (report.get("index") or {}).get("gaps", []) if g["kind"] == "other_source"]
+    if not planted and not found:
+        return {}
+    names = [s["name"] for s in report["sources"]]
+    both = set(kinds["unchanged"]) | set(kinds["changed"]) | set(kinds["conditions"])
+    right, read = set(), Counter()
+    for g in found:
+        fids = {fid for c in g["claims"] for fid in bound.get(c, {})}
+        hit = {fid for fid in fids if planted.get(fid) == names.index(g["source"])}
+        right |= hit
+        read["right" if hit else "both give it" if fids & both else "another fact" if fids else "unbound"] += 1
+    looks = Counter(g["look"] for g in found if g.get("look"))
+    return {"gaps_found": f"{len(right)}/{len(planted)}", "gaps": dict(sorted(read.items())),
+            **({"gap_looks": dict(sorted(looks.items()))} if looks else {})}
 
 def _bound(report, side, keys, renames):
     """{claim id: {fact id: outcome}}: the facts each claim is bound to, the later revision's renamed to the

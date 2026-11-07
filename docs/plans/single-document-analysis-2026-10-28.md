@@ -1,6 +1,6 @@
 # Single-document analysis: claims situated among their subject's claims, inconsistencies and gaps
 
-- **Status:** Active (2026-10-29): milestone 1, `analyze`, built 2026-10-29 (0.7.0); milestone 3, the second pass, 2026-10-31 (0.18.0; on by default in analyses since 0.22.0, with gaps looked for and kinds read together); milestone 4's first form (contradictions in a view) and milestone 5 by code, 2026-10-31; milestones 6 and 7 planned. [Design questions](#design-questions) 1 and 3 answered 2026-10-28, 6 on 2026-10-29, 2, 4 and 5 on 2026-10-31. Milestone 2 moved to [indexes and glossaries](indexes-and-glossaries-2026-10-29.md) (2026-10-29).
+- **Status:** Active (2026-10-29): milestone 1, `analyze`, built 2026-10-29 (0.7.0); milestone 3, the second pass, 2026-10-31 (0.18.0; on by default in analyses since 0.22.0, with gaps looked for and kinds read together); milestone 4's first form (contradictions in a view) and milestone 5 by code, 2026-10-31; milestone 6 built 2026-11-07 (`judge_notes`, off); milestone 7 built 2026-11-07 (subjects across documents and the gaps another source fills; `match_subjects` and `look_gaps`, off). [Design questions](#design-questions) 1 and 3 answered 2026-10-28, 6 on 2026-10-29, 2, 4 and 5 on 2026-10-31. Milestone 2 moved to [indexes and glossaries](indexes-and-glossaries-2026-10-29.md) (2026-10-29).
 - **The owner, 2026-10-29, setting the focus:** "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless." And: "Well, I say "single document" but I really mean "single source" that might be a folder of docs." The indexes are [their own plan](indexes-and-glossaries-2026-10-29.md).
 - **The owner, 2026-10-28, from trials:**
   - "we probably need to prioritize development of a second pass (or an entire refinement, situating, contextualizing strategy) where claims are analyzed in context, not just the provenance of where the claim is located but also situating it with other claims about the subject and distinguishing it with more nuance. A lot of comparisons don't make sense because they're compared without enough context. Context can help mitigate drift from heuristics (I hope!)."
@@ -313,6 +313,31 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
     - **B. States:** kept apart only where the model, matching, says two subjects are states of one item; within a match, conditions shown beside each gap, not split? Claude's recommendation: yes, splitting by conditions later if trials need it.
     - **C. Revisions too?** Claude's recommendation: yes. The looks there catch false additions and removals, and exact keys measure them.
     - **D. Findings in proposals' matching:** no longer a match on their own, shown to the model as evidence? Claude's recommendation: yes. The turbine pair's tower and blade went wrong by them.
+- **Built 2026-11-07** (the owner's answers above; 0.44.0):
+  - **Matching:** proposals' subjects by name or other names, never by the findings alone (D); revisions as before.
+  - **`match_subjects`** (off; `crossmatch.py`): a subject names leave alone in the source with fewer, shown up to 8 subjects of the other sharing a name word or a property, with the judge's verdicts on their claims as evidence. The model names the same item, the corresponding element (A) or a state of it (B, kept apart). One counterpart each. Entries of kind "match"; the index says "matched by model: the corresponding element".
+  - **The gap kind "Another source gives it"** (by code, both modes: C): a matched subject's property one source gives and another, giving the subject two claims or more, doesn't. Those its source gives the subject's siblings come first.
+  - **`look_gaps`** (off): each looked for where it'd be in the source lacking it (dossiers.looks). The look isn't shown the other source's value, so it can't take a look-alike for it. The answer is shown beside the gap, in the subjects' blank cell, and on the other source's claim's card ("Not given by a.pdf as read; looked for on ...").
+- **Measured on the controlled revision pairs** (scored by the lab: comparisons.json's `gaps_found`, `gaps`, `gap_looks`; the refresh $0.075):
+  - **Two knob pairs added** (`revisions.py`):
+    - `wtp-tables-s1-clean-gaps`: the valve schedule's stroke time column dropped, 20 valves kept. 20 of 20 found in every format, none false.
+    - `wtp-s1-gaps`: the design basis's raw water turbidity and filtration rate no longer given, the rapid mix basin's volume and alum's storage given. 1 of 4 found in every format. The misses are the reader's grouping, not the gaps': raw water and filtration read as subjects of their own (gone whole from the later), the alum's storage as "alum day tanks". One false: a property named two ways ("served population", "serving population").
+  - **Today's pairs:** 5 planted (of 28 facts added or removed, 23 are whole items). Found in the PDFs 1 (members' 3 and views-poll's 1 missed); in the other formats up to 4. 30 more on the PDFs: 9 of facts both revisions give (the reader's miss, or a property named two ways), 20 of claims bound to no fact (sheets' and abbreviations' claims).
+  - **Looked for** (`look_gaps`, the PDF pairs; $0.007):
+
+    | Gaps (by the keys) | Given | Not given | No place for it | Not shown |
+    |---|---|---|---|---|
+    | Planted (22) | 1 | 0 | 21 | 0 |
+    | Both revisions give it (10) | 9 | 0 | 0 | 1 |
+    | Bound to no fact (22) | 7 | 4 | 10 | 1 |
+
+    - So the look tells the reader's misses from the revisions' own gaps. The one planted gap said given is a renumbered condition: the look took condition 1's words for the fatal-error condition (a positional property, as alignment's renumbering knob).
+- **Measured on the turbine pair** (NREL 5 MW pages 25 to 36, IEA 15 MW pages 20 to 31, proposals; both levers on; 77 requests, $0.009):
+  - **Matching:** by name and other names, 7 subjects (the tower now the tower's). The model asked of 21, 4 matched, all plausible: IEA's DTU Basic Controller and NREL's baseline blade-pitch controller, IEA's "tower and monopile" and NREL's integrated tower, each one's aerodynamic power and power coefficient. 4 dropped (a candidate taken, or none of those shown).
+  - **Gaps:** 56. Given 4: the NREL tower's steel density and moduli, read under "steel", and the rotor's rated power. No place 34: NREL's controller gains, pitch sensitivities and the tower's distributed properties, which IEA's pages don't tabulate. Not shown 18: the operating points IEA's pages give and NREL's don't.
+  - **What remains:** a property named several ways in one source ("Power Coefficient", "Power Coef. (Cp)", "Power Coefficient (CP)") is several gaps; the slices' coverage, not the designs', makes most of them.
+- **Not made defaults** (the owner's call): Claude's recommendation is `look_gaps` on, since it costs little (a request per gap) and tells the reader's misses apart; `match_subjects` on for proposals once the owner's trials say the matches are right.
+- **Not built:** candidates found by embeddings (the design's "where the run made vectors"); a property named several ways joined before gaps are counted.
 
 ## Design questions
 
