@@ -1416,6 +1416,22 @@ class JudgeContext(Lever):
         from .schema import RuledJudgment
         return RULINGS, RuledJudgment
 
+class JudgeNotes(Lever):
+    lever_name, stage, off = "judge_notes", "comparison", {"judge_notes": False}
+    # comparisons: each source's subjects read together first (the second pass, dossiers.py), and each claim judged
+    # shown what it noted of the claim, as a "noted" field: context its passage lacks, its relations to its subject's
+    # other claims, doubts (docs/plans/single-document-analysis-2026-10-28.md, milestone 6; the owner, 2026-10-28:
+    # "A lot of comparisons don't make sense because they're compared without enough context"; 2026-11-07: "Proceed
+    # with the recommended path.")
+    judge_notes: Annotated[bool, _shaping(roles=COMPARE)] = False
+
+    def judges_with_notes(self):
+        return self.judge_notes
+
+    def judged_notes(self, evidence, notes):
+        shown = super().judged_notes(evidence, notes)
+        return {**shown, "noted": list(notes)} if self.judge_notes and notes else shown
+
 class JudgeGlossary(Lever):
     lever_name, stage, off = "judge_glossary", "comparison", {"judge_glossary": False}
     # each claim judged shown the abbreviations and terms its words use, as its document defines them (the glossary
@@ -1509,8 +1525,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds, ReadTogether,
-                 FindTensions, Summaries, Embed, Rerank)
+                 JudgeContext, JudgeNotes, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds,
+                 ReadTogether, FindTensions, Summaries, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
 
@@ -1687,6 +1703,18 @@ class Platform(Composable):
         """What a claim being judged shows besides its own fields ({field: value}); records: its content's {id:
         ContextRecord}: the platform's, nothing."""
         return {}
+
+    @chained
+    def judged_notes(self, evidence, notes):
+        """What the second pass noted of a claim being judged ({"noted": [lines]} or nothing); notes: its lines: the
+        platform's, nothing."""
+        return {}
+
+    @chosen
+    def judges_with_notes(self):
+        """Whether a comparison reads each source's subjects together before judging, and shows the judge what that
+        noted of each claim (the judge_notes lever's): the platform's, never."""
+        return False
 
     @chained
     def judged_terms(self, evidence, defined):

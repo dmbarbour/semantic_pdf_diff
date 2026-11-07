@@ -124,6 +124,11 @@ RULINGS = ('\nEach claim\'s "context", where given, is what its document says ar
            "are about the same thing, apply in the same circumstances, and are stated in the same frame, from their "
            "fields and context. Equal values in different frames or scopes are not equivalent.")
 
+# With the judge_notes lever, where the second pass noted something of a claim judged (dossiers.py).
+NOTED = ('\nEach claim\'s "noted", where given, is what a second reading of its document found reading it with its '
+         "subject's other claims (ours, not the document's): context its own passage lacks, how it relates to them, "
+         "doubts about it. Read the claim with it; it doesn't change what the claim says.")
+
 # With the judge_glossary lever, where a claim judged uses a term its document defines (terms.Terms).
 TERMS = '\nEach claim\'s "terms", where given, are what its document defines the abbreviations and terms it uses as.'
 
@@ -131,13 +136,14 @@ def instructions(mode):
     """A comparison prompt's instructions (the rest is the two claims and the numeric check)."""
     return COMPARE + MODE_CONTEXT[mode]
 
-def pair_request(s, mode, a, b, output=None, records=None, defined=None):
+def pair_request(s, mode, a, b, output=None, records=None, defined=None, notes=None):
     """The judge's request for claims a and b: (prompt, images, the claims' fields as shown, numeric check). The
     claims are shown without their provenance (PROVENANCE_FIELDS), with source images where the settings send them,
     and with what their context records say where the settings show it (records: {content: {id: ContextRecord}};
     the judge_context lever's, not among the fields returned: the explainer is shown context by its own lever), and
     the terms they use as their documents define them where the settings show them (defined: {content:
-    terms.Terms}; the judge_glossary lever's, likewise not returned)."""
+    terms.Terms}; the judge_glossary lever's, likewise not returned), and what the second pass noted of them (notes:
+    {claim id: [lines]}; the judge_notes lever's, likewise)."""
     images, payload, shown = [], [], []
     for e in (a, b):
         p = e.model_dump(exclude=PROVENANCE_FIELDS)
@@ -147,9 +153,10 @@ def pair_request(s, mode, a, b, output=None, records=None, defined=None):
             images += extra
         payload.append(p)
         shown.append({**p, **s.judged_context(e, (records or {}).get(e.content, {})),
-                      **s.judged_terms(e, (defined or {}).get(e.content))})
+                      **s.judged_terms(e, (defined or {}).get(e.content)),
+                      **s.judged_notes(e, (notes or {}).get(e.id, ()))})
     calc = numeric_check(a, b)
-    terms = TERMS if any("terms" in x for x in shown) else ""
+    terms = (TERMS if any("terms" in x for x in shown) else "") + (NOTED if any("noted" in x for x in shown) else "")
     prompt = (instructions(mode) + s.judging()[0] + terms + "\nA=" + json.dumps(shown[0], ensure_ascii=False)
               + "\nB=" + json.dumps(shown[1], ensure_ascii=False))
     prompt += "\nNumeric check=" + json.dumps(calc)
@@ -182,7 +189,7 @@ def _read_off(claim):
                                         or bool(getattr(claim, "image", None)))
 
 def compare(left, right, output, client, mode, dispatcher=None, progress=None, headings=None, label="", records=None,
-            glossary=None, disciplines=None):
+            glossary=None, disciplines=None, notes=None):
     """Claim-level comparison of two evidence lists (e.g. two sources' evidence).
 
     Evidence belongs to content, so content present on both sides yields identical
@@ -285,7 +292,7 @@ def compare(left, right, output, client, mode, dispatcher=None, progress=None, h
         for index, (score, a, b) in enumerate(pairs[:client.s.max_pairs]):
             dispatch.make_room()
             attempted.update((a.id,b.id))
-            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output, records, defined)
+            prompt, images, payload, calc = pair_request(client.s, mode, a, b, output, records, defined, notes)
             payloads[index] = (a, b, payload, images)
             progress.add()
             dispatch.submit(prompt, schema, images, ("compare", mode, settings_key, a.id, b.id),

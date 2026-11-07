@@ -259,6 +259,8 @@ HELP = {
                          "(kept), or dropped"),
     "summaries": Help(_L, "analyses: the summaries written, each sentence citing the claims it rests on and checked "
                           "against them: sections, files, source (by default), subjects, topics; [] for none"),
+    "judge_notes": Help(_L, "comparisons: each source's subjects read together first (the second pass), and the judge "
+                            "shown what it noted of each claim"),
     "tensions": Help(_L, "analyses: each subject's claims read for those hard to hold together on engineering "
                          "grounds, by level, what would reconcile them looked for in the source"),
     "reviewer_concerns": Help(_L, "a reviewer's concerns the tensions are also asked to watch for (a list of "

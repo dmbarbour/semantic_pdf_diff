@@ -341,9 +341,12 @@ def compare_and_report(options, settings, store, client, names, read, document, 
     comparing = comparison_interpreter(settings)
     label = provenance.text_hash(comparing.model_dump_json())
     found = read.glossary
+    commentary, notes = None, None
+    if settings.judges_with_notes():  # each source's subjects read together first, the judge shown what they noted
+        commentary, notes = read_before_judging(options, settings, document, coverage, client, label, progress)
     data = compare(left, right, store.folder, client, options.mode, progress=progress, headings=headings,
                    label=label, records=read.records, glossary=(found or {}).get('terms'),
-                   disciplines=(found or {}).get('disciplines'))
+                   disciplines=(found or {}).get('disciplines'), notes=notes)
     if options.mode == 'revisions':
         data['record_changes'] = restated(settings, files[names[0]], files[names[1]], read.records or {}, left, right)
         for f in data['findings']:  # a finding whose claims a restated record reaches says so
@@ -359,6 +362,8 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         records=document.records,
         settings={**settings.model_dump(), 'base_url': redact_url(settings.base_url)},
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
+    if commentary is not None:  # the second pass's log, as an analysis keeps it: its notes on the cards
+        data['commentary'] = commentary
     data = searchable({**traced(data), **({'glossary': found} if found is not None else {})}, settings, client,
                       options.mode, label, progress)
     progress.close()  # the comparison's requests, its search's (names, vectors) too
@@ -367,6 +372,24 @@ def compare_and_report(options, settings, store, client, names, read, document, 
                   or any(f.get('processing_error') or f.get('explanation', {}).get('processing_error')
                          for f in data['findings']))
     return saved_and_written(options, settings, store, client, data, out, incomplete)
+
+def read_before_judging(options, settings, document, coverage, client, label, progress):
+    """The second pass over a comparison's sources, before judging (the judge_notes lever; single-document analysis,
+    milestone 6): each source's subjects read together as an analysis reads them (dossiers.read_together), from the
+    sources' claims as a report holds them; (its log, {claim id: what it noted of the claim, in words: the export's
+    notes}). Its requests are named by the comparison's interpreter, as the judge's are."""
+    from . import dossiers, indexes
+    from .export import notes_of
+    pre = Report(mode=options.mode, findings=[], unmatched=[], shared=[], retrieval={},
+                 created_at=provenance.now().isoformat(), sources=document.sources, files=document.files,
+                 interpreters=document.interpreters, scan_issues=document.scan_issues, file_difference={},
+                 sections=document.sections, situation=document.situation, evidence=document.evidence,
+                 coverage=coverage, records=document.records, settings={}, limitations=[]).model_dump()
+    commentary = dossiers.read_together(pre, indexes.built(pre), client, options.mode, label, progress)
+    files = {}
+    for f in sorted(pre['files'], key=lambda f: (f['source'], f['path'])):
+        files.setdefault(f['content'], f)
+    return commentary, notes_of({**pre, 'commentary': commentary}, files)
 
 # What an analysis's report says of itself: a comparison's limitations but those of comparing.
 ANALYSIS_LIMITATIONS = [x for x in LIMITATIONS if not x.startswith(('Retrieval', 'No global'))]

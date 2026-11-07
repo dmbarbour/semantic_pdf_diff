@@ -97,6 +97,7 @@ NOT_EXERCISED = {
     'second_pass': "analyses only, of subjects of two claims or more; these runs compare (tests/test_dossiers.py)",
     'tensions': "analyses only, of subjects holding a word value; these runs compare (tests/test_tensions.py)",
     'summaries': "analyses only; these runs compare (tests/test_summaries.py)",
+    'judge_notes': "the stub's second pass notes nothing, so the judge is shown no note (tests/test_judge_notes.py)",
     'reviewer_concerns': "analyses only, with tensions on; these runs compare (tests/test_tensions.py)",
     'confirm_kinds': "analyses only, of kinds of two items or more; these runs compare (tests/test_indexes.py)",
     'retrieve_glossary': "needs a term a glossary defines; these documents define none (tests/test_glossary.py)",
