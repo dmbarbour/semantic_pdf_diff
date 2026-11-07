@@ -98,6 +98,10 @@ NOT_EXERCISED = {
     'tensions': "analyses only, of subjects holding a word value; these runs compare (tests/test_tensions.py)",
     'summaries': "analyses only; these runs compare (tests/test_summaries.py)",
     'judge_notes': "the stub's second pass notes nothing, so the judge is shown no note (tests/test_judge_notes.py)",
+    'match_subjects': "proposals' subjects names leave alone, sharing a word or a property with the other's; run "
+                      "with the model's answers in tests/test_crossmatch.py",
+    'look_gaps': "needs subjects matched across the documents, each with two claims or more; run with the model's "
+                 "answers in tests/test_crossmatch.py",
     'reviewer_concerns': "analyses only, with tensions on; these runs compare (tests/test_tensions.py)",
     'confirm_kinds': "analyses only, of kinds of two items or more; these runs compare (tests/test_indexes.py)",
     'retrieve_glossary': "needs a term a glossary defines; these documents define none (tests/test_glossary.py)",

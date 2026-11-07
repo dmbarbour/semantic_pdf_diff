@@ -203,6 +203,8 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `record_changes` | `true` | post | record_changes | compare | - |
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `judge_notes` | `false` | shaping | judge_notes | compare | - |
+| `match_subjects` | `false` | selecting | match_subjects | compare | - |
+| `look_gaps` | `false` | selecting | look_gaps | compare | - |
 | `judge_glossary` | `false` | shaping | judge_glossary | compare | - |
 | `topic_names` | `true` | selecting | topic_names | compare | - |
 | `topic_glossary` | `true` | shaping | topic_names | compare | - |

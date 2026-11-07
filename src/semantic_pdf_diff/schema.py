@@ -550,6 +550,13 @@ class Tensions(Lenient):
     """One subject's claims read for those hard to hold together on engineering grounds (tensions.py)."""
     tensions: list[Tension] = Field(default_factory=list, max_length=20)
 
+class SubjectMatch(Lenient):
+    """A subject's counterpart in the other source, as the model names it (crossmatch.py): a candidate's name (B1,
+    B2, ...) or "", the same item, the corresponding element or a state of it, and why."""
+    match: str = Field(default="", max_length=20)
+    relation: str = Field(default="", max_length=20)
+    why: str = Field(default="", max_length=400)
+
 class SummarySentence(Lenient):
     text: str = Field(default="", max_length=600)
     cites: list[Annotated[str, Field(max_length=20)]] = Field(default_factory=list, max_length=30)  # C1, C2, ...

@@ -61,7 +61,8 @@ ADDS = ("scope", "condition", "frame", "holder")
 NAME = re.compile(r"\bC\d+\b")  # a claim's name in its dossier
 READS = ("as_claimed", "otherwise", "not_shown")  # what a re-read finds
 LOOKS = ("given", "not_given", "no_place", "not_shown")  # what a look for a gap finds
-LOOKED_FOR = ("siblings", "likely")              # the gaps looked for: a subject and a property each
+LOOKED_FOR = ("siblings", "likely")              # the gaps an analysis looks for: a subject and a property each
+ELSEWHERE = "another source gives a value of it for this item"  # why a gap another source fills was expected
 ZOOM = 4.0           # a re-read's rendering, at most this many pixels a point
 AROUND = (3.0, 6.0)  # a marked claim's box widened this many times (across, down), within its tile,
 LEAST = (240, 120)   # to this many points at least: a whole page's mark read again closer (an inch mark, not a foot's)
@@ -466,9 +467,11 @@ Return JSON {"reads": "", "value": "", "unit": "", "quote": "", "why": ""}.
 '''
 
 def look_prompt(gap, names):
+    """A gap's look: its subject, property and why it was expected; for one another source fills, not that source's
+    value, so the look can't take a value like it for the property's (milestone 7)."""
     subject = gap["subject"] + (f" (also named {', '.join(names[:4])})" if names else "")
-    return (LOOK.replace("{subject}", subject).replace("{property}", gap["property"])
-            .replace("{why}", gap.get("why") or "(none given)"))
+    why = ELSEWHERE if gap["kind"] == "other_source" else gap.get("why") or "(none given)"
+    return LOOK.replace("{subject}", subject).replace("{property}", gap["property"]).replace("{why}", why)
 
 def looked_said(found):
     """Where a gap was looked for and what was found (its log entry), as the gaps say it after "looked for on": "a.pdf,
@@ -527,12 +530,13 @@ def where_to_look(gap, index, evidence, files, pages):
     cx, cy = (union.x0 + union.x1) / 2, (union.y0 + union.y1) / 2
     return best, pymupdf.Rect(cx - w, cy - h, cx + w, cy + h) & page.rect
 
-def looks(data, index, store, client, mode, label, side, progress=None):
-    """The gaps found among siblings, and those the second pass says are likely (index["gaps"]), looked for before
-    they're reported (where_to_look): the place rendered closer and asked whether it gives a value of the property for
-    the subject. A PDF's subjects only; others skipped. {"entries": [a "looked" entry a gap: "relation" given,
-    not_given or not_shown; "text" the property, "value" what it gives, "where" the page], "asked": n, "failed": n,
-    "skipped": n}, in the gaps' order."""
+def looks(data, index, store, client, mode, label, side, progress=None, kinds=LOOKED_FOR):
+    """The gaps of these kinds (index["gaps"]: an analysis's among siblings and those the second pass says are likely;
+    a comparison's that another source fills, milestone 7), looked for before they're reported (where_to_look): the
+    place rendered closer and asked whether it gives a value of the property for the subject. A PDF's subjects only;
+    others skipped. {"entries": [a "looked" entry a gap: "relation" given, not_given or not_shown; "text" the
+    property, "value" what it gives, "where" the page; "claims" a gap another source fills cites, its card's], "asked":
+    n, "failed": n, "skipped": n}, in the gaps' order."""
     from .dispatch import Dispatcher
     from .regions import crop_name, crop_stem
     from .scan import read_origin
@@ -542,7 +546,7 @@ def looks(data, index, store, client, mode, label, side, progress=None):
     files = {}
     for f in sorted(data.get("files", []), key=lambda f: (f["source"], f["path"])):
         files.setdefault(f["content"], f)
-    wanted = [g for g in index.get("gaps", []) if g["kind"] in LOOKED_FOR and g["subject"] and g["property"]]
+    wanted = [g for g in index.get("gaps", []) if g["kind"] in kinds and g["subject"] and g["property"]]
     found, counts = {}, {"asked": 0, "failed": 0, "skipped": 0}
     if not wanted:
         return {"entries": [], **counts}
@@ -583,8 +587,9 @@ def looks(data, index, store, client, mode, label, side, progress=None):
                         return
                     reads = answer.reads if answer.reads in LOOKS else "not_shown"
                     value = " ".join(s for s in (answer.value, answer.unit) if s) if reads == "given" else ""
-                    found[n] = entry("looked", g["source"], g["subject"], [], key, relation=reads, text=g["property"],
-                                     value=value, where=where, quote=answer.quote, why=answer.why)
+                    cited = g["claims"] if g["kind"] == "other_source" else []  # the other source's, on its cards
+                    found[n] = entry("looked", g["source"], g["subject"], cited, key, relation=reads,
+                                     text=g["property"], value=value, where=where, quote=answer.quote, why=answer.why)
                 dispatch.make_room()
                 progress.add()
                 dispatch.submit(look_prompt(g, others), Reread, (assets / name,), key, done)

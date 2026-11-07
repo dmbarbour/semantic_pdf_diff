@@ -6,11 +6,16 @@ document that would be useful, and it seems deeply related to the problem of com
 - **Subjects** are alignment's items (align.Side), a source's at a time: a tag in the entity (P-101B), else the
   entity's words; a claim named by position joins the tagged item whose values it repeats. A subject is named as its
   claims most often name it, and lists its properties, each with every value given and where.
-- **In a comparison,** the sources' subjects are matched where the findings pair their claims (the most pairs first,
-  one to one), else where they're keyed alike, and each is listed once with each source's values beside the others'
-  (the owner: "One merged index"). A subject's properties are one where they're named alike or the findings pair
-  their claims ("seating capacity" and "rider capacity"). A property one source gives a subject and another doesn't
-  is left blank there: weak, never a finding.
+- **In a comparison,** the sources' subjects are matched, and each is listed once with each source's values beside
+  the others' (the owner: "One merged index"). Revisions: where the findings pair their claims (the most pairs first,
+  one to one; alignment decided the items, the findings follow it), else where they're keyed alike. Proposals: where
+  they're keyed alike or named as other names of one thing, never by the findings alone (a judge's verdicts are
+  about values, not identity: the turbine pair's tower went to a mode of the other's by three uncertain verdicts;
+  single-document analysis, milestone 7, the owner answering its design's question D, 2026-11-07: "All four
+  recommendations look good as a start."). Then, where the match_subjects lever ran (crossmatch.py), the model's
+  matches of what's left. A subject's properties are one where they're named alike or the findings pair their claims
+  ("seating capacity" and "rider capacity"). A property one source gives a matched subject and another doesn't is
+  left blank there, and is a gap (below).
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
 - **Other names** (milestone 3): the names one thing goes by, as the run found them (a glossary term reaching its
@@ -30,8 +35,11 @@ document that would be useful, and it seems deeply related to the problem of com
   "drawing title"). Where the confirm_kinds lever ran (kindcheck.py), the model's names and moves.
 - **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
   each source's, a term the sources define differently marked.
-- **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): a property
-  most of an item's siblings give that it doesn't (each source's own); a figure, table or sheet cited and not found
+- **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): in a
+  comparison, a property another source gives a matched subject that a source describing it doesn't (milestone 7;
+  the owner's clearest kind: "Project A tells you a bunch about Bob including his favorite food, while Project B
+  tells you about Bob but did not mention his favorite food"); a property most of an item's siblings give that it
+  doesn't (each source's own); a figure, table or sheet cited and not found
   (situating's unresolved references); a value given as a placeholder ("TBD", "to be confirmed"); and, where the
   second pass ran (dossiers.py), what it says a subject likely lacks. Each weak: where it was expected and why, never
   a finding.
@@ -50,6 +58,9 @@ from .values import singular
 
 # The relations a finding pairs two claims of one subject by: unrelated pairs say they aren't.
 PAIRING = ("different", "equivalent", "complementary", "uncertain")
+# The model's matches of subjects across sources (crossmatch.py) that make them one, as the index says it: a state of
+# one item stays apart.
+MATCHED = {"same": "the same item", "corresponding": "the corresponding element"}
 # Where in its file a claim is, as each format names it (report.py's PLACES, without a PDF's box).
 PLACES = {"pdf": lambda loc: f"page {loc['page']}",
           "text": lambda loc: f"lines {loc['lines'][0]}–{loc['lines'][1]}",
@@ -155,14 +166,16 @@ def renamed(subjects, alias):
         out.append((key, name, cs))
     return out
 
-def matched(found, findings, sources, alias=lambda name: None):
+def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=()):
     """The sources' subjects matched across them: [{source: (key, name, claims)}], each subject once. Two sources'
-    subjects are one where the findings pair their claims, the most pairs first and one to one; else where they're
-    keyed alike (a tag, or the same words), or named as other names of one thing (alias); the rest alone."""
+    subjects are one where the findings pair their claims (by_findings: revisions), the most pairs first and one to
+    one; else where they're keyed alike (a tag, or the same words), or named as other names of one thing (alias);
+    then as the model matched them (matches: [((source, name), (source, name), relation)], crossmatch.py), each alone
+    till then; the rest alone."""
     of = {c["id"]: (source, key) for source in sources for key, _, claims in found[source] for c in claims}
     by = {(source, key): (key, name, claims) for source in sources for key, name, claims in found[source]}
     links = Counter()
-    for f in findings:
+    for f in findings if by_findings else ():
         a, b = of.get(f.get("a")), of.get(f.get("b"))
         if f.get("relation") in PAIRING and a and b and a[0] != b[0]:
             links[tuple(sorted((a, b)))] += 1
@@ -188,6 +201,16 @@ def matched(found, findings, sources, alias=lambda name: None):
             else:
                 group[source] = by[(source, k)]
         merged += [group, *apart]
+    named = {(source, name): k for source in sources for k, name, _ in found[source]}
+    for a, b, relation in matches:
+        ka, kb = named.get(a), named.get(b)
+        if ka is None or kb is None or a[0] == b[0]:
+            continue
+        ga, gb = (next((g for g in merged if g.get(x[0], (None,))[0] == k), None) for x, k in ((a, ka), (b, kb)))
+        if ga is None or gb is None or ga["matched_by"] or gb["matched_by"]:
+            continue  # each alone till then
+        ga.update({k: v for k, v in gb.items() if k != "matched_by"}, matched_by=f"model: {MATCHED[relation]}")
+        merged.remove(gb)
     return merged
 
 LISTING = re.compile(r"\s*(?:,\s*(?:and|or)|,|;|&|and|or)\s*", re.IGNORECASE)  # between a list's items
@@ -262,7 +285,10 @@ def built(data):
     found = {source: renamed(subjects_of(claims[source]), alias) for source in sources}
     paired = [(f["a"], f["b"]) for f in data.get("findings", []) if f.get("relation") in PAIRING]
     subjects, by_tag = [], {}
-    for group in matched(found, data.get("findings", []), sources, alias):
+    matches = [((c["source"], c["subject"]), (c["other_source"], c["other"]), c["relation"])
+               for c in (data.get("commentary") or {}).get("entries", [])
+               if c["kind"] == "match" and c.get("relation") in MATCHED]
+    for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals", matches):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
         properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)
@@ -454,7 +480,8 @@ SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most 
 # A value that holds a place for one not given ("N/A" says it doesn't apply, not that it's missing)
 PLACEHOLDER = re.compile(r"^\W*(?:TBD|TBC|TBA|TBV|TBR|to be (?:determined|confirmed|provided|advised|verified|decided|"
                          r"agreed|supplied|issued))\b", re.IGNORECASE)
-GAP_KINDS = ("siblings", "blank", "reference", "placeholder", "likely")
+GAP_KINDS = ("other_source", "siblings", "blank", "reference", "placeholder", "likely")
+OTHER_CLAIMS = 2  # a source's claims of a matched subject, at least, for what another source gives it to be a gap
 BLANK_ROWS = 3  # a table's rows, at least, for a cell left blank to say anything
 # a gap looked for, in a kind: the reader's misses first, then what the place leaves blank, those not looked for,
 # and last those the place has no place for or doesn't show (dossiers.looks)
@@ -469,7 +496,7 @@ def gaps(data, subjects, found_kinds, where):
     evidence of absence, and the reader may have missed what's there. A gap looked for where it would be
     (dossiers.looks) also has "looked" (where, and what was found there) and "look" (dossiers.LOOKS), and comes in its
     kind in LOOKED's order."""
-    out = []
+    out = given_elsewhere(data, subjects, found_kinds)
     for k in found_kinds:
         for source in data_sources(data):
             members = [i for i in k["subjects"] if given(subjects[i], source)]
@@ -526,8 +553,42 @@ def gaps(data, subjects, found_kinds, where):
             out.append({"kind": "placeholder", "source": where.source.get(e["content"], ""), "subject": e["entity"],
                         "property": e["attribute"], "where": where(e), "why": f"given as “{e['value']}”",
                         "claims": [e["id"]]})
-    return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), LOOKED.get(g.get("look"), 2), g["source"],
-                                      natural(g["subject"]), natural(g["property"]), natural(g["where"])))
+    # another source's: where its source gives the property for the subject's siblings first (it gives that kind of
+    # property elsewhere)
+    rank = {id(g): 0 if g.pop("siblings_give", True) else 1 for g in out}
+    return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), LOOKED.get(g.get("look"), 2), rank[id(g)],
+                                      g["source"], natural(g["subject"]), natural(g["property"]), natural(g["where"])))
+
+def given_elsewhere(data, subjects, found_kinds):
+    """What another source gives a matched subject that a source describing it doesn't (milestone 7): of a subject
+    with claims in two sources or more, each source with OTHER_CLAIMS of its own or more, each property it gives no
+    value of, under any of its names, that another source does; where expected, the subject's first place in it; why,
+    the other's value and where; its claims, the other's."""
+    kind_of_ = {i: k for k in found_kinds for i in k["subjects"]}
+    out = []
+    for i, s in enumerate(subjects):
+        mine = [src for src in data_sources(data) if src in s["claims"]]
+        if len(mine) < 2:
+            continue
+        for src in mine:
+            own = [v for p in s["properties"] for v in p["values"] if v["source"] == src and not v.get("several")]
+            if len(own) < OTHER_CLAIMS:
+                continue
+            k = kind_of_.get(i)
+            for p in s["properties"]:
+                if any(v["source"] == src for v in p["values"]):
+                    continue
+                given_ = [v for v in p["values"] if not v.get("several")]
+                if not given_:
+                    continue
+                v = given_[0]
+                name = keys_of(k).get(p["name"].casefold(), p["name"].casefold()) if k else None
+                out.append({"kind": "other_source", "source": src, "subject": s["name"], "property": p["name"],
+                            "where": own[0]["where"], "why": f"{v['source']} gives {said(v)} ({v['where']})",
+                            "claims": [x["claim"] for x in given_[:3]],
+                            "siblings_give": bool(k) and any(name in gives(subjects[j], k, src)
+                                                             for j in k["subjects"] if j != i)})
+    return out
 
 def table_place(r, f):
     """Where a table is (its record; f its file), in words a reader finds it by: "a.pdf, page 2, table 3", "a.pdf,
@@ -580,6 +641,13 @@ def inconsistencies(data, where):
                     "where": [where(e) for e in claims], "why": c.get("why", ""),
                     "read again": [again.get(x, "") for x in c["claims"]]})
     return out
+
+def said(v):
+    """A value as written: its value, unit (none for "-") and conditions; a claim naming several items says so."""
+    unit = "" if v["unit"] in ("", "-") else v["unit"]
+    return (" ".join(x for x in (str(v["value"]), unit) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
+            + (f" [of {', '.join(v['several'])}]" if v.get("several") else "")
+            + (f" [said of {', '.join(v['listed'])}]" if v.get("listed") else ""))
 
 def data_sources(data):
     return [s["name"] for s in data.get("sources", [])]

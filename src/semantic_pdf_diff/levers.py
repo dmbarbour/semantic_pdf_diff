@@ -1432,6 +1432,28 @@ class JudgeNotes(Lever):
         shown = super().judged_notes(evidence, notes)
         return {**shown, "noted": list(notes)} if self.judge_notes and notes else shown
 
+class MatchSubjects(Lever):
+    lever_name, stage, off = "match_subjects", "comparison", {"match_subjects": False}
+    # proposals: the subjects matching by code (keyed alike, other names) leaves alone in one source each shown with
+    # its likeliest counterparts in the other and the model asked which is the same item, the corresponding element
+    # or a state of it, if any (crossmatch.py; docs/plans/single-document-analysis-2026-10-28.md, milestone 7; the
+    # owner, 2026-11-07: "All four recommendations look good as a start.")
+    match_subjects: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def matches_subjects(self, mode):
+        return self.match_subjects and mode == "proposals"
+
+class LookGaps(Lever):
+    lever_name, stage, off = "look_gaps", "comparison", {"look_gaps": False}
+    # comparisons: each gap another source fills (a matched subject's property one source gives and another
+    # describing it doesn't: indexes.given_elsewhere) looked for where it'd be in the source lacking it, as an
+    # analysis's siblings' gaps are (dossiers.looks): given (the reader's miss; in revisions, a false addition or
+    # removal), not given, no place for it, not shown (milestone 7, as match_subjects)
+    look_gaps: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def looks_for_gaps(self, mode):
+        return self.look_gaps and mode != "analysis"
+
 class JudgeGlossary(Lever):
     lever_name, stage, off = "judge_glossary", "comparison", {"judge_glossary": False}
     # each claim judged shown the abbreviations and terms its words use, as its document defines them (the glossary
@@ -1525,7 +1547,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, JudgeGlossary, NameTopics, SearchNames, ReadGlossary, ConfirmKinds,
+                 JudgeContext, JudgeNotes, MatchSubjects, LookGaps, JudgeGlossary, NameTopics, SearchNames,
+                 ReadGlossary, ConfirmKinds,
                  ReadTogether, FindTensions, Summaries, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
 DEFAULT_LEVERS = tuple(REGISTRY)
@@ -1769,6 +1792,18 @@ class Platform(Composable):
         """The kinds of summary a report asks for (summaries.py): the platform's, none; the summaries lever's, in
         analyses, those it names."""
         return []
+
+    @chosen
+    def matches_subjects(self, mode):
+        """Whether the model matches the subjects a comparison's code leaves alone across its sources (crossmatch.py):
+        the platform's, never; the match_subjects lever's, in proposals when on."""
+        return False
+
+    @chosen
+    def looks_for_gaps(self, mode):
+        """Whether a comparison looks for the gaps another source fills where they'd be (dossiers.looks): the
+        platform's, never; the look_gaps lever's, in comparisons when on."""
+        return False
 
     @chosen
     def finds_tensions(self, mode):

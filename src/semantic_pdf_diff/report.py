@@ -205,6 +205,10 @@ class Cards:
                 from .dossiers import reread_said
                 lines.append(f"Read again from its place: {esc(reread_said(c))}"
                              + (f" ({esc(c['why'])})" if c.get("why") else ""))
+            elif c["kind"] == "looked":  # a gap another source fills: what this claim gives, looked for there
+                from .dossiers import looked_said
+                lines.append(f"Not given by {esc(c['source'])} as read; looked for on {esc(looked_said(c))}"
+                             + (f" ({esc(c['why'])})" if c.get("why") else ""))
         if not lines:
             return ""
         return ('<div class="notes"><b>Read with its subject\'s other claims</b> (ours, not the document\'s):'
@@ -734,7 +738,7 @@ def page_html(data, shown, stored, chosen, account, mime="image/webp", note=''):
                            '</button>' for t, (words, name) in enumerate(zip(way.topics, names)))
                  + '<button data-topic="-1">In no topic <small></small></button></div>')
     sources, paths = index.get('sources', []), {f['path'] for f in data['files']}
-    page += (subjects_html(subjects, sources) + item_kinds_html(kinds, subjects, sources)
+    page += (subjects_html(subjects, sources, gaps) + item_kinds_html(kinds, subjects, sources)
              + figures_html(figures, len(sides) > 1) + glossary_html(terms, sources, paths)
              + gaps_html(gaps, sources, paths) + inconsistencies_html(clashes, sources) + suspects + reading
              + summarized)
@@ -795,18 +799,22 @@ def placed(source, where, paths=(), page=None):
     low, high = (int(found.group(1)), int(found.group(2) or found.group(1))) if found else (page, page)
     return [f"{source} / {path}" if source else path, low, high]
 
-def subjects_html(subjects, sources):
+def subjects_html(subjects, sources, gaps=()):
     """The Subjects view (indexes.py): each subject, its other names and its properties, each value linked to its
-    claim's card; in a comparison a column a source, "—" where one gives nothing (weak: not saying isn't absence).
+    claim's card; in a comparison a column a source, "—" where one gives nothing (weak: not saying isn't absence),
+    with what a look for it where it'd be found (gaps another source fills: dossiers.looks, the look_gaps lever's).
     A search shows the subjects it finds by their words and claims (searched)."""
     if not subjects:
         return ''
     many = len(sources) > 1
-    def values(vs):  # a claim naming several items says which (indexes.several)
+    looked = {(g["source"], g["subject"], g["property"]): g["looked"] for g in gaps
+              if g["kind"] == "other_source" and g.get("looked")}
+    def values(vs, at=None):  # a claim naming several items says which (indexes.several)
         return '<br>'.join(f'<a href="#claim={esc(v["claim"])}">{esc(said_of(v))}</a> <small>{esc(v["where"])}'
                            + (f'; of {esc(", ".join(v["several"]))}' if v.get('several') else '')
                            + (f'; said of {esc(", ".join(v["listed"]))}' if v.get('listed') else '') + '</small>'
-                           for v in vs) or '—'
+                           for v in vs) or '—' + (f' <small>looked for on {esc(looked[at])}</small>' if at in looked
+                                                  else '')
     out = []
     for s in subjects:
         names = [n for n in s['names'] if n.casefold() != s['name'].casefold()]  # ("Airfoil" isn't also "airfoil")
@@ -821,7 +829,8 @@ def subjects_html(subjects, sources):
             + ''.join(f"<br><small>{esc(n)}</small>" for n in p.get('names', [])
                       if n.casefold() != p['name'].casefold())
             + "</td>"
-            + (''.join(f"<td>{values([v for v in p['values'] if v['source'] == src])}</td>" for src in sources)
+            + (''.join(f"<td>{values([v for v in p['values'] if v['source'] == src], (src, s['name'], p['name']))}"
+                       "</td>" for src in sources)
                if many else f"<td>{values(p['values'])}</td>") + '</tr>' for p in s['properties'])
         words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties'])])
         claims = [v['claim'] for p in s['properties'] for v in p['values']]

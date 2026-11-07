@@ -19,19 +19,12 @@ import re
 import zipfile
 from xml.sax.saxutils import escape
 
-from .indexes import properties, reach_said, where_said
+from .indexes import properties, reach_said, said, where_said
 
 FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # every member's, so the same index gives the same bytes
 # A value printed as a plain number, stored as one so it sorts and filters as one; not one with a leading zero (a
 # tag, "007") nor of more digits than Excel keeps (15).
 NUMBER = re.compile(r"-?(?:0|[1-9]\d*|[1-9]\d{0,2}(?:,\d{3})+)(?:\.\d+)?")
-
-def said(v):
-    """A value as written: its value, unit (none for "-") and conditions; a claim naming several items says so."""
-    unit = "" if v["unit"] in ("", "-") else v["unit"]
-    return (" ".join(x for x in (str(v["value"]), unit) if x) + (f" ({v['conditions']})" if v["conditions"] else "")
-            + (f" [of {', '.join(v['several'])}]" if v.get("several") else "")
-            + (f" [said of {', '.join(v['listed'])}]" if v.get("listed") else ""))
 
 def counted(n, one, many=None):
     """ "1 claim", "2 claims"."""
@@ -122,8 +115,9 @@ def placed(x, k):
     return x["where"][k] + (f"; read again: {again}" if again else "")
 
 # The gaps' kinds, as index.md, the workbook and the page head them
-GAP_TITLES = {"siblings": "Missing among siblings", "blank": "Left blank in a table", "reference": "Cited, not found",
-              "placeholder": "Placeholders", "likely": "Likely missing, read together"}
+GAP_TITLES = {"other_source": "Another source gives it", "siblings": "Missing among siblings",
+              "blank": "Left blank in a table", "reference": "Cited, not found", "placeholder": "Placeholders",
+              "likely": "Likely missing, read together"}
 INCONSISTENCIES_NOTE = ("Two claims of one subject that the second pass, reading its claims together, says contradict "
                         "each other: other values for the same thing under the same conditions. Ours, not the "
                         "document's: check both against their places.")

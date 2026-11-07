@@ -79,6 +79,54 @@ class Subjects(unittest.TestCase):
         apart = indexes.built(report(a + b, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b")))
         self.assertEqual(len(apart["subjects"][0]["properties"]), 2)  # unrelated: not one property
 
+    def test_proposals_subjects_matched_by_name_or_the_model_not_by_findings_alone(self):
+        """The turbine pair (single-document analysis, milestone 7; the owner, answering its design's question D,
+        2026-11-07: "All four recommendations look good as a start."): uncertain verdicts linked one turbine's tower
+        to a mode of the other's, leaving the other's own tower alone."""
+        a = [claim("A-1", "ca", "tower", "height", "87.6", "m"), claim("A-2", "ca", "tower", "mass", "347", "t"),
+             claim("A-3", "ca", "NREL 5-MW baseline turbine", "rated power", "5", "MW")]
+        b = [claim("B-1", "cb", "first torsional mode", "frequency", "0.8", "Hz"),
+             claim("B-2", "cb", "Tower", "height", "144", "m"),
+             claim("B-3", "cb", "IEA Wind 15-MW reference turbine", "rated power", "15", "MW")]
+        found = [{"a": "A-1", "b": "B-1", "relation": "uncertain"}, {"a": "A-2", "b": "B-1", "relation": "uncertain"}]
+
+        def matched(mode, *entries):
+            index = indexes.built(report(a + b, found, ("a", "b"), mode=mode, commentary={"entries": list(entries)}))
+            return sorted((s["name"], s["matched_by"], sorted(s["claims"])) for s in index["subjects"])
+        self.assertEqual(matched("revisions"), [("IEA Wind 15-MW reference turbine", "", ["b"]),
+                                                ("NREL 5-MW baseline turbine", "", ["a"]), ("Tower", "", ["b"]),
+                                                ("tower", "findings", ["a", "b"])])  # alignment's items, followed
+        self.assertEqual(matched("proposals"), [("IEA Wind 15-MW reference turbine", "", ["b"]),
+                                                ("NREL 5-MW baseline turbine", "", ["a"]),
+                                                ("first torsional mode", "", ["b"]), ("tower", "name", ["a", "b"])])
+        turbines = {"kind": "match", "source": "a", "subject": "NREL 5-MW baseline turbine", "other_source": "b",
+                    "other": "IEA Wind 15-MW reference turbine", "relation": "corresponding"}
+        self.assertIn(("NREL 5-MW baseline turbine", "model: the corresponding element", ["a", "b"]),
+                      matched("proposals", turbines))
+        self.assertEqual(len(matched("proposals", {**turbines, "relation": "state"})), 4)  # a state stays apart
+
+    def test_what_another_source_gives_a_matched_subject_a_gap_its_kind_given_elsewhere_first(self):
+        """The owner's clearest gap (2026-10-28): "Project A tells you a bunch about Bob including his favorite food,
+        while Project B tells you about Bob but did not mention his favorite food"."""
+        a = [claim("A-1", "ca", "P-101", "flow", "5", "L/s"), claim("A-2", "ca", "P-101", "head", "40", "m"),
+             claim("A-3", "ca", "P-102", "flow", "6", "L/s"), claim("A-4", "ca", "P-102", "NPSH", "3", "m"),
+             claim("A-5", "ca", "tower", "height", "87.6", "m"), claim("A-6", "ca", "tower", "mass", "347", "t")]
+        b = [claim("B-1", "cb", "P-101", "flow", "5.5", "L/s"), claim("B-2", "cb", "P-101", "NPSH", "2.9", "m", page=4),
+             claim("B-3", "cb", "Tower", "height", "144", "m"), claim("B-4", "cb", "Tower", "diameter", "10", "m"),
+             claim("B-5", "cb", "P-102", "flow", "6", "L/s")]
+        index = indexes.built(report(a + b, [], ("a", "b"), mode="proposals"))
+        gaps = [(g["source"], g["subject"], g["property"], g["where"], g["why"], g["claims"]) for g in index["gaps"]
+                if g["kind"] == "other_source"]
+        self.assertEqual(gaps, [
+            ("a", "P-101", "NPSH", "a.pdf, page 1", "b gives 2.9 m (b.pdf, page 4)", ["B-2"]),  # a gives P-102's
+            ("a", "tower", "diameter", "a.pdf, page 1", "b gives 10 m (b.pdf, page 1)", ["B-4"]),
+            ("b", "P-101", "head", "b.pdf, page 1", "a gives 40 m (a.pdf, page 1)", ["A-2"]),
+            ("b", "tower", "mass", "b.pdf, page 1", "a gives 347 t (a.pdf, page 1)", ["A-6"])])  # P-102: b's one claim
+        self.assertNotIn("siblings_give", index["gaps"][0])
+        page = indexfiles.markdown(index)
+        self.assertIn("### Another source gives it\n\n- a: **P-101: NPSH** (a.pdf, page 1; b gives 2.9 m (b.pdf, page "
+                      "4))", page)
+
     def test_kinds_of_items_tagged_and_numbered(self):
         """The owner, 2026-10-30, of items or kinds: "I think we should have indices for both, where feasible.\""""
         evidence = ONE + [claim("A-5", "ca", "P-103 feed pump", "rated power", "9", "kW"),

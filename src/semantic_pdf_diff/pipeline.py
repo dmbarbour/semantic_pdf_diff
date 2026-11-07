@@ -366,6 +366,19 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         data['commentary'] = commentary
     data = searchable({**traced(data), **({'glossary': found} if found is not None else {})}, settings, client,
                       options.mode, label, progress)
+    if settings.matches_subjects(options.mode):  # what matching by code leaves alone, matched by the model
+        from . import crossmatch, indexes
+        matched = crossmatch.read(data, indexes.built(data), client, options.mode, label, progress)
+        log_ = data.setdefault('commentary', {'entries': []})
+        log_['entries'] += matched.pop('entries')
+        log_['matched'] = matched
+    if settings.looks_for_gaps(options.mode):  # what another source gives a subject, looked for where it'd be
+        from . import dossiers, indexes
+        looked = dossiers.looks(data, indexes.built(data), store, client, options.mode, label, settings.image_side,
+                                progress, kinds=("other_source",))
+        log_ = data.setdefault('commentary', {'entries': []})
+        log_['entries'] += looked.pop('entries')
+        log_['looked'] = looked
     progress.close()  # the comparison's requests, its search's (names, vectors) too
     incomplete = (any(r['status'] not in ('complete',) for r in coverage) or not left or not right
                   or data['retrieval']['omitted_by_pair_limit'] > 0
