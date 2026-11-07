@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.41.0 (2026-11-07)
+
+- **Summaries, each sentence citing its claims, as a setting** (`summaries`, none by default; analyses; the owner: "This seems like a good design for milestone 4."). The kinds named are written by the model from the claims alone: a section's (a drawing set's sheets, page by page), a file's from its sections', a folder's from its files', a subject's, a topic's. Each sentence cites the claims it rests on and is checked by code: it cites claims it was given, and states no number they don't give; one failing is kept and marked. In a Summaries view, each citation a link to its claim, and in `export` as chunks labelled as written by the model, with the claims they cite. On two real analyses, 694 sentences, every one citing its claims, none stating a number they don't give.
+- **Fixed: tensions raised two values of one property, and two items sharing a name as conflicts.** A tension whose claims all give one property is dropped (the second pass's contradictions), and a "can't both hold" whose claims stand on different pages is taken as "needs a reason", saying they may be two items. On scical's sheets, 14 tensions became 10, none "can't both hold"; on the IEA report, 2, both worth it (a drag coefficient of 0, a misread; plywood as an exterior deck).
+
 ## 0.40.0 (2026-11-06)
 
 - **An analysis's later steps shown as bars of their own** (the owner: "it seems the second pass doesn't have its own progress bar? Mine's been on `embed` with 10,296/10,296 sentences but has been doing reread steps for hours now."): the second pass's subjects and kinds, the claims it doubts read again, the gaps looked for, the kinds named, the tensions' subjects. Before, they were counted only in the status line, under the last bar drawn.
