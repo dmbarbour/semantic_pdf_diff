@@ -262,6 +262,7 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
 - **Reported** in the comparison's report beside its findings, labelled weak, with the claim the other source gives.
 - **Measured** by the knob of an attribute one revision or proposal gives and the other doesn't, on the controlled pairs.
 - **Design, 2026-11-07** (Claude's sketch, for the owner's review; the owner, 2026-11-07: "Please proceed." to a design first). Questions A to D below.
+  - **Answered 2026-11-07** (the owner: "All four recommendations look good as a start."): A to D as recommended. With it, for revisions: "I'd want some extra cues about what is claimed to have been revised or why. I don't believe we track that sort of provenance at the moment because it doesn't look enough like a number or engineering claim." A direction of its own: the plans index's tentative row *Revision cues*.
   - **What there is:**
     - A comparison's merged index matches the sources' subjects: where the findings pair their claims (the most pairs first), then keyed alike (a tag, the same words), then other names.
     - Each matched subject's properties are listed with each source's values. A property one source doesn't give is left blank. It isn't listed or looked for anywhere: only each source's own gaps are (milestone 5).
