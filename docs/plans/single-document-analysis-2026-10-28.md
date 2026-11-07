@@ -207,7 +207,10 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
       - Reconciling words were looked for in the passages claims were read from: a passage holds its neighbours' sentences, so every claim of the "6 Electrical and Materials" paragraph was cited for each. Now in what claims say, and context records (a mitigation the text says that no claim holds isn't found: a [levers' idea](../reviews/levers.md#ideas-not-built-yet)).
       - "NEMA 3R" was looked for as "NEMA" (a word of two characters left out), and found in the NEMA 1 claim: a word with a number now counts, and the words must stand near one another and near something of the tension's claims.
       - A tension whose reason named nothing of its claims (a NEMA 1 enclosure's reason, cited to the wet well's coating) stood in a clean twin: such an entry is now dropped.
-    - **Not yet measured:** real documents, by eye.
+    - **Real documents, by eye** (2026-11-07, $0.33 with what `whole_lines` and the readers' versions asked again):
+      - **IEA 22 MW's pages and a DC drawing set's** (29 subjects asked): 2 tensions, both worth it: "airfoil drag coefficient 0" can't hold (a misread: the text gives the cylinder's lift coefficient 0.0 and drag coefficient 0.35), and plywood as an exterior deck surface needs a reason.
+      - **scical's 9 sheets** (188 subjects asked): at first 6 tensions, then, asked again with the prompt saying a tension is about one item, 14: two items sharing a generic name called "can't both hold" (a "beam" LVL in one detail and a W-beam in another; "horizontal member", "vertical member" plywood and HSS), and two values of one property (the floor sheathing's 1" and 1/2"), which the prompt excludes. Worth a look among them: ASTM A307 all-thread rod "driven into" asphalt; a 10 ft assembly on full-extension drawer slides; 10d and 6d nails for one sheathing.
+      - **So, by code** (gemma-4 ignoring the prompt's two rules): a tension whose claims all give one property dropped (the second pass's contradictions); a "can't both hold" whose claims stand on different pages taken as "needs a reason", the level said kept, its why saying they may be two items. scical: 14 → 10, no "can't both hold" left; the planted reports and the IEA report unchanged.
 
 ### 5. Gaps within one document
 

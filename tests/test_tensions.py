@@ -62,6 +62,18 @@ class Asked(unittest.TestCase):
                              [("tension", ["A-1", "A-2"], "reason", reconciled)])
             self.assertEqual(entries[0]["why"], "“low-alloy steel” (page 2) isn't corrosion-resistant on its own")
 
+    def test_two_values_of_one_property_dropped_and_a_conflict_across_pages_a_reason(self):
+        d = data()
+        d["evidence"].append(claim("A-6", "ca", "Access hatch frame", "material", "stainless steel", "", page=6))
+        _, subject, named, _ = tensions.asked(d, indexes.built(d))[0]
+        entries, dropped = tensions.logged(answer(
+            {"claims": ["C1", "C3"], "level": "conflict", "why": "C1 and C3: two materials", "reconcile": []},
+            {"claims": ["C2", "C3"], "level": "conflict", "why": "a stainless steel frame resists hydrogen sulfide",
+             "reconcile": []}), "a", subject, named, ("tensions", "analysis", "x"), tensions.places(d, "a"))
+        self.assertEqual(dropped, 1)  # two materials: two values of one property, the second pass's
+        self.assertEqual([(e["relation"], e.get("said_level")) for e in entries], [("reason", "conflict")])
+        self.assertTrue(entries[0]["why"].endswith("(on pages 2, 6: may be two items sharing a name)"))
+
     def test_reconciling_words_are_a_words_forms_near_one_another_not_the_tensions_own(self):
         said = [("A", "claim", tensions._words("hot-dip galvanised and epoxy coated after fabrication")),
                 ("B", "claim", tensions._words("the pump control panel is a NEMA 1 enclosure")),
