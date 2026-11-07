@@ -37,6 +37,11 @@ removed fact of an item the revision lacking it still gives OTHER_CLAIMS facts o
 report's index (as the run wrote it) is read for its gaps of that kind: right (its claims bound to a planted
 gap, on the side lacking it), both give it (a fact both revisions give: the reader's miss, or a property named two
 ways), another fact, or unbound; with what each look found, where the look_gaps lever ran.
+
+**Matching** (docs/plans/tentative-matches-2026-11-07.md, milestone 1): the report's index's subjects matched across
+the revisions (as the run wrote them), each scored by the keys' items its claims are bound to: right where each
+side's most bound item is the same, wrong where it isn't, unscorable where a side's claims are bound to none; and of
+the items both revisions' claims give (OTHER_CLAIMS bound claims or more on each side), how many a right match holds.
 """
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -148,7 +153,46 @@ def score_comparison(earlier, later, report):
             **({"echoes": score_echoes_compared(earlier, later, report, side)} if earlier.get("echoes") else {}),
             **({"kinds": _explained(read.kinds_found)} if read.kinds_found else {}),
             **_gaps(report, side, keys, renames, kinds, bound),
+            **_matching(report, side, keys, renames, bound),
             "detail": dict(sorted(detail.items()))}
+
+def _matching(report, side, keys, renames, bound):
+    """The index's subjects matched across the revisions, scored by the keys' items (see the module's note):
+    {"matching": {"groups", "right", "wrong", "unscorable", "items", "matched"}}, or nothing without an index."""
+    from semantic_pdf_diff import indexes
+    subjects = (report.get("index") or {}).get("subjects")
+    if not subjects:
+        return {}
+    facts = [{(renames.get(f["id"], f["id"]) if k else f["id"]): f for f in key["facts"]
+              if f["role"] == "fact" and not f.get("relation")} for k, key in enumerate(keys)]
+    item = lambda fid: " ".join((facts[0].get(fid) or facts[1].get(fid))["entity"].casefold().split())  # noqa: E731
+    items = [Counter(), Counter()]  # each side's bound claims by item
+    for claim, fids in bound.items():
+        for fid in fids:
+            if fid in facts[0] or fid in facts[1]:
+                items[side[claim]][item(fid)] += 1
+    names = [x["name"] for x in report["sources"]]
+    counts, matched = Counter(), set()
+    for s in subjects:
+        if len(s["claims"]) < 2:
+            continue
+        counts["groups"] += 1
+        most = []
+        for k, name in enumerate(names):
+            found = Counter(item(fid) for c in s["claims"].get(name, []) for fid in bound.get(c, {})
+                            if fid in facts[0] or fid in facts[1])
+            top = max(found.values(), default=0)
+            most.append({i for i, n in found.items() if n == top} if top else set())
+        if not all(most):
+            counts["unscorable"] += 1
+        elif most[0] & most[1]:
+            counts["right"] += 1
+            matched |= most[0] & most[1]
+        else:
+            counts["wrong"] += 1
+    both = {i for i in items[0] if items[0][i] >= indexes.OTHER_CLAIMS and items[1][i] >= indexes.OTHER_CLAIMS}
+    return {"matching": {**{k: counts[k] for k in ("groups", "right", "wrong", "unscorable")}, "items": len(both),
+                         "matched": len(both & matched)}}
 
 def _gaps(report, side, keys, renames, kinds, bound):
     """The gaps another revision fills, scored (see the module's note): {"gaps_found": "found/planted", "gaps": {how

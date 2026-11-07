@@ -51,6 +51,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -142,6 +150,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -232,6 +248,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -320,6 +344,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -416,6 +448,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -506,6 +546,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -590,6 +638,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
    },
    "detail": {
     "el.Camelback.g": "confirmed",
@@ -676,6 +732,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -760,6 +824,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
    },
    "detail": {
     "el.Camelback.g": "confirmed",
@@ -846,6 +918,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -929,6 +1009,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -1071,6 +1159,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -1211,6 +1307,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -1353,6 +1457,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -1493,6 +1605,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -1642,6 +1762,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -1725,6 +1853,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -1806,6 +1942,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -1892,6 +2036,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -1977,6 +2129,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -2052,6 +2212,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -2122,6 +2290,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 2,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.demand": "confirmed",
     "opt1.season": "reported",
@@ -2174,6 +2350,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -2246,6 +2430,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -2316,6 +2508,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -2398,6 +2598,14 @@
     "given": 4,
     "no_place": 2
    },
+   "matching": {
+    "groups": 24,
+    "right": 19,
+    "wrong": 0,
+    "unscorable": 5,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -2471,6 +2679,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -2589,6 +2805,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -2707,6 +2931,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -2825,6 +3057,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -2943,6 +3183,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -3061,6 +3309,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -3179,6 +3435,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -3297,6 +3561,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -3415,6 +3687,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -3533,6 +3813,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -3673,6 +3961,14 @@
     "given": 1,
     "not_given": 2
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -3754,6 +4050,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -3840,6 +4144,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -3922,6 +4234,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -4002,6 +4322,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -4101,6 +4429,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -4258,6 +4594,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -4415,6 +4759,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -4572,6 +4924,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -4729,6 +5089,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -4863,6 +5231,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -4931,6 +5307,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -4999,6 +5383,14 @@
    "unmatched": 0,
    "pairs": 2,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -5066,6 +5458,14 @@
    "unmatched": 0,
    "pairs": 10,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -5144,6 +5544,14 @@
       "restated": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -5229,6 +5637,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -5300,6 +5716,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -5370,6 +5794,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "reported",
@@ -5444,6 +5876,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -5516,6 +5956,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "reported",
@@ -5596,6 +6044,14 @@
    },
    "gaps_found": "0/3",
    "gaps": {},
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5662,6 +6118,14 @@
    "gaps": {
     "right": 3
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 3,
+    "matched": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5727,6 +6191,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -5795,6 +6267,14 @@
    "gaps": {
     "right": 3
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -5861,6 +6341,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -5948,6 +6436,14 @@
    "gap_looks": {
     "given": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6011,6 +6507,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 3,
+    "matched": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6073,6 +6577,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -6150,6 +6662,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6226,6 +6746,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6306,6 +6834,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6376,6 +6912,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6444,6 +6988,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -6515,6 +7067,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -6584,6 +7144,14 @@
       "conditions": 1
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -6661,6 +7229,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 27,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 1
    },
    "detail": {
     "attach.attempts": "confirmed",
@@ -6740,6 +7316,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -6818,6 +7402,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -6887,6 +7479,14 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 20,
+    "wrong": 0,
+    "unscorable": 6,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -6966,6 +7566,14 @@
    "unmatched": 0,
    "pairs": 24,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -7107,6 +7715,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -7250,6 +7866,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -7398,6 +8022,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -7531,6 +8163,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -7668,6 +8308,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -7794,6 +8442,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -7920,6 +8576,14 @@
    "unmatched": 0,
    "pairs": 77,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -8059,6 +8723,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -8186,6 +8858,14 @@
    "unmatched": 0,
    "pairs": 76,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -8327,6 +9007,14 @@
       "misread": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -8470,6 +9158,14 @@
       "restated": 2
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -8617,6 +9313,14 @@
       "restated": 9
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -8766,6 +9470,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -8913,6 +9625,14 @@
       "restated": 10
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -9081,6 +9801,14 @@
     "no_place": 3,
     "not_shown": 1
    },
+   "matching": {
+    "groups": 32,
+    "right": 22,
+    "wrong": 1,
+    "unscorable": 9,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -9216,6 +9944,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -9277,6 +10013,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -9341,6 +10085,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -9404,6 +10156,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -9466,6 +10226,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -9544,6 +10312,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 4,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9621,6 +10397,14 @@
    "gaps": {
     "both give it": 2
    },
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9696,6 +10480,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9772,6 +10564,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 7,
+    "right": 4,
+    "wrong": 0,
+    "unscorable": 3,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9848,6 +10648,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 8,
+    "right": 5,
+    "wrong": 0,
+    "unscorable": 3,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -9910,6 +10718,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ack": "settled",
@@ -9976,6 +10792,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -10040,6 +10864,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack": "settled",
@@ -10106,6 +10938,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 6,
+    "right": 6,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -10170,6 +11010,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack": "settled",
@@ -10236,6 +11084,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -10296,6 +11152,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -10358,6 +11222,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -10419,6 +11291,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -10479,6 +11359,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -10550,6 +11438,14 @@
     "given": 1,
     "no_place": 5,
     "not_shown": 1
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -10638,6 +11534,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 2
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -10729,6 +11633,14 @@
     "both give it": 1,
     "unbound": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -10816,6 +11728,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 4
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -10905,6 +11825,14 @@
    "gaps": {
     "unbound": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -10980,6 +11908,14 @@
    },
    "gap_looks": {
     "no_place": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -11105,6 +12041,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -11228,6 +12172,14 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -11354,6 +12306,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -11478,6 +12438,14 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -11612,6 +12580,14 @@
     "no_place": 1,
     "not_given": 2
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -11690,6 +12666,14 @@
    "gaps": {
     "right": 1,
     "unbound": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -11770,6 +12754,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -11849,6 +12841,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -11927,6 +12927,14 @@
    "gaps_found": "1/4",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -12017,6 +13025,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -12093,6 +13109,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -12172,6 +13196,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -12263,6 +13295,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -12353,6 +13393,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -12441,6 +13489,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -12537,6 +13593,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -12627,6 +13691,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -12711,6 +13783,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
    },
    "detail": {
     "el.Camelback.g": "confirmed",
@@ -12797,6 +13877,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -12881,6 +13969,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
    },
    "detail": {
     "el.Camelback.g": "confirmed",
@@ -12967,6 +14063,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -13050,6 +14154,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -13192,6 +14304,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -13332,6 +14452,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -13474,6 +14602,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -13614,6 +14750,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -13763,6 +14907,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -13846,6 +14998,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -13927,6 +15087,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -14013,6 +15181,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -14098,6 +15274,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -14173,6 +15357,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -14243,6 +15435,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 2,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.demand": "confirmed",
     "opt1.season": "reported",
@@ -14295,6 +15495,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -14367,6 +15575,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -14437,6 +15653,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -14519,6 +15743,14 @@
     "given": 4,
     "no_place": 2
    },
+   "matching": {
+    "groups": 24,
+    "right": 19,
+    "wrong": 0,
+    "unscorable": 5,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -14592,6 +15824,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -14710,6 +15950,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -14828,6 +16076,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -14946,6 +16202,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15064,6 +16328,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15182,6 +16454,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15300,6 +16580,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15418,6 +16706,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15536,6 +16832,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15654,6 +16958,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -15794,6 +17106,14 @@
     "given": 1,
     "not_given": 2
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -15875,6 +17195,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -15961,6 +17289,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -16043,6 +17379,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -16123,6 +17467,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -16222,6 +17574,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -16379,6 +17739,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -16536,6 +17904,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -16693,6 +18069,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -16850,6 +18234,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -16984,6 +18376,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -17052,6 +18452,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -17120,6 +18528,14 @@
    "unmatched": 0,
    "pairs": 2,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -17187,6 +18603,14 @@
    "unmatched": 0,
    "pairs": 10,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -17265,6 +18689,14 @@
       "restated": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -17350,6 +18782,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -17421,6 +18861,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -17491,6 +18939,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "reported",
@@ -17565,6 +19021,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -17637,6 +19101,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "reported",
@@ -17717,6 +19189,14 @@
    },
    "gaps_found": "0/3",
    "gaps": {},
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -17783,6 +19263,14 @@
    "gaps": {
     "right": 3
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 3,
+    "matched": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -17848,6 +19336,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -17916,6 +19412,14 @@
    "gaps": {
     "right": 3
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -17982,6 +19486,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -18069,6 +19581,14 @@
    "gap_looks": {
     "given": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18132,6 +19652,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 3,
+    "matched": 3
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18194,6 +19722,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -18271,6 +19807,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18347,6 +19891,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18427,6 +19979,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18497,6 +20057,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18565,6 +20133,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -18636,6 +20212,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -18705,6 +20289,14 @@
       "conditions": 1
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -18782,6 +20374,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 27,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 1
    },
    "detail": {
     "attach.attempts": "confirmed",
@@ -18861,6 +20461,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -18939,6 +20547,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -19008,6 +20624,14 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 20,
+    "wrong": 0,
+    "unscorable": 6,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -19087,6 +20711,14 @@
    "unmatched": 0,
    "pairs": 24,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -19228,6 +20860,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -19371,6 +21011,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -19519,6 +21167,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -19652,6 +21308,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -19789,6 +21453,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -19915,6 +21587,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -20041,6 +21721,14 @@
    "unmatched": 0,
    "pairs": 77,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -20180,6 +21868,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -20307,6 +22003,14 @@
    "unmatched": 0,
    "pairs": 76,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -20448,6 +22152,14 @@
       "misread": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -20591,6 +22303,14 @@
       "restated": 2
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -20738,6 +22458,14 @@
       "restated": 9
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -20887,6 +22615,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -21034,6 +22770,14 @@
       "restated": 10
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -21202,6 +22946,14 @@
     "no_place": 3,
     "not_shown": 1
    },
+   "matching": {
+    "groups": 32,
+    "right": 22,
+    "wrong": 1,
+    "unscorable": 9,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -21337,6 +23089,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -21398,6 +23158,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -21462,6 +23230,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -21525,6 +23301,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -21587,6 +23371,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -21665,6 +23457,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 4,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -21742,6 +23542,14 @@
    "gaps": {
     "both give it": 2
    },
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -21817,6 +23625,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -21893,6 +23709,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 7,
+    "right": 4,
+    "wrong": 0,
+    "unscorable": 3,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -21969,6 +23793,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 8,
+    "right": 5,
+    "wrong": 0,
+    "unscorable": 3,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -22031,6 +23863,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ack": "settled",
@@ -22097,6 +23937,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -22161,6 +24009,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack": "settled",
@@ -22227,6 +24083,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 6,
+    "right": 6,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -22291,6 +24155,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack": "settled",
@@ -22357,6 +24229,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -22417,6 +24297,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -22479,6 +24367,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -22540,6 +24436,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -22600,6 +24504,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -22671,6 +24583,14 @@
     "given": 1,
     "no_place": 5,
     "not_shown": 1
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -22759,6 +24679,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 2
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -22850,6 +24778,14 @@
     "both give it": 1,
     "unbound": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -22937,6 +24873,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 4
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -23026,6 +24970,14 @@
    "gaps": {
     "unbound": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -23101,6 +25053,14 @@
    },
    "gap_looks": {
     "no_place": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -23226,6 +25186,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -23349,6 +25317,14 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -23475,6 +25451,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -23599,6 +25583,14 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -23733,6 +25725,14 @@
     "no_place": 1,
     "not_given": 2
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -23812,6 +25812,14 @@
     "right": 1,
     "unbound": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -23890,6 +25898,14 @@
    "gaps_found": "1/4",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -23970,6 +25986,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -24048,6 +26072,14 @@
    "gaps_found": "1/4",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -24138,6 +26170,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -24214,6 +26254,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -24293,6 +26341,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -24387,6 +26443,14 @@
    "gaps": {
     "unbound": 2
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -24476,6 +26540,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -24564,6 +26636,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -24655,6 +26735,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -24739,6 +26827,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
    },
    "detail": {
     "el.Camelback.g": "confirmed",
@@ -24825,6 +26921,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -24910,6 +27014,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -24993,6 +27105,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -25135,6 +27255,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -25275,6 +27403,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -25417,6 +27553,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -25558,6 +27702,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -25639,6 +27791,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -25725,6 +27885,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -25810,6 +27978,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -25885,6 +28061,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -25954,6 +28138,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -26026,6 +28218,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -26096,6 +28296,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -26179,6 +28387,14 @@
     "given": 5,
     "no_place": 2
    },
+   "matching": {
+    "groups": 19,
+    "right": 9,
+    "wrong": 5,
+    "unscorable": 5,
+    "items": 14,
+    "matched": 6
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -26252,6 +28468,14 @@
    "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -26370,6 +28594,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -26488,6 +28720,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -26606,6 +28846,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -26724,6 +28972,14 @@
    "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -26842,6 +29098,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -26960,6 +29224,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -27078,6 +29350,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -27219,6 +29499,14 @@
     "given": 1,
     "not_given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -27305,6 +29593,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -27387,6 +29683,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -27467,6 +29771,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -27566,6 +29878,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -27723,6 +30043,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -27880,6 +30208,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -28037,6 +30373,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -28171,6 +30515,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -28240,6 +30592,14 @@
    "unmatched": 0,
    "pairs": 2,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -28307,6 +30667,14 @@
    "unmatched": 0,
    "pairs": 1,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -28374,6 +30742,14 @@
    "unmatched": 0,
    "pairs": 1,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -28458,6 +30834,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -28528,6 +30912,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "reported",
@@ -28602,6 +30994,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -28674,6 +31074,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "reported",
@@ -28754,6 +31162,14 @@
    },
    "gaps_found": "0/3",
    "gaps": {},
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -28819,6 +31235,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -28887,6 +31311,14 @@
    "gaps": {
     "right": 3
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -28953,6 +31385,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -29040,6 +31480,14 @@
    "gap_looks": {
     "given": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -29102,6 +31550,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -29179,6 +31635,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -29255,6 +31719,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -29335,6 +31807,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -29403,6 +31883,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -29474,6 +31962,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -29543,6 +32039,14 @@
       "conditions": 1
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -29620,6 +32124,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 27,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 1
    },
    "detail": {
     "attach.attempts": "confirmed",
@@ -29699,6 +32211,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -29777,6 +32297,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -29846,6 +32374,14 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 20,
+    "wrong": 0,
+    "unscorable": 6,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -29933,6 +32469,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -30076,6 +32620,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -30217,6 +32769,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -30360,6 +32920,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -30486,6 +33054,14 @@
    "unmatched": 38,
    "pairs": 52,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -30612,6 +33188,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -30738,6 +33322,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -30864,6 +33456,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -31006,6 +33606,14 @@
       "restated": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -31150,6 +33758,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -31293,6 +33909,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -31434,6 +34058,14 @@
       "misread": 3
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -31601,6 +34233,14 @@
     "no_place": 4,
     "not_shown": 2
    },
+   "matching": {
+    "groups": 27,
+    "right": 17,
+    "wrong": 1,
+    "unscorable": 9,
+    "items": 14,
+    "matched": 9
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -31736,6 +34376,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -31798,6 +34446,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -31862,6 +34518,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -31924,6 +34588,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -32002,6 +34674,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 4,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -32077,6 +34757,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -32153,6 +34841,14 @@
    "gaps_found": "0/1",
    "gaps": {
     "both give it": 1
+   },
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.borealis": "confirmed",
@@ -32231,6 +34927,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -32293,6 +34997,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ack": "settled",
@@ -32359,6 +35071,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -32423,6 +35143,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack": "settled",
@@ -32489,6 +35217,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -32554,6 +35290,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -32614,6 +35358,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -32676,6 +35428,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -32736,6 +35496,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -32805,6 +35573,14 @@
    "gap_looks": {
     "given": 2,
     "no_place": 5
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -32895,6 +35671,14 @@
    "gaps": {
     "unbound": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -32978,6 +35762,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -33060,6 +35852,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -33148,6 +35948,14 @@
    },
    "gap_looks": {
     "no_place": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -33273,6 +36081,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -33397,6 +36213,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -33520,6 +36344,14 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -33655,6 +36487,14 @@
     "no_place": 1,
     "not_given": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -33736,6 +36576,14 @@
     "right": 1,
     "unbound": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -33815,6 +36663,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -33893,6 +36749,14 @@
    "gaps_found": "1/4",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -33987,6 +36851,14 @@
    "gaps": {
     "unbound": 2
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -34063,6 +36935,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -34142,6 +37022,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -34236,6 +37124,14 @@
    "gaps": {
     "unbound": 2
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -34325,6 +37221,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -34413,6 +37317,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -34504,6 +37416,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -34588,6 +37508,14 @@
       "changed": 4
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
    },
    "detail": {
     "el.Camelback.g": "confirmed",
@@ -34674,6 +37602,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -34759,6 +37695,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7
+   },
    "detail": {
     "el.Camelback.g": "confirmed",
     "el.Camelback.height": "confirmed",
@@ -34842,6 +37786,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -34984,6 +37936,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -35124,6 +38084,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -35266,6 +38234,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -35407,6 +38383,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -35488,6 +38472,14 @@
    "gaps_found": "0/0",
    "gaps": {
     "unbound": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
    },
    "detail": {
     "ahu3.airflow": "confirmed",
@@ -35574,6 +38566,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -35659,6 +38659,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 6,
+    "matched": 6
+   },
    "detail": {
     "ahu3.airflow": "confirmed",
     "ahu3.fanmotor": "confirmed",
@@ -35734,6 +38742,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -35803,6 +38819,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -35875,6 +38899,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "opt1.august": "confirmed",
     "opt1.demand": "confirmed",
@@ -35945,6 +38977,14 @@
       "changed": 5
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "opt1.august": "confirmed",
@@ -36028,6 +39068,14 @@
     "given": 5,
     "no_place": 2
    },
+   "matching": {
+    "groups": 19,
+    "right": 9,
+    "wrong": 5,
+    "unscorable": 5,
+    "items": 14,
+    "matched": 6
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -36101,6 +39149,14 @@
    "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36219,6 +39275,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36337,6 +39401,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36455,6 +39527,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36573,6 +39653,14 @@
    "unmatched": 0,
    "pairs": 3,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36691,6 +39779,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36809,6 +39905,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -36927,6 +40031,14 @@
    "unmatched": 0,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -37068,6 +40180,14 @@
     "given": 1,
     "not_given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -37154,6 +40274,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -37236,6 +40364,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -37316,6 +40452,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -37415,6 +40559,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -37572,6 +40724,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -37729,6 +40889,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -37886,6 +41054,14 @@
      "old_claims_relations": []
     }
    ],
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 25,
+    "matched": 25
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -38020,6 +41196,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -38089,6 +41273,14 @@
    "unmatched": 0,
    "pairs": 2,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -38156,6 +41348,14 @@
    "unmatched": 0,
    "pairs": 1,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -38223,6 +41423,14 @@
    "unmatched": 0,
    "pairs": 1,
    "omitted": 0,
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -38307,6 +41515,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -38377,6 +41593,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "reported",
@@ -38451,6 +41675,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "reported",
     "fail.ack": "confirmed",
@@ -38523,6 +41755,14 @@
       "changed": 3
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "reported",
@@ -38603,6 +41843,14 @@
    },
    "gaps_found": "0/3",
    "gaps": {},
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -38668,6 +41916,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -38736,6 +41992,14 @@
    "gaps": {
     "right": 3
    },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -38802,6 +42066,14 @@
    "gaps_found": "3/3",
    "gaps": {
     "right": 3
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -38889,6 +42161,14 @@
    "gap_looks": {
     "given": 4
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -38951,6 +42231,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",
@@ -39028,6 +42316,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -39104,6 +42400,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -39184,6 +42488,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -39252,6 +42564,14 @@
       "conditions": 2
      }
     }
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -39323,6 +42643,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
+   },
    "detail": {
     "ext.field": "confirmed",
     "fail.ack": "confirmed",
@@ -39392,6 +42720,14 @@
       "conditions": 1
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 4,
+    "matched": 4
    },
    "detail": {
     "ext.field": "confirmed",
@@ -39469,6 +42805,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 27,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 1
    },
    "detail": {
     "attach.attempts": "confirmed",
@@ -39548,6 +42892,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -39626,6 +42978,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 25,
+    "right": 25,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 0,
+    "matched": 0
+   },
    "detail": {
     "attach.attempts": "confirmed",
     "attach.deadline": "confirmed",
@@ -39695,6 +43055,14 @@
    "unmatched": 1,
    "pairs": 0,
    "omitted": 0,
+   "matching": {
+    "groups": 26,
+    "right": 20,
+    "wrong": 0,
+    "unscorable": 6,
+    "items": 14,
+    "matched": 14
+   },
    "detail": {
     "D101.height": "confirmed",
     "D101.width": "confirmed",
@@ -39782,6 +43150,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -39925,6 +43301,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -40066,6 +43450,14 @@
       "conditions": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -40209,6 +43601,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -40335,6 +43735,14 @@
    "unmatched": 38,
    "pairs": 52,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -40461,6 +43869,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -40587,6 +44003,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -40713,6 +44137,14 @@
    "unmatched": 0,
    "pairs": 71,
    "omitted": 0,
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -40855,6 +44287,14 @@
       "restated": 5
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -40999,6 +44439,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -41142,6 +44590,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
+   },
    "detail": {
     "BR1.brake fins": "confirmed",
     "BR1.entry speed": "confirmed",
@@ -41283,6 +44739,14 @@
       "misread": 3
      }
     }
+   },
+   "matching": {
+    "groups": 28,
+    "right": 28,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 28,
+    "matched": 28
    },
    "detail": {
     "BR1.brake fins": "confirmed",
@@ -41450,6 +44914,14 @@
     "no_place": 4,
     "not_shown": 2
    },
+   "matching": {
+    "groups": 27,
+    "right": 17,
+    "wrong": 1,
+    "unscorable": 9,
+    "items": 14,
+    "matched": 9
+   },
    "detail": {
     "hallc.D101.height": "confirmed",
     "hallc.D101.width": "confirmed",
@@ -41585,6 +45057,14 @@
    "gap_looks": {
     "given": 1
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -41647,6 +45127,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -41711,6 +45199,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "reported",
     "ack.2": "confirmed",
@@ -41773,6 +45269,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "reported",
@@ -41851,6 +45355,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 4,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -41926,6 +45438,14 @@
    },
    "gaps_found": "0/1",
    "gaps": {},
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -42002,6 +45522,14 @@
    "gaps_found": "0/1",
    "gaps": {
     "both give it": 1
+   },
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.borealis": "confirmed",
@@ -42080,6 +45608,14 @@
    "gaps": {
     "both give it": 1
    },
+   "matching": {
+    "groups": 4,
+    "right": 2,
+    "wrong": 0,
+    "unscorable": 2,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.borealis": "confirmed",
     "ack.delmar": "confirmed",
@@ -42142,6 +45678,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ack": "settled",
@@ -42208,6 +45752,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -42272,6 +45824,14 @@
       "changed": 1
      }
     }
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack": "settled",
@@ -42338,6 +45898,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack": "settled",
     "beams": "reported",
@@ -42403,6 +45971,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -42463,6 +46039,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -42525,6 +46109,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
+   },
    "detail": {
     "ack.1": "confirmed",
     "ack.2": "confirmed",
@@ -42585,6 +46177,14 @@
       "not_same_item": 1
      }
     }
+   },
+   "matching": {
+    "groups": 3,
+    "right": 3,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 2,
+    "matched": 2
    },
    "detail": {
     "ack.1": "confirmed",
@@ -42654,6 +46254,14 @@
    "gap_looks": {
     "given": 2,
     "no_place": 5
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -42744,6 +46352,14 @@
    "gaps": {
     "unbound": 1
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -42827,6 +46443,14 @@
      }
     }
    },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -42909,6 +46533,14 @@
       "changed": 2
      }
     }
+   },
+   "matching": {
+    "groups": 15,
+    "right": 15,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -42997,6 +46629,14 @@
    },
    "gap_looks": {
     "no_place": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -43122,6 +46762,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -43246,6 +46894,14 @@
    "gaps": {
     "right": 20
    },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
+   },
    "detail": {
     "B-401.airflow": "confirmed",
     "B-401.discharge pressure": "confirmed",
@@ -43369,6 +47025,14 @@
    "gaps_found": "20/20",
    "gaps": {
     "right": 20
+   },
+   "matching": {
+    "groups": 26,
+    "right": 26,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 26,
+    "matched": 26
    },
    "detail": {
     "B-401.airflow": "confirmed",
@@ -43504,6 +47168,14 @@
     "no_place": 1,
     "not_given": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 11
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -43585,6 +47257,14 @@
     "right": 1,
     "unbound": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -43664,6 +47344,14 @@
    "gaps": {
     "right": 1
    },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -43742,6 +47430,14 @@
    "gaps_found": "1/4",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
    },
    "detail": {
     "P-101A.capacity": "confirmed",
@@ -43836,6 +47532,14 @@
    "gaps": {
     "unbound": 2
    },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10
+   },
    "detail": {
     "P-101A.capacity": "confirmed",
     "P-101A.head": "confirmed",
@@ -43912,6 +47616,14 @@
    "gaps_found": "1/1",
    "gaps": {
     "right": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 5,
+    "matched": 5
    },
    "detail": {
     "ext.field": "confirmed",

@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Planned (2026-11-07). [Design questions](#design-questions) 1 to 3 answered 2026-11-07; 4 and 5 open.
+- **Status:** Active (2026-11-07): [milestone 1](#1-a-scorer-for-matching) built 2026-11-07. [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -25,11 +25,11 @@ The owner's model is "possibly relevant or a match, not sure, investigate furthe
 - **A relation and a level are two things** (Fable): the relation is what the match claims (the same item, the corresponding element, a state of it); the level is how well it's evidenced (firm, plausible, possible). Tensions store their level in `relation`; matches won't.
 - **Groups and links:**
   - a firm match joins two subjects into one group, as today;
-  - a plausible or possible one is a link between two subjects that stay apart: `subject["links"]: [{other, relation, level, evidence}]`, many to many, never chained (a link isn't an edge of `aliases()`' union-find, so A~B~C doesn't follow);
+  - a plausible or possible one is a link between two subjects that stay apart: `subject["links"]: [{other, relation, level, evidence}]`, many to many (a corresponding element may link to several: [question 5](#design-questions)), never chained (a link isn't an edge of `aliases()`' union-find, so A~B~C doesn't follow);
   - a link raised to firm becomes a group.
 - **Evidence per pair, logged, non-matches too** (Fable): one entry a (subject, candidate) pair asked, of kind `match_evidence`, with each signal's raw value and the mode. A weight is fitted from the pairs that matched and those that didn't; logging only matches loses the second.
 - **A level is a view of the evidence** (Fable): the rubric (milestone 2), then a weight table (milestone 6), each versioned, maps a pair's evidence to its level when a report is written. A new rubric changes views, never the log; "the latest entry decides" would depend on the order answers came in.
-- **The mode changes what evidence says** (Fable): a value in common is strong evidence of one item across revisions, and coincidence across proposals (two designs' towers sharing a value). The judge's verdicts likewise. Revisions' and proposals' evidence are weighed apart ([question 4](#design-questions)).
+- **The mode changes what evidence says** (Fable): a value in common is strong evidence of one item across revisions, and coincidence across proposals (two designs' towers sharing a value). The judge's verdicts likewise. So revisions' and proposals' evidence are weighed apart: two rubrics, later two weight tables ([question 4](#design-questions)).
 - **Never a finding,** as gaps aren't. A plausible link feeds links and topics (the owner's answer), not the merged index or its gaps.
 
 ## Milestones
@@ -42,6 +42,18 @@ There's none: milestone 7's "matching, scored against the keys' items" wasn't bu
 - A group or link is right where both sides' items agree, wrong where they don't, unscorable where unbound.
 - Per level: how many, right, wrong, unscorable; the keys' items both sides give (`OTHER_CLAIMS` claims or more) matched at no level; and whether firm > plausible > possible in share right.
 - Today's matching measured first (the baseline): firm only.
+- **Built 2026-11-07** (`comparison._matching`; comparisons.json's `matching`). The baseline, revisions' matching as the index makes it (by the findings, then names), firm only, on the controlled revision pairs as recorded:
+
+  | Format | Subjects matched | Right | Wrong | Unscorable | Items both give, matched |
+  |---|---|---|---|---|---|
+  | PDF | 505 | 482 | 1 | 22 | 354 of 355 |
+  | Markdown | 369 | 367 | 0 | 2 | 301 of 301 |
+  | Word | 405 | 403 | 0 | 2 | 303 of 303 |
+  | Decks | 406 | 403 | 0 | 3 | 306 of 306 |
+  | Workbooks | 384 | 381 | 0 | 3 | 305 of 305 |
+
+  - **So revisions match well already:** alignment decides their items first, and the findings follow it. The one wrong is the two halls' sheets (`lcc-plans`), alike but for their title blocks; most unscorable are drawing sheets' claims bound to no fact.
+  - **Proposals have no controlled pair yet** (milestone 5): where matching is weakest (the turbine pair's tower), there's nothing keyed to score.
 
 ### 2. Links and their evidence, by code (stage 1)
 
@@ -110,5 +122,5 @@ The owner: "until we're confident in our tooling and we have a good idea on how 
 1. **Levels:** answered 2026-11-07 (quoted at the top): three, a rubric first, numbers after (milestone 6).
 2. **What plausible matches feed:** answered 2026-11-07: links and topics, not the merged index or its gaps; weighted relationships in the index explored as a step (milestone 7).
 3. **Stage 2 with the model:** answered 2026-11-07: as levers, the normal way (milestone 4).
-4. **One weighing or two?** (Fable) Revisions' and proposals' evidence weighed apart (a value in common means another thing in each), so two rubrics and later two weight tables, or one with the mode a signal? Claude's recommendation: two.
-5. **Many to one for corresponding elements?** (Fable) One to one for the same item; the corresponding element allowed one to many among plausible links ("tower and monopile" against a tower and a monopile), firm staying one to one? Claude's recommendation: yes.
+4. **One weighing or two?** (Fable) Revisions' and proposals' evidence weighed apart (a value in common means another thing in each), so two rubrics and later two weight tables, or one with the mode a signal? Answered 2026-11-07 (the owner: "I'll accept these recommendations."): two, as Claude recommended.
+5. **Many to one for corresponding elements?** (Fable) One to one for the same item; the corresponding element allowed one to many among plausible links ("tower and monopile" against a tower and a monopile), firm staying one to one? Answered 2026-11-07 (as 4): yes, as Claude recommended.
