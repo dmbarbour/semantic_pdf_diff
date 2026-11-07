@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.43.0 (2026-11-07)
+
+- **The second pass in comparisons, its notes shown the judge, as a setting** (`judge_notes`, off): each source's subjects read together before judging (as an analysis's second pass), the judge shown what that noted of each claim, and the notes kept as the comparison's commentary, on its cards. Measured: the controlled revision pairs within noise; a proposals pair (two reference turbines) 27 of 1,000 verdicts changed, most more decisive and right. Left off: a run costs the second pass's requests besides the judge's.
+
 ## 0.42.0 (2026-11-07)
 
 - **Summaries of sections, files and the source by default in analyses** (the owner: "Go ahead and turn on summaries."): each sentence citing the claims it rests on and checked against them, in the Summaries view and the export. Subjects' and topics', a request an item or topic, are asked for with `summaries`; `summaries: []` writes none. A store analyzed before writes them on its next run, its claims from the store.
