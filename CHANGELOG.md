@@ -2,6 +2,15 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.44.0 (2026-11-07)
+
+- **Subjects across documents, and the gaps another source fills** (single-document analysis, milestone 7; the owner, answering its design: "All four recommendations look good as a start."):
+  - Comparing proposals, subjects are matched by name or other names, no longer by the judge's verdicts alone (they compare values, not items). Revisions as before.
+  - `match_subjects` (off): the model matches what names leave alone to the same item, the corresponding element (each design's tower) or a state of it, kept apart; "matched by model" in the index.
+  - A gap kind, **Another source gives it**: a matched subject's property one source gives and another describing it doesn't, in the gaps view, index.md, the workbook and gaps.csv.
+  - `look_gaps` (off): each such gap looked for where it'd be (given under another name, not given, no place for it, not shown), beside the gap, in the subjects' blank cell and on the other source's card.
+- The slice runs' replay fixture re-recorded: it had gone stale.
+
 ## 0.43.0 (2026-11-07)
 
 - **The second pass in comparisons, its notes shown the judge, as a setting** (`judge_notes`, off): each source's subjects read together before judging (as an analysis's second pass), the judge shown what that noted of each claim, and the notes kept as the comparison's commentary, on its cards. Measured: the controlled revision pairs within noise; a proposals pair (two reference turbines) 27 of 1,000 verdicts changed, most more decisive and right. Left off: a run costs the second pass's requests besides the judge's.
