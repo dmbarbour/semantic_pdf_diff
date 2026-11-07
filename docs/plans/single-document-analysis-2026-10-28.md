@@ -261,6 +261,57 @@ Moved 2026-10-29 to [indexes and glossaries](indexes-and-glossaries-2026-10-29.m
 - **The owner's clearest gap:** an attribute one source gives for a matched subject, in the same state, that the other doesn't.
 - **Reported** in the comparison's report beside its findings, labelled weak, with the claim the other source gives.
 - **Measured** by the knob of an attribute one revision or proposal gives and the other doesn't, on the controlled pairs.
+- **Design, 2026-11-07** (Claude's sketch, for the owner's review; the owner, 2026-11-07: "Please proceed." to a design first). Questions A to D below.
+  - **What there is:**
+    - A comparison's merged index matches the sources' subjects: where the findings pair their claims (the most pairs first), then keyed alike (a tag, the same words), then other names.
+    - Each matched subject's properties are listed with each source's values. A property one source doesn't give is left blank. It isn't listed or looked for anywhere: only each source's own gaps are (milestone 5).
+  - **What that gives on a proposals pair** (the turbine pair of milestone 6; by code, no requests):
+    - **Matches:** 103 subjects; 16 matched, every one by the findings; 87 alone.
+    - **The judge's verdicts aren't evidence of identity across proposals:** they're about values. Of the 1,000 verdicts, 877 are unrelated and 100 uncertain. Subjects were linked mostly by uncertain pairs: "Generator Torque" and the "torque curve" (17), NREL's "tower" (117 claims) and IEA's "first torsional mode" (3).
+    - **So the matches go wrong:** that link took NREL's tower, leaving IEA's own "Tower" (8 claims) alone, though both are keyed "tower". NREL's one-claim "tip-speed ratio" took IEA's "blade" (77 claims).
+    - **Matched subjects mostly differ:** the rotor gives 16 of its 18 properties in one source only. Much of that is what each slice covers (NREL's pages describe the control system, IEA's the blade structure), not gaps.
+  - **Subjects matched (revisions):** as now. Alignment decided the items, and the findings follow it, settled pairs among them.
+  - **Subjects matched (proposals), by code first:**
+    - Keyed alike, then other names. The findings are no longer a match on their own: they're the model's evidence (question D). On the turbine pair, rotor, tower, generator power and generator torque.
+    - **Then the model, for what's left** (`match_subjects`, a lever): a subject alone in one source, shown with up to 8 candidates in the other (by shared name words and property names, and by embedding where the run made vectors). Each side is shown with its name, kind and properties, a value each, and how many of their claims the findings paired.
+    - **The model answers:** the same item; the corresponding element (each proposal's tower: the owner's "corresponding elements"); a state of it (as designed and as built; phase 1 and phase 2); or none. Each with why.
+    - **Checked mechanically:** the names given, one counterpart each.
+    - **Cost:** one request per subject left alone in the smaller source. Pennies on the turbine pair (47 requests).
+    - **Kept:** every match is an entry in the log (kind "match": the two subjects, how they were matched and why), and the merged index is built from those entries. A match never changes a claim.
+  - **States** (question B):
+    - Two subjects the model calls states of one item stay two subjects, linked, with no gaps between them.
+    - Within a matched subject, a property is one property whatever its conditions. Each value's conditions are shown beside the gap, not split into states, until trials show they need splitting.
+  - **Gaps, "another source gives it"** (a gap kind, first in GAP_KINDS: the owner's clearest kind):
+    - **Found:** for a matched subject, a property one source gives that the other doesn't under any of its names, where the other describes the subject (two claims of its own or more).
+    - **Each gap gives:**
+      - the source lacking it
+      - the subject and the property
+      - where it'd be expected: the subject's first place in that source
+      - why: what the other source gives, and where ("1,250 gpm, b.pdf page 3"), linked to that claim's card
+    - **Ordered:** properties the lacking source gives for the subject's siblings first (it gives that kind of property elsewhere), then the rest.
+    - **Weak, as every gap:** never a finding, never counted against a document.
+  - **Looked for where it'd be** (`look_gaps`, a lever; dossiers.looks, as siblings' gaps are in an analysis):
+    - The page of the lacking source that names the subject best is rendered closer and asked: given, not given, no place for it, or not shown.
+    - **Given** is the reader's miss. In revisions, it's also a false "possibly added or removed" claim, now said so on its card.
+    - **Not shown** is most of what a slice doesn't cover.
+    - **Cost:** one image request per gap, about $0.0002 each (milestone 5's 150 looks cost $0.022).
+  - **Reported** where gaps are now: the Gaps view (each source's, this kind first), index.md, the workbook's Gaps sheet and gaps.csv. A blank cell of the merged index links to its gap.
+  - **In both modes** (question C): in revisions, the gaps restate additions and removals by subject, and the looks catch the reader's misses behind false ones; that's where exact keys can measure it.
+  - **Measured:**
+    - **Controlled revision pairs, as they are:**
+      - Of the keys' 28 added or removed facts, 5 belong to an item both revisions keep: planted gaps, scored for recall.
+      - The other 23 are whole items, matched to nothing: no gaps expected.
+      - A gap whose fact the keys say both revisions give is a false one, the reader's miss: the looks should say "given".
+    - **A knob added** (a lab build): revisions dropping or adding one property of items that are kept: a schedule's column dropped (a gap for each row), a sentence giving one property dropped, a property added. 15 to 20 more planted gaps, with today's pairs as controls.
+    - **Matching:** scored against the keys' items, by code and then with the model.
+    - **The turbine pair, by eye:** the matches, and a sample of the gaps with their looks.
+    - **No controlled proposal pairs exist:** a pair (two projects of one kind, one leaving properties out) is a lab build of its own, proposed if the turbine pair says the gaps are worth it.
+    - **Estimated cost:** under $0.50 in all; asked first above $5.
+  - **Questions:**
+    - **A. Corresponding elements:** in proposals, match the corresponding elements (each proposal's tower, each its rotor), not only the same item? Claude's recommendation: yes, the model saying which it is.
+    - **B. States:** kept apart only where the model, matching, says two subjects are states of one item; within a match, conditions shown beside each gap, not split? Claude's recommendation: yes, splitting by conditions later if trials need it.
+    - **C. Revisions too?** Claude's recommendation: yes. The looks there catch false additions and removals, and exact keys measure them.
+    - **D. Findings in proposals' matching:** no longer a match on their own, shown to the model as evidence? Claude's recommendation: yes. The turbine pair's tower and blade went wrong by them.
 
 ## Design questions
 
