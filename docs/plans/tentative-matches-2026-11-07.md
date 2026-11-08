@@ -127,6 +127,12 @@ The owner: "let's just adapt the normal levers approaches perhaps". Each test a 
     - **Revisions:** links unchanged in every arm (plausible 10 of 10).
     - **The reads:** picked 26, neither 29 (mostly siblings, which hidden values can't tell apart: rightly left possible), the decoy 1. The one wrong plausible link: Cyclone's bunny hop for Ridgeback's helix, which Cyclone dropped. A role gone still invites a pick over a weaker decoy.
   - **The turbine pair** (both levers with meaning, the reranker and `match_subjects`; 12 reads, $0.004): the read turned down the reranker's wrong pairs (Design Point, Drivetrain, a flapwise mode: neither or the decoy). Two plausible: NREL's baseline and IEA's reference turbines (right); DOWEC's and IEA's "turbine" (loose).
+  - **Held-out rule, written 2026-11-08 before the held-out pairs were generated** (Claude's, under [0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)'s paired method; the owner, 2026-11-08: "I'm inclined to add them, but no reason to skip the proper test phase"):
+    - **Unit:** one proposals pair in one format, of seeds 2 and 3 (`controlled.py heldout`): 30 units, none seen in development. One run each with both levers on; the arms without them rebuilt from the same reports (`link_tests` asks nothing; the reads' entries left out).
+    - **`link_tests`** passes where wrong plausible links fall, summed over the units, at p < 0.1 by a sign flip over the units that change, and plausible links' precision falls in no format.
+    - **`link_read`** (with `link_tests`) passes where right plausible links rise by the same test, plausible links' precision stays 90% or more overall and 80% or more in every format.
+    - **Reported, not judged:** right links lost at any level; firm matches (neither lever touches them).
+    - **Checked once,** on the code as committed (02d461a); a lever failing it stays off, its held-out result quoted.
   - **Not built:** *a look as a test.* Links aren't looked for (the owner: links feed "links and topics for now"), so no look tests one. *Part-of neighbours* (the tower of the matched turbine). *The same item within a source:* links are across sources so far.
 
 ### 5. A controlled proposals pair
