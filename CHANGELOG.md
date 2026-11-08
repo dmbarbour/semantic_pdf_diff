@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.49.0 (2026-11-08)
+
+- **A link's evidence tested by code** (`link_tests`, off; tentative matches, milestone 4): properties in common count only where they set a pair apart from its siblings; between proposals, values that don't fit (another kind of unit, more than ten times apart) leave a link possible at most. On the controlled proposals pairs, plausible links 16 of 16 right (25 of 43 without).
+- **A link read by the model against a decoy** (`link_read`, off): the linked subject and the other source's next likeliest, values hidden between proposals; picked, evidence; the decoy or neither, possible at most. With the tests, plausible links 24 of 25 right.
+- A model's readings of a pair (the reranker's, `match_subjects`', the read) count as one kind of evidence toward a link's level.
+
 ## 0.48.0 (2026-11-08)
 
 - **Links by the reranker's likest** (`link_rerank`, off; with a reranker, `rerank_model`): each subject left alone ranked against the other source's, told the task (the same item, or one playing the same part); its likest, scoring 0.8 or more, a link's evidence of its own (tentative matches, milestone 3). The reranker scores relevance more than identity: alone it makes a link possible at most.
