@@ -98,7 +98,7 @@ There's none: milestone 7's "matching, scored against the keys' items" wasn't bu
     - **How it counts:** a subject's likest at 0.8 or more is evidence of its own (it reads names and properties together, so it isn't the names' family).
     - **The turbine pair** (Qwen/Qwen3-Reranker-8B, DeepInfra's API; 52 requests; with `link_meaning` and `match_subjects`): it scores relevance, not identity. Its right pair, NREL's baseline turbine and IEA's reference one, scored 0.98, with meaning plausible: the only plausible link, and right. Wrong pairs scored as high: IEA's "15-MW turbine" and "Region 2½" 0.97, "turbine" and "Drivetrain" 0.95. Under 0.8 they were mostly wrong, hence the threshold. Alone it makes a link possible at most. Naming a reranker also reranks the claims' pairs before the judge, so 551 pairs were judged again ($0.11).
     - **The controlled PDF pairs** ($0.002, 21 requests): it agreed with every right link (alum and ferric sulfate 0.95, the two plants 0.99, the split's P-101C and P-101E 0.998) and added no wrong one.
-  - **Not built:** both directions asked by `match_subjects`.
+  - **Not built:** both directions asked by `match_subjects` (the owner, 2026-11-08: "Doubling requests isn't good unless it pays off."): no sample shows its worth yet; it waits on more keyed proposals pairs (milestone 5, extended).
 
 ### 4. Tied together and tested (stage 2, as levers)
 
