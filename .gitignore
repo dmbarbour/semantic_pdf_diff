@@ -10,6 +10,7 @@ tests/fixtures/*.sqlite
 benchmarks/runs/
 benchmarks/**/replay.sqlite
 benchmarks/controlled/fixture.sqlite
+benchmarks/controlled/heldout/
 benchmarks/probes/fixture.sqlite
 benchmarks/report.html
 benchmarks/eyetest/images/

@@ -13,6 +13,7 @@
     python scripts/controlled.py refresh --jobs 6 --max-cost 2   # all of it after a change, six runs at once
     python scripts/controlled.py run --variant b62.json --jobs 6     # a named variant, into the archive (below)
     python scripts/controlled.py analyze --jobs 4            # the planted reports analyzed, scored (below)
+    python scripts/controlled.py heldout --seed 2 --seed 3 --variant v.json   # held-out proposals pairs (below)
 
 The same seed gives the same PDFs, so the pipeline asks the same queries and recorded answers replay. Each document
 is read alone (extraction, scored into results.json); each revision pair is then compared in revisions mode
@@ -42,6 +43,13 @@ checkout's.
 pass on and situated (references), recorded or replayed as `run` is (a variant's settings over them with --variant),
 and scores what the second pass and the gaps found by code found against what's planted: analysis.json (the
 standard arm's; docs/plans/single-document-analysis-2026-10-28.md, milestones 3 to 5).
+
+`heldout` measures a change already chosen on held-out proposals pairs (proposals.py; decision 0037: held-out sets
+scored only when a change is up for promotion): the seeds named, never development's, generated into heldout/
+(git-ignored: the generator makes them again), each pair compared in proposals mode in every format with a variant's
+settings over the corpus's, recorded into heldout/fixture.sqlite (its own archive), and scored by role
+(comparison.score_proposals) into heldout/<variant>.json, with the links by level for each arm a variant's
+link_tests and link_read make: off, the tests, the tests and the reads (the arms rebuilt from the same reports).
 
 Recording adds to the working fixture (fixture.sqlite, git-ignored), an archive keeping every answer ever recorded,
 every variant's. `pack` exports the committed replay.zip from it: the standard runs replay from fresh stores, reading
@@ -76,6 +84,8 @@ ANALYSIS_RUNS = ROOT / "benchmarks/runs/controlled-analysis"
 PAIR_RUNS = ROOT / "benchmarks/runs/controlled-pairs"
 VARIANTS = MAIN / "benchmarks/runs/controlled/variants"  # a named variant's runs, then its pairs'
 VARIANT_PAIRS = MAIN / "benchmarks/runs/controlled-pairs/variants"
+HELDOUT = MAIN / "benchmarks/controlled/heldout"  # held-out seeds' documents and archive (git-ignored)
+HELDOUT_RUNS = MAIN / "benchmarks/runs/controlled-heldout"
 LEDGER = recording.ledger(ROOT)
 BASE_SETTINGS = recording.BASE_SETTINGS  # the settings recordings share: they shape the queries
 ONE_SOURCE = "analysis"  # an analysis's mode (report.ONE_SOURCE)
@@ -119,6 +129,12 @@ def main(argv=None):
     analyzing.add_argument("--max-cost", type=float, default=0.2)
     analyzing.add_argument("--jobs", type=int, default=1, help="runs at once, in processes sharing the fixture")
     analyzing.add_argument("--variant", type=Path, metavar="FILE", help="a named variant, as `run --variant` takes")
+    held = sub.add_parser("heldout", help="held-out proposals pairs: generate the seeds named, compare in every "
+                                          "format with a variant's settings, score by role")
+    held.add_argument("--seed", type=int, action="append", required=True, help="never development's (1)")
+    held.add_argument("--variant", type=Path, required=True, metavar="FILE", help="as `run --variant` takes")
+    held.add_argument("--max-cost", type=float, default=0.2)
+    held.add_argument("--jobs", type=int, default=1)
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
@@ -143,6 +159,10 @@ def main(argv=None):
         for project in consistency.corpus():  # planted inconsistencies and gaps, and their clean twins
             print(f"{consistency.write(project, DOCS_ANALYSIS)}: {len(project.planted)} planted")
         return 0
+    if args.command == "heldout":
+        if 1 in args.seed:
+            parser.error("seed 1 is development's: held-out seeds are others")
+        return heldout(tuple(args.seed), args.variant, args.max_cost, args.jobs)
     if args.command == "run":
         if args.unaligned and args.rows:
             parser.error("--unaligned and --rows are separate runs")
@@ -419,6 +439,86 @@ def _one(job):
     if mode == ONE_SOURCE:
         return name, pipeline.attempt(pipeline.analyze_paths, a, folder, settings, options)
     return name, pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
+
+def heldout(seeds, variant_path, max_cost, jobs=1):
+    """Held-out proposals pairs (see the module's note): generated, compared, scored; exit status as run's."""
+    from semantic_pdf_diff import ledger
+    from semantic_pdf_diff.progress import setup_logging
+    from semantic_pdf_diff_lab.bench import controlled
+    from semantic_pdf_diff_lab.bench.controlled import proposals, representations, slides, workbooks
+    from semantic_pdf_diff_lab.bench.controlled.corpus import PROJECTS
+    folders = {".pdf": HELDOUT / "docs", ".md": HELDOUT / "docs-md", ".docx": HELDOUT / "docs-docx",
+               ".pptx": HELDOUT / "docs-pptx", ".xlsx": HELDOUT / "docs-xlsx"}
+    projects = [PROJECTS[key](seed) for seed in seeds for key in sorted({key for key, *_ in proposals.PAIRS})]
+    projects += [project for seed in seeds for _, project in proposals.proposed(seed)]
+    for project in projects:
+        controlled.write(project, folders[".pdf"])
+        lines = representations.markdown(project)
+        representations.write(project, lines, folders[".md"])
+        representations.write_docx(project, lines, folders[".docx"])
+        slides.write(folders[".pptx"], project, slides.deck(project))
+        workbooks.write(folders[".xlsx"], project, workbooks.workbook(project))
+    name, config, _ = variant(variant_path, folder=HELDOUT_RUNS)
+    runs = HELDOUT_RUNS / name
+    pairs = [pair for seed in seeds for pair in proposals.pairs(seed)]
+    alone = [(f, f, runs / "docs" / f.name, f.name, "proposals") for suffix, folder in folders.items()
+             for f in sorted(folder.glob(f"*{suffix}"))]
+    compared = [(folders[s] / f"{p.earlier}{s}", folders[s] / f"{p.later}{s}", runs / f"{p.id}{s}", f"pair {p.id}{s}",
+                 "proposals") for p in pairs for s in folders]
+    setup_logging(quiet=True)
+    before = ledger.spent(LEDGER, round="controlled")
+    _BATCH.update(replay=False, responder=None, fixture=HELDOUT / "fixture.sqlite", export=None, config=config,
+                  overrides={}, max_cost=max_cost, before=before)
+    worst, capped = 0, 0
+    for batch in (alone, compared):  # the documents first: the pairs replay their extraction
+        for run_name, code in _each(batch, jobs):
+            if code == CAPPED:
+                capped += 1
+                continue
+            worst = max(worst, code)
+            if code not in (0, 2):
+                print(f"{run_name}: exit {code}", flush=True)
+    print(f"spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}")
+    if capped:
+        print(f"cap of ${max_cost} reached: {capped} runs not started (run again to resume)")
+        return 3
+    scored = heldout_scores(pairs, folders, runs)
+    (HELDOUT / f"{name}.json").write_text(json.dumps(scored, indent=1) + "\n", encoding="utf-8")
+    for arm, levels in scored["totals"].items():
+        print(f"{arm:12s} " + "; ".join(f"{level} {c.get('right', 0)} right of {c.get('links', 0)}"
+                                         for level, c in sorted(levels.items())))
+    return worst
+
+def heldout_scores(pairs, folders, runs):
+    """Each held-out pair's links by level in each arm (off, tests, tests and reads), and their totals, from its
+    report rebuilt (indexes.built) with the arm's settings."""
+    from collections import Counter, defaultdict
+    from semantic_pdf_diff import indexes
+    from semantic_pdf_diff_lab.bench.controlled import comparison
+    arms = {"off": (False, False), "tests": (True, False), "tests+reads": (True, True)}
+    units, totals = {}, defaultdict(lambda: defaultdict(Counter))
+    for pair in pairs:
+        for suffix, folder in folders.items():
+            path = runs / f"{pair.id}{suffix}" / "report.json"
+            if not path.exists():
+                continue
+            report = json.loads(path.read_text(encoding="utf-8"))
+            keys = [json.loads((folder / f"{d}.key.json").read_text(encoding="utf-8"))
+                    for d in (pair.earlier, pair.later)]
+            entries = (report.get("commentary") or {}).get("entries", [])
+            unit = {}
+            for arm, (tests, reads) in arms.items():
+                data = {**report, "settings": {**(report.get("settings") or {}), "link_tests": tests},
+                        "commentary": {**(report.get("commentary") or {}),
+                                       "entries": [e for e in entries if reads or e["kind"] != "link_read"]}}
+                data["index"] = indexes.built(data)
+                links = comparison.score_proposals(*keys, data)["matching"].get("links", {})
+                unit[arm] = links
+                for level, c in links.items():
+                    totals[arm][level].update(c)
+            units[f"{pair.id}{suffix}"] = unit
+    return {"totals": {arm: {level: dict(c) for level, c in levels.items()} for arm, levels in totals.items()},
+            "units": units}
 
 def context():
     """context.json: the standard runs' context measures (bench/context.py), per run and summed, with the sums

@@ -133,6 +133,18 @@ The owner: "let's just adapt the normal levers approaches perhaps". Each test a 
     - **`link_read`** (with `link_tests`) passes where right plausible links rise by the same test, plausible links' precision stays 90% or more overall and 80% or more in every format.
     - **Reported, not judged:** right links lost at any level; firm matches (neither lever touches them).
     - **Checked once,** on the code as committed (02d461a); a lever failing it stays off, its held-out result quoted.
+  - **Held-out result, 2026-11-08** (`controlled.py heldout --seed 2 --seed 3`; $0.70; 30 units): both pass.
+
+    | Arm | Plausible: right of | Possible: right of |
+    |---|---|---|
+    | Neither | 69 of 124 | 53 of 153 |
+    | `link_tests` | 32 of 32 | 62 of 121 |
+    | `link_tests` and `link_read` | 57 of 60 | 37 of 93 |
+
+    - **`link_tests`:** wrong plausible links 55 → 0 (18 units changed, p < 0.0001); precision in each format 46–82% → 100%.
+    - **`link_read`:** right plausible links 32 → 57 (20 units changed, p < 0.0001); precision 95% overall, 87.5% at least in each format (Markdown and PDF 7 of 8 and 14 of 16; the rest all right).
+    - **Reported, not judged:** right links at any level 122 → 94 with the tests (siblings' pairs that nothing sets apart lose their link; the reads keep 94), wrong ones 155 → 59.
+    - **Defaults** are the owner's call (the owner: "I'm inclined to add them").
   - **Not built:** *a look as a test.* Links aren't looked for (the owner: links feed "links and topics for now"), so no look tests one. *Part-of neighbours* (the tower of the matched turbine). *The same item within a source:* links are across sources so far.
 
 ### 5. A controlled proposals pair
