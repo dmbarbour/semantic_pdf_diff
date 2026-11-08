@@ -13269,8 +13269,14 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
      }
     }
    },
@@ -13365,6 +13371,415 @@
     "unrelated": 61
    },
    "unmatched": 32
+  },
+  "wtp-s1-cedar-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 8,
+      "right": 4,
+      "wrong": 4
+     },
+     "possible": {
+      "links": 5,
+      "right": 3,
+      "wrong": 2
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "another fact": 2,
+    "both give it": 2,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "no_place": 2,
+    "not_shown": 3
+   },
+   "findings": {
+    "complementary": 5,
+    "different": 37,
+    "equivalent": 2,
+    "uncertain": 27,
+    "unrelated": 80
+   },
+   "unmatched": 19
+  },
+  "wtp-s1-cedar-proposals.md": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 7,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 4,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 19,
+    "equivalent": 1,
+    "uncertain": 29,
+    "unrelated": 67
+   },
+   "unmatched": 24
+  },
+  "wtp-s1-cedar-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 7,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 8,
+      "right": 3,
+      "wrong": 5
+     },
+     "possible": {
+      "links": 4,
+      "right": 3,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 27,
+    "equivalent": 1,
+    "uncertain": 20,
+    "unrelated": 66
+   },
+   "unmatched": 11
+  },
+  "wtp-s1-cedar-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 11,
+      "right": 5,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 1,
+    "uncertain": 27,
+    "unrelated": 72
+   },
+   "unmatched": 26
+  },
+  "wtp-s1-cedar-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 8,
+    "matched": 4,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 11,
+      "right": 5,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 5,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 16,
+    "equivalent": 1,
+    "uncertain": 26,
+    "unrelated": 70
+   },
+   "unmatched": 28
+  },
+  "coaster-s1-proposals": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "both give it": 1,
+    "right": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 23,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 141
+   },
+   "unmatched": 22
+  },
+  "coaster-s1-proposals.md": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7,
+    "links": {
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "both give it": 4,
+    "right": 2,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 18,
+    "equivalent": 3,
+    "uncertain": 2,
+    "unrelated": 140
+   },
+   "unmatched": 26
+  },
+  "coaster-s1-proposals.docx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 8,
+      "right": 1,
+      "wrong": 7
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "right": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 5,
+    "unrelated": 127
+   },
+   "unmatched": 24
+  },
+  "coaster-s1-proposals.pptx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 126
+   },
+   "unmatched": 24
+  },
+  "coaster-s1-proposals.xlsx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 19,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 125
+   },
+   "unmatched": 23
   }
  },
  "replay": {
@@ -26637,8 +27052,14 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
      }
     }
    },
@@ -26733,6 +27154,415 @@
     "unrelated": 61
    },
    "unmatched": 32
+  },
+  "wtp-s1-cedar-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 8,
+      "right": 4,
+      "wrong": 4
+     },
+     "possible": {
+      "links": 5,
+      "right": 3,
+      "wrong": 2
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "another fact": 2,
+    "both give it": 2,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "no_place": 2,
+    "not_shown": 3
+   },
+   "findings": {
+    "complementary": 5,
+    "different": 37,
+    "equivalent": 2,
+    "uncertain": 27,
+    "unrelated": 80
+   },
+   "unmatched": 19
+  },
+  "wtp-s1-cedar-proposals.md": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 7,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 4,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 18,
+    "equivalent": 1,
+    "uncertain": 30,
+    "unrelated": 67
+   },
+   "unmatched": 26
+  },
+  "wtp-s1-cedar-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 7,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 8,
+      "right": 3,
+      "wrong": 5
+     },
+     "possible": {
+      "links": 4,
+      "right": 3,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 27,
+    "equivalent": 1,
+    "uncertain": 20,
+    "unrelated": 66
+   },
+   "unmatched": 11
+  },
+  "wtp-s1-cedar-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 11,
+      "right": 5,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 1,
+    "uncertain": 27,
+    "unrelated": 72
+   },
+   "unmatched": 26
+  },
+  "wtp-s1-cedar-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 8,
+    "matched": 4,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 11,
+      "right": 5,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 5,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 16,
+    "equivalent": 1,
+    "uncertain": 26,
+    "unrelated": 70
+   },
+   "unmatched": 28
+  },
+  "coaster-s1-proposals": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "both give it": 1,
+    "right": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 23,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 141
+   },
+   "unmatched": 22
+  },
+  "coaster-s1-proposals.md": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7,
+    "links": {
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "both give it": 4,
+    "right": 2,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 18,
+    "equivalent": 3,
+    "uncertain": 2,
+    "unrelated": 140
+   },
+   "unmatched": 26
+  },
+  "coaster-s1-proposals.docx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 8,
+      "right": 1,
+      "wrong": 7
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "right": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 5,
+    "unrelated": 127
+   },
+   "unmatched": 24
+  },
+  "coaster-s1-proposals.pptx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 126
+   },
+   "unmatched": 24
+  },
+  "coaster-s1-proposals.xlsx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 19,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 125
+   },
+   "unmatched": 23
   }
  },
  "recorded-rows": {
@@ -37500,8 +38330,14 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
      }
     }
    },
@@ -37597,6 +38433,339 @@
     "unrelated": 59
    },
    "unmatched": 24
+  },
+  "wtp-s1-cedar-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 5,
+      "right": 2,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 8,
+      "right": 5,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "another fact": 2,
+    "both give it": 2,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1,
+    "not_shown": 3
+   },
+   "findings": {
+    "complementary": 5,
+    "different": 32,
+    "equivalent": 2,
+    "uncertain": 28,
+    "unrelated": 84
+   },
+   "unmatched": 23
+  },
+  "wtp-s1-cedar-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 1,
+      "wrong": 2
+     },
+     "possible": {
+      "links": 9,
+      "right": 5,
+      "wrong": 4
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 19,
+    "equivalent": 2,
+    "uncertain": 26,
+    "unrelated": 75
+   },
+   "unmatched": 21
+  },
+  "wtp-s1-cedar-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 7,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 1,
+      "wrong": 2
+     },
+     "possible": {
+      "links": 10,
+      "right": 6,
+      "wrong": 4
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 18,
+    "equivalent": 1,
+    "uncertain": 27,
+    "unrelated": 69
+   },
+   "unmatched": 25
+  },
+  "wtp-s1-cedar-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 8,
+    "matched": 4,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 1,
+      "wrong": 2
+     },
+     "possible": {
+      "links": 9,
+      "right": 5,
+      "wrong": 4
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 5,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 18,
+    "equivalent": 1,
+    "uncertain": 26,
+    "unrelated": 68
+   },
+   "unmatched": 24
+  },
+  "coaster-s1-proposals": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "both give it": 1,
+    "right": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 24,
+    "equivalent": 3,
+    "uncertain": 3,
+    "unrelated": 141
+   },
+   "unmatched": 20
+  },
+  "coaster-s1-proposals.docx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 8,
+      "right": 1,
+      "wrong": 7
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "right": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 128
+   },
+   "unmatched": 23
+  },
+  "coaster-s1-proposals.pptx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 2,
+    "unrelated": 128
+   },
+   "unmatched": 22
+  },
+  "coaster-s1-proposals.xlsx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 2,
+    "unrelated": 126
+   },
+   "unmatched": 22
   }
  },
  "replay-rows": {
@@ -48364,8 +49533,14 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
      }
     }
    },
@@ -48461,6 +49636,339 @@
     "unrelated": 59
    },
    "unmatched": 24
+  },
+  "wtp-s1-cedar-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 5,
+      "right": 2,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 8,
+      "right": 5,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "another fact": 2,
+    "both give it": 2,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1,
+    "not_shown": 3
+   },
+   "findings": {
+    "complementary": 5,
+    "different": 32,
+    "equivalent": 2,
+    "uncertain": 28,
+    "unrelated": 84
+   },
+   "unmatched": 23
+  },
+  "wtp-s1-cedar-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 1,
+      "wrong": 2
+     },
+     "possible": {
+      "links": 9,
+      "right": 5,
+      "wrong": 4
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 19,
+    "equivalent": 2,
+    "uncertain": 26,
+    "unrelated": 75
+   },
+   "unmatched": 21
+  },
+  "wtp-s1-cedar-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 7,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 1,
+      "wrong": 2
+     },
+     "possible": {
+      "links": 10,
+      "right": 6,
+      "wrong": 4
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 18,
+    "equivalent": 1,
+    "uncertain": 27,
+    "unrelated": 69
+   },
+   "unmatched": 25
+  },
+  "wtp-s1-cedar-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 7,
+    "right": 6,
+    "wrong": 1,
+    "unscorable": 0,
+    "items": 8,
+    "matched": 4,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 1,
+      "wrong": 2
+     },
+     "possible": {
+      "links": 9,
+      "right": 5,
+      "wrong": 4
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {
+    "both give it": 5,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 18,
+    "equivalent": 1,
+    "uncertain": 26,
+    "unrelated": 68
+   },
+   "unmatched": 24
+  },
+  "coaster-s1-proposals": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "both give it": 1,
+    "right": 1
+   },
+   "gap_looks": {
+    "given": 1,
+    "no_place": 1
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 24,
+    "equivalent": 3,
+    "uncertain": 3,
+    "unrelated": 141
+   },
+   "unmatched": 20
+  },
+  "coaster-s1-proposals.docx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 8,
+    "right": 8,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 8,
+      "right": 1,
+      "wrong": 7
+     }
+    }
+   },
+   "gaps_found": "1/2",
+   "gaps": {
+    "right": 1
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 4,
+    "unrelated": 128
+   },
+   "unmatched": 23
+  },
+  "coaster-s1-proposals.pptx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 2,
+    "unrelated": 128
+   },
+   "unmatched": 22
+  },
+  "coaster-s1-proposals.xlsx": {
+   "facts": {
+    "changed": 24,
+    "conditions": 0,
+    "added": 4,
+    "removed": 4,
+    "unchanged": 2
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 7,
+    "matched": 5,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 1,
+      "wrong": 6
+     }
+    }
+   },
+   "gaps_found": "0/2",
+   "gaps": {},
+   "findings": {
+    "complementary": 3,
+    "different": 20,
+    "equivalent": 3,
+    "uncertain": 2,
+    "unrelated": 126
+   },
+   "unmatched": 22
   }
  }
 }

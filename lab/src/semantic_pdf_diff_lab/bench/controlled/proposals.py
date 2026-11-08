@@ -8,6 +8,13 @@ some roles kept alike (the filters), one role gone (the UV option), a decoy (a b
 pump), a property dropped from a role both keep (the clarifiers' surface loading rate) and one added (the flash
 mixer's volume): gaps another source fills.
 
+Three designs (milestone 5, extended 2026-11-08; the owner: "please proceed with milestone 4 and the answer-key
+improvement for milestone 5", after asking whether the sample sufficed to judge asking both ways): Pine Ridge's and
+Cedar Falls' design bases against Harrow Creek's, and the Cyclone roller coaster against Ridgeback. Each names its items
+its own way, some by what they do rather than how they're spelled (clarifiers, a coagulation tank), so the model's
+other names miss some; keeps others alike; drops a role; adds a decoy of a role it keeps; and drops one property and
+adds another of items both keep.
+
 Scored by comparison.score_proposals: matching by role (each subject's claims bound to the keys' facts, a fact's role
 its id's), and the gaps another source fills.
 """
@@ -16,7 +23,7 @@ from dataclasses import dataclass, replace
 
 from .corpus import PROJECTS
 from .model import Draw, Fact
-from .revisions import add_sentence
+from .revisions import add_row, add_sentence, drawer, drop_row, rewrite
 
 @dataclass
 class Pair:
@@ -62,6 +69,17 @@ def _drop_column(project, caption_word, column):
                 return
     raise ValueError(f"{project.id}: no table of {caption_word}")
 
+def _renamed(p, words, items, pattern=None):
+    """Every printed string's words replaced (words: [(old, new)]; pattern: a regex to strike), and each role's
+    entity and aliases (items: {old entity: (new entity, aliases)})."""
+    def edit(text):
+        for old, new in words:
+            text = text.replace(old, new)
+        return pattern.sub("", text) if pattern else text
+    _edit(p, edit)
+    p.facts[:] = [f if f.entity not in items else replace(f, entity=items[f.entity][0], aliases=items[f.entity][1])
+                  for f in p.facts]
+
 def pine_ridge(seed):
     """Pine Ridge's design basis: Harrow Creek's template drawn from another seed, its items named its own way."""
     p = PROJECTS["wtp"](seed + 1)
@@ -91,13 +109,90 @@ def pine_ridge(seed):
                       ("flow", "rated flow"), d.number(3000, 6000), "gpm"))
     return p
 
-# (the pair's corpus project maker and seed's id pattern, the other design's maker, the pair's name)
-PAIRS = (("wtp-s{seed}", pine_ridge, "proposals"),)
+CEDAR_WORDS = (("Harrow Creek", "Cedar Falls"), ("The rapid mix basin provides", "The coagulation tank provides"),
+               ("Flocculation follows in", "Slow mixing follows in"),
+               ("sedimentation basins, each", "settling basins, each"), ("Raw water pumps", "Low-lift pumps"),
+               ("P-101A", "LL-1"), ("P-101B", "LL-2"), ("P-101C", "LL-3"),
+               ("Chlorine is fed at", "Sodium hypochlorite is fed at"),
+               ("Two options were compared for primary disinfection.", "One option was considered for primary "
+                                                                         "disinfection."),
+               ("Option A: UV", "Ultraviolet reactors"))
+CEDAR_ITEMS = {"Harrow Creek Water Treatment Plant": ("Cedar Falls Water Treatment Plant", ("Cedar Falls WTP",
+                                                                                            "the plant")),
+               "Rapid mix basin": ("Coagulation tank", ("coagulation tank",)),
+               "Flocculation basins": ("Slow mixing tanks", ("slow mixing", "slow mixers")),
+               "Sedimentation basins": ("Settling basins", ("settling basin", "settling basins")),
+               "Raw water pump P-101A": ("Low-lift pump LL-1", ("LL-1", "low-lift pump LL-1")),
+               "Raw water pump P-101B": ("Low-lift pump LL-2", ("LL-2", "low-lift pump LL-2")),
+               "Raw water pump P-101C": ("Low-lift pump LL-3", ("LL-3", "low-lift pump LL-3")),
+               "Chlorine feed": ("Sodium hypochlorite feed", ("sodium hypochlorite", "hypochlorite feed")),
+               "Option A, UV disinfection": ("Ultraviolet reactors", ("UV reactors", "ultraviolet"))}
+FINISHED = re.compile(r" ?Finished water turbidity shall not exceed [\d.,]+ NTU in 95% of monthly samples\.")
+
+def cedar_falls(seed):
+    """Cedar Falls' design basis: Harrow Creek's template from a seed further on, named its own way again; the
+    chlorine contact option gone, a sludge pump (a decoy for the low-lift pumps), the finished water's turbidity
+    limit not given and the filters' backwash rate given (2 gaps)."""
+    p = PROJECTS["wtp"](seed + 2)
+    p.id, p.title = f"wtp-s{seed}-cedar", "Cedar Falls Water Treatment Plant"
+    p.edits = []
+    _drop_column(p, "Disinfection options", 2)
+    gone = {f.id for f in p.facts if f.id.startswith("optB.")} | {"plant.finished_turbidity"}
+    _renamed(p, CEDAR_WORDS, CEDAR_ITEMS, FINISHED)
+    p.facts[:] = [f for f in p.facts if f.id not in gone]
+    p.edits.append({"kind": "removed", "facts": sorted(gone)})
+    d = Draw(f"{p.id}-proposal")
+    d.used |= {f.value for f in p.facts}
+    filters = p.fact("filters.rate")
+    add_sentence(p, "filters.rate", "The filters are backwashed at {v} gpm/ft².",
+                 Fact("filters.backwash", filters.entity, filters.aliases, "backwash rate", ("backwash",),
+                      d.number(15, 22, 1), "gpm/ft²"))
+    add_sentence(p, "mix.g", "A sludge pump moves {v} gpm from the basins.",
+                 Fact("sludge.capacity", "Sludge pump", ("sludge pump", "the sludge pump"), "capacity",
+                      ("flow", "rated flow"), d.number(150, 600), "gpm"))
+    return p
+
+CYCLONE_WORDS = (("Ridgeback", "Cyclone"), ("The lift hill rises", "The chain lift rises"),
+                 ("First drop", "Main drop"), ("first drop", "main drop"), ("Zero-g roll", "Heartline roll"),
+                 ("Camelback", "Airtime hill"), ("support columns", "steel bents"))
+CYCLONE_ITEMS = {"Lift hill": ("Chain lift", ("chain lift", "lift")), "First drop": ("Main drop", ("main drop",
+                                                                                                  "drop")),
+                 "Ridgeback roller coaster": ("Cyclone roller coaster", ("Cyclone", "the ride", "the coaster")),
+                 "Zero-g roll": ("Heartline roll", ("heartline roll",)),
+                 "Camelback": ("Airtime hill", ("airtime hill",)),
+                 "Support structure": ("Steel structure", ("steel bents", "structure"))}
+G_MAX = re.compile(r", and the maximum vertical acceleration is [\d.]+ g")
+
+def cyclone(seed):
+    """The Cyclone roller coaster: Ridgeback's template from the next seed, named its own way (a chain lift, a main
+    drop, a heartline roll, an airtime hill, steel bents), its helix gone, a bunny hop (a decoy for the airtime hill),
+    its maximum vertical acceleration not given and its trains' length given (2 gaps)."""
+    p = PROJECTS["coaster"](seed + 1)
+    p.id, p.title = f"coaster-s{seed}-proposal", "Cyclone roller coaster"
+    p.edits = []
+    old, lift = p.fact("ride.lift_old"), p.fact("ride.lift")
+    rewrite(p, f"In revision B the lift hill was raised from {old.value} ft to {lift.value} ft.",
+            f"The lift hill rises {lift.value} ft.")  # a design, not a revision: no superseded height
+    p.facts.remove(old)
+    d = drawer(p)
+    add_row(p, "Camelback", "Bunny hop", d)
+    drop_row(p, "Helix")
+    _renamed(p, CYCLONE_WORDS, CYCLONE_ITEMS, G_MAX)
+    p.facts[:] = [f for f in p.facts if f.id != "ride.g_max"]
+    p.edits.append({"kind": "removed", "facts": ["ride.g_max"]})
+    trains = p.fact("trains.mass")
+    add_sentence(p, "trains.mass", "Each train is {v} ft long.",
+                 Fact("trains.length", trains.entity, trains.aliases, "train length", ("length",),
+                      d.number(52, 78), "ft"))
+    return p
+
+# (the corpus project's key, the other design's maker and id's ending, the pair's id's ending)
+PAIRS = (("wtp", pine_ridge, "proposal", "proposals"), ("wtp", cedar_falls, "cedar", "cedar-proposals"),
+         ("coaster", cyclone, "proposal", "proposals"))
 
 def pairs(seed=1):
     """Each pair's documents, by id (nothing generated)."""
-    return [Pair(f"{base.format(seed=seed)}-{name}", base.format(seed=seed), f"wtp-s{seed}-proposal")
-            for base, _, name in PAIRS]
+    return [Pair(f"{key}-s{seed}-{name}", f"{key}-s{seed}", f"{key}-s{seed}-{other}") for key, _, other, name in PAIRS]
 
 def check(project):
     """A proposal's key is honest: its facts all placed (render raises otherwise), each value naming one fact."""
@@ -110,7 +205,7 @@ def check(project):
 def proposed(seed=1):
     """[(Pair, the generated design)], checked."""
     out = []
-    for (base, make, _), pair in zip(PAIRS, pairs(seed)):
+    for (_, make, _, _), pair in zip(PAIRS, pairs(seed)):
         project = make(seed)
         check(project)
         out.append((pair, project))

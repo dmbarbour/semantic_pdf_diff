@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 23082,
-   "evidence": 12971,
+   "claims": 23522,
+   "evidence": 13292,
    "frame in conditions": 36,
-   "grounded": 6152,
+   "grounded": 6240,
    "list records": 36,
    "no content words": 3,
    "note records": 11,
@@ -14,13 +14,13 @@
    "partly": 64,
    "partly (image)": 38,
    "positioned": 124,
-   "printed": 8326,
+   "printed": 8591,
    "sheet records": 11,
-   "table records": 354,
-   "unsupported": 38,
+   "table records": 365,
+   "unsupported": 39,
    "unsupported (image)": 819,
-   "with conditions": 7114,
-   "with records": 6692
+   "with conditions": 7203,
+   "with records": 6793
   },
   "placed": {
    "bound": {
@@ -29,8 +29,8 @@
     "nowhere": 53
    },
    "frame": {
-    "attribute": 13,
-    "conditions": 125,
+    "attribute": 15,
+    "conditions": 133,
     "frame": 195,
     "records": 109
    },
@@ -38,11 +38,12 @@
     "stance": 219
    },
    "provenance": {
-    "conditions": 5
+    "conditions": 5,
+    "nowhere": 5
    },
    "scope": {
-    "attribute": 29,
-    "conditions": 1949,
+    "attribute": 33,
+    "conditions": 1985,
     "nowhere": 6
    },
    "sibling": {
@@ -63,14 +64,15 @@
     "shown, not used": 48
    },
    "frame": {
-    "shown, not used": 13
+    "shown, not used": 15
    },
    "provenance": {
-    "in conditions": 5
+    "in conditions": 5,
+    "kept out": 5
    },
    "scope": {
     "image only": 4,
-    "shown, not used": 31
+    "shown, not used": 35
    },
    "sibling": {
     "in conditions": 145,
@@ -108,14 +110,14 @@
      "share": 0.584
     },
     "<0.95": {
-     "readings": 11434,
-     "right": 11286,
+     "readings": 11638,
+     "right": 11490,
      "share": 0.987
     },
     "<=1.0": {
-     "readings": 31816,
-     "right": 29028,
-     "share": 0.912
+     "readings": 32470,
+     "right": 29658,
+     "share": 0.913
     }
    },
    "image": {
@@ -130,16 +132,16 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 22194,
-     "right": 20200,
-     "share": 0.91
+     "readings": 22434,
+     "right": 20436,
+     "share": 0.911
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 11094,
-     "right": 11066,
-     "share": 0.997
+     "readings": 11298,
+     "right": 11270,
+     "share": 0.998
     }
    },
    "text": {
@@ -159,9 +161,9 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 9622,
-     "right": 8828,
-     "share": 0.917
+     "readings": 10036,
+     "right": 9222,
+     "share": 0.919
     }
    }
   }
@@ -709,6 +711,182 @@
      }
     },
     "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-proposal": {
+   "inventory": {
+    "claims": 97,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 14,
+    "printed": 30,
+    "evidence": 32,
+    "context_bytes_per_request": 80,
+    "data_bytes_per_request": 530,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "nowhere": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "kept out": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-proposal.docx": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 2,
+    "unsupported": 1,
+    "with conditions": 3,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 30,
+    "evidence": 32,
+    "context_bytes_per_request": 59,
+    "data_bytes_per_request": 632,
+    "examples": {
+     "unsupported": [
+      "ride | train count | operating"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "nowhere": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "kept out": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-proposal.md": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 15,
+    "evidence": 32,
+    "context_bytes_per_request": 523,
+    "data_bytes_per_request": 198,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "nowhere": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "kept out": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-proposal.pptx": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 30,
+    "evidence": 32,
+    "context_bytes_per_request": 451,
+    "data_bytes_per_request": 125,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "nowhere": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "kept out": 1
+     }
+    },
+    "named": {},
+    "examples": {}
+   }
+  },
+  "coaster-s1-proposal.xlsx": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 2,
+    "with conditions": 2,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 15,
+    "printed": 30,
+    "evidence": 32,
+    "context_bytes_per_request": 447,
+    "data_bytes_per_request": 127,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "provenance": {
+      "nowhere": 1
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {
+     "provenance": {
+      "kept out": 1
+     }
+    },
     "named": {},
     "examples": {}
    }
@@ -7926,6 +8104,189 @@
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
      ]
     }
+   }
+  },
+  "wtp-s1-cedar": {
+   "inventory": {
+    "claims": 90,
+    "grounded": 27,
+    "with conditions": 27,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 11,
+    "printed": 31,
+    "evidence": 36,
+    "context_bytes_per_request": 69,
+    "data_bytes_per_request": 787,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-cedar.docx": {
+   "inventory": {
+    "claims": 31,
+    "grounded": 8,
+    "with conditions": 8,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 11,
+    "printed": 28,
+    "evidence": 31,
+    "context_bytes_per_request": 268,
+    "data_bytes_per_request": 1210,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 6,
+      "attribute": 2
+     },
+     "frame": {
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read turbidity (95th percentile) | measured over the last five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-cedar.md": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 17,
+    "evidence": 32,
+    "context_bytes_per_request": 593,
+    "data_bytes_per_request": 251,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 6,
+      "attribute": 2
+     },
+     "frame": {
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read turbidity (95th percentile) | measured over the last five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-cedar.pptx": {
+   "inventory": {
+    "claims": 31,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 11,
+    "printed": 28,
+    "evidence": 31,
+    "context_bytes_per_request": 570,
+    "data_bytes_per_request": 240,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-cedar.xlsx": {
+   "inventory": {
+    "claims": 31,
+    "grounded": 20,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 9,
+    "printed": 26,
+    "evidence": 31,
+    "context_bytes_per_request": 448,
+    "data_bytes_per_request": 154,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8
+     },
+     "frame": {
+      "conditions": 1
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
    }
   },
   "wtp-s1-comments.docx": {
