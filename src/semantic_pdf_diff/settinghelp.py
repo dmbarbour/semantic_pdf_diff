@@ -263,6 +263,8 @@ HELP = {
                             "shown what it noted of each claim"),
     "match_subjects": Help(_L, "proposals: the subjects matching by name leaves alone in one source each matched by "
                                "the model to the same item, the corresponding element or a state of it in the other"),
+    "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "
+                             "alike in meaning a link's evidence and its candidates"),
     "look_gaps": Help(_L, "comparisons: each property another source gives a matched subject, and a source "
                           "describing it doesn't, looked for where it'd be in that source"),
     "tensions": Help(_L, "analyses: each subject's claims read for those hard to hold together on engineering "

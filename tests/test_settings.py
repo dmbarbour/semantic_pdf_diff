@@ -100,6 +100,8 @@ NOT_EXERCISED = {
     'judge_notes': "the stub's second pass notes nothing, so the judge is shown no note (tests/test_judge_notes.py)",
     'match_subjects': "proposals' subjects names leave alone, sharing a word or a property with the other's; run "
                       "with the model's answers in tests/test_crossmatch.py",
+    'link_meaning': "needs an embedding model (embed_model) and subjects alone in each document; run with names' "
+                    "vectors in tests/test_links.py",
     'look_gaps': "needs subjects matched across the documents, each with two claims or more; run with the model's "
                  "answers in tests/test_crossmatch.py",
     'reviewer_concerns': "analyses only, with tensions on; these runs compare (tests/test_tensions.py)",

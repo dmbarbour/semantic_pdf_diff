@@ -11,21 +11,27 @@ plausible matches "should feed links and topics for now").
   findings, alignment's groupings or the model's answers (crossmatch.py): its signals, each evidence, none deciding:
   - `name`: name words in common (not stop words nor generic ones: "data", "item"), counted where one is rare among
     the subjects' names (RARE at most: the turbine pair's "blade" and "turbine" name dozens) or most of their words
-    are (NAME_SHARE);
+    are (NAME_SHARE), or two names spelled alike (their letters' trigrams, SPELLED: "flocculators", "flocculation";
+    milestone 3);
+  - `meaning`: two names alike in meaning (their embeddings' cosine, MEANING at least, each the other's likest: the
+    link_meaning lever's, with an embedding model; milestone 3);
   - `properties`: property names in common;
   - `values`: values in common (alignment's value_key);
   - `judged`: the judge's verdicts on their claims paired, by relation;
   - `grouped`: alignment's grouping of them (ambiguous, a split or merge candidate);
   - `model`: the model's answer naming one the other's counterpart (same, corresponding, state), taken or not.
-  Identifiers that differ ("Room 104", "Room 105") rule a pair out.
+  Between revisions, identifiers that differ ("Room 104", "Room 105") rule a pair out; not between proposals, whose
+  corresponding elements differ by their numbers too (NREL's 5 MW turbine and IEA's 15 MW: milestone 3).
 - **The rubric** (RUBRIC; a view of the signals, by mode, the owner having chosen two weighings: revisions' and
   proposals' evidence means other things): a signal counts for a pair where
   - names share a rare word, or most of their words; two properties or more are in common;
   - (revisions) a value is in common, the judge paired their claims (any relation but unrelated), alignment grouped
     them; (proposals) the judge called a pair of their claims equivalent, different or complementary (values in
     common, and "uncertain", are coincidence and doubt between two designs);
-  - the model named one the other's counterpart.
-  Two signals or more: plausible; one: possible. The level is worked out from the signals each time a report is
+  - the model named one the other's counterpart; names alike in meaning.
+  Names alike by their words, their spelling or their meaning are one family of evidence (they're all the names':
+  the turbine pair's "Rotor Speed" and "rotor-speed error" alike by both); two families or more: plausible; one:
+  possible. The level is worked out from the signals each time a report is
   written: a new rubric changes what's shown, never what was asked.
 - **Kept in the index** (indexes.built: each subject's "links"), shown as links and in topics, never in the merged
   index's values nor its gaps, never a finding.
@@ -39,6 +45,10 @@ RUBRIC = "rubric/1"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
+SPELLED = 0.5  # or two names' letters' trigrams in common, their share at least
+MEANING = 0.8  # two names' embeddings' cosine, at least, for names alike in meaning (the turbine pair: its two
+# turbines 0.86, wrong pairs mostly under 0.8)
+FAMILY = {"meaning": "name"}  # signals of one family, counted once toward a level
 LEVELS = ("plausible", "possible")
 RELATION = {"revisions": "same", "proposals": "corresponding"}  # a link's relation where the model gave none
 STRONG = {"revisions": ("equivalent", "different", "complementary", "uncertain"),  # the judge's verdicts that count
@@ -59,6 +69,35 @@ def _values(subject, evidence):
                 key = value_key(Evidence.model_validate(e))
                 if key is not None:
                     out.add(key)
+    return out
+
+def _trigrams(name):
+    letters = "".join(c for c in name.casefold() if c.isalnum() or c == " ")
+    return {letters[k:k + 3] for k in range(len(letters) - 2)} - {""}
+
+def _spelled(a, b):
+    """Whether two subjects have names spelled alike (their trigrams' share in common, SPELLED at least)."""
+    for x in a["names"]:
+        tx = _trigrams(x)
+        for y in b["names"]:
+            ty = _trigrams(y)
+            if tx and ty and len(tx & ty) >= SPELLED * len(tx | ty):
+                return True
+    return False
+
+def _spelled_pairs(alone, sources):
+    """The pairs of subjects alone in the two sources whose names are spelled alike (_spelled), found through their
+    trigrams in common."""
+    by = defaultdict(set)
+    for j, t in alone.get(sources[1], []):
+        for n in t["names"]:
+            for g in _trigrams(n):
+                by[g].add(j)
+    subject = dict(alone.get(sources[1], []))
+    out = set()
+    for i, s in alone.get(sources[0], []):
+        shared = Counter(j for n in s["names"] for g in _trigrams(n) for j in by.get(g, ()))
+        out |= {tuple(sorted((i, j))) for j, n in shared.items() if n >= 3 and _spelled(s, subject[j])}
     return out
 
 def _alone(index):
@@ -84,6 +123,40 @@ def _paired(data, owner):
                     if x != y:
                         out[tuple(sorted((x, y)))]["grouped"].append(g["kind"])
     return out
+
+def _meaning(data, subjects, alone, sources):
+    """The pairs of subjects alone in the two sources whose names are alike in meaning: each the other's likest by
+    their names' embeddings (data["name_vectors"]: embed.names), their cosine MEANING at least: {(i, j): cosine}."""
+    import math
+    from operator import mul
+    from .embed import unpacked
+    vectors = (data.get("name_vectors") or {}).get("vectors") or {}
+    if not vectors:
+        return {}
+    kept = {}  # a name's vector and its length, unpacked once
+
+    def of(s):
+        out = []
+        for n in s["names"]:
+            if n in vectors and n not in kept:
+                v = unpacked(vectors[n])
+                kept[n] = (v, math.sqrt(sum(map(mul, v, v))) or 1.0)
+            if n in kept:
+                out.append(kept[n])
+        return out
+    near, theirs = {}, [(j, of(t)) for j, t in alone.get(sources[1], [])]
+    for i, s in alone.get(sources[0], []):
+        mine = of(s)
+        for j, ys in theirs:
+            if mine and ys:
+                near[i, j] = max(sum(map(mul, a, b)) / (na * nb) for a, na in mine for b, nb in ys)
+    best_a, best_b = {}, {}
+    for (i, j), c in near.items():
+        if c > best_a.get(i, (0, None))[0]:
+            best_a[i] = (c, j)
+        if c > best_b.get(j, (0, None))[0]:
+            best_b[j] = (c, i)
+    return {tuple(sorted((i, j))): c for i, (c, j) in best_a.items() if c >= MEANING and best_b[j][1] == i}
 
 def linked(data, index):
     """Each subject's links: {subject's index: [{"source", "other", "relation", "level", "signals", "evidence"}]},
@@ -117,6 +190,9 @@ def linked(data, index):
             by[w].add(j)
     held = Counter(w for s in subjects for w in _name_words(s))  # how many subjects' names hold each word
     pairs = set(paired)
+    pairs |= _spelled_pairs(alone, sources)
+    likest = _meaning(data, subjects, alone, sources)  # names alike in meaning: {(i, j): cosine}, mutual likest
+    pairs |= set(likest)
     for i, s in alone.get(sources[0], []):
         for w in _name_words(s) | {("property", p) for p in _properties(s)}:
             pairs |= {tuple(sorted((i, j))) for j in by.get(w, ())}
@@ -126,7 +202,7 @@ def linked(data, index):
         if list(s["claims"]) == list(t["claims"]):  # one source's two subjects: not this milestone's
             continue
         ids = [identifiers({w for n in x["names"] for w in words(n)}) for x in (s, t)]
-        if ids[0] and ids[1] and not ids[0] & ids[1]:  # Room 104 isn't Room 105
+        if mode == "revisions" and ids[0] and ids[1] and not ids[0] & ids[1]:  # Room 104 isn't Room 105
             continue
         said = paired.get((i, j), {"judged": Counter(), "grouped": [], "model": []})
         ev = {"name": sorted(_name_words(s) & _name_words(t)), "properties": sorted(_properties(s) & _properties(t)),
@@ -135,14 +211,17 @@ def linked(data, index):
               "model": [r for r, _ in said["model"]]}
         names = (_name_words(s), _name_words(t))
         said_alike = any(held[w] <= RARE for w in ev["name"]) or (
-            ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1]))
-        signals = [k for k, counts in (("name", said_alike), ("properties", len(ev["properties"]) >= 2),
+            ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1])) or _spelled(s, t)
+        if (i, j) in likest:
+            ev["meaning"] = round(likest[i, j], 3)
+        signals = [k for k, counts in (("name", said_alike), ("meaning", (i, j) in likest),
+                                       ("properties", len(ev["properties"]) >= 2),
                                        ("values", mode == "revisions" and ev["values"] > 0),
                                        ("judged", any(said["judged"][r] for r in STRONG[mode])),
                                        ("grouped", bool(ev["grouped"])), ("model", bool(ev["model"]))) if counts]
         if not signals:
             continue
-        level = LEVELS[0] if len(signals) >= 2 else LEVELS[1]
+        level = LEVELS[0] if len({FAMILY.get(x, x) for x in signals}) >= 2 else LEVELS[1]
         relation = ev["model"][0] if ev["model"] else RELATION[mode]
         score = (len(signals), len(ev["properties"]) + len(ev["name"]) + ev["values"])
         found.append((score, i, j, {"relation": relation, "level": level, "signals": signals, "evidence": ev,
@@ -156,7 +235,8 @@ def linked(data, index):
     return dict(out)
 
 SAID = {"same": "the same as", "corresponding": "the counterpart of", "state": "a state of"}  # how a link reads
-SIGNALS = {"name": "names", "properties": "properties in common", "values": "values in common",
+SIGNALS = {"name": "names", "meaning": "names alike in meaning", "properties": "properties in common",
+           "values": "values in common",
            "judged": "claims the judge paired", "grouped": "grouped by alignment", "model": "the model's match"}
 
 def link_said(link):

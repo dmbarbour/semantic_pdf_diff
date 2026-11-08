@@ -135,6 +135,39 @@ def embedded(evidence, dispatch, s, label, progress=None):
     return {"model": s.embed_model, "dimensions": s.embed_dimensions, "vectors": kept, "of": of,
             "requests": len(batches), "failed": failed, **({"not_sent": len(unsent)} if unsent else {})}
 
+def names(texts, dispatch, s, label, progress=None):
+    """Names embedded, each once, for links by meaning (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone
+    3): {"model", "dimensions", "vectors": {name: kept vector}, "requests", "failed"}; a name whose request failed has
+    none (the next run asks again)."""
+    from .progress import NoProgress
+    from .recipes import Recipe
+    progress = progress or NoProgress()
+    texts = sorted(set(texts))
+    vectors, failed = {}, 0
+
+    def finish(start, count):
+        def done(value, error):
+            nonlocal failed
+            progress.finish("failed" if error is not None else "complete")
+            if error is not None:
+                failed += 1
+                return
+            vectors.update(zip(texts[start:start + count], value.vectors))
+        return done
+    batches = range(0, len(texts), EMBED_A_REQUEST)
+    for start in batches:
+        dispatch.make_room()
+        progress.add()
+        dispatch.submit_request(request(s, texts[start:start + EMBED_A_REQUEST],
+                                        Recipe(("embed names", label, str(start // EMBED_A_REQUEST)))),
+                                finish(start, len(texts[start:start + EMBED_A_REQUEST])))
+    dispatch.drain()
+    if failed:
+        log.warning(f"The embedding model {s.embed_model}: {failed} of {len(batches)} requests of names failed; their "
+                    "names have no meaning's link, and the next run asks again")
+    return {"model": s.embed_model, "dimensions": s.embed_dimensions,
+            "vectors": {t: vectors[t] for t in texts if t in vectors}, "requests": len(batches), "failed": failed}
+
 class Claim:
     """A claim's fields as rerank.sentence reads them, from a report's evidence (a dict)."""
     def __init__(self, e):

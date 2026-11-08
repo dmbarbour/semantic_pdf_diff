@@ -229,7 +229,8 @@ class Binding(unittest.TestCase):
         self.assertEqual(bound["levers"], [n for n in L.DEFAULT_LEVERS
                                            if n not in ("reconcile", "align", "verify_visuals", "explain_differences",
                                                         "editorial", "record_changes", "judge_context", "judge_notes",
-                                                        "match_subjects", "look_gaps", "judge_glossary", "topic_names",
+                                                        "match_subjects", "link_meaning", "look_gaps",
+                                                        "judge_glossary", "topic_names",
                                                         "search_names", "glossary",
                                                         "retrieve_glossary", "confirm_kinds", "second_pass", "tensions",
                                                         "summaries", "embed", "rerank")])

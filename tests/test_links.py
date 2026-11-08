@@ -34,8 +34,12 @@ class Linked(unittest.TestCase):
         self.assertEqual(links_of(data), {
             ("Alum", "ferric sulfate"): ("possible", "corresponding", ["properties"]),  # its doses alone
             ("Harrow Creek Water Treatment Plant", "Pine Ridge Water Treatment Plant"):
-                ("plausible", "corresponding", ["name", "properties"])})  # Room 104 isn't Room 105; no decoy's
+                ("plausible", "corresponding", ["name", "properties"]),
+            ("Room 104", "Room 105"): ("plausible", "corresponding", ["name", "properties"])})  # no decoy's
         self.assertEqual(len(indexes.built(data)["subjects"]), 7)  # none joined
+        revisions = links_of(report(A + B, [], ("a", "b"), mode="revisions"))
+        self.assertNotIn(("Room 104", "Room 105"), revisions)  # one document's Room 104 isn't its Room 105
+        # (between proposals two designs' rooms may correspond, as NREL's 5 MW turbine and IEA's 15 MW do)
         judged = report(A + B, [{"a": "A-3", "b": "B-3", "relation": "different"}], ("a", "b"), mode="proposals")
         self.assertEqual(links_of(judged)["Alum", "ferric sulfate"][0], "plausible")
         doubt = report(A + B, [{"a": "A-3", "b": "B-3", "relation": "uncertain"}], ("a", "b"), mode="proposals")
@@ -69,6 +73,34 @@ class Linked(unittest.TestCase):
              for n, (attribute, value, unit) in enumerate([("volume", f"2{k}", "gal"), ("depth", f"5{k}", "ft")])]
         found = links_of(report(a + b, [], ("a", "b"), mode="proposals"))
         self.assertEqual(len(found), links.LINKS)
+
+class Signals(unittest.TestCase):
+    """Milestone 3: names spelled alike, and alike in meaning (the link_meaning lever's)."""
+    def test_names_spelled_alike_count_as_names(self):
+        a = [claim("A-1", "ca", "flocculation", "stages", "4", "")]
+        b = [claim("B-1", "cb", "flocculators", "stage count", "3", "")]
+        self.assertEqual(links_of(report(a + b, [], ("a", "b"), mode="proposals")),
+                         {("flocculation", "flocculators"): ("possible", "corresponding", ["name"])})
+
+    def test_names_alike_in_meaning_each_the_others_likest(self):
+        from semantic_pdf_diff.embed import packed
+        a = [claim("A-1", "ca", "sedimentation basins", "length", "159", "ft"),
+             claim("A-2", "ca", "sedimentation basins", "width", "47", "ft"), claim("A-3", "ca", "Alum", "dose", "38.8",
+                                                                                 "mg/L")]
+        b = [claim("B-1", "cb", "clarifiers", "length", "166", "ft"), claim("B-2", "cb", "clarifiers", "width", "33",
+                                                                             "ft"),
+             claim("B-3", "cb", "settling tanks", "depth", "15", "ft")]
+        vectors = {"sedimentation basins": packed([1, 0.2, 0]), "clarifiers": packed([0.95, 0.25, 0.05]),
+                   "settling tanks": packed([0.9, 0.1, 0.4]), "Alum": packed([0, 0, 1])}
+        data = report(a + b, [], ("a", "b"), mode="proposals", name_vectors={"vectors": vectors})
+        found = links_of(data)
+        self.assertEqual(found["sedimentation basins", "clarifiers"],
+                         ("plausible", "corresponding", ["meaning", "properties"]))
+        self.assertNotIn(("sedimentation basins", "settling tanks"), found)  # alike, but not each other's likest
+        self.assertNotIn(("Alum", "settling tanks"), found)  # alike in nothing
+        self.assertEqual(links_of(report(a + b, [], ("a", "b"), mode="proposals"))["sedimentation basins",
+                                                                                   "clarifiers"][0],
+                         "possible")  # without the vectors: its properties alone
 
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):

@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.47.0 (2026-11-08)
+
+- **Links by names alike in meaning** (`link_meaning`, off; with an embedding model, `embed_model`): each claim's name embedded once, two subjects whose names are each other's likest (cosine 0.8 or more) a link's evidence and candidates (tentative matches, milestone 3; the owner: "Match candidates by meaning might help").
+- Names spelled alike (letters' trigrams) are a link's candidates and names' evidence; the names' words, spelling and meaning count as one kind of evidence toward a link's level.
+- Comparing proposals, numbers that differ in two names no longer rule a link out (NREL's 5 MW turbine and IEA's 15 MW); comparing revisions they still do (Room 104 isn't Room 105).
+
 ## 0.46.0 (2026-11-07)
 
 - **Links: subjects possibly one, kept apart** (tentative matches, milestone 2; the owner: "Three levels is a start"; plausible matches "should feed links and topics for now"): in a comparison, two sources' subjects linked by weaker evidence, never merged, each with its level (plausible: two signals; possible: one) and its signals (names, properties or values in common, the judge's pairings, alignment's groupings, the model's answers). Shown in the Subjects view and index.md ("possibly the counterpart of …"), found by a search for either; a plausible link's claims share a topic. Revisions' and proposals' evidence weighed apart.

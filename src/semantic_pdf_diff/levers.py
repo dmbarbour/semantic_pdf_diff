@@ -1443,6 +1443,16 @@ class MatchSubjects(Lever):
     def matches_subjects(self, mode):
         return self.match_subjects and mode == "proposals"
 
+class LinkMeaning(Lever):
+    lever_name, stage, off = "link_meaning", "comparison", {"link_meaning": False}
+    # comparisons: each subject's names embedded (embed.names, with embed_model), two names alike in meaning a
+    # link's signal and its candidates (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone 3; the owner,
+    # 2026-11-07: "Match candidates by meaning might help")
+    link_meaning: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def links_by_meaning(self, mode):
+        return self.link_meaning and bool(getattr(self, "embed_model", None)) and mode != "analysis"
+
 class LookGaps(Lever):
     lever_name, stage, off = "look_gaps", "comparison", {"look_gaps": False}
     # comparisons: each gap another source fills (a matched subject's property one source gives and another
@@ -1548,7 +1558,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LookGaps, JudgeGlossary, NameTopics, SearchNames,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkMeaning, LookGaps, JudgeGlossary, NameTopics,
+                 SearchNames,
                  ReadGlossary, ConfirmKinds,
                  ReadTogether, FindTensions, Summaries, Embed, Rerank)
 REGISTRY = {c.lever_name: c for c in LEVER_CLASSES}
@@ -1798,6 +1809,12 @@ class Platform(Composable):
     def matches_subjects(self, mode):
         """Whether the model matches the subjects a comparison's code leaves alone across its sources (crossmatch.py):
         the platform's, never; the match_subjects lever's, in proposals when on."""
+        return False
+
+    @chosen
+    def links_by_meaning(self, mode):
+        """Whether a comparison's subjects' names are embedded for links by meaning (embed.names): the platform's,
+        never; the link_meaning lever's, with an embedding model named, in comparisons."""
         return False
 
     @chosen

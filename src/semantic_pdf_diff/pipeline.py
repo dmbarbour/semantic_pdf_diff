@@ -364,8 +364,13 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         limitations=LIMITATIONS, paused=getattr(client, 'paused', None) or '').model_dump()
     if commentary is not None:  # the second pass's log, as an analysis keeps it: its notes on the cards
         data['commentary'] = commentary
-    data = searchable({**traced(data), **({'glossary': found} if found is not None else {})}, settings, client,
-                      options.mode, label, progress)
+    data = {**traced(data), **({'glossary': found} if found is not None else {})}
+    if settings.links_by_meaning(options.mode):  # names embedded for links by meaning, before the topics count links
+        from . import embed
+        with Dispatcher(client) as dispatch:
+            data['name_vectors'] = embed.names([e['entity'] for e in data['evidence']], dispatch, settings, label,
+                                               progress)
+    data = searchable(data, settings, client, options.mode, label, progress)
     if settings.matches_subjects(options.mode):  # what matching by code leaves alone, matched by the model
         from . import crossmatch, indexes
         matched = crossmatch.read(data, indexes.built(data), client, options.mode, label, progress)
