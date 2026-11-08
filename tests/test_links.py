@@ -102,6 +102,19 @@ class Signals(unittest.TestCase):
                                                                                    "clarifiers"][0],
                          "possible")  # without the vectors: its properties alone
 
+    def test_the_rerankers_likest_scoring_well_evidence_of_its_own(self):
+        a = [claim("A-1", "ca", "Alum", "dose", "38.8", "mg/L")]
+        b = [claim("B-1", "cb", "ferric sulfate", "dosage", "18.5", "mg/L"),
+             claim("B-2", "cb", "chlorine", "dose rate", "3.7", "mg/L")]
+        ranks = {"scores": {"a": {"Alum": {"ferric sulfate": 0.81, "chlorine": 0.42}}}}
+        found = links_of(report(a + b, [], ("a", "b"), mode="proposals", subject_ranks=ranks))
+        self.assertEqual(found, {("Alum", "ferric sulfate"): ("possible", "corresponding", ["reranked"])})
+        low = {"scores": {"a": {"Alum": {"ferric sulfate": 0.31, "chlorine": 0.12}}}}
+        self.assertEqual(links_of(report(a + b, [], ("a", "b"), mode="proposals", subject_ranks=low)), {})
+        from semantic_pdf_diff.rerank import described
+        index = indexes.built(report(a + b, [], ("a", "b"), mode="proposals"))
+        self.assertEqual(described(index["subjects"][0]), "Alum: dose")
+
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):
         data = report(A + B, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b"), mode="proposals")

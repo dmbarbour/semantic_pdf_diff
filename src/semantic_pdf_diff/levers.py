@@ -1453,6 +1453,17 @@ class LinkMeaning(Lever):
     def links_by_meaning(self, mode):
         return self.link_meaning and bool(getattr(self, "embed_model", None)) and mode != "analysis"
 
+class LinkRerank(Lever):
+    lever_name, stage, off = "link_rerank", "comparison", {"link_rerank": False}
+    # comparisons: the subjects alone in one source each ranked against the other's by the reranker (rerank.subjects,
+    # with rerank_model), its likest a link's signal when it scores well (links.py; tentative matches, milestone 3;
+    # the owner, 2026-11-07: "Outside of embeddings and cross-encoders, it's difficult to turn model confidence into
+    # numbers")
+    link_rerank: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def links_by_reranker(self, mode):
+        return self.link_rerank and bool(getattr(self, "rerank_model", None)) and mode != "analysis"
+
 class LookGaps(Lever):
     lever_name, stage, off = "look_gaps", "comparison", {"look_gaps": False}
     # comparisons: each gap another source fills (a matched subject's property one source gives and another
@@ -1558,7 +1569,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LinkMeaning, LookGaps, JudgeGlossary, NameTopics,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkMeaning, LinkRerank, LookGaps, JudgeGlossary,
+                 NameTopics,
                  SearchNames,
                  ReadGlossary, ConfirmKinds,
                  ReadTogether, FindTensions, Summaries, Embed, Rerank)
@@ -1815,6 +1827,12 @@ class Platform(Composable):
     def links_by_meaning(self, mode):
         """Whether a comparison's subjects' names are embedded for links by meaning (embed.names): the platform's,
         never; the link_meaning lever's, with an embedding model named, in comparisons."""
+        return False
+
+    @chosen
+    def links_by_reranker(self, mode):
+        """Whether a comparison's subjects are ranked by the reranker for links (rerank.subjects): the platform's,
+        never; the link_rerank lever's, with a reranker named, in comparisons."""
         return False
 
     @chosen

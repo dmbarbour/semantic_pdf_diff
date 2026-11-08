@@ -36,6 +36,10 @@ INSTRUCTION = ("Given a claim from one engineering design document, retrieve cla
                "same property of the same kind of component, so that their values can be compared")
 VERSION = 1
 log = logging.getLogger("semantic_pdf_diff")
+# What it's told when it ranks subjects for links (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone 3)
+SUBJECTS = ("Given an item of one engineering design, retrieve the items of another design that are the same item or "
+            "play the same part in it, so that their properties can be compared")
+MOST_DOCUMENTS = 60  # subjects a subject is ranked against, at most (A to Z)
 
 def sentence(claim):
     """A claim as the reranker reads it: "The rated power of the rotor, for 10 m/s." (its subject; its value is what a
@@ -57,21 +61,22 @@ def endpoint(s):
     raise ValueError(f"rerank_api is deepinfra, but the endpoint {base} isn't DeepInfra's OpenAI-compatible one "
                      "(.../v1/openai): set rerank_url")
 
-def request(s, query, documents, key=None):
-    """A request scoring documents against query with the settings' reranker (s.rerank_model, s.rerank_api)."""
+def request(s, query, documents, key=None, instruction=INSTRUCTION):
+    """A request scoring documents against query with the settings' reranker (s.rerank_model, s.rerank_api), told
+    the task (instruction)."""
     instructed = s.rerank_api != "tei"
     canonical = {"rerank": s.rerank_model, "api": s.rerank_api, "version": VERSION,
-                 "instruction": INSTRUCTION if instructed else "", "query": query, "documents": list(documents)}
+                 "instruction": instruction if instructed else "", "query": query, "documents": list(documents)}
     name = hashlib.sha256(json.dumps(canonical, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
-    prompt = "\n".join([f"RERANK {s.rerank_model} ({s.rerank_api})", *([INSTRUCTION] if instructed else []),
+    prompt = "\n".join([f"RERANK {s.rerank_model} ({s.rerank_api})", *([instruction] if instructed else []),
                         "QUERY: " + query, "DOCUMENTS:", *(f"{i}. {d}" for i, d in enumerate(documents, 1))])
 
     def body():
         if s.rerank_api == "rerank":
             sent = {"model": s.rerank_model, "query": query, "documents": list(documents), "top_n": len(documents),
-                    "instruction": INSTRUCTION}
+                    "instruction": instruction}
         elif s.rerank_api == "deepinfra":
-            sent = {"queries": [query] * len(documents), "documents": list(documents), "instruction": INSTRUCTION}
+            sent = {"queries": [query] * len(documents), "documents": list(documents), "instruction": instruction}
         else:
             sent = {"query": query, "texts": list(documents)}
         return json.dumps(sent).encode()
@@ -100,6 +105,49 @@ def request(s, query, documents, key=None):
                    description={"template": "rerank", "source_type": "", "text_chars": len(prompt), "image_bytes": [],
                                 "params": {"rerank": s.rerank_model}},
                    url=endpoint(s), model=s.rerank_model, read=read, api_key=key_named(s.rerank_key_env))
+
+def described(subject):
+    """A subject as the reranker reads it: "Alum (also alum): dose; maximum dose"."""
+    also = [n for n in subject["names"] if n.casefold() != subject["name"].casefold()][:3]
+    properties = list(dict.fromkeys(p["name"] for p in subject["properties"]))[:12]
+    return subject["name"] + (f" (also {', '.join(also)})" if also else "") + (": " + "; ".join(properties)
+                                                                               if properties else "")
+
+def subjects(index, dispatch, s, label, progress=None):
+    """The subjects alone in one source each ranked against those alone in the other (the source with fewer asking,
+    MOST_DOCUMENTS at most, A to Z), a request each, for links (links.py): {"model", "scores": {source: {subject:
+    {other: score}}}, "requests", "failed"}. index: one built without the model's other names (they're asked after
+    these, by topic), so the same subjects are asked whenever."""
+    progress = progress or NoProgress()
+    sources = index.get("sources", [])
+    alone = {x: sorted((t for t in index.get("subjects", []) if list(t["claims"]) == [x]),
+                       key=lambda t: (t["name"].casefold(), t["name"])) for x in sources}
+    if len(sources) != 2 or not all(alone.values()):
+        return {}
+    mine, theirs = sorted(sources, key=lambda x: len(alone[x]))
+    documents = alone[theirs][:MOST_DOCUMENTS]
+    scores, failed = {}, 0
+
+    def finish(subject):
+        def done(value, error):
+            nonlocal failed
+            progress.finish("failed" if error is not None else "complete")
+            if error is not None:
+                failed += 1
+                return
+            scores[subject["name"]] = {t["name"]: round(x, 4) for t, x in zip(documents, value.scores)}
+        return done
+    for subject in alone[mine]:
+        dispatch.make_room()
+        progress.add()
+        dispatch.submit_request(request(s, described(subject), [described(t) for t in documents],
+                                        ("rerank subjects", label, mine, subject["name"]), SUBJECTS), finish(subject))
+    dispatch.drain()
+    if failed:
+        log.warning(f"The reranker {s.rerank_model}: {failed} of {len(alone[mine])} requests ranking subjects failed; "
+                    "their subjects have no reranker's link, and the next run asks again")
+    return {"model": s.rerank_model, "scores": {mine: {k: scores[k] for k in sorted(scores)}},
+            "requests": len(alone[mine]), "failed": failed}
 
 def ranked(pairs, dispatch, client, mode, label, progress=None):
     """The candidate pairs ((retrieval score, a, b), best first) the judge takes, reranked: each claim's candidates

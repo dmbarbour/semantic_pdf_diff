@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for the reranker and both directions. [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions. [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -93,9 +93,12 @@ There's none: milestone 7's "matching, scored against the keys' items" wasn't bu
   - **Numbers that differ** rule a pair out between revisions only. Between proposals they ruled out the turbine pair's likest pair by meaning, NREL's 5 MW turbine and IEA's 15 MW (0.86): two designs' counterparts differ by their numbers too.
   - **The turbine pair** (Qwen/Qwen3-Embedding-8B, 155 names, three requests; with `match_subjects`): six possible links, none plausible. Right: NREL's baseline turbine and IEA's reference one (0.86), and the two offshore turbines (0.85). Wrong or loose: DOWEC's and IEA's "turbine" (0.82), "aerodynamic torque" and CCBlade's aerodynamic power, the pitch controller's model and CCBlade's, "Rotor Speed" and "rotor-speed error". No two turbines here share properties: one family of evidence each.
   - **The controlled PDF pairs** (a variant, the same model): links unchanged, plausible 4 of 4 right, the possible one unscorable. The model's other names (`search_names`) had already matched the renamed items.
-  - **Not built:**
-    - **The reranker as a signal:** the endpoint serves none to measure (`config models rerank`: none); the owner's may.
-    - **Both directions asked by `match_subjects`.**
+  - **The reranker as a signal** (`link_rerank`, off; with `rerank_model`; built 2026-11-08 after the owner: "I believe DeepInfra has rerankers, pretty sure we've used them previously": Claude had looked only at `/models`, which DeepInfra's inference API isn't listed in):
+    - **How it's asked:** each subject alone in the source with fewer, one request each, against the other source's (`rerank.subjects`, 60 at most), told the task: "the same item or play the same part". Before the topics, on the subjects built without the model's other names.
+    - **How it counts:** a subject's likest at 0.8 or more is evidence of its own (it reads names and properties together, so it isn't the names' family).
+    - **The turbine pair** (Qwen/Qwen3-Reranker-8B, DeepInfra's API; 52 requests; with `link_meaning` and `match_subjects`): it scores relevance, not identity. Its right pair, NREL's baseline turbine and IEA's reference one, scored 0.98, with meaning plausible: the only plausible link, and right. Wrong pairs scored as high: IEA's "15-MW turbine" and "Region 2½" 0.97, "turbine" and "Drivetrain" 0.95. Under 0.8 they were mostly wrong, hence the threshold. Alone it makes a link possible at most. Naming a reranker also reranks the claims' pairs before the judge, so 551 pairs were judged again ($0.11).
+    - **The controlled PDF pairs** ($0.002, 21 requests): it agreed with every right link (alum and ferric sulfate 0.95, the two plants 0.99, the split's P-101C and P-101E 0.998) and added no wrong one.
+  - **Not built:** both directions asked by `match_subjects`.
 
 ### 4. Tied together and tested (stage 2, as levers)
 

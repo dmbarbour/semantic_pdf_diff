@@ -265,6 +265,8 @@ HELP = {
                                "the model to the same item, the corresponding element or a state of it in the other"),
     "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "
                              "alike in meaning a link's evidence and its candidates"),
+    "link_rerank": Help(_L, "comparisons, with a reranker (rerank_model): each subject ranked against the other "
+                            "source's, its likest a link's evidence when it scores well"),
     "look_gaps": Help(_L, "comparisons: each property another source gives a matched subject, and a source "
                           "describing it doesn't, looked for where it'd be in that source"),
     "tensions": Help(_L, "analyses: each subject's claims read for those hard to hold together on engineering "

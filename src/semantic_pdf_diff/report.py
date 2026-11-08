@@ -609,7 +609,8 @@ def linked_names(data):
         return {}
     from .indexes import built
     out = {}
-    for s in built({k: v for k, v in data.items() if k not in ('synonyms', 'commentary')})['subjects']:
+    from .links import stable
+    for s in built(stable(data))['subjects']:
         names = ' '.join(x['other'] for x in s.get('links', []) if x['level'] == 'plausible')
         if names:
             for ids in s['claims'].values():

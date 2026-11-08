@@ -15,6 +15,8 @@ plausible matches "should feed links and topics for now").
     milestone 3);
   - `meaning`: two names alike in meaning (their embeddings' cosine, MEANING at least, each the other's likest: the
     link_meaning lever's, with an embedding model; milestone 3);
+  - `reranked`: the reranker's likest for a subject, scoring RERANKED at least (rerank.subjects: the link_rerank
+    lever's, with a reranker; it reads names and properties together, so it's evidence of its own; milestone 3);
   - `properties`: property names in common;
   - `values`: values in common (alignment's value_key);
   - `judged`: the judge's verdicts on their claims paired, by relation;
@@ -49,10 +51,17 @@ SPELLED = 0.5  # or two names' letters' trigrams in common, their share at least
 MEANING = 0.8  # two names' embeddings' cosine, at least, for names alike in meaning (the turbine pair: its two
 # turbines 0.86, wrong pairs mostly under 0.8)
 FAMILY = {"meaning": "name"}  # signals of one family, counted once toward a level
+RERANKED = 0.8  # the reranker's score, at least, of a subject's likest for it to count (the turbine pair: its right
+# pair 0.98, but wrong ones as high: it scores relevance, not identity; those under 0.8 mostly wrong)
 LEVELS = ("plausible", "possible")
 RELATION = {"revisions": "same", "proposals": "corresponding"}  # a link's relation where the model gave none
 STRONG = {"revisions": ("equivalent", "different", "complementary", "uncertain"),  # the judge's verdicts that count
           "proposals": ("equivalent", "different", "complementary")}
+
+def stable(data):
+    """A report's data as the topics count links: without the model's other names and its log (asked after the
+    topics, the other names a request a topic), so what's built from it is the same whenever."""
+    return {k: v for k, v in data.items() if k not in ("synonyms", "commentary")}
 
 def _name_words(subject):
     return {w for n in subject["names"] for w in words(n)} - STOP - GENERIC
@@ -158,6 +167,22 @@ def _meaning(data, subjects, alone, sources):
             best_b[j] = (c, i)
     return {tuple(sorted((i, j))): c for i, (c, j) in best_a.items() if c >= MEANING and best_b[j][1] == i}
 
+def _ranked(data, subjects, alone):
+    """The reranker's likest subject for each subject it ranked, scoring RERANKED at least (data["subject_ranks"]:
+    rerank.subjects): {(i, j): score}, by the subjects' names in their sources."""
+    found = (data.get("subject_ranks") or {}).get("scores") or {}
+    named = {(source, s["name"]): i for source, xs in alone.items() for i, s in xs}
+    out = {}
+    for source, ranks in found.items():
+        other = next((x for x in alone if x != source), None)
+        for name, scores in ranks.items():
+            i = named.get((source, name))
+            best = max(scores.items(), key=lambda x: (x[1], x[0]), default=None)
+            if i is None or best is None or best[1] < RERANKED or (other, best[0]) not in named:
+                continue
+            out[tuple(sorted((i, named[other, best[0]])))] = best[1]
+    return out
+
 def linked(data, index):
     """Each subject's links: {subject's index: [{"source", "other", "relation", "level", "signals", "evidence"}]},
     the other's source and name, the signals counted for it, and their evidence; both subjects of a pair hold it.
@@ -193,6 +218,8 @@ def linked(data, index):
     pairs |= _spelled_pairs(alone, sources)
     likest = _meaning(data, subjects, alone, sources)  # names alike in meaning: {(i, j): cosine}, mutual likest
     pairs |= set(likest)
+    ranked = _ranked(data, subjects, alone)  # the reranker's likest: {(i, j): score}
+    pairs |= set(ranked)
     for i, s in alone.get(sources[0], []):
         for w in _name_words(s) | {("property", p) for p in _properties(s)}:
             pairs |= {tuple(sorted((i, j))) for j in by.get(w, ())}
@@ -214,7 +241,10 @@ def linked(data, index):
             ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1])) or _spelled(s, t)
         if (i, j) in likest:
             ev["meaning"] = round(likest[i, j], 3)
+        if (i, j) in ranked:
+            ev["reranked"] = ranked[i, j]
         signals = [k for k, counts in (("name", said_alike), ("meaning", (i, j) in likest),
+                                       ("reranked", (i, j) in ranked),
                                        ("properties", len(ev["properties"]) >= 2),
                                        ("values", mode == "revisions" and ev["values"] > 0),
                                        ("judged", any(said["judged"][r] for r in STRONG[mode])),
@@ -235,7 +265,8 @@ def linked(data, index):
     return dict(out)
 
 SAID = {"same": "the same as", "corresponding": "the counterpart of", "state": "a state of"}  # how a link reads
-SIGNALS = {"name": "names", "meaning": "names alike in meaning", "properties": "properties in common",
+SIGNALS = {"name": "names", "meaning": "names alike in meaning", "reranked": "the reranker's likest",
+           "properties": "properties in common",
            "values": "values in common",
            "judged": "claims the judge paired", "grouped": "grouped by alignment", "model": "the model's match"}
 

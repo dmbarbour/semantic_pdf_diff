@@ -370,6 +370,11 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         with Dispatcher(client) as dispatch:
             data['name_vectors'] = embed.names([e['entity'] for e in data['evidence']], dispatch, settings, label,
                                                progress)
+    if settings.links_by_reranker(options.mode):  # subjects ranked for links, before the topics count links
+        from . import indexes, rerank
+        from .links import stable
+        with Dispatcher(client) as dispatch:
+            data['subject_ranks'] = rerank.subjects(indexes.built(stable(data)), dispatch, settings, label, progress)
     data = searchable(data, settings, client, options.mode, label, progress)
     if settings.matches_subjects(options.mode):  # what matching by code leaves alone, matched by the model
         from . import crossmatch, indexes
