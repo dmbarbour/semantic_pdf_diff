@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.48.0 (2026-11-08)
+
+- **Links by the reranker's likest** (`link_rerank`, off; with a reranker, `rerank_model`): each subject left alone ranked against the other source's, told the task (the same item, or one playing the same part); its likest, scoring 0.8 or more, a link's evidence of its own (tentative matches, milestone 3). The reranker scores relevance more than identity: alone it makes a link possible at most.
+
 ## 0.47.0 (2026-11-08)
 
 - **Links by names alike in meaning** (`link_meaning`, off; with an embedding model, `embed_model`): each claim's name embedded once, two subjects whose names are each other's likest (cosine 0.8 or more) a link's evidence and candidates (tentative matches, milestone 3; the owner: "Match candidates by meaning might help").
