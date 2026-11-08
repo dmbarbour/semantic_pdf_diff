@@ -263,6 +263,11 @@ HELP = {
                             "shown what it noted of each claim"),
     "match_subjects": Help(_L, "proposals: the subjects matching by name leaves alone in one source each matched by "
                                "the model to the same item, the corresponding element or a state of it in the other"),
+    "link_tests": Help(_L, "comparisons: a link's evidence tested by code: properties in common counted only where "
+                           "they set the pair apart from its siblings; proposals' values that don't fit leave it "
+                           "possible"),
+    "link_read": Help(_L, "comparisons: each link read by the model against a decoy, the other source's next "
+                          "likeliest; the decoy or neither picked leaves it possible"),
     "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "
                              "alike in meaning a link's evidence and its candidates"),
     "link_rerank": Help(_L, "comparisons, with a reranker (rerank_model): each subject ranked against the other "

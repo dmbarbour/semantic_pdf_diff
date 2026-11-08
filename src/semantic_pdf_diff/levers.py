@@ -1443,6 +1443,24 @@ class MatchSubjects(Lever):
     def matches_subjects(self, mode):
         return self.match_subjects and mode == "proposals"
 
+class LinkTests(Lever):
+    lever_name, stage, off = "link_tests", "comparison", {"link_tests": False}
+    # comparisons: a link's evidence tested by code (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone
+    # 4; the owner, 2026-11-07: "let's just adapt the normal levers approaches"): properties in common counted only
+    # where they set the pair apart from its siblings; between proposals, values of the properties in common that
+    # don't fit (another kind of unit, or more than ten times apart) leave a link possible at most. No requests
+    link_tests: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+class LinkRead(Lever):
+    lever_name, stage, off = "link_read", "comparison", {"link_read": False}
+    # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
+    # (crossmatch.read_links; tentative matches, milestone 4; Fable's review: a question with a wrong answer, values
+    # hidden between proposals): picked, evidence; the decoy or neither, possible at most
+    link_read: Annotated[bool, _selecting(roles=COMPARE)] = False
+
+    def reads_links(self, mode):
+        return self.link_read and mode != "analysis"
+
 class LinkMeaning(Lever):
     lever_name, stage, off = "link_meaning", "comparison", {"link_meaning": False}
     # comparisons: each subject's names embedded (embed.names, with embed_model), two names alike in meaning a
@@ -1569,7 +1587,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LinkMeaning, LinkRerank, LookGaps, JudgeGlossary,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkRead, LinkMeaning, LinkRerank, LookGaps,
+                 JudgeGlossary,
                  NameTopics,
                  SearchNames,
                  ReadGlossary, ConfirmKinds,
@@ -1821,6 +1840,12 @@ class Platform(Composable):
     def matches_subjects(self, mode):
         """Whether the model matches the subjects a comparison's code leaves alone across its sources (crossmatch.py):
         the platform's, never; the match_subjects lever's, in proposals when on."""
+        return False
+
+    @chosen
+    def reads_links(self, mode):
+        """Whether a comparison's links are read by the model against decoys (crossmatch.read_links): the platform's,
+        never; the link_read lever's, in comparisons when on."""
         return False
 
     @chosen

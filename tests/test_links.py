@@ -2,6 +2,7 @@
 milestone 2). The owner, 2026-11-07: "Three levels is a start"; plausible matches "should feed links and topics for
 now"; revisions' and proposals' evidence weighed apart ("I'll accept these recommendations.")."""
 import stubs  # noqa: F401 (a clean environment)
+import json
 import unittest
 
 from semantic_pdf_diff import indexes, indexfiles, links
@@ -114,6 +115,67 @@ class Signals(unittest.TestCase):
         from semantic_pdf_diff.rerank import described
         index = indexes.built(report(a + b, [], ("a", "b"), mode="proposals"))
         self.assertEqual(described(index["subjects"][0]), "Alum: dose")
+
+class Tested(unittest.TestCase):
+    """Milestone 4: a link's evidence tested by code (link_tests) and read by the model against a decoy (link_read)."""
+    PUMPS = ([claim(f"A-{n}{k}", "ca", f"P-10{n}", attribute, value, unit)
+              for n, cap, head in ((1, "1,200", "40"), (2, "2,400", "60"))
+              for k, (attribute, value, unit) in enumerate([("capacity", cap, "gpm"), ("head", head, "ft")])]
+             + [claim(f"B-{n}{k}", "cb", f"LL-{n}", attribute, value, unit)
+                for n, cap, head in ((1, "1,300", "42"), (2, "2,500", "58"))
+                for k, (attribute, value, unit) in enumerate([("capacity", cap, "gpm"), ("head", head, "ft")])])
+
+    def test_siblings_properties_dont_set_a_pair_apart(self):
+        judged = [{"a": "A-10", "b": "B-10", "relation": "different"},
+                  {"a": "A-10", "b": "B-20", "relation": "different"}]
+        off = links_of(report(self.PUMPS, judged, ("a", "b"), mode="proposals"))
+        self.assertEqual(off["P-101", "LL-1"][0], "plausible")
+        self.assertEqual(off["P-101", "LL-2"][0], "plausible")  # the other pump as plausible: its siblings' properties
+        on = links_of(report(self.PUMPS, judged, ("a", "b"), mode="proposals", settings={"link_tests": True}))
+        self.assertEqual((on["P-101", "LL-1"][0], on["P-101", "LL-2"][0]), ("possible", "possible"))
+        self.assertNotIn(("P-102", "LL-1"), on)  # its siblings' properties alone: no link
+
+    def test_values_that_dont_fit_leave_a_link_possible(self):
+        a = [claim("A-1", "ca", "tower", "height", "87.6", "m"), claim("A-2", "ca", "tower", "mass", "347", "t")]
+        b = [claim("B-1", "cb", "Tower", "height", "0.8", "Hz"), claim("B-2", "cb", "Tower", "mass", "860", "t")]
+        found = [{"a": "A-1", "b": "B-1", "relation": "different"}]
+        data = report(a + b, found, ("a", "b"), mode="proposals", settings={"link_tests": True})
+        index = indexes.built(data)  # keyed alike: one subject; renamed apart to be linked
+        self.assertEqual(len(index["subjects"]), 1)
+        b = [claim("B-1", "cb", "steel tube", "height", "0.8", "Hz"), claim("B-2", "cb", "steel tube", "mass", "860",
+                                                                             "t")]
+        found = links_of(report(a + b, [{"a": "A-1", "b": "B-1", "relation": "different"}], ("a", "b"),
+                                mode="proposals", settings={"link_tests": True}))
+        self.assertEqual(found["tower", "steel tube"][0], "possible")  # a height isn't a frequency
+        b[0] = claim("B-1", "cb", "steel tube", "height", "144", "m")
+        found = links_of(report(a + b, [{"a": "A-1", "b": "B-1", "relation": "different"}], ("a", "b"),
+                                mode="proposals", settings={"link_tests": True}))
+        self.assertEqual(found["tower", "steel tube"][0], "plausible")
+
+    def test_a_link_read_against_a_decoy(self):
+        from semantic_pdf_diff import crossmatch
+        judged = [{"a": "A-10", "b": "B-10", "relation": "different"}]
+        data = report(self.PUMPS, judged, ("a", "b"), mode="proposals")
+        asked = crossmatch.links_asked(data, indexes.built(data))
+        s, _, other, _, decoy, pair, text = asked[0]
+        self.assertEqual((s["name"], other["name"], decoy["name"]), ("P-101", "LL-1", "LL-2"))
+        self.assertIn("values left out", text)
+        self.assertNotIn("1,300", text)  # proposals' values hidden
+
+        class Picks:
+            def __init__(self, pick):
+                self.pick = pick
+
+            def ask(self, prompt, schema, images=(), key=None):
+                shown = json.loads(prompt[prompt.index('{\n "item"'):])
+                linked = next(k for k, v in shown["candidates"].items() if v["name"] == "LL-1")
+                return schema.model_validate({"pick": linked if self.pick == "linked" else "", "why": "x"})
+        for pick, level in (("linked", "plausible"), ("neither", "possible")):
+            read = crossmatch.read_links(data, indexes.built(data), Picks(pick), "proposals", "x")
+            entries = [e for e in read["entries"] if e["subject"] == "P-101" and e["other"] == "LL-1"]
+            self.assertEqual(entries[0]["relation"], "picked" if pick == "linked" else "neither")
+            with_read = report(self.PUMPS, judged, ("a", "b"), mode="proposals", commentary={"entries": entries})
+            self.assertEqual(links_of(with_read)["P-101", "LL-1"][0], level)
 
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):

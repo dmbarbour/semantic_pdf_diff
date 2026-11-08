@@ -557,6 +557,11 @@ class SubjectMatch(Lenient):
     relation: str = Field(default="", max_length=20)
     why: str = Field(default="", max_length=400)
 
+class LinkRead(Lenient):
+    """A link read against a decoy (crossmatch.read_links): the candidate picked (B1, B2) or "", and why."""
+    pick: str = Field(default="", max_length=20)
+    why: str = Field(default="", max_length=400)
+
 class SummarySentence(Lenient):
     text: str = Field(default="", max_length=600)
     cites: list[Annotated[str, Field(max_length=20)]] = Field(default_factory=list, max_length=30)  # C1, C2, ...

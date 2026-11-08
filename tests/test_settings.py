@@ -102,6 +102,9 @@ NOT_EXERCISED = {
                       "with the model's answers in tests/test_crossmatch.py",
     'link_meaning': "needs an embedding model (embed_model) and subjects alone in each document; run with names' "
                     "vectors in tests/test_links.py",
+    'link_tests': "needs links between subjects alone in each document; run in tests/test_links.py",
+    'link_read': "needs links between subjects alone in each document; run with the model's reads in "
+                 "tests/test_links.py",
     'link_rerank': "needs a reranker (rerank_model) and subjects alone in each document; run with ranks in "
                    "tests/test_links.py",
     'look_gaps': "needs subjects matched across the documents, each with two claims or more; run with the model's "

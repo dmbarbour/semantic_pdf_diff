@@ -32,9 +32,19 @@ plausible matches "should feed links and topics for now").
     common, and "uncertain", are coincidence and doubt between two designs);
   - the model named one the other's counterpart; names alike in meaning.
   Names alike by their words, their spelling or their meaning are one family of evidence (they're all the names':
-  the turbine pair's "Rotor Speed" and "rotor-speed error" alike by both); two families or more: plausible; one:
-  possible. The level is worked out from the signals each time a report is
-  written: a new rubric changes what's shown, never what was asked.
+  the turbine pair's "Rotor Speed" and "rotor-speed error" alike by both), and a model's reading of the two another
+  (the reranker's, the model's match, its pick over a decoy); two families or more: plausible; one: possible. The
+  level is worked out from the signals each time a report is written: a new rubric changes what's shown, never what
+  was asked.
+- **Tested, where the link_tests lever says** (its setting as the report's run had it; milestone 4; the owner,
+  2026-11-07: "let's just adapt the normal levers approaches"):
+  - *distinct properties:* properties in common count only where this pair's are more than either subject has in
+    common with any other candidate. Siblings share theirs: the controlled proposals' three pumps each linked to the
+    other design's three, and the coaster's elements to each other's, all plausible by properties alone.
+  - *values that fit* (between proposals): a property both give, its values of one kind of unit and within FIT
+    times of each other; a pair whose values don't fit is possible at most (a height isn't a frequency).
+- **Read by the model, where the link_read lever ran** (crossmatch.read_links): a link shown against a decoy, the model
+  picking its counterpart: picked, evidence of its own (`read`); the decoy or neither, possible at most.
 - **Kept in the index** (indexes.built: each subject's "links"), shown as links and in topics, never in the merged
   index's values nor its gaps, never a finding.
 """
@@ -50,7 +60,11 @@ NAME_SHARE = 0.5  # or the share of two names' words in common, at least
 SPELLED = 0.5  # or two names' letters' trigrams in common, their share at least
 MEANING = 0.8  # two names' embeddings' cosine, at least, for names alike in meaning (the turbine pair: its two
 # turbines 0.86, wrong pairs mostly under 0.8)
-FAMILY = {"meaning": "name"}  # signals of one family, counted once toward a level
+# signals of one family, counted once toward a level: the names' (words, spelling, meaning), and a model's reading of
+# the two (the reranker's, the model's match, its pick over a decoy: the turbine pair's IEA "15-MW turbine" and NREL's
+# "Region 2½" were plausible by the reranker and the read alone)
+FAMILY = {"meaning": "name", "reranked": "model", "read": "model"}
+FIT = 10  # times apart, at most, two designs' values of one property may be for their items to correspond
 RERANKED = 0.8  # the reranker's score, at least, of a subject's likest for it to count (the turbine pair: its right
 # pair 0.98, but wrong ones as high: it scores relevance, not identity; those under 0.8 mostly wrong)
 LEVELS = ("plausible", "possible")
@@ -62,6 +76,36 @@ def stable(data):
     """A report's data as the topics count links: without the model's other names and its log (asked after the
     topics, the other names a request a topic), so what's built from it is the same whenever."""
     return {k: v for k, v in data.items() if k not in ("synonyms", "commentary")}
+
+def _by_property(subject, evidence):
+    """{a property's key (its names' words): [its values' keys]} (align.value_key)."""
+    out = defaultdict(list)
+    for p in subject["properties"]:
+        keys = {" ".join(sorted(words(n))) for n in p.get("names", [p["name"]])} - {""}
+        for v in p["values"]:
+            e = evidence.get(v["claim"])
+            key = value_key(Evidence.model_validate(e)) if e is not None else None
+            if key is not None:
+                for k in keys:
+                    out[k].append(key)
+    return out
+
+def _fits(a, b, common):
+    """Whether two subjects' values of the properties in common fit (FIT): of one kind of unit, within FIT times of
+    each other; text and unknown units aren't weighed."""
+    for k in common:
+        for x in a.get(k, []):
+            for y in b.get(k, []):
+                if x[0] == "text" or y[0] == "text" or len(x) < 2 or len(y) < 2:
+                    continue
+                if not isinstance(x[1], (int, float)) or not isinstance(y[1], (int, float)):
+                    continue
+                if x[0] != y[0]:
+                    return False
+                small, large = sorted((abs(x[1]), abs(y[1])))
+                if small and large / small > FIT:
+                    return False
+    return True
 
 def _name_words(subject):
     return {w for n in subject["names"] for w in words(n)} - STOP - GENERIC
@@ -201,6 +245,7 @@ def linked(data, index):
         if i not in values:
             values[i] = _values(subjects[i], evidence)
         return values[i]
+    reads = {}  # the model's reads of links against decoys (crossmatch.read_links): {(i, j): relation}
     # the model's answers (crossmatch.py), taken or not
     named = {(next(iter(s["claims"])), s["name"]): i for i, s in enumerate(subjects) if len(s["claims"]) == 1}
     for c in (data.get("commentary") or {}).get("entries", []):
@@ -208,6 +253,10 @@ def linked(data, index):
             a, b = named.get((c["source"], c["subject"])), named.get((c.get("other_source"), c.get("other")))
             if a is not None and b is not None:
                 paired[tuple(sorted((a, b)))]["model"].append((c.get("relation", ""), bool(c.get("taken"))))
+        elif c["kind"] == "link_read":
+            a, b = named.get((c["source"], c["subject"])), named.get((c.get("other_source"), c.get("other")))
+            if a is not None and b is not None:
+                reads[tuple(sorted((a, b)))] = c.get("relation", "")
     # candidates sharing a name word or a property's name, besides those named
     by = defaultdict(set)
     for j, t in alone.get(sources[1], []):
@@ -223,6 +272,22 @@ def linked(data, index):
     for i, s in alone.get(sources[0], []):
         for w in _name_words(s) | {("property", p) for p in _properties(s)}:
             pairs |= {tuple(sorted((i, j))) for j in by.get(w, ())}
+    tests = bool((data.get("settings") or {}).get("link_tests"))
+    common = {}  # each pair's properties in common, for the distinctness test
+    for i, j in pairs:
+        common[i, j] = _properties(subjects[i]) & _properties(subjects[j])
+    most = Counter()  # each subject's largest overlap with any candidate, and how many candidates reach it
+    for (i, j), c in common.items():
+        for x in (i, j):
+            if len(c) > most[x, "size"]:
+                most[x, "size"], most[x, "count"] = len(c), 1
+            elif len(c) == most[x, "size"]:
+                most[x, "count"] += 1
+    by_property = {}
+
+    def distinct(i, j):
+        n = len(common[i, j])
+        return all(most[x, "size"] == n and most[x, "count"] == 1 for x in (i, j))
     found = []
     for i, j in sorted(pairs):
         s, t = subjects[i], subjects[j]
@@ -243,15 +308,29 @@ def linked(data, index):
             ev["meaning"] = round(likest[i, j], 3)
         if (i, j) in ranked:
             ev["reranked"] = ranked[i, j]
+        own = len(ev["properties"]) >= 2 and (not tests or distinct(i, j))
+        if tests and len(ev["properties"]) >= 2 and not own:
+            ev["shared_by_siblings"] = True
         signals = [k for k, counts in (("name", said_alike), ("meaning", (i, j) in likest),
                                        ("reranked", (i, j) in ranked),
-                                       ("properties", len(ev["properties"]) >= 2),
+                                       ("properties", own),
                                        ("values", mode == "revisions" and ev["values"] > 0),
                                        ("judged", any(said["judged"][r] for r in STRONG[mode])),
-                                       ("grouped", bool(ev["grouped"])), ("model", bool(ev["model"]))) if counts]
+                                       ("grouped", bool(ev["grouped"])), ("model", bool(ev["model"])),
+                                       ("read", reads.get((i, j)) == "picked")) if counts]
+        if (i, j) in reads:
+            ev["read"] = reads[i, j]
         if not signals:
             continue
         level = LEVELS[0] if len({FAMILY.get(x, x) for x in signals}) >= 2 else LEVELS[1]
+        if tests and mode == "proposals" and ev["properties"]:
+            for x in (i, j):
+                if x not in by_property:
+                    by_property[x] = _by_property(subjects[x], evidence)
+            if not _fits(by_property[i], by_property[j], ev["properties"]):
+                ev["misfit"], level = True, LEVELS[1]  # values that don't fit: possible at most
+        if reads.get((i, j)) in ("decoy", "neither"):
+            level = LEVELS[1]  # the model picked the decoy, or neither: possible at most
         relation = ev["model"][0] if ev["model"] else RELATION[mode]
         score = (len(signals), len(ev["properties"]) + len(ev["name"]) + ev["values"])
         found.append((score, i, j, {"relation": relation, "level": level, "signals": signals, "evidence": ev,
@@ -266,6 +345,7 @@ def linked(data, index):
 
 SAID = {"same": "the same as", "corresponding": "the counterpart of", "state": "a state of"}  # how a link reads
 SIGNALS = {"name": "names", "meaning": "names alike in meaning", "reranked": "the reranker's likest",
+           "read": "the model's pick over a decoy",
            "properties": "properties in common",
            "values": "values in common",
            "judged": "claims the judge paired", "grouped": "grouped by alignment", "model": "the model's match"}

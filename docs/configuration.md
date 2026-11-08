@@ -204,6 +204,8 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `judge_context` | `false` | shaping | judge_context | compare | - |
 | `judge_notes` | `false` | shaping | judge_notes | compare | - |
 | `match_subjects` | `false` | selecting | match_subjects | compare | - |
+| `link_tests` | `false` | selecting | link_tests | compare | - |
+| `link_read` | `false` | selecting | link_read | compare | - |
 | `link_meaning` | `false` | selecting | link_meaning | compare | - |
 | `link_rerank` | `false` | selecting | link_rerank | compare | - |
 | `look_gaps` | `true` | selecting | look_gaps | compare | - |

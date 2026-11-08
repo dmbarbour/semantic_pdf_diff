@@ -382,6 +382,12 @@ def compare_and_report(options, settings, store, client, names, read, document, 
         log_ = data.setdefault('commentary', {'entries': []})
         log_['entries'] += matched.pop('entries')
         log_['matched'] = matched
+    if settings.reads_links(options.mode):  # each link read against a decoy (tentative matches, milestone 4)
+        from . import crossmatch, indexes
+        read = crossmatch.read_links(data, indexes.built(data), client, options.mode, label, progress)
+        log_ = data.setdefault('commentary', {'entries': []})
+        log_['entries'] += read.pop('entries')
+        log_['links_read'] = read
     if settings.looks_for_gaps(options.mode):  # what another source gives a subject, looked for where it'd be
         from . import dossiers, indexes
         looked = dossiers.looks(data, indexes.built(data), store, client, options.mode, label, settings.image_side,

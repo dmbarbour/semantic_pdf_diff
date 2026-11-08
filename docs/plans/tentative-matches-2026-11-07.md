@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions. [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08. [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -110,6 +110,24 @@ The owner: "let's just adapt the normal levers approaches perhaps". Each test a 
   - *the corresponding element across proposals:* roles and structure, not values: properties in common, one kind, part-of neighbours matched (the tower of the matched turbine), units and magnitudes that fit (a height isn't a frequency).
 - **A look as a test:** a gap's look finding the property under the other's name raises a match; "no place" and "not shown" say nothing (in proposals they're mostly coverage).
 - **The model's read, discriminating** (Fable): not "do these match?", which invites relations and leans to confirming, but a question with a wrong answer: name a property of one that contradicts the hypothesis, or choose between the candidate and a decoy (the next best candidate). Values hidden in proposals, as a gap's look hides the other's value. Its sub-answers logged as signals, never a confidence word.
+- **Built 2026-11-08** (0.49.0; the owner: "please proceed with milestone 4 and the answer-key improvement for milestone 5"), both levers off; measured on the extended controlled proposals pairs (milestone 5: three pairs, every format), each arm rebuilt from the same recorded reports where it asks nothing:
+  - **`link_tests`** (code, no requests):
+    - *Distinct properties:* properties in common count only where this pair's are more than either subject has in common with any other candidate. The wrong links were among siblings: P-101A plausible with each of the other design's three pumps, the camelback with each track element, all by shared properties.
+    - *Values that fit* (proposals): a property both give, of one kind of unit and within ten times; else possible at most.
+  - **`link_read`** (a request a link, 80 at most): each link shown against a decoy, the other source's subject with the most properties in common but the linked one, the order set by their names. Values hidden between proposals. Picked: evidence. The decoy or neither: possible at most. Entries of kind "link_read".
+  - **One family for a model's readings:** the reranker's, `match_subjects`' answer and the read count once. On the turbine pair, the reranker and the read alone made IEA's "15-MW turbine" and NREL's "Region 2½" plausible.
+  - **Measured** (proposals pairs, every format):
+
+    | Arm | Plausible: right of | Possible: right of |
+    |---|---|---|
+    | Neither | 25 of 43 | 26 of 68 |
+    | `link_tests` | 16 of 16 | 20 of 41 |
+    | `link_tests` and `link_read` ($0.005, 56 reads) | 24 of 25 | 12 of 32 |
+
+    - **Revisions:** links unchanged in every arm (plausible 10 of 10).
+    - **The reads:** picked 26, neither 29 (mostly siblings, which hidden values can't tell apart: rightly left possible), the decoy 1. The one wrong plausible link: Cyclone's bunny hop for Ridgeback's helix, which Cyclone dropped. A role gone still invites a pick over a weaker decoy.
+  - **The turbine pair** (both levers with meaning, the reranker and `match_subjects`; 12 reads, $0.004): the read turned down the reranker's wrong pairs (Design Point, Drivetrain, a flapwise mode: neither or the decoy). Two plausible: NREL's baseline and IEA's reference turbines (right); DOWEC's and IEA's "turbine" (loose).
+  - **Not built:** *a look as a test.* Links aren't looked for (the owner: links feed "links and topics for now"), so no look tests one. *Part-of neighbours* (the tower of the matched turbine). *The same item within a source:* links are across sources so far.
 
 ### 5. A controlled proposals pair
 
@@ -120,6 +138,12 @@ The owner: "let's just adapt the normal levers approaches perhaps". Each test a 
   - **Matching by role:** 12 of 12 right in the PDF (9 of 9 in Word, 12 of 12 elsewhere), none wrong; of the 10 roles both give, 9 matched (Word 5 of 9). The model's other names (`search_names`, on by default) matched the renamed ones (IP-1 and P-101A, the flash mixer and the rapid mix basin, the clarifiers and the sedimentation basins, the contact tank and Option B).
   - **Left apart:** alum and ferric sulfate (each design's coagulant: its doses in common, no word), the two plants (their names share "water treatment plant"), and the decoy. The links of milestone 2 are scored on these.
   - **Gaps another source fills:** 2 of 2 in every format.
+- **Extended 2026-11-08** (the owner, after asking whether the sample sufficed to judge asking both ways: "please proceed with milestone 4 and the answer-key improvement for milestone 5"; recorded $0.25): three pairs.
+  - **Cedar Falls' design basis** (`wtp-s1-cedar`) against Harrow Creek's: named by function (a coagulation tank, slow mixing tanks, settling basins, low-lift pumps LL-1 to LL-3, sodium hypochlorite's feed, ultraviolet reactors); its chlorine contact option gone; a sludge pump (a decoy); its finished water's turbidity limit not given; its filters' backwash rate given.
+  - **The Cyclone roller coaster** (`coaster-s1-proposal`) against Ridgeback: a chain lift, a main drop, a heartline roll, an airtime hill, steel bents; its helix gone; a bunny hop (a decoy for the airtime hill); its maximum vertical acceleration not given; its trains' length given.
+  - **Pine Ridge,** as before.
+  - **The model's other names miss more** of Cedar Falls' and Cyclone's renames, so matching and links have work: Cedar Falls' PDF matched 5 of its 10 roles (6 of 7 matches right), and its links were 4 of 8 plausible right before milestone 4's tests.
+  - **Held-out seeds** (fresh seeds of each design) aren't generated yet: due before levels' numbers are fitted (milestone 6).
 
 ### 6. Levels from numbers
 
