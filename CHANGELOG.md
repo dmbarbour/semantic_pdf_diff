@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.54.0 (2026-11-09)
+
+- **Ctrl+C ends a run wherever it lands.** PyMuPDF's table detection caught the interrupt and the run went on; under load it could also land in garbage collection, printing a traceback above the resume note. The interrupt is now marked as it comes and checked at each page and each wait for answers, and one Python can't raise isn't printed. (0.53.0's "no longer races" fixed the test, not the cause.)
+- **`property_links`** (off; tentative matches, milestone 8): a gap another source fills, or a gap "if one item", isn't counted where the lacking side plausibly gives the property under another name (names, values of one unit kind, the judge's pairing); a possible one is kept, its why saying "possibly given as …". Held out on new seeds: false gaps 64 → 24, no right gap lost; most of it with `link_gaps` on.
+- The test runner shows a flaky module's failure under load.
+- A review of fitting-together gotchas, with Fable (`docs/research/gotchas-review-2026-11-09.md`), and milestones 8 to 16 of the tentative matches plan.
+
 ## 0.53.0 (2026-11-09)
 
 - **`linked_values` on by default** (the owner: "Let's add `linked_values` by default"): a plausible link's other subject's values beside the subject's, in the Subjects view, index.md and the export, not merged. Round 0's settings keep it off.

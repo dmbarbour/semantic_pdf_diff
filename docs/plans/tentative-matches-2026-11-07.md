@@ -278,6 +278,12 @@ The owner, 2026-11-09: "So it seems weighted/fuzzy joining of properties hasn't 
     - **Guard:** right gaps (both kinds) lost, one at most, summed.
     - **Reported, not judged:** link gaps' share right with it; unbound and another fact.
     - **Checked once,** on the code as committed.
+  - **Held out, 2026-11-09** (seeds 6 and 7, 30 units, one run at defaults, $0.71; the arms rebuilt from it, each run's gaps reproduced by a rebuild): **passed.**
+    - **Target met:** false gaps (both give it, both kinds) 64 → 24, 12 units changed, p = 0.0002.
+    - **Guard met:** right gaps lost 0 (29 and 29).
+    - **By kind:** link gaps 42 → 4 false, 7 right kept (7 of 51 right → 7 of 12); gaps another source fills 22 → 20 false (p = 0.5): with `link_gaps` off, today's default, it changes little.
+    - **What's left** (gaps another source fills): mostly a subject split within one source, the lacking side giving the property under the other half ("Ridgeback" holding the coaster's speed, length, duration and inversions, "Ridgeback roller coaster" the subject both give), or under a neighbour (the support columns under "track"); names alike only by stem ("inversion count", "number of inversions") with unitless values.
+    - **The default** is the owner's call.
 
 ### 9. Test material before the levers that need it
 
