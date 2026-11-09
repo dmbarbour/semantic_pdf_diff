@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.57.0 (2026-11-09)
+
+- **`keyed_links` on by default** (the owner: "Nice. Please turn `keyed_links` on, then proceed."): between proposals, a tag or name both designs give is one item unless their properties say otherwise; contested, a plausible link. Round 0's settings keep it off. The controlled corpus re-recorded ($0.001).
+
 ## 0.56.0 (2026-11-09)
 
 - **`keyed_links`** (off; tentative matches, milestone 14): between proposals, two subjects keyed alike (a tag, the same words, other names) stay one unless either has more properties in common, two or more, with another of the other design's subjects; contested, they're a plausible link ("a tag or name both give"). "P-101" in two designs is a numbering habit, not identity. Held out on new seeds: wrong firm groups 34 → 3, right ones lost 9 of 372.
