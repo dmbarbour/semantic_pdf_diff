@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.56.0 (2026-11-09)
+
+- **`keyed_links`** (off; tentative matches, milestone 14): between proposals, two subjects keyed alike (a tag, the same words, other names) stay one unless either has more properties in common, two or more, with another of the other design's subjects; contested, they're a plausible link ("a tag or name both give"). "P-101" in two designs is a numbering habit, not identity. Held out on new seeds: wrong firm groups 34 → 3, right ones lost 9 of 372.
+- A proposals pair for it in the controlled corpus: Birch Hollow, Harrow Creek's pump tags on other pumps.
+
 ## 0.55.0 (2026-11-09)
 
 - **`link_gaps` and `property_links` on by default** (the owner: "Please turn `link_gaps` and `property_gaps` on together."): a plausible link's other subject's properties a subject doesn't give are reported as the weakest gaps ("if one item"), and a gap isn't counted where the lacking side plausibly gives the property under another name. No requests added (link gaps aren't looked for). Round 0's settings keep both off.
