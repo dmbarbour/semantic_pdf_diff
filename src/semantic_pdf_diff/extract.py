@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pymupdf
 
-from . import keyvalue
+from . import interrupts, keyvalue
 from .context import Context
 from .pages import native, native_page, on_crop, reading_blocks, shown, union
 from .progress import within
@@ -155,6 +155,7 @@ class PdfReading:
 
     def page(self, number, page):
         """Read one page: its tables detected, then its text, tables, signals and image tasks."""
+        interrupts.checked()  # a Ctrl+C a call on the last page swallowed
         found, marks = self.detect(number, page)
         self.text(number, page, found)
         self.tables(number, page, found, marks)
@@ -203,6 +204,7 @@ class PdfReading:
         try:
             detected = [(table, table.extract()) for table in page.find_tables().tables]
         except Exception as e:  # noqa: BLE001 (PyMuPDF's)
+            interrupts.checked()  # Ctrl+C, which find_tables swallows (it returns None), not a detection failure
             detected = []
             record(coverage_row(content=content, page=number, bbox=list(native_page(page)),
                                 task=f"table-detection:p{number}", status="failed",

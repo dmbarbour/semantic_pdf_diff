@@ -19,7 +19,7 @@ import os
 import signal
 import sys
 from pathlib import Path
-from . import __version__, configuration, crops, fixtures, manifest
+from . import __version__, configuration, crops, fixtures, interrupts, manifest
 from .pipeline import (RunOptions, attempt, check_fixture, declare_paths, document_properties, from_interrupt, limits,
                        require_model, run, settings_from)
 from .schema import Source
@@ -64,8 +64,9 @@ def main(argv=None, client=None):
 def first_interrupt(signum, frame):
     """Ctrl+C: KeyboardInterrupt, as Python's own handler raises it, and a second Ctrl+C ends the process where it is,
     while the first is closing what's open (the answers are committed as they come, and SQLite's files survive a
-    process's end)."""
+    process's end). Marked as it came, for a call that swallows the interrupt (interrupts)."""
     signal.signal(signal.SIGINT, signal.SIG_DFL)
+    interrupts.arrived()
     raise KeyboardInterrupt
 
 def interrupted(argv):

@@ -20,9 +20,9 @@ from pathlib import Path
 
 import pyte
 
-from semantic_pdf_diff import checkup
+from semantic_pdf_diff import checkup, interrupts
 from semantic_pdf_diff.settings import Settings
-from stubs import chat_answer, prompt_of, request_body, serving, source_data, summed, text_pdf
+from stubs import Recorder, chat_answer, prompt_of, request_body, serving, source_data, summed, text_pdf
 
 PAGES = 30
 MESSAGE = 'Interrupted: rerun the same command to resume; finished work is kept.'
@@ -34,7 +34,8 @@ def endpoint(interrupt_at):
     from interrupt_at on with the group known, or by run() as it learns the group, if the requests came first), and
     holds every later request unanswered until the block ends (or state['release'] is set): requests in flight the
     run mustn't wait for. (Sent only at request interrupt_at exactly, a run whose group the test hadn't yet set by then
-    was never interrupted and timed out: three times under the full suite's load, 2026-10-29, 10-30 and 11-09.)"""
+    would never be interrupted. The timeouts under the full suite's load, 2026-10-29, 10-30 and 11-09, were blamed on
+    that; the 11-09 log showed the run's Ctrl+C swallowed by PyMuPDF's find_tables, the product's bug: interrupts.)"""
     state = {'requests': 0, 'group': None, 'release': threading.Event(), 'lock': threading.Lock(), 'sent': False,
              'at': interrupt_at}
 
@@ -219,6 +220,33 @@ class FromInterrupt(unittest.TestCase):
         with contextlib.redirect_stderr(io.StringIO()) as err:
             self.assertEqual(attempt(failing), 1)
         self.assertEqual(err.getvalue(), "Error: a bug of its own\n")
+
+class Swallowed(unittest.TestCase):
+    """Ctrl+C during a call that swallows it: PyMuPDF's find_tables catches every Exception and returns None (the
+    commit gate, 2026-11-09: the run went on, test_interrupt timing out)."""
+    def tearDown(self):
+        interrupts._arrived.clear()
+
+    def test_ctrl_c_during_table_detection_ends_the_run_not_the_page_tables(self):
+        from unittest.mock import patch
+
+        import pymupdf
+
+        from semantic_pdf_diff.jobs import extract_pdf
+
+        def swallowing(page, *a, **k):  # as find_tables does: the interrupt marked, raised, caught, None returned
+            interrupts.arrived()
+            return None
+        rows = []
+        with tempfile.TemporaryDirectory() as d, patch.object(pymupdf.Page, 'find_tables', swallowing):
+            path = Path(d) / 't.pdf'
+            text_pdf(path, ['Pump rated power 10 kW', 'Fan rated power 2 kW'])
+            with self.assertRaises(KeyboardInterrupt):
+                rows = extract_pdf(path, 'sha256:' + 'a' * 64 + '.pdf', Path(d), Recorder())
+        self.assertEqual(rows, [])
+
+    def test_no_mark_no_interrupt(self):
+        interrupts.checked()
 
 if __name__ == '__main__':
     unittest.main()
