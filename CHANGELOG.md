@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.51.0 (2026-11-09)
+
+- **A link's level from numbers** (`link_levels: weights`, off; tentative matches, milestone 6): comparing proposals, each candidate pair's features banded and weighed (Fellegi-Sunter weights fitted on the controlled proposals pairs, `link_weights.json`), its score against thresholds giving its level, the model's read raising a link it picks; each link says its score and the share of matches it says. Held out (fresh seeds): right plausible links 48 → 62, 95.4% right (the rubric 96.0%). Revisions keep the rubric.
+- `links.candidates`: each pair's features apart from its leveling (behaviour preserved).
+
 ## 0.50.0 (2026-11-09)
 
 - **`link_tests` and `link_read` on by default** (the owner: "Yes, turn both on by default."), after passing their held-out rule (seeds 2 and 3 of the three controlled proposals pairs, every format): wrong plausible links 55 → 0 with the tests; right plausible links 32 → 57 with the reads, 95% of plausible links right. The reads ask a request a link, comparing proposals only (as held out). Round 0's settings keep both off.
