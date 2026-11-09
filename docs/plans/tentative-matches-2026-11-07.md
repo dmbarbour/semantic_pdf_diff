@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built); [7](#7-indexing-with-weighted-relationships-explored) explored 2026-11-09 (`link_gaps`, `linked_values`, off: the owner's to take or leave). [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built); [7](#7-indexing-with-weighted-relationships-explored) explored 2026-11-09 (`linked_values` on, `link_gaps` off). Milestones 8 to 13 added 2026-11-09 from [the same-thing review](../research/same-thing-review-2026-11-09.md) (the owner: "The proposed order looks good."). [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -253,6 +253,39 @@ The owner: "until we're confident in our tooling and we have a good idea on how 
     - *the linked values in the subject's own table,* filling its "—" cells, marked;
     - *search ranked by a link's weight:* the page's search filters, it doesn't rank, and links already make either name find the other;
     - *weighted edges* until the weights are trusted (milestone 6).
+
+### 8. Properties fitted together
+
+The owner, 2026-11-09: "So it seems weighted/fuzzy joining of properties hasn't been done yet, as part of fitting things together. I agree that's a natural part of what we're doing already" ([the same-thing review](../research/same-thing-review-2026-11-09.md)).
+
+- **Properties possibly one, with levels, as subjects' links are:** names (words, spelling, meaning), units of one kind, magnitudes that fit, the judge's pairing of their claims, other names (the glossary, the model's).
+- **Used where properties are compared:** a gap another source fills (firm matches: `given_elsewhere`) and a gap "if one item" (links: `if_one_item`) not counted where the other gives a property plausibly one with it. Later, the merged index's values.
+- **A lever, measured** by the gap scorer's buckets on the controlled pairs ("both give it" should fall, "right" hold), held out before it's taken.
+
+### 9. Test material before the levers that need it
+
+- Section titles renamed and reordered in the proposals designs; roles among siblings (duty, standby); a same-named decoy in another section.
+- A second sealed template of another genre (schedules or drawings), so each held-out check has a fresh template (the owner, 2026-11-09, of keeping templates sealed: "use your best judgement").
+
+### 10. Place, use and context, fitted
+
+The owner, 2026-11-09: "We'll also add context of use as something to compare heuristically"; "we need place/use/context relationships that are also 'fitted' based on intelligence and heuristics, generally fuzzy not all or nothing."
+
+- **Sections matched across sources,** softly (headings, abouts, the firm matches in them): a link's `place` band.
+- **A subject's use profile** (its sections, role words, kind, conditions, relations), compared by words and meaning; shown to `match_subjects` and the read.
+- **A third family, place/use,** in the rubric and the weights.
+
+### 11. Link gaps looked for
+
+The owner, 2026-11-09: "Sure, the prior 'for now' is past. Treat it as a lever." `dossiers.looks` for gaps "if one item"; a "given" also the look as a link's test (milestone 4's unbuilt).
+
+### 12. Relations
+
+Part of, connected to, serves: a `neighbour` band; a proposals pair from the schematics templates to measure it (the lab's scorer taught relational facts).
+
+### 13. A panel of judges for real documents
+
+The owner, 2026-11-09: "Not viable for me to mark things. I'm dealing with projects large enough that investigating each link or verifying a contradiction is an hour of work. But bringing back our panel of judges is something we could try, if we can ensure we provide enough context for their judgements to be meaningful." Links, gaps and contradictions on public real pairs judged by a model panel ([0018](../decisions/0018-several-raters-none-ground-truth.md)), each shown what it needs: both subjects' claims, their sections and abouts, their places' crops.
 
 ## Measurement
 

@@ -93,7 +93,17 @@ Fable (claude-fable-5-1), 2026-11-09, read-only, at the owner's request ("with s
 - Use enters as evidence through where a subject sits (sections) and what it's said to do, compared by code first; the model is shown it, not asked for a number.
 - Knobs before levers: the controlled templates must vary what use-based evidence reads (section titles, roles, same-named items elsewhere), or it scores perfectly for the wrong reason.
 
-## Questions for the owner
+## The owner's answers, 2026-11-09
+
+- **On properties:** "So it seems weighted/fuzzy joining of properties hasn't been done yet, as part of fitting things together. I agree that's a natural part of what we're doing already, to the extent I didn't understand we're treating it separately. We'll also add context of use as something to compare heuristically. Please add a review to find other such elements that might be gotchas for us down the road."
+- **On the order:** "The proposed order looks good."
+- **A:** "Sure, the prior 'for now' is past. Treat it as a lever."
+- **B:** "Yes, we need place/use/context relationships that are also 'fitted' based on intelligence and heuristics, generally fuzzy not all or nothing."
+- **C:** "Not sure what this is asking. If it's about test methodology against overfitting, use your best judgement." Claude's judgement: Harbor stays sealed until a candidate beats the rubric on validation; a second sealed template of another genre is made first, so each check has a fresh one.
+- **D:** "Not viable for me to mark things. I'm dealing with projects large enough that investigating each link or verifying a contradiction is an hour of work. But bringing back our panel of judges is something we could try, if we can ensure we provide enough context for their judgements to be meaningful."
+- **Carried on** in [tentative matches](../plans/tentative-matches-2026-11-07.md), milestones 8 to 13, and a review of other such gotchas ([fitting-together gotchas](gotchas-review-2026-11-09.md)).
+
+## Questions for the owner (answered above)
 
 - **A. Looks for link gaps,** reversing "links and topics for now" for gaps only?
 - **B. A third family, place/use, in the rubric** (and the two-family rule required of any numbers)?
