@@ -1467,9 +1467,10 @@ class LinkIndex(Lever):
     # we have a good idea on how to index with weighted relationships. Exploring those options should be a plan
     # step"): link_gaps, what a plausible link's other subject gives that a subject doesn't, as the weakest gaps,
     # never looked for; linked_values, its values beside the subject's in the Subjects view, index.md and the export,
-    # not merged. Both the owner's to take or leave
+    # not merged. Both the owner's to take or leave: linked_values on by default since 2026-11-09 (the owner: "Let's
+    # add `linked_values` by default"); link_gaps off ("consider how to improve `link_gaps`")
     link_gaps: Annotated[bool, _selecting(roles=COMPARE)] = False
-    linked_values: Annotated[bool, _selecting(roles=COMPARE)] = False
+    linked_values: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
