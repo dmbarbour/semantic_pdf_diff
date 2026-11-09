@@ -1,12 +1,12 @@
 {
  "totals": {
   "inventory": {
-   "claims": 23522,
-   "evidence": 13292,
+   "claims": 23836,
+   "evidence": 13493,
    "frame in conditions": 36,
-   "grounded": 6240,
+   "grounded": 6332,
    "list records": 36,
-   "no content words": 3,
+   "no content words": 4,
    "note records": 11,
    "numbered in attribute": 164,
    "numbered in conditions": 2,
@@ -14,13 +14,13 @@
    "partly": 64,
    "partly (image)": 38,
    "positioned": 124,
-   "printed": 8591,
+   "printed": 8754,
    "sheet records": 11,
-   "table records": 365,
+   "table records": 373,
    "unsupported": 39,
-   "unsupported (image)": 819,
-   "with conditions": 7203,
-   "with records": 6793
+   "unsupported (image)": 820,
+   "with conditions": 7297,
+   "with records": 6844
   },
   "placed": {
    "bound": {
@@ -30,7 +30,7 @@
    },
    "frame": {
     "attribute": 15,
-    "conditions": 133,
+    "conditions": 143,
     "frame": 195,
     "records": 109
    },
@@ -42,8 +42,8 @@
     "nowhere": 5
    },
    "scope": {
-    "attribute": 33,
-    "conditions": 1985,
+    "attribute": 37,
+    "conditions": 2026,
     "nowhere": 6
    },
    "sibling": {
@@ -72,7 +72,7 @@
    },
    "scope": {
     "image only": 4,
-    "shown, not used": 35
+    "shown, not used": 39
    },
    "sibling": {
     "in conditions": 145,
@@ -110,14 +110,14 @@
      "share": 0.584
     },
     "<0.95": {
-     "readings": 11638,
-     "right": 11490,
+     "readings": 11740,
+     "right": 11592,
      "share": 0.987
     },
     "<=1.0": {
-     "readings": 32470,
-     "right": 29658,
-     "share": 0.913
+     "readings": 32988,
+     "right": 30140,
+     "share": 0.914
     }
    },
    "image": {
@@ -132,15 +132,15 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 22434,
-     "right": 20436,
+     "readings": 22560,
+     "right": 20556,
      "share": 0.911
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 11298,
-     "right": 11270,
+     "readings": 11400,
+     "right": 11372,
      "share": 0.998
     }
    },
@@ -161,8 +161,8 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 10036,
-     "right": 9222,
+     "readings": 10428,
+     "right": 9584,
      "share": 0.919
     }
    }
@@ -8081,6 +8081,195 @@
     "evidence": 43,
     "context_bytes_per_request": 634,
     "data_bytes_per_request": 180,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-birch": {
+   "inventory": {
+    "claims": 120,
+    "grounded": 31,
+    "unsupported (image)": 1,
+    "with conditions": 32,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 12,
+    "printed": 40,
+    "evidence": 47,
+    "context_bytes_per_request": 237,
+    "data_bytes_per_request": 488,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read contact time at peak flow |  / contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-birch.docx": {
+   "inventory": {
+    "claims": 58,
+    "grounded": 20,
+    "no content words": 1,
+    "with conditions": 21,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 34,
+    "evidence": 38,
+    "context_bytes_per_request": 516,
+    "data_bytes_per_request": 1053,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-birch.md": {
+   "inventory": {
+    "claims": 60,
+    "grounded": 19,
+    "with conditions": 19,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 21,
+    "evidence": 40,
+    "context_bytes_per_request": 643,
+    "data_bytes_per_request": 425,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-birch.pptx": {
+   "inventory": {
+    "claims": 38,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 34,
+    "evidence": 38,
+    "context_bytes_per_request": 630,
+    "data_bytes_per_request": 315,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-birch.xlsx": {
+   "inventory": {
+    "claims": 38,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 34,
+    "evidence": 38,
+    "context_bytes_per_request": 621,
+    "data_bytes_per_request": 316,
     "examples": {}
    },
    "keyed": {

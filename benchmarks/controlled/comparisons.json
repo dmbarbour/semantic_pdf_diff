@@ -3954,11 +3954,9 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 1,
     "unbound": 2
    },
    "gap_looks": {
-    "given": 1,
     "not_given": 2
    },
    "matching": {
@@ -5254,13 +5252,6 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
-   "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
-   },
-   "gap_looks": {
-    "given": 1
-   },
    "matching": {
     "groups": 15,
     "right": 15,
@@ -11467,13 +11458,10 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 2,
     "unbound": 5
    },
    "gap_looks": {
-    "given": 1,
-    "no_place": 5,
-    "not_shown": 1
+    "no_place": 5
    },
    "matching": {
     "groups": 15,
@@ -12607,12 +12595,10 @@
    "omitted": 0,
    "gaps_found": "1/4",
    "gaps": {
-    "both give it": 1,
     "right": 1,
     "unbound": 2
    },
    "gap_looks": {
-    "given": 1,
     "no_place": 1,
     "not_given": 2
    },
@@ -13632,7 +13618,7 @@
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 4,
+    "both give it": 2,
     "right": 2,
     "unbound": 1
    },
@@ -13675,6 +13661,10 @@
    "gaps": {
     "right": 1
    },
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -13713,6 +13703,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -13750,6 +13744,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 19,
@@ -13758,6 +13756,182 @@
     "unrelated": 125
    },
    "unmatched": 23
+  },
+  "wtp-s1-birch-proposals": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "no_place": 4
+   },
+   "findings": {
+    "complementary": 14,
+    "different": 65,
+    "uncertain": 19,
+    "unrelated": 101
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-birch-proposals.md": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 15,
+    "different": 42,
+    "equivalent": 1,
+    "uncertain": 18,
+    "unrelated": 90
+   },
+   "unmatched": 1
+  },
+  "wtp-s1-birch-proposals.docx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3
+   },
+   "findings": {
+    "complementary": 10,
+    "different": 40,
+    "uncertain": 18,
+    "unrelated": 94
+   },
+   "unmatched": 7
+  },
+  "wtp-s1-birch-proposals.pptx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3
+   },
+   "findings": {
+    "complementary": 7,
+    "different": 23,
+    "uncertain": 31,
+    "unrelated": 94
+   },
+   "unmatched": 26
+  },
+  "wtp-s1-birch-proposals.xlsx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3
+   },
+   "findings": {
+    "complementary": 9,
+    "different": 39,
+    "uncertain": 18,
+    "unrelated": 92
+   },
+   "unmatched": 7
   }
  },
  "replay": {
@@ -17715,11 +17889,9 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 1,
     "unbound": 2
    },
    "gap_looks": {
-    "given": 1,
     "not_given": 2
    },
    "matching": {
@@ -19015,13 +19187,6 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
-   "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
-   },
-   "gap_looks": {
-    "given": 1
-   },
    "matching": {
     "groups": 15,
     "right": 15,
@@ -25228,13 +25393,10 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 2,
     "unbound": 5
    },
    "gap_looks": {
-    "given": 1,
-    "no_place": 5,
-    "not_shown": 1
+    "no_place": 5
    },
    "matching": {
     "groups": 15,
@@ -26368,12 +26530,10 @@
    "omitted": 0,
    "gaps_found": "1/4",
    "gaps": {
-    "both give it": 1,
     "right": 1,
     "unbound": 2
    },
    "gap_looks": {
-    "given": 1,
     "no_place": 1,
     "not_given": 2
    },
@@ -27393,7 +27553,7 @@
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 4,
+    "both give it": 2,
     "right": 2,
     "unbound": 1
    },
@@ -27436,6 +27596,10 @@
    "gaps": {
     "right": 1
    },
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -27474,6 +27638,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -27511,6 +27679,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 19,
@@ -27519,6 +27691,182 @@
     "unrelated": 125
    },
    "unmatched": 23
+  },
+  "wtp-s1-birch-proposals": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "no_place": 4
+   },
+   "findings": {
+    "complementary": 14,
+    "different": 65,
+    "uncertain": 19,
+    "unrelated": 101
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-birch-proposals.md": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2,
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 15,
+    "different": 42,
+    "equivalent": 1,
+    "uncertain": 18,
+    "unrelated": 90
+   },
+   "unmatched": 1
+  },
+  "wtp-s1-birch-proposals.docx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3
+   },
+   "findings": {
+    "complementary": 9,
+    "different": 39,
+    "uncertain": 18,
+    "unrelated": 96
+   },
+   "unmatched": 8
+  },
+  "wtp-s1-birch-proposals.pptx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3
+   },
+   "findings": {
+    "complementary": 7,
+    "different": 23,
+    "uncertain": 31,
+    "unrelated": 94
+   },
+   "unmatched": 26
+  },
+  "wtp-s1-birch-proposals.xlsx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3
+   },
+   "findings": {
+    "complementary": 9,
+    "different": 40,
+    "uncertain": 17,
+    "unrelated": 92
+   },
+   "unmatched": 7
   }
  },
  "recorded-rows": {
@@ -29612,11 +29960,10 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 1,
     "unbound": 6
    },
    "gap_looks": {
-    "given": 5,
+    "given": 4,
     "no_place": 2
    },
    "matching": {
@@ -30724,11 +31071,9 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 1,
     "unbound": 1
    },
    "gap_looks": {
-    "given": 1,
     "not_given": 1
    },
    "matching": {
@@ -31764,13 +32109,6 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
-   "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
-   },
-   "gap_looks": {
-    "given": 1
-   },
    "matching": {
     "groups": 15,
     "right": 15,
@@ -36829,11 +37167,9 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 2,
     "unbound": 5
    },
    "gap_looks": {
-    "given": 2,
     "no_place": 5
    },
    "matching": {
@@ -37740,12 +38076,10 @@
    "omitted": 0,
    "gaps_found": "1/4",
    "gaps": {
-    "both give it": 1,
     "right": 1,
     "unbound": 1
    },
    "gap_looks": {
-    "given": 1,
     "no_place": 1,
     "not_given": 1
    },
@@ -38618,6 +38952,10 @@
    "gaps": {
     "right": 1
    },
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -38655,6 +38993,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -38692,6 +39034,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -38700,6 +39046,148 @@
     "unrelated": 126
    },
    "unmatched": 22
+  },
+  "wtp-s1-birch-proposals": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "no_place": 4
+   },
+   "findings": {
+    "complementary": 15,
+    "different": 60,
+    "equivalent": 1,
+    "uncertain": 21,
+    "unrelated": 102
+   },
+   "unmatched": 4
+  },
+  "wtp-s1-birch-proposals.docx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2
+   },
+   "findings": {
+    "complementary": 12,
+    "different": 43,
+    "equivalent": 2,
+    "uncertain": 15,
+    "unrelated": 99
+   },
+   "unmatched": 3
+  },
+  "wtp-s1-birch-proposals.pptx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
+   "findings": {
+    "complementary": 14,
+    "different": 41,
+    "uncertain": 14,
+    "unrelated": 88
+   },
+   "unmatched": 3
+  },
+  "wtp-s1-birch-proposals.xlsx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
+   "findings": {
+    "complementary": 13,
+    "different": 42,
+    "uncertain": 13,
+    "unrelated": 89
+   },
+   "unmatched": 3
   }
  },
  "replay-rows": {
@@ -40793,11 +41281,10 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 1,
     "unbound": 6
    },
    "gap_looks": {
-    "given": 5,
+    "given": 4,
     "no_place": 2
    },
    "matching": {
@@ -41905,11 +42392,9 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 1,
     "unbound": 1
    },
    "gap_looks": {
-    "given": 1,
     "not_given": 1
    },
    "matching": {
@@ -42945,13 +43430,6 @@
    "unmatched": 4,
    "pairs": 0,
    "omitted": 0,
-   "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
-   },
-   "gap_looks": {
-    "given": 1
-   },
    "matching": {
     "groups": 15,
     "right": 15,
@@ -48010,11 +48488,9 @@
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 2,
     "unbound": 5
    },
    "gap_looks": {
-    "given": 2,
     "no_place": 5
    },
    "matching": {
@@ -48921,12 +49397,10 @@
    "omitted": 0,
    "gaps_found": "1/4",
    "gaps": {
-    "both give it": 1,
     "right": 1,
     "unbound": 1
    },
    "gap_looks": {
-    "given": 1,
     "no_place": 1,
     "not_given": 1
    },
@@ -49799,6 +50273,10 @@
    "gaps": {
     "right": 1
    },
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -49836,6 +50314,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -49873,6 +50355,10 @@
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "right": 1,
+    "found_beside": 1
+   },
    "findings": {
     "complementary": 3,
     "different": 20,
@@ -49881,6 +50367,148 @@
     "unrelated": 126
    },
    "unmatched": 22
+  },
+  "wtp-s1-birch-proposals": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 3,
+    "unbound": 1
+   },
+   "gap_looks": {
+    "no_place": 4
+   },
+   "findings": {
+    "complementary": 15,
+    "different": 60,
+    "equivalent": 1,
+    "uncertain": 21,
+    "unrelated": 102
+   },
+   "unmatched": 4
+  },
+  "wtp-s1-birch-proposals.docx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 2
+   },
+   "findings": {
+    "complementary": 12,
+    "different": 43,
+    "equivalent": 2,
+    "uncertain": 15,
+    "unrelated": 99
+   },
+   "unmatched": 3
+  },
+  "wtp-s1-birch-proposals.pptx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
+   "findings": {
+    "complementary": 13,
+    "different": 42,
+    "uncertain": 13,
+    "unrelated": 89
+   },
+   "unmatched": 3
+  },
+  "wtp-s1-birch-proposals.xlsx": {
+   "facts": {
+    "changed": 33,
+    "conditions": 0,
+    "added": 6,
+    "removed": 0,
+    "unchanged": 0
+   },
+   "matching": {
+    "groups": 14,
+    "right": 11,
+    "wrong": 3,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 7,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "both give it": 1
+   },
+   "findings": {
+    "complementary": 13,
+    "different": 42,
+    "uncertain": 13,
+    "unrelated": 89
+   },
+   "unmatched": 3
   }
  }
 }

@@ -8726,6 +8726,205 @@
     "text": "10/10"
    }
   },
+  "wtp-s1-birch": {
+   "facts": 39,
+   "found": 37,
+   "recall": 0.9487,
+   "found_right": 37,
+   "missed": [
+    "bw.capacity",
+    "floc.stages"
+   ],
+   "claims": 56,
+   "outcomes": {
+    "misbound": 3,
+    "right": 52,
+    "text": 1
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "prose": 0.9259,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3077,
+    "text": 0.6154,
+    "visual": 0.8974
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 12
+    },
+    "text": {
+     "misbound": 3,
+     "right": 25
+    },
+    "visual": {
+     "misbound": 3,
+     "right": 37,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10",
+    "visual": "11/11"
+   }
+  },
+  "wtp-s1-birch.docx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "floc.stages",
+    "recycle.capacity",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 0.8846,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.md": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "floc.stages",
+    "recycle.capacity",
+    "sludge.capacity"
+   ],
+   "claims": 40,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "md-prose": 0.8846,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13,
+     "text": 2
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.pptx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "pptx-prose": 0.8846,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.xlsx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "xlsx-prose": 0.8846,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-cedar": {
    "facts": 32,
    "found": 30,
@@ -19928,6 +20127,205 @@
     "text": "10/10"
    }
   },
+  "wtp-s1-birch": {
+   "facts": 39,
+   "found": 37,
+   "recall": 0.9487,
+   "found_right": 37,
+   "missed": [
+    "bw.capacity",
+    "floc.stages"
+   ],
+   "claims": 56,
+   "outcomes": {
+    "misbound": 3,
+    "right": 52,
+    "text": 1
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "prose": 0.9259,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3077,
+    "text": 0.6154,
+    "visual": 0.8974
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 12
+    },
+    "text": {
+     "misbound": 3,
+     "right": 25
+    },
+    "visual": {
+     "misbound": 3,
+     "right": 37,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10",
+    "visual": "11/11"
+   }
+  },
+  "wtp-s1-birch.docx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "floc.stages",
+    "recycle.capacity",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 0.8846,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.md": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "floc.stages",
+    "recycle.capacity",
+    "sludge.capacity"
+   ],
+   "claims": 40,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "md-prose": 0.8846,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13,
+     "text": 2
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.pptx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "pptx-prose": 0.8846,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.xlsx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "xlsx-prose": 0.8846,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-cedar": {
    "facts": 32,
    "found": 30,
@@ -30055,6 +30453,167 @@
     "text": "10/10"
    }
   },
+  "wtp-s1-birch": {
+   "facts": 39,
+   "found": 37,
+   "recall": 0.9487,
+   "found_right": 37,
+   "missed": [
+    "bw.capacity",
+    "floc.stages"
+   ],
+   "claims": 56,
+   "outcomes": {
+    "misbound": 3,
+    "right": 52,
+    "text": 1
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "prose": 0.9259,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3077,
+    "text": 0.6154,
+    "visual": 0.8974
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 12
+    },
+    "text": {
+     "misbound": 3,
+     "right": 25
+    },
+    "visual": {
+     "misbound": 3,
+     "right": 37,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10",
+    "visual": "11/11"
+   }
+  },
+  "wtp-s1-birch.docx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "floc.stages",
+    "recycle.capacity",
+    "sludge.capacity"
+   ],
+   "claims": 40,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 0.8846,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13,
+     "text": 2
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.pptx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "pptx-prose": 0.8846,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.xlsx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "xlsx-prose": 0.8846,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-cedar": {
    "facts": 32,
    "found": 30,
@@ -39796,6 +40355,167 @@
     },
     "text": {
      "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch": {
+   "facts": 39,
+   "found": 37,
+   "recall": 0.9487,
+   "found_right": 37,
+   "missed": [
+    "bw.capacity",
+    "floc.stages"
+   ],
+   "claims": 56,
+   "outcomes": {
+    "misbound": 3,
+    "right": 52,
+    "text": 1
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "prose": 0.9259,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3077,
+    "text": 0.6154,
+    "visual": 0.8974
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 12
+    },
+    "text": {
+     "misbound": 3,
+     "right": 25
+    },
+    "visual": {
+     "misbound": 3,
+     "right": 37,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10",
+    "visual": "11/11"
+   }
+  },
+  "wtp-s1-birch.docx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "floc.stages",
+    "recycle.capacity",
+    "sludge.capacity"
+   ],
+   "claims": 40,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36,
+    "text": 2
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "docx-prose": 0.8846,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13,
+     "text": 2
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.pptx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "pptx-prose": 0.8846,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "10/10"
+   }
+  },
+  "wtp-s1-birch.xlsx": {
+   "facts": 39,
+   "found": 36,
+   "recall": 0.9231,
+   "found_right": 36,
+   "missed": [
+    "bw.capacity",
+    "floc.stages",
+    "sludge.capacity"
+   ],
+   "claims": 38,
+   "outcomes": {
+    "misbound": 2,
+    "right": 36
+   },
+   "conditions_kept": "11/11",
+   "recall_by_form": {
+    "xlsx-prose": 0.8846,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3333,
+    "text": 0.5897
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 13
+    },
+    "text": {
+     "misbound": 2,
+     "right": 23
     }
    },
    "conditions_by_reader": {

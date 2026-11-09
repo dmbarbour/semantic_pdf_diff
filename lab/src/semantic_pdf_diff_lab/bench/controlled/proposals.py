@@ -194,6 +194,42 @@ def cyclone(seed):
                       d.number(52, 78), "ft"))
     return p
 
+BIRCH_WORDS = (("Harrow Creek", "Birch Hollow"), ("P-101A", "P-201A"), ("P-101B", "P-201B"), ("P-101C", "P-201C"))
+BIRCH_ITEMS = {"Harrow Creek Water Treatment Plant": ("Birch Hollow Water Treatment Plant", ("Birch Hollow WTP",
+                                                                                              "the plant")),
+               "Raw water pump P-101A": ("Raw water pump P-201A", ("P-201A", "pump P-201A", "raw water pump P-201A")),
+               "Raw water pump P-101B": ("Raw water pump P-201B", ("P-201B", "pump P-201B", "raw water pump P-201B")),
+               "Raw water pump P-101C": ("Raw water pump P-201C", ("P-201C", "pump P-201C", "raw water pump P-201C"))}
+# Harrow Creek's raw water pump tags on Birch Hollow's other pumps: (tag, the pump, its role's id, the fact its sentence
+# follows, what it does)
+BIRCH_TAGGED = (("P-101A", "Backwash pump", "bw", "filters.rate", "delivers {v} gpm to the filters"),
+                ("P-101B", "Sludge pump", "sludge", "sed.depth", "moves {v} gpm of sludge from the basins"),
+                ("P-101C", "Washwater recycle pump", "recycle", "plant.design_flow",
+                 "returns {v} gpm of washwater to the head of the plant"))
+
+def birch_hollow(seed):
+    """Birch Hollow's design basis (tentative matches, milestone 14's knob; the gotchas review, item 2: "P-101 in two
+    designs is a numbering habit, not identity"): Harrow Creek's template from a seed further on, its items named as
+    Harrow Creek names them but its raw water pumps tagged P-201A to C, and Harrow Creek's tags P-101A to C on its
+    backwash, sludge and washwater recycle pumps, each a capacity and a head as the raw water pumps have: a tag in
+    both designs, another role in each."""
+    p = PROJECTS["wtp"](seed + 3)
+    p.id, p.title = f"wtp-s{seed}-birch", "Birch Hollow Water Treatment Plant"
+    p.edits = []
+    _renamed(p, BIRCH_WORDS, BIRCH_ITEMS)
+    d = Draw(f"{p.id}-proposal")
+    d.used |= {f.value for f in p.facts}
+    for tag, pump, role, after, does in BIRCH_TAGGED:
+        name = f"{pump} {tag}"
+        aliases = (tag, f"pump {tag}", f"{pump.lower()} {tag}")
+        add_sentence(p, after, f"{name} {does}.",
+                     Fact(f"{role}.capacity", name, aliases, "capacity", ("flow", "rated flow"), d.number(300, 6000),
+                          "gpm"))
+        add_sentence(p, f"{role}.capacity", f"{name} has a total dynamic head of {{v}} ft.",
+                     Fact(f"{role}.head", name, aliases, "total dynamic head", ("TDH", "head"), d.number(20, 120, 1),
+                          "ft"))
+    return p
+
 HARBOR_WORDS = (("Lakeshore Telemetry Link", "Harbor Telemetry Link"),
                 ("Status Report Formats", "Buffer Report Formats"),
                 ("extended short status report", "extended compact buffer report"),
@@ -247,7 +283,7 @@ def harbor(seed):
 
 # (the corpus project's key, the other design's maker and id's ending, the pair's id's ending)
 PAIRS = (("wtp", pine_ridge, "proposal", "proposals"), ("wtp", cedar_falls, "cedar", "cedar-proposals"),
-         ("coaster", cyclone, "proposal", "proposals"))
+         ("coaster", cyclone, "proposal", "proposals"), ("wtp", birch_hollow, "birch", "birch-proposals"))
 
 # held out only: never in development's corpus (controlled.py heldout)
 HELDOUT_PAIRS = (("spec", harbor, "proposal", "proposals"),)
