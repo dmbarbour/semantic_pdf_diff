@@ -30,9 +30,13 @@ MESSAGE = 'Interrupted: rerun the same command to resume; finished work is kept.
 @contextlib.contextmanager
 def endpoint(interrupt_at):
     """A stub endpoint answering a claim for each page's power in kW, equivalence for comparisons. Once interrupt_at
-    requests have come, it sends Ctrl+C's signal to the process group in state['group'], and holds every later request
-    unanswered until the block ends (or state['release'] is set): requests in flight the run mustn't wait for."""
-    state = {'requests': 0, 'group': None, 'release': threading.Event(), 'lock': threading.Lock()}
+    requests have come, it sends Ctrl+C's signal to the process group in state['group'] (once: at the first request
+    from interrupt_at on with the group known, or by run() as it learns the group, if the requests came first), and
+    holds every later request unanswered until the block ends (or state['release'] is set): requests in flight the
+    run mustn't wait for. (Sent only at request interrupt_at exactly, a run whose group the test hadn't yet set by then
+    was never interrupted and timed out: three times under the full suite's load, 2026-10-29, 10-30 and 11-09.)"""
+    state = {'requests': 0, 'group': None, 'release': threading.Event(), 'lock': threading.Lock(), 'sent': False,
+             'at': interrupt_at}
 
     def post(handler):
         prompt = prompt_of(request_body(handler)['messages'][1]['content'])
@@ -41,8 +45,9 @@ def endpoint(interrupt_at):
         with state['lock']:
             state['requests'] += 1
             n = state['requests']
-        if n == interrupt_at and state['group'] is not None:
-            os.killpg(state['group'], signal.SIGINT)
+            if n >= interrupt_at and state['group'] is not None and not state['sent']:
+                state['sent'] = True
+                os.killpg(state['group'], signal.SIGINT)
         if n >= interrupt_at:
             state['release'].wait(60)
         answer = {'claims': [], 'complete': True, 'issues': []}
@@ -85,7 +90,11 @@ def run(root, url, store, cache, on_terminal=True, group=None):
     process = subprocess.Popen(command, env=env, stdin=subprocess.DEVNULL, stdout=out, stderr=subprocess.STDOUT,
                                start_new_session=True)  # its own process group, as a terminal's foreground job
     if group is not None:
-        group['group'] = process.pid
+        with group['lock']:  # the endpoint may have had its requests before it knew whom to interrupt
+            group['group'] = process.pid
+            if group['requests'] >= group['at'] and not group['sent']:
+                group['sent'] = True
+                os.killpg(process.pid, signal.SIGINT)
     try:
         if on_terminal:
             code = process.wait(timeout=120)
