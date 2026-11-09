@@ -1468,8 +1468,9 @@ class LinkIndex(Lever):
     # step"): link_gaps, what a plausible link's other subject gives that a subject doesn't, as the weakest gaps,
     # never looked for; linked_values, its values beside the subject's in the Subjects view, index.md and the export,
     # not merged. Both the owner's to take or leave: linked_values on by default since 2026-11-09 (the owner: "Let's
-    # add `linked_values` by default"); link_gaps off ("consider how to improve `link_gaps`")
-    link_gaps: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # add `linked_values` by default"); link_gaps too, with property_links, once that passed its held-out rule (the
+    # owner, 2026-11-09: "Please turn `link_gaps` and `property_gaps` on together.")
+    link_gaps: Annotated[bool, _selecting(roles=COMPARE)] = True
     linked_values: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class PropertyLinks(Lever):
@@ -1477,8 +1478,10 @@ class PropertyLinks(Lever):
     # comparisons: a property possibly given under another name (links.property_alike: its names, its values' unit
     # kind and magnitude, the judge's pairing of its claims; two families plausible), so a gap another source fills, or
     # "if one item", isn't counted where the lacking side plausibly gives it (tentative matches, milestone 8; the owner,
-    # 2026-11-09: "weighted/fuzzy joining of properties [...] as part of fitting things together")
-    property_links: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # 2026-11-09: "weighted/fuzzy joining of properties [...] as part of fitting things together"). On by default
+    # since 2026-11-09 with link_gaps, after passing its held-out rule (the owner: "Please turn `link_gaps` and
+    # `property_gaps` on together.")
+    property_links: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}

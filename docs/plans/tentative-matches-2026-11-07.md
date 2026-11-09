@@ -283,7 +283,7 @@ The owner, 2026-11-09: "So it seems weighted/fuzzy joining of properties hasn't 
     - **Guard met:** right gaps lost 0 (29 and 29).
     - **By kind:** link gaps 42 → 4 false, 7 right kept (7 of 51 right → 7 of 12); gaps another source fills 22 → 20 false (p = 0.5): with `link_gaps` off, today's default, it changes little.
     - **What's left** (gaps another source fills): mostly a subject split within one source, the lacking side giving the property under the other half ("Ridgeback" holding the coaster's speed, length, duration and inversions, "Ridgeback roller coaster" the subject both give), or under a neighbour (the support columns under "track"); names alike only by stem ("inversion count", "number of inversions") with unitless values.
-    - **The default** is the owner's call.
+    - **On by default, with `link_gaps`,** 2026-11-09 (the owner: "Please turn `link_gaps` and `property_gaps` on together."; `property_gaps` meaning `property_links`). Round 0 keeps both off.
 
 ### 9. Test material before the levers that need it
 
@@ -312,7 +312,7 @@ The owner, 2026-11-09: "Not viable for me to mark things. I'm dealing with proje
 
 ### 14. Firm matches between proposals with two families
 
-From [the gotchas review](../research/gotchas-review-2026-11-09.md) (its item 2, with 1): a shared tag, name or other name a strong name signal, a group firm only with a second family (the judge's pairings, the model's match, distinct properties), as links already need. Its knob first: a proposals design keeping the other's tags with roles permuted. The lab's scorer tightened with it (its item 13), so firm errors show.
+From [the gotchas review](../research/gotchas-review-2026-11-09.md) (its item 2, with 1): a shared tag, name or other name a strong name signal, a group firm only with a second family (the judge's pairings, the model's match, distinct properties), as links already need. A group with a shared tag or name alone becomes a plausible link (the owner, 2026-11-09, asked whether plausible or possible: "A plausible link is good."): kept apart, its values beside the subject's, its gaps "if one item". Its knob first: a proposals design keeping the other's tags with roles permuted. The lab's scorer tightened with it (its item 13), so firm errors show.
 
 ### 15. Values keyed by unit kind
 

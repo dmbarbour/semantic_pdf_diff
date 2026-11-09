@@ -122,6 +122,8 @@
   "link_tests": false,
   "link_read": false,
   "linked_values": false,
+  "link_gaps": false,
+  "property_links": false,
   "leave_text": "none",
   "images_first": false,
   "text_spans": "section",
