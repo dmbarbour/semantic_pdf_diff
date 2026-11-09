@@ -209,6 +209,12 @@ The owner: "then figure out how to analyze or evidence a fuzzy, weighted, or pro
     - **Guards:** 95.4% of the weights' plausible links right (the rubric's 96.0%: 0.6 points under); the least, Markdown, 9 of 11 (81.8%); the PDFs 12 of 13; Word, decks and workbooks every one.
     - **Calibration** (the share right by the share the score says): 0.9–1.0, 49 of 49; 0.7–0.9, 15 of 22 (a little overconfident, as on validation); 0.3–0.5, 16 of 45 (it says 0.33); 0.1–0.3, 37 of 149 (it says 0.20); under 0.1, 2 of 77.
     - **Defaults** are the owner's call.
+  - **The turbine pair, by eye** (offline, its report as recorded): the weights make 9 plausible links, most wrong. Among them: "Drivetrain" and IEA's "15-MW turbine", "aerodynamic torque" and CCBlade's aerodynamic power, "Rotor Speed" and "rotor-speed error", REpower's machine and "turbine". Each by names alike alone (+6.1, enough by itself to pass the plausible threshold). The rubric, which needs two families of evidence, makes 2 (one right, one loose).
+    - **So the held-out check measured another seed of the same templates, not another kind of document.** On the controlled designs, counterparts renamed share words far more often than on real ones, so the weights trust names more than real documents bear.
+    - **Claude's recommendation:** keep `rubric` the default. Before the weights are trusted:
+      - a held-out template the weights never saw (the convention center, the link protocol), with decoys named alike;
+      - the names' weight bounded, or the rubric's two families required of the weights too;
+      - EM on real pairs without keys, a rater of its own.
 
 ### 7. Indexing with weighted relationships, explored
 
