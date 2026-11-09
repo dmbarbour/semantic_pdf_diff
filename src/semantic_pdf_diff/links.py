@@ -227,14 +227,17 @@ def _ranked(data, subjects, alone):
             out[tuple(sorted((i, named[other, best[0]])))] = best[1]
     return out
 
-def linked(data, index):
-    """Each subject's links: {subject's index: [{"source", "other", "relation", "level", "signals", "evidence"}]},
-    the other's source and name, the signals counted for it, and their evidence; both subjects of a pair hold it.
-    Subjects alone in one source only, across two sources."""
+def candidates(data, index):
+    """Every pair of subjects alone in the two sources that a link may join, with what's known of it, whatever the
+    settings: [{"i", "j" (the subjects' indices, the lower first), "evidence" (as a link shows it), "alike" (names
+    alike: a rare word, most words, or the spelling), "distinct" (two properties or more in common, more than either
+    has with any other candidate), "fits" (proposals: the values of the properties in common fit; None where none are
+    weighed), "read" (the model's read against a decoy, or None)}], A to Z by the pair. A level is worked out from
+    these (linked: the rubric; tentative matches, milestone 6: numbers)."""
     subjects, mode = index.get("subjects", []), data.get("mode", "")
     sources = index.get("sources", [])
     if len(sources) != 2 or mode not in RELATION:
-        return {}
+        return []
     alone = _alone(index)
     owner = {c: i for i, s in enumerate(subjects) if len(s["claims"]) == 1 for c in next(iter(s["claims"].values()))}
     evidence = {e["id"]: e for e in data.get("evidence", [])}
@@ -272,7 +275,6 @@ def linked(data, index):
     for i, s in alone.get(sources[0], []):
         for w in _name_words(s) | {("property", p) for p in _properties(s)}:
             pairs |= {tuple(sorted((i, j))) for j in by.get(w, ())}
-    tests = bool((data.get("settings") or {}).get("link_tests"))
     common = {}  # each pair's properties in common, for the distinctness test
     for i, j in pairs:
         common[i, j] = _properties(subjects[i]) & _properties(subjects[j])
@@ -288,7 +290,7 @@ def linked(data, index):
     def distinct(i, j):
         n = len(common[i, j])
         return all(most[x, "size"] == n and most[x, "count"] == 1 for x in (i, j))
-    found = []
+    out = []
     for i, j in sorted(pairs):
         s, t = subjects[i], subjects[j]
         if list(s["claims"]) == list(t["claims"]):  # one source's two subjects: not this milestone's
@@ -302,34 +304,50 @@ def linked(data, index):
               "judged": dict(sorted(said["judged"].items())), "grouped": sorted(set(said["grouped"])),
               "model": [r for r, _ in said["model"]]}
         names = (_name_words(s), _name_words(t))
-        said_alike = any(held[w] <= RARE for w in ev["name"]) or (
-            ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1])) or _spelled(s, t)
+        alike = bool(any(held[w] <= RARE for w in ev["name"]) or (
+            ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1])) or _spelled(s, t))
         if (i, j) in likest:
             ev["meaning"] = round(likest[i, j], 3)
         if (i, j) in ranked:
             ev["reranked"] = ranked[i, j]
-        own = len(ev["properties"]) >= 2 and (not tests or distinct(i, j))
-        if tests and len(ev["properties"]) >= 2 and not own:
-            ev["shared_by_siblings"] = True
-        signals = [k for k, counts in (("name", said_alike), ("meaning", (i, j) in likest),
-                                       ("reranked", (i, j) in ranked),
-                                       ("properties", own),
-                                       ("values", mode == "revisions" and ev["values"] > 0),
-                                       ("judged", any(said["judged"][r] for r in STRONG[mode])),
-                                       ("grouped", bool(ev["grouped"])), ("model", bool(ev["model"])),
-                                       ("read", reads.get((i, j)) == "picked")) if counts]
         if (i, j) in reads:
             ev["read"] = reads[i, j]
-        if not signals:
-            continue
-        level = LEVELS[0] if len({FAMILY.get(x, x) for x in signals}) >= 2 else LEVELS[1]
-        if tests and mode == "proposals" and ev["properties"]:
+        fits = None
+        if mode == "proposals" and ev["properties"]:
             for x in (i, j):
                 if x not in by_property:
                     by_property[x] = _by_property(subjects[x], evidence)
-            if not _fits(by_property[i], by_property[j], ev["properties"]):
-                ev["misfit"], level = True, LEVELS[1]  # values that don't fit: possible at most
-        if reads.get((i, j)) in ("decoy", "neither"):
+            fits = _fits(by_property[i], by_property[j], ev["properties"])
+        out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
+                    "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j))})
+    return out
+
+def linked(data, index):
+    """Each subject's links: {subject's index: [{"source", "other", "relation", "level", "signals", "evidence"}]},
+    the other's source and name, the signals counted for it, and their evidence; both subjects of a pair hold it.
+    Subjects alone in one source only, across two sources; each pair's level by the rubric (RUBRIC), its tests where
+    the link_tests setting says."""
+    subjects, mode = index.get("subjects", []), data.get("mode", "")
+    tests = bool((data.get("settings") or {}).get("link_tests"))
+    found = []
+    for c in candidates(data, index):
+        i, j, ev = c["i"], c["j"], dict(c["evidence"])
+        own = len(ev["properties"]) >= 2 and (not tests or c["distinct"])
+        if tests and len(ev["properties"]) >= 2 and not own:
+            ev["shared_by_siblings"] = True
+        signals = [k for k, counts in (("name", c["alike"]), ("meaning", "meaning" in ev),
+                                       ("reranked", "reranked" in ev),
+                                       ("properties", own),
+                                       ("values", mode == "revisions" and ev["values"] > 0),
+                                       ("judged", any(ev["judged"].get(r) for r in STRONG[mode])),
+                                       ("grouped", bool(ev["grouped"])), ("model", bool(ev["model"])),
+                                       ("read", c["read"] == "picked")) if counts]
+        if not signals:
+            continue
+        level = LEVELS[0] if len({FAMILY.get(x, x) for x in signals}) >= 2 else LEVELS[1]
+        if tests and mode == "proposals" and ev["properties"] and c["fits"] is False:
+            ev["misfit"], level = True, LEVELS[1]  # values that don't fit: possible at most
+        if c["read"] in ("decoy", "neither"):
             level = LEVELS[1]  # the model picked the decoy, or neither: possible at most
         relation = ev["model"][0] if ev["model"] else RELATION[mode]
         score = (len(signals), len(ev["properties"]) + len(ev["name"]) + ev["values"])
