@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.50.0 (2026-11-09)
+
+- **`link_tests` and `link_read` on by default** (the owner: "Yes, turn both on by default."), after passing their held-out rule (seeds 2 and 3 of the three controlled proposals pairs, every format): wrong plausible links 55 → 0 with the tests; right plausible links 32 → 57 with the reads, 95% of plausible links right. The reads ask a request a link, comparing proposals only (as held out). Round 0's settings keep both off.
+- `controlled.py heldout`: held-out proposals pairs generated, compared and scored by role, apart from development's.
+
 ## 0.49.0 (2026-11-08)
 
 - **A link's evidence tested by code** (`link_tests`, off; tentative matches, milestone 4): properties in common count only where they set a pair apart from its siblings; between proposals, values that don't fit (another kind of unit, more than ten times apart) leave a link possible at most. On the controlled proposals pairs, plausible links 16 of 16 right (25 of 43 without).
