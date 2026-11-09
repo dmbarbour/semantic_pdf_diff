@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08. [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09, its held-out check due. [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -172,6 +172,32 @@ The owner: "then figure out how to analyze or evidence a fuzzy, weighted, or pro
 - **Levels as thresholds** on the score, set on held-out pairs for each level's share right (say firm 95% or more, plausible 60%; the owner's call).
 - **Without keys:** expectation-maximization (Winkler's) fits m and u on real pairs, a rater of its own beside the keys (0018).
 - **Held out:** weights and thresholds fitted on development seeds, judged on fresh seeds and one domain never fitted on (a rolling window); the turbine pair stays by eye, never a fit's target. Binomial intervals per level.
+
+- **Built 2026-11-09** (the owner: "Please proceed with milestone 6."; checked first with the advisor):
+  - **A pair's features apart from its leveling** (`links.candidates`; behaviour preserved: the 289 recorded controlled reports rebuilt to identical links), banded (`links.bands`): names alike, meaning, properties in common (0 to 3), distinct from siblings', values that fit, the judge's counting verdicts (0 to 2), the model's match.
+  - **Fitted on proposals only** (`linkfit.py`): revisions' subjects left alone hold too few counterparts to fit (the split revision's two), so revisions keep the rubric, though the owner chose two weighings.
+  - **On the default recordings.** With `match_subjects` on, the model matches most renamed items firmly and leaves mostly siblings alone (165 of 173 validation pairs), so meaning and the model's match never showed; they weigh nothing until fitted. The reranker's signal isn't fitted (naming one re-judges every claim pair).
+  - **Fellegi-Sunter weights** (seed 1: 149 labelled pairs, 53 matches; log2 of each band's share among matches over its share among non-matches): names alike +6.1, distinct properties +3.5, two counting verdicts +3.0, one property in common +5.1 (a band to watch: seed 1's pairs sharing one property were mostly matches), values that don't fit −0.7. A ridge logistic on the same bands chose the same pairs.
+  - **Left out a template at a time** (development): the top-scored as many as there are matches, the coaster 7 of 10 right, the water plants 28 of 43.
+  - **Thresholds set on seeds 2 and 3** (validation, looked at before): plausible at a score of 2.807 (95% right), possible at −0.146 (`link_weights.json`, `weights/1`, stamped with the candidate generator and rubric it was fitted on).
+  - **The read** only raises (a possible link picked over its decoy is plausible). As a test it lowered 10 validation links, every one right: siblings the reads can't tell apart, which the weights already weigh.
+
+    | Validation (seeds 2, 3), the cap and reads applied | Plausible: right of |
+    |---|---|
+    | The rubric (today's defaults) | 57 of 60 |
+    | Weights, the read lowering | 58 of 61 |
+    | Weights, no read | 68 of 71 |
+    | Weights, the read raising (`link_levels: weights`) | 71 of 74 |
+
+  - **Calibration on validation** (the share right by the share the score says): 0.9–1.0, 53 of 54; 0.7–0.9, 17 of 27 (overconfident); 0.3–0.5, 28 of 75; 0.1–0.3, 28 of 124; under 0.1, 1 of 92.
+  - **`link_levels`** (`rubric`, the default, or `weights`): a link under weights says its score and the share of matches it says (`likely`).
+  - **Held-out rule, written 2026-11-09 before seeds 4 and 5 were generated** (Claude's, as 0037; the advisor: a three-way split, seeds 2 and 3 now spent on thresholds):
+    - **Units:** one proposals pair in one format, of seeds 4 and 5: 30 units.
+    - **Arms:** the rubric (today's defaults) and `link_levels: weights`, each run with its own reads (`controlled.py heldout`, twice: the second replays all but its reads).
+    - **Target:** right plausible links more with the weights, summed over the units, at p < 0.1 by a sign flip over the units that change.
+    - **Guards:** the weights' plausible links 90% right or more overall and 80% or more in every format, and no more than 3 points under the rubric's overall.
+    - **Reported, not judged:** the calibration of `likely` by band; possible links; right links at any level.
+    - **Checked once,** on the code as committed; failing, `link_levels` stays `rubric`, its held-out result quoted.
 
 ### 7. Indexing with weighted relationships, explored
 

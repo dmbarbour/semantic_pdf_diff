@@ -1,0 +1,46 @@
+{
+ "version": "weights/1",
+ "candidates": "candidates/1",
+ "rubric": "rubric/1",
+ "mode": "proposals",
+ "fitted": "2026-11-09 on the controlled proposals pairs of seed 1 (three pairs, every format, default settings); thresholds set on seeds 2 and 3 for 95% of plausible links right (tentative matches, milestone 6)",
+ "matches": 53,
+ "pairs": 149,
+ "prior": 0.3557,
+ "thresholds": {
+  "plausible": 2.807,
+  "possible": -0.146
+ },
+ "weights": {
+  "alike": {
+   "no": -0.639,
+   "yes": 6.13
+  },
+  "meaning": {
+   "absent": 0.0
+  },
+  "properties": {
+   "0": -1.936,
+   "1": 5.081,
+   "2": 4.74,
+   "3": -0.039
+  },
+  "distinct": {
+   "no": -0.45,
+   "yes": 3.477
+  },
+  "fits": {
+   "absent": 0.0,
+   "no": -0.746,
+   "yes": 0.664
+  },
+  "judged": {
+   "0": -0.656,
+   "1": 0.318,
+   "2": 2.986
+  },
+  "model": {
+   "none": 0.0
+  }
+ }
+}

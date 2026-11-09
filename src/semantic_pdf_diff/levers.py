@@ -1452,6 +1452,14 @@ class LinkTests(Lever):
     # default since 2026-11-09, after passing its held-out rule (the owner: "Yes, turn both on by default.")
     link_tests: Annotated[bool, _selecting(roles=COMPARE)] = True
 
+class LinkLevels(Lever):
+    lever_name, stage, off = "link_levels", "comparison", {"link_levels": "rubric"}
+    # proposals: a link's level from the rubric's signals, or from numbers: its features' Fellegi-Sunter weights
+    # summed against the thresholds of link_weights.json (links.py, linkfit.py; tentative matches, milestone 6; the
+    # owner, 2026-11-07: "figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match").
+    # Revisions keep the rubric
+    link_levels: Annotated[Literal["rubric", "weights"], _selecting(roles=COMPARE)] = "rubric"
+
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
     # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
@@ -1590,7 +1598,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkRead, LinkMeaning, LinkRerank, LookGaps,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkRead, LinkMeaning, LinkRerank,
+                 LookGaps,
                  JudgeGlossary,
                  NameTopics,
                  SearchNames,

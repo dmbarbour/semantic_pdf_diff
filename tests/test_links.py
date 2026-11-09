@@ -177,6 +177,45 @@ class Tested(unittest.TestCase):
             with_read = report(self.PUMPS, judged, ("a", "b"), mode="proposals", commentary={"entries": entries})
             self.assertEqual(links_of(with_read)["P-101", "LL-1"][0], level)
 
+class Weighed(unittest.TestCase):
+    """Milestone 6: a link's level from its features' weights (link_levels: weights; proposals only)."""
+    def test_a_pairs_score_its_bands_weights_its_level_by_the_thresholds(self):
+        data = report(A + B, [{"a": "A-3", "b": "B-3", "relation": "different"}], ("a", "b"), mode="proposals",
+                      settings={"link_levels": "weights"})
+        index = indexes.built(data)
+        plant = next(s for s in index["subjects"] if s["name"] == "Harrow Creek Water Treatment Plant")
+        (link,) = plant["links"]
+        table = links.weights()
+        bands = {"alike": "yes", "properties": "2", "distinct": "yes", "fits": "yes", "judged": "0",
+                 "meaning": "absent", "model": "none"}
+        expected = round(sum(table["weights"][f].get(b, 0.0) for f, b in bands.items()), 3)
+        self.assertEqual((link["score"], link["level"], link["rubric"]), (expected, "plausible", "weights/1"))
+        self.assertGreater(link["likely"], 0.9)
+        revisions = report(A + B, [], ("a", "b"), mode="revisions", settings={"link_levels": "weights"})
+        found = [x for s in indexes.built(revisions)["subjects"] for x in s.get("links", [])]
+        self.assertTrue(found and all("score" not in x for x in found))  # revisions keep the rubric
+
+    def test_the_models_pick_raises_a_possible_link_its_neither_lowers_nothing(self):
+        def pump(cid, content, name, cap, head, power):
+            return [claim(f"{cid}0", content, name, "capacity", cap, "gpm"), claim(f"{cid}1", content, name, "head",
+                                                                                  head, "ft"),
+                    claim(f"{cid}2", content, name, "motor power", power, "hp")]
+        claims = (pump("A-1", "ca", "P-101", "1,200", "40", "75") + pump("B-1", "cb", "LL-1", "1,300", "42", "80")
+                  + pump("B-2", "cb", "LL-2", "2,500", "58", "120"))
+        judged = [{"a": "A-10", "b": "B-10", "relation": "different"},
+                  {"a": "A-11", "b": "B-11", "relation": "different"}]
+        read = {"kind": "link_read", "source": "a", "subject": "P-101", "other_source": "b", "other": "LL-1",
+                "relation": "picked"}
+        settings = {"link_levels": "weights"}
+
+        def level(*entries):
+            data = report(claims, judged, ("a", "b"), mode="proposals", settings=settings,
+                          commentary={"entries": list(entries)})
+            return links_of(data)["P-101", "LL-1"][0]
+        self.assertEqual(level(), "possible")  # siblings' properties, the judge's pairing: possible by the weights
+        self.assertEqual(level(read), "plausible")
+        self.assertEqual(level({**read, "relation": "neither"}), "possible")
+
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):
         data = report(A + B, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b"), mode="proposals")

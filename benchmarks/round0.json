@@ -67,7 +67,7 @@
     "explain_differences",
     "editorial",
     "record_changes",
-    "judge_context", "judge_notes", "match_subjects", "link_tests", "link_read", "link_meaning", "link_rerank",
+    "judge_context", "judge_notes", "match_subjects", "link_tests", "link_levels", "link_read", "link_meaning", "link_rerank",
     "look_gaps",
     "judge_glossary", "topic_names", "search_names", "glossary", "confirm_kinds", "second_pass",
     "tensions", "summaries", "embed",

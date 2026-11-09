@@ -45,6 +45,15 @@ plausible matches "should feed links and topics for now").
     times of each other; a pair whose values don't fit is possible at most (a height isn't a frequency).
 - **Read by the model, where the link_read lever ran** (crossmatch.read_links): a link shown against a decoy, the model
   picking its counterpart: picked, evidence of its own (`read`); the decoy or neither, possible at most.
+- **Levels from numbers, where the link_levels setting says "weights"** (milestone 6; the owner, 2026-11-07: "Perhaps we
+  start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic
+  numeric match"): a pair's features banded (bands()), each band's Fellegi-Sunter weight (log2 of its share among
+  matches over its share among non-matches) summed into its score, its level by the table's thresholds
+  (link_weights.json: fitted by the lab on the controlled proposals pairs, linkfit.py; proposals only, revisions
+  keeping the rubric: their subjects left alone hold too few counterparts to fit). The model's read only raises: a
+  possible link it picks over its decoy is plausible; "neither" lowers nothing (on seeds 2 and 3, read as a test it
+  lowered 10 plausible links, every one right: siblings the reads can't tell apart, which the weights already weigh).
+  Links are ordered by score for the cap. A link says its score and the share of matches it says (`likely`).
 - **Kept in the index** (indexes.built: each subject's "links"), shown as links and in topics, never in the merged
   index's values nor its gaps, never a finding.
 """
@@ -227,6 +236,39 @@ def _ranked(data, subjects, alone):
             out[tuple(sorted((i, named[other, best[0]])))] = best[1]
     return out
 
+def bands(candidate, mode):
+    """A candidate pair's features, banded, as the weights are fitted and read (linkfit.py): {feature: band}. The
+    model's read isn't one: it's asked only of links already chosen."""
+    ev = candidate["evidence"]
+    meaning = ev.get("meaning")
+    judged = sum(ev["judged"].get(r, 0) for r in STRONG[mode])
+    model = ev["model"][0] if ev["model"] else ""
+    return {"alike": "yes" if candidate["alike"] else "no",
+            "meaning": "absent" if meaning is None else ("high" if meaning >= 0.85 else "mid"),
+            "properties": str(min(len(ev["properties"]), 3)),
+            "distinct": "yes" if candidate["distinct"] else "no",
+            "fits": "absent" if candidate["fits"] is None else ("yes" if candidate["fits"] else "no"),
+            "judged": str(min(judged, 2)),
+            "model": {"": "none", "same": "match", "corresponding": "match"}.get(model, model)}
+
+_WEIGHTS = {}
+
+def weights():
+    """The weight table (link_weights.json), read once."""
+    if not _WEIGHTS:
+        import json
+        from pathlib import Path
+        _WEIGHTS.update(json.loads((Path(__file__).with_name("link_weights.json")).read_text(encoding="utf-8")))
+    return _WEIGHTS
+
+def scored(table, candidate, mode):
+    """(a pair's score: its bands' weights summed, a band the table hasn't seen weighing nothing; the share of
+    matches it says, with the table's prior)."""
+    s = sum(table["weights"].get(f, {}).get(b, 0.0) for f, b in bands(candidate, mode).items())
+    p = table["prior"]
+    odds = (p / (1 - p)) * 2 ** s if 0 < p < 1 else 0.0
+    return round(s, 3), round(odds / (1 + odds), 3)
+
 def candidates(data, index):
     """Every pair of subjects alone in the two sources that a link may join, with what's known of it, whatever the
     settings: [{"i", "j" (the subjects' indices, the lower first), "evidence" (as a link shows it), "alike" (names
@@ -329,9 +371,26 @@ def linked(data, index):
     the link_tests setting says."""
     subjects, mode = index.get("subjects", []), data.get("mode", "")
     tests = bool((data.get("settings") or {}).get("link_tests"))
+    table = weights() if (data.get("settings") or {}).get("link_levels") == "weights" else None
+    if table is not None and table["mode"] != mode:
+        table = None  # revisions keep the rubric: the weights are proposals'
     found = []
     for c in candidates(data, index):
         i, j, ev = c["i"], c["j"], dict(c["evidence"])
+        if table is not None:
+            s, likely = scored(table, c, mode)
+            if s < table["thresholds"]["possible"]:
+                continue
+            level = LEVELS[0] if s >= table["thresholds"]["plausible"] or c["read"] == "picked" else LEVELS[1]
+            signals = [k for k, counts in (("name", c["alike"]), ("meaning", "meaning" in ev),
+                                           ("properties", c["distinct"]), ("judged", any(
+                                               ev["judged"].get(r) for r in STRONG[mode])),
+                                           ("model", bool(ev["model"])), ("read", c["read"] == "picked")) if counts]
+            relation = ev["model"][0] if ev["model"] else RELATION[mode]
+            found.append(((s, 0), i, j, {"relation": relation, "level": level, "signals": signals,
+                                                     "evidence": ev, "score": s, "likely": likely,
+                                                     "rubric": table["version"]}))
+            continue
         own = len(ev["properties"]) >= 2 and (not tests or c["distinct"])
         if tests and len(ev["properties"]) >= 2 and not own:
             ev["shared_by_siblings"] = True

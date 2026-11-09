@@ -103,6 +103,8 @@ NOT_EXERCISED = {
     'link_meaning': "needs an embedding model (embed_model) and subjects alone in each document; run with names' "
                     "vectors in tests/test_links.py",
     'link_tests': "needs links between subjects alone in each document; run in tests/test_links.py",
+    'link_levels': "proposals' links between subjects alone in each document; run with the weights in "
+                   "tests/test_links.py",
     'link_read': "needs links between subjects alone in each document; run with the model's reads in "
                  "tests/test_links.py",
     'link_rerank': "needs a reranker (rerank_model) and subjects alone in each document; run with ranks in "
