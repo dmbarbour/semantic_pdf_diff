@@ -252,6 +252,23 @@ class Swallowed(unittest.TestCase):
     def test_no_mark_no_interrupt(self):
         interrupts.checked()
 
+    def test_raised_where_python_cant_raise_it_not_printed(self):
+        from unittest.mock import patch
+
+        class Collected:
+            def __del__(self):  # as a weakref's callback during garbage collection, where Ctrl+C came
+                raise KeyboardInterrupt
+
+        class Failing:
+            def __del__(self):
+                raise ValueError("a bug of its own")
+        with patch.object(sys, 'unraisablehook', interrupts.unraisable), \
+                contextlib.redirect_stderr(io.StringIO()) as err:
+            Collected()
+            self.assertEqual(err.getvalue(), '')
+            Failing()
+        self.assertIn('ValueError: a bug of its own', err.getvalue())
+
     def test_swallowed_anywhere_the_run_ends_where_it_waits_next(self):
         from semantic_pdf_diff.dispatch import Dispatcher
         interrupts.arrived()

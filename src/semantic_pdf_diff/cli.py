@@ -52,6 +52,7 @@ def main(argv=None, client=None):
     if argv is not None:
         return attempt(command, list(argv), client)
     signal.signal(signal.SIGINT, first_interrupt)
+    sys.unraisablehook = interrupts.unraisable
     try:
         return attempt(command, sys.argv[1:], client)
     except KeyboardInterrupt:
