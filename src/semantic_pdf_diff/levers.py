@@ -1489,8 +1489,9 @@ class KeyedLinks(Lever):
     # properties say otherwise, either having more in common with another subject (indexes.firm_keyed; the judge and
     # the model, shown them by the key, saying nothing more), else a plausible link (milestone 14;
     # the gotchas review, item 2: "P-101 in two designs is a numbering habit, not identity"; the owner, 2026-11-09:
-    # "A plausible link is good.")
-    keyed_links: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # "A plausible link is good."). On by default since 2026-11-09, after passing its held-out rule (the owner: "Nice.
+    # Please turn `keyed_links` on, then proceed.")
+    keyed_links: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}

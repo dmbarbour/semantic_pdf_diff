@@ -341,7 +341,7 @@ From [the gotchas review](../research/gotchas-review-2026-11-09.md) (its item 2,
     - **Target met:** wrong firm groups 34 → 3, 11 units changed, p = 0.0005; the knob's 30 → 0, Cedar Falls' 4 → 3.
     - **Guard met:** right firm groups lost 9 of 372 (2.4%; at most 3%): chlorine feeds, alum and the disinfection options, items of one or two properties a sibling contests.
     - **Reported:** plausible links right 61 → 87, wrong 2 → 36 (30 of them the knob's contested tags, plausible as the owner chose); possible links right 22 → 25, wrong 21 → 52; the keys' items a right group holds 256 → 247 of 358.
-    - **The default** is the owner's call.
+    - **On by default,** 2026-11-09 (the owner: "Nice. Please turn `keyed_links` on, then proceed."). Round 0 keeps it off.
 
 ### 15. Values keyed by unit kind
 

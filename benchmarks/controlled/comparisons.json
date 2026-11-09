@@ -13322,23 +13322,28 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "right": 2,
-    "unbound": 1
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 1,
@@ -13358,34 +13363,26 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
+    "groups": 6,
     "right": 6,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 4,
+      "right": 4
      },
      "possible": {
-      "links": 7,
+      "links": 8,
       "right": 3,
-      "wrong": 4
+      "wrong": 5
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "another fact": 2,
-    "both give it": 2,
-    "unbound": 1
-   },
-   "gap_looks": {
-    "no_place": 2,
-    "not_shown": 3
-   },
+   "gaps": {},
    "findings": {
     "complementary": 5,
     "different": 37,
@@ -13404,28 +13401,30 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
-    "right": 7,
-    "wrong": 1,
+    "groups": 6,
+    "right": 6,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 5,
+      "right": 4,
+      "wrong": 1
      },
      "possible": {
-      "links": 4,
+      "links": 5,
       "right": 1,
-      "wrong": 3
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "both give it": 4,
-    "unbound": 1
+   "gaps": {},
+   "if_one_item": {
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 3,
@@ -13522,26 +13521,27 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
+    "groups": 6,
     "right": 6,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 8,
     "matched": 4,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 4
      },
      "possible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 1,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "0/2",
    "gaps": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1
    },
    "findings": {
@@ -13766,26 +13766,36 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
-    "right": 11,
-    "wrong": 3,
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 3,
     "unbound": 1
    },
    "gap_looks": {
-    "no_place": 4
+    "no_place": 1
+   },
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 14,
@@ -13804,23 +13814,33 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 2,
     "unbound": 1
+   },
+   "if_one_item": {
+    "another fact": 1,
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 15,
@@ -13840,30 +13860,39 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 3
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 6,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
-    "complementary": 10,
-    "different": 40,
+    "complementary": 9,
+    "different": 39,
     "uncertain": 18,
-    "unrelated": 94
+    "unrelated": 96
    },
-   "unmatched": 7
+   "unmatched": 8
   },
   "wtp-s1-birch-proposals.pptx": {
    "facts": {
@@ -13874,22 +13903,27 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 4,
+      "right": 1,
+      "wrong": 3
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 3
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 4,
+    "both give it": 9,
+    "unbound": 2,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 7,
@@ -13908,27 +13942,35 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 3
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 5,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 9,
-    "different": 39,
-    "uncertain": 18,
+    "different": 40,
+    "uncertain": 17,
     "unrelated": 92
    },
    "unmatched": 7
@@ -27257,23 +27299,28 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "right": 2,
-    "unbound": 1
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 1,
@@ -27293,34 +27340,26 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
+    "groups": 6,
     "right": 6,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 4,
+      "right": 4
      },
      "possible": {
-      "links": 7,
+      "links": 8,
       "right": 3,
-      "wrong": 4
+      "wrong": 5
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "another fact": 2,
-    "both give it": 2,
-    "unbound": 1
-   },
-   "gap_looks": {
-    "no_place": 2,
-    "not_shown": 3
-   },
+   "gaps": {},
    "findings": {
     "complementary": 5,
     "different": 37,
@@ -27339,28 +27378,30 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
-    "right": 7,
-    "wrong": 1,
+    "groups": 6,
+    "right": 6,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 5,
+      "right": 4,
+      "wrong": 1
      },
      "possible": {
-      "links": 4,
+      "links": 5,
       "right": 1,
-      "wrong": 3
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "both give it": 4,
-    "unbound": 1
+   "gaps": {},
+   "if_one_item": {
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 3,
@@ -27457,26 +27498,27 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
+    "groups": 6,
     "right": 6,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 8,
     "matched": 4,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 4
      },
      "possible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 1,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "0/2",
    "gaps": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1
    },
    "findings": {
@@ -27701,26 +27743,36 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
-    "right": 11,
-    "wrong": 3,
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 3,
     "unbound": 1
    },
    "gap_looks": {
-    "no_place": 4
+    "no_place": 1
+   },
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 14,
@@ -27739,23 +27791,33 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 2,
     "unbound": 1
+   },
+   "if_one_item": {
+    "another fact": 1,
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 15,
@@ -27775,22 +27837,31 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 3
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 6,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 9,
@@ -27809,22 +27880,27 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 4,
+      "right": 1,
+      "wrong": 3
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 3
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 4,
+    "both give it": 9,
+    "unbound": 2,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 7,
@@ -27843,22 +27919,30 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 3
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 5,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 9,
@@ -38574,16 +38658,17 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9,
+    "matched": 8,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
@@ -38652,23 +38737,28 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "right": 2,
-    "unbound": 1
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 1,
@@ -38688,23 +38778,28 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "right": 2,
-    "unbound": 1
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 1,
@@ -38724,35 +38819,27 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
-    "right": 6,
-    "wrong": 1,
+    "groups": 5,
+    "right": 5,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 6,
+      "right": 5,
+      "wrong": 1
      },
      "possible": {
-      "links": 4,
+      "links": 5,
       "right": 1,
-      "wrong": 3
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "another fact": 2,
-    "both give it": 2,
-    "unbound": 1
-   },
-   "gap_looks": {
-    "given": 1,
-    "no_place": 1,
-    "not_shown": 3
-   },
+   "gaps": {},
    "findings": {
     "complementary": 5,
     "different": 32,
@@ -38849,27 +38936,27 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
+    "groups": 6,
     "right": 6,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 8,
     "matched": 4,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 4
      },
      "possible": {
-      "links": 3,
+      "links": 4,
       "right": 1,
-      "wrong": 2
+      "wrong": 3
      }
     }
    },
    "gaps_found": "0/2",
    "gaps": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1
    },
    "findings": {
@@ -39056,26 +39143,37 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
-    "right": 11,
-    "wrong": 3,
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 5,
+      "wrong": 5
      }
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 3,
+    "both give it": 1,
     "unbound": 1
    },
    "gap_looks": {
-    "no_place": 4
+    "no_place": 2
+   },
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 15,
@@ -39095,22 +39193,31 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 2
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 6,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 12,
@@ -39130,28 +39237,36 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 1,
+    "both give it": 4,
+    "found_beside": 0
    },
    "findings": {
-    "complementary": 14,
-    "different": 41,
-    "uncertain": 14,
-    "unrelated": 88
+    "complementary": 13,
+    "different": 42,
+    "uncertain": 13,
+    "unrelated": 89
    },
    "unmatched": 3
   },
@@ -39164,22 +39279,30 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 1,
+    "both give it": 4,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 13,
@@ -49895,16 +50018,17 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9,
+    "matched": 8,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
@@ -49973,23 +50097,28 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "right": 2,
-    "unbound": 1
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 1,
@@ -50009,23 +50138,28 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 12,
-    "right": 12,
+    "groups": 11,
+    "right": 11,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "right": 2,
-    "unbound": 1
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 1,
@@ -50045,35 +50179,27 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
-    "right": 6,
-    "wrong": 1,
+    "groups": 5,
+    "right": 5,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 6,
+      "right": 5,
+      "wrong": 1
      },
      "possible": {
-      "links": 4,
+      "links": 5,
       "right": 1,
-      "wrong": 3
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "another fact": 2,
-    "both give it": 2,
-    "unbound": 1
-   },
-   "gap_looks": {
-    "given": 1,
-    "no_place": 1,
-    "not_shown": 3
-   },
+   "gaps": {},
    "findings": {
     "complementary": 5,
     "different": 32,
@@ -50170,27 +50296,27 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 7,
+    "groups": 6,
     "right": 6,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 8,
     "matched": 4,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 4,
+      "right": 4
      },
      "possible": {
-      "links": 3,
+      "links": 4,
       "right": 1,
-      "wrong": 2
+      "wrong": 3
      }
     }
    },
    "gaps_found": "0/2",
    "gaps": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1
    },
    "findings": {
@@ -50377,26 +50503,37 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
-    "right": 11,
-    "wrong": 3,
+    "groups": 10,
+    "right": 10,
+    "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 5,
+      "wrong": 5
      }
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "both give it": 3,
+    "both give it": 1,
     "unbound": 1
    },
    "gap_looks": {
-    "no_place": 4
+    "no_place": 2
+   },
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 15,
@@ -50416,22 +50553,31 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 2
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 6,
+    "unbound": 1,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 12,
@@ -50451,22 +50597,30 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 1,
+    "both give it": 4,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 13,
@@ -50485,22 +50639,30 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 14,
+    "groups": 11,
     "right": 11,
-    "wrong": 3,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     },
+     "possible": {
+      "links": 4,
+      "wrong": 4
      }
     }
    },
    "gaps_found": "0/0",
-   "gaps": {
-    "both give it": 1
+   "gaps": {},
+   "if_one_item": {
+    "another fact": 1,
+    "both give it": 4,
+    "found_beside": 0
    },
    "findings": {
     "complementary": 13,
