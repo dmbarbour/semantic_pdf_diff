@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.57.1 (2026-11-09)
+
+- The slices replay fixture re-recorded for `keyed_links` on: 0.57.0 was released with it missing 9 answers (the full suite's slow replay test failed; the commit gate's quick suite skips it).
+
 ## 0.57.0 (2026-11-09)
 
 - **`keyed_links` on by default** (the owner: "Nice. Please turn `keyed_links` on, then proceed."): between proposals, a tag or name both designs give is one item unless their properties say otherwise; contested, a plausible link. Round 0's settings keep it off. The controlled corpus re-recorded ($0.001).
