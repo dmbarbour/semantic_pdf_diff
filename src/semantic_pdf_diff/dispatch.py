@@ -18,6 +18,7 @@ import copy
 import os
 import random
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from . import interrupts
 from .failures import ModelFailure
 from .progress import carried, handling
 
@@ -159,7 +160,9 @@ class Dispatcher:
             self.wait_one()
 
     def wait_one(self):
-        """Handle at least one finished request (results may queue more)."""
+        """Handle at least one finished request (results may queue more). A Ctrl+C a call swallowed (interrupts) ends
+        the run here, where it waits: wherever it was swallowed, the run waits next."""
+        interrupts.checked()
         if self.held and (not self.inflight or self.shuffle.random() < 0.5):
             request, finish, value, error = self.held.pop(self.shuffle.randrange(len(self.held)))
             if error is not None:

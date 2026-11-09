@@ -5,9 +5,9 @@ module at a time, four modules taking 61%). The slowest modules start first, so 
     python scripts/run_tests.py -j 4 test_align test_store
     QUICK=1 python scripts/run_tests.py         # skips the tests marked @slow, as with unittest
 
-Each module's output is shown only when it fails. Exit status 1 if any module fails. A run over every module that
-passes records a pass for the tree it tested, for the commit gate (scripts/gate.py), unless --no-record
-(or GATE_NO_RECORD, set by the gate's own runs).
+Each module's output is shown only when it fails (a flaky one's too: its failure under load). Exit status 1 if any
+module fails. A run over every module that passes records a pass for the tree it tested, for the commit gate
+(scripts/gate.py), unless --no-record (or GATE_NO_RECORD, set by the gate's own runs).
 
 How busy the machine is (its CPUs' busy share, and the load average) is said before the run, and measured during
 each module. A module that failed with the CPUs at least BUSY busy is run again alone after the rest, the machine
@@ -127,9 +127,12 @@ def main(argv=None):
                   + (f"  ({described(busy, None)})" if code else ""), flush=True)
             if code:
                 failed.append((name, output, busy))
+    under_load = {name: output for name, output, _ in failed}
     failed, flaky = retried(failed, lambda name: run(name, args.timeout))
     for name, output in failed:
         print(f"\n===== {name} =====\n{output}")
+    for name, _ in flaky:  # its failure under load, for a diagnosis (2026-11-09: test_interrupt's, unseen)
+        print(f"\n===== {name}, failed under load (passed alone) =====\n{under_load[name]}")
     print(f"\n{ran} tests in {len(names)} modules, {time.monotonic() - started:.0f}s: "
           + (f"{len(failed)} module(s) failed: {', '.join(n for n, _ in failed)}" if failed else "OK")
           + (f"; flaky under load, passed alone: {'; '.join(f'{n} ({why})' for n, why in flaky)}" if flaky else ""))

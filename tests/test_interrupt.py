@@ -47,7 +47,7 @@ def endpoint(interrupt_at):
             state['requests'] += 1
             n = state['requests']
             if n >= interrupt_at and state['group'] is not None and not state['sent']:
-                state['sent'] = True
+                state['sent'], state['sent_at'] = True, time.monotonic()
                 os.killpg(state['group'], signal.SIGINT)
         if n >= interrupt_at:
             state['release'].wait(60)
@@ -94,7 +94,7 @@ def run(root, url, store, cache, on_terminal=True, group=None):
         with group['lock']:  # the endpoint may have had its requests before it knew whom to interrupt
             group['group'] = process.pid
             if group['requests'] >= group['at'] and not group['sent']:
-                group['sent'] = True
+                group['sent'], group['sent_at'] = True, time.monotonic()
                 os.killpg(process.pid, signal.SIGINT)
     try:
         if on_terminal:
@@ -117,6 +117,8 @@ def run(root, url, store, cache, on_terminal=True, group=None):
             reader.join(10)
             os.close(master)
     took = time.monotonic() - started
+    if group is not None and group['sent']:
+        group['ended'] = time.monotonic()
     text = b''.join(written).decode(errors='replace')
     if not on_terminal:
         return code, took, text.splitlines()
@@ -159,7 +161,9 @@ class Interrupted(unittest.TestCase):
         with endpoint(interrupt_at=12) as (url, state):
             code, took, rows = run(self.root, url, store, cache, group=state)
             self.assertEqual(code, 130, rows)
-            self.assertLess(took, 20)  # the requests held unanswered weren't waited for
+            # the requests held unanswered weren't waited for: timed from Ctrl+C (from the start, a slow start under
+            # the full suite's load counted: 98% busy, 2026-11-09)
+            self.assertLess(state['ended'] - state['sent_at'], 20)
             self.assertEqual(rows[-1], MESSAGE)
             self.assertFalse([r for r in rows if 'Traceback' in r or 'KeyboardInterrupt' in r], rows)
             self.assertFalse([r for r in rows if '█' in r or '░' in r or ' queued' in r], rows)  # no bars left
@@ -247,6 +251,12 @@ class Swallowed(unittest.TestCase):
 
     def test_no_mark_no_interrupt(self):
         interrupts.checked()
+
+    def test_swallowed_anywhere_the_run_ends_where_it_waits_next(self):
+        from semantic_pdf_diff.dispatch import Dispatcher
+        interrupts.arrived()
+        with self.assertRaises(KeyboardInterrupt):
+            Dispatcher(Recorder()).wait_one()
 
 if __name__ == '__main__':
     unittest.main()
