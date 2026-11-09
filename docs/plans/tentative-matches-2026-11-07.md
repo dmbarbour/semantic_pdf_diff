@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09, its held-out check due. [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built). [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -198,6 +198,17 @@ The owner: "then figure out how to analyze or evidence a fuzzy, weighted, or pro
     - **Guards:** the weights' plausible links 90% right or more overall and 80% or more in every format, and no more than 3 points under the rubric's overall.
     - **Reported, not judged:** the calibration of `likely` by band; possible links; right links at any level.
     - **Checked once,** on the code as committed; failing, `link_levels` stays `rubric`, its held-out result quoted.
+  - **Held-out result, 2026-11-09** (seeds 4 and 5, 30 units; the rubric arm $0.72, the weights arm $0.005, its own reads): passes.
+
+    | Arm | Plausible: right of | Possible: right of |
+    |---|---|---|
+    | The rubric (today's defaults) | 48 of 50 | 25 of 61 |
+    | `link_levels: weights` | 62 of 65 | 18 of 51 |
+
+    - **Target:** right plausible links 48 → 62 (14 units changed, p = 0.0001).
+    - **Guards:** 95.4% of the weights' plausible links right (the rubric's 96.0%: 0.6 points under); the least, Markdown, 9 of 11 (81.8%); the PDFs 12 of 13; Word, decks and workbooks every one.
+    - **Calibration** (the share right by the share the score says): 0.9–1.0, 49 of 49; 0.7–0.9, 15 of 22 (a little overconfident, as on validation); 0.3–0.5, 16 of 45 (it says 0.33); 0.1–0.3, 37 of 149 (it says 0.20); under 0.1, 2 of 77.
+    - **Defaults** are the owner's call.
 
 ### 7. Indexing with weighted relationships, explored
 
