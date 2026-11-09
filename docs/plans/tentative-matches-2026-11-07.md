@@ -261,6 +261,23 @@ The owner, 2026-11-09: "So it seems weighted/fuzzy joining of properties hasn't 
 - **Properties possibly one, with levels, as subjects' links are:** names (words, spelling, meaning), units of one kind, magnitudes that fit, the judge's pairing of their claims, other names (the glossary, the model's).
 - **Used where properties are compared:** a gap another source fills (firm matches: `given_elsewhere`) and a gap "if one item" (links: `if_one_item`) not counted where the other gives a property plausibly one with it. Later, the merged index's values.
 - **A lever, measured** by the gap scorer's buckets on the controlled pairs ("both give it" should fall, "right" hold), held out before it's taken.
+- **Built 2026-11-09** (`links.property_alike`, `indexes.given_otherwise`; `property_links`, off): two properties possibly one by three families: names (the same words, one's within the other's, most shared, spelled alike), values (numbers of one unit kind within ten times; another kind rules them out), the judge's pairing of their claims. Two families plausible: the gap isn't counted. One: kept, its why saying "possibly given as …".
+  - **Measured** (the recorded reports rebuilt, no requests; `link_gaps` on in both arms):
+
+    | Pairs | False link gaps, off → on | False gaps another source fills, off → on | Right gaps |
+    |---|---|---|---|
+    | Proposals, seed 1 | 18 → 0 | 17 → 15 | 14 and 3, kept |
+    | Proposals, seeds 2 and 3 | 37 → 1 | 16 → 9 | 24 and 7, kept |
+    | Revisions, seed 1 | – | 16 → 11 | 120, kept |
+
+    - With it, link gaps were 10 right of 12 (from about 1 in 8).
+  - **Held-out rule, written 2026-11-09 before seeds 6 and 7 were generated:**
+    - **Units:** one proposals pair in one format, seeds 6 and 7 (the sealed template left out): 30 units.
+    - **Arms:** `property_links` off and on, rebuilt from one run at today's defaults, `link_gaps` on in both.
+    - **Target:** false gaps (the bucket "both give it", both kinds) fewer, summed over the units, at p < 0.1 by a sign flip over the units that change.
+    - **Guard:** right gaps (both kinds) lost, one at most, summed.
+    - **Reported, not judged:** link gaps' share right with it; unbound and another fact.
+    - **Checked once,** on the code as committed.
 
 ### 9. Test material before the levers that need it
 

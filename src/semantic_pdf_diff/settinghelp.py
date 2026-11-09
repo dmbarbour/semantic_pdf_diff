@@ -272,6 +272,8 @@ HELP = {
                           "weakest gaps (if one item), never looked for"),
     "linked_values": Help(_L, "comparisons: a plausible link's other subject's values beside the subject's in the "
                               "Subjects view, index.md and the export, not merged"),
+    "property_links": Help(_L, "comparisons: a property possibly given under another name (its names, its values' unit "
+                               "kind and magnitude, the judge's pairing), not counted as a gap where plausibly given"),
     "link_read": Help(_L, "proposals: each link read by the model against a decoy, the other source's next "
                           "likeliest; the decoy or neither picked leaves it possible"),
     "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "

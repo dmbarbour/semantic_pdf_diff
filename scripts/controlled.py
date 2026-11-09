@@ -46,7 +46,8 @@ standard arm's; docs/plans/single-document-analysis-2026-10-28.md, milestones 3 
 
 `heldout` measures a change already chosen on held-out proposals pairs (proposals.py; decision 0037: held-out sets
 scored only when a change is up for promotion): the seeds named, never development's, generated into heldout/
-(git-ignored: the generator makes them again), each pair compared in proposals mode in every format with a variant's
+(git-ignored: the generator makes them again; the sealed templates only with --sealed), each pair compared in
+proposals mode in every format with a variant's
 settings over the corpus's, recorded into heldout/fixture.sqlite (its own archive), and scored by role
 (comparison.score_proposals) into heldout/<variant>.json, with the links by level for each arm a variant's
 link_tests and link_read make: off, the tests, the tests and the reads (the arms rebuilt from the same reports).
@@ -135,6 +136,9 @@ def main(argv=None):
     held.add_argument("--variant", type=Path, required=True, metavar="FILE", help="as `run --variant` takes")
     held.add_argument("--max-cost", type=float, default=0.2)
     held.add_argument("--jobs", type=int, default=1)
+    held.add_argument("--sealed", action="store_true",
+                      help="the sealed templates too (proposals.HELDOUT_PAIRS): spent once, on a candidate that beats "
+                           "today's default on validation")
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
@@ -162,7 +166,7 @@ def main(argv=None):
     if args.command == "heldout":
         if 1 in args.seed:
             parser.error("seed 1 is development's: held-out seeds are others")
-        return heldout(tuple(args.seed), args.variant, args.max_cost, args.jobs)
+        return heldout(tuple(args.seed), args.variant, args.max_cost, args.jobs, args.sealed)
     if args.command == "run":
         if args.unaligned and args.rows:
             parser.error("--unaligned and --rows are separate runs")
@@ -440,7 +444,7 @@ def _one(job):
         return name, pipeline.attempt(pipeline.analyze_paths, a, folder, settings, options)
     return name, pipeline.attempt(pipeline.compare_paths, a, b, folder, settings, options)
 
-def heldout(seeds, variant_path, max_cost, jobs=1):
+def heldout(seeds, variant_path, max_cost, jobs=1, sealed=False):
     """Held-out proposals pairs (see the module's note): generated, compared, scored; exit status as run's."""
     from semantic_pdf_diff import ledger
     from semantic_pdf_diff.progress import setup_logging
@@ -449,9 +453,9 @@ def heldout(seeds, variant_path, max_cost, jobs=1):
     from semantic_pdf_diff_lab.bench.controlled.corpus import PROJECTS
     folders = {".pdf": HELDOUT / "docs", ".md": HELDOUT / "docs-md", ".docx": HELDOUT / "docs-docx",
                ".pptx": HELDOUT / "docs-pptx", ".xlsx": HELDOUT / "docs-xlsx"}
-    listed = proposals.PAIRS + proposals.HELDOUT_PAIRS
+    listed = proposals.PAIRS + (proposals.HELDOUT_PAIRS if sealed else ())
     projects = [PROJECTS[key](seed) for seed in seeds for key in sorted({key for key, *_ in listed})]
-    projects += [project for seed in seeds for _, project in proposals.proposed(seed, heldout=True)]
+    projects += [project for seed in seeds for _, project in proposals.proposed(seed, heldout=sealed)]
     for project in projects:
         controlled.write(project, folders[".pdf"])
         lines = representations.markdown(project)
@@ -461,7 +465,7 @@ def heldout(seeds, variant_path, max_cost, jobs=1):
         workbooks.write(folders[".xlsx"], project, workbooks.workbook(project))
     name, config, _ = variant(variant_path, folder=HELDOUT_RUNS)
     runs = HELDOUT_RUNS / name
-    pairs = [pair for seed in seeds for pair in proposals.pairs(seed, heldout=True)]
+    pairs = [pair for seed in seeds for pair in proposals.pairs(seed, heldout=sealed)]
     alone = [(f, f, runs / "docs" / f.name, f.name, "proposals") for suffix, folder in folders.items()
              for f in sorted(folder.glob(f"*{suffix}"))]
     compared = [(folders[s] / f"{p.earlier}{s}", folders[s] / f"{p.later}{s}", runs / f"{p.id}{s}", f"pair {p.id}{s}",

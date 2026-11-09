@@ -511,6 +511,8 @@ def gaps(data, subjects, found_kinds, where):
     out = given_elsewhere(data, subjects, found_kinds)
     if (data.get("settings") or {}).get("link_gaps"):  # what a plausible link's other subject gives (tentative
         out += if_one_item(subjects)  # matches, milestone 7)
+    if (data.get("settings") or {}).get("property_links"):  # a property possibly given under another name
+        out = given_otherwise(data, subjects, out)  # (tentative matches, milestone 8)
     for k in found_kinds:
         for source in data_sources(data):
             members = [i for i in k["subjects"] if given(subjects[i], source)]
@@ -572,6 +574,37 @@ def gaps(data, subjects, found_kinds, where):
     rank = {id(g): 0 if g.pop("siblings_give", True) else 1 for g in out}
     return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), LOOKED.get(g.get("look"), 2), rank[id(g)],
                                       g["source"], natural(g["subject"]), natural(g["property"]), natural(g["where"])))
+
+def given_otherwise(data, subjects, gaps):
+    """The gaps another source fills, and "if one item", less those whose property the lacking side plausibly gives
+    under another name (links.property_alike: two families of names, values and the judge's pairing); one possibly
+    given (a family) kept, its why saying so (the property_links setting's; tentative matches, milestone 8)."""
+    from .links import property_alike, property_evidence
+    keys, judged = property_evidence(data)
+    by_name = defaultdict(list)
+    for s in subjects:
+        by_name[s["name"]].append(s)
+    out = []
+    for g in gaps:
+        if g["kind"] not in ("other_source", "if_one_item"):
+            out.append(g)
+            continue
+        mine = [p for s in by_name.get(g["subject"], []) for p in s["properties"]
+                if any(v["source"] == g["source"] for v in p["values"])]
+        given = g["claims"]  # the other side's claims of the property
+        best = None
+        for q in mine:
+            level, families = property_alike([g["property"]], given, q.get("names", [q["name"]]),
+                                             [v["claim"] for v in q["values"] if v["source"] == g["source"]],
+                                             keys, judged)
+            if level and (best is None or (level == "plausible" and best[0] != "plausible")):
+                best = (level, families, q["name"])
+        if best and best[0] == "plausible":
+            continue  # given under another name, plausibly
+        if best:
+            g = {**g, "why": g["why"] + f"; possibly given as {best[2]} ({', '.join(best[1])})"}
+        out.append(g)
+    return out
 
 def if_one_item(subjects):
     """What a subject's plausible links' other subjects give that it doesn't, were they one item (the link_gaps

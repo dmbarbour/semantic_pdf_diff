@@ -230,7 +230,7 @@ class Binding(unittest.TestCase):
                                            if n not in ("reconcile", "align", "verify_visuals", "explain_differences",
                                                         "editorial", "record_changes", "judge_context", "judge_notes",
                                                         "match_subjects", "link_tests", "link_levels", "link_index",
-                                                        "link_read",
+                                                        "property_links", "link_read",
                                                         "link_meaning",
                                                         "link_rerank", "look_gaps",
                                                         "judge_glossary", "topic_names",

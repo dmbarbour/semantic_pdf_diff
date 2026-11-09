@@ -242,6 +242,33 @@ class Indexed(unittest.TestCase):
         self.assertIn("its values (not merged):</p><table><tbody><tr><td>design flow</td>", shown)
         self.assertEqual(len(index["subjects"]), 2)  # not merged
 
+class Properties(unittest.TestCase):
+    """Milestone 8: a property possibly given under another name (property_links; off)."""
+    def test_names_values_and_the_judge_two_families_plausible_another_unit_kind_rules_out(self):
+        a = [claim("A-1", "ca", "plant", "design flow (average day)", "25.9", "MGD")]
+        b = [claim("B-1", "cb", "plant", "average day flow", "16.3", "MGD"), claim("B-2", "cb", "plant", "flow", "3",
+                                                                                 "Hz")]
+        data = report(a + b, [], ("a", "b"), mode="proposals")
+        keys, judged = links.property_evidence(data)
+        self.assertEqual(links.property_alike(["design flow (average day)"], ["A-1"], ["average day flow"], ["B-1"],
+                                              keys, judged), ("plausible", ["name", "values"]))
+        self.assertEqual(links.property_alike(["design flow (average day)"], ["A-1"], ["flow"], ["B-2"], keys,
+                                              judged), (None, []))  # a frequency isn't a flow
+        data = report(a + b, [{"a": "A-1", "b": "B-2", "relation": "different"}], ("a", "b"), mode="proposals")
+        keys, judged = links.property_evidence(data)
+        self.assertEqual(links.property_alike(["capacity"], ["A-1"], ["rating"], ["B-1"], keys, judged),
+                         ("possible", ["values"]))
+
+    def test_a_gap_given_under_another_name_not_counted(self):
+        a = [claim("A-1", "ca", "P-101", "design flow (average day)", "25.9", "MGD"),
+             claim("A-2", "ca", "P-101", "head", "40", "ft")]
+        b = [claim("B-1", "cb", "P-101", "average day flow", "16.3", "MGD"), claim("B-2", "cb", "P-101", "head", "42",
+                                                                                   "ft")]
+        gaps = lambda on: [(g["source"], g["property"]) for g in indexes.built(report(  # noqa: E731
+            a + b, [], ("a", "b"), mode="proposals", settings={"property_links": on}))["gaps"]]
+        self.assertEqual(sorted(gaps(False)), [("a", "average day flow"), ("b", "design flow (average day)")])
+        self.assertEqual(gaps(True), [])
+
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):
         data = report(A + B, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b"), mode="proposals")

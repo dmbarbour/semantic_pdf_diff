@@ -436,3 +436,53 @@ def link_said(link):
     common, claims the judge paired)"."""
     return (f"possibly {SAID.get(link['relation'], 'the same as')} {link['other']} ({link['source']}; {link['level']}: "
             + ", ".join(SIGNALS.get(x, x) for x in link["signals"]) + ")")
+
+
+# --- properties possibly one (tentative matches, milestone 8; the owner, 2026-11-09: "weighted/fuzzy joining of
+# properties [...] as part of fitting things together"): two properties of a subject (or of a link's two subjects)
+# named otherwise, by three families of evidence: their names (the same words, one's within the other's, most words
+# shared, spelled alike), their values (numbers of one unit kind within FIT times of each other; another unit kind
+# rules them out), and the judge's pairing of their claims. Two families: plausible; one: possible.
+
+def property_evidence(data):
+    """(each claim's value key (align.value_key), the pairs of claims the judge paired by a relation that counts)."""
+    keys = {}
+    for e in data.get("evidence", []):
+        key = value_key(Evidence.model_validate(e))
+        if key is not None:
+            keys[e["id"]] = key
+    strong = STRONG.get(data.get("mode", ""), STRONG["proposals"])
+    judged = {frozenset((f["a"], f["b"])) for f in data.get("findings", []) if f.get("relation") in strong}
+    return keys, judged
+
+def _name_alike(a, b):
+    """Two properties' names alike: a name's words equal, within the other's, most of them shared, or spelled alike."""
+    for x in a:
+        wx = set(words(x)) - STOP - GENERIC
+        for y in b:
+            wy = set(words(y)) - STOP - GENERIC
+            if wx and wy and (wx <= wy or wy <= wx or len(wx & wy) >= NAME_SHARE * len(wx | wy)):
+                return True
+            tx, ty = _trigrams(x), _trigrams(y)
+            if tx and ty and len(tx & ty) >= SPELLED * len(tx | ty):
+                return True
+    return False
+
+def property_alike(p_names, p_claims, q_names, q_claims, keys, judged):
+    """(level or None, its families) of two properties possibly one: names, values, the judge (see above)."""
+    families = []
+    if _name_alike(p_names, q_names):
+        families.append("name")
+    a = [keys[c] for c in p_claims if c in keys and len(keys[c]) >= 2 and isinstance(keys[c][1], (int, float))]
+    b = [keys[c] for c in q_claims if c in keys and len(keys[c]) >= 2 and isinstance(keys[c][1], (int, float))]
+    if a and b:
+        if not {x[0] for x in a} & {y[0] for y in b}:
+            return None, []  # numbers of other kinds: not one property
+        if any(x[0] == y[0] and (x[1] == y[1] or (min(abs(x[1]), abs(y[1])) and max(abs(x[1]), abs(y[1]))
+                                                  / min(abs(x[1]), abs(y[1])) <= FIT)) for x in a for y in b):
+            families.append("values")
+    if any(frozenset((c, d)) in judged for c in p_claims for d in q_claims):
+        families.append("judged")
+    if not families:
+        return None, []
+    return (LEVELS[0] if len(families) >= 2 else LEVELS[1]), families

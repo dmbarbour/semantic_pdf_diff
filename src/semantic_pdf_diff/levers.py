@@ -1472,6 +1472,14 @@ class LinkIndex(Lever):
     link_gaps: Annotated[bool, _selecting(roles=COMPARE)] = False
     linked_values: Annotated[bool, _selecting(roles=COMPARE)] = True
 
+class PropertyLinks(Lever):
+    lever_name, stage, off = "property_links", "comparison", {"property_links": False}
+    # comparisons: a property possibly given under another name (links.property_alike: its names, its values' unit
+    # kind and magnitude, the judge's pairing of its claims; two families plausible), so a gap another source fills, or
+    # "if one item", isn't counted where the lacking side plausibly gives it (tentative matches, milestone 8; the owner,
+    # 2026-11-09: "weighted/fuzzy joining of properties [...] as part of fitting things together")
+    property_links: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
     # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
@@ -1610,7 +1618,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, LinkRead, LinkMeaning,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks, LinkRead,
+                 LinkMeaning,
                  LinkRerank,
                  LookGaps,
                  JudgeGlossary,

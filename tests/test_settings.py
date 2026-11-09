@@ -107,6 +107,7 @@ NOT_EXERCISED = {
                    "tests/test_links.py",
     'link_gaps': "needs plausible links between subjects alone in each document; run in tests/test_links.py",
     'linked_values': "needs plausible links between subjects alone in each document; run in tests/test_links.py",
+    'property_links': "needs gaps of properties named otherwise across the documents; run in tests/test_links.py",
     'link_read': "needs links between subjects alone in each document; run with the model's reads in "
                  "tests/test_links.py",
     'link_rerank': "needs a reranker (rerank_model) and subjects alone in each document; run with ranks in "
