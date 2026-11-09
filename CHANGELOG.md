@@ -2,6 +2,13 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.53.0 (2026-11-09)
+
+- **`linked_values` on by default** (the owner: "Let's add `linked_values` by default"): a plausible link's other subject's values beside the subject's, in the Subjects view, index.md and the export, not merged. Round 0's settings keep it off.
+- `link_gaps` (off) compares a link's properties as the link counts them in common: a property counted as its evidence is no longer its gap.
+- `test_interrupt` no longer races its run's start under load.
+- A review of how "the same thing" is decided across sections and documents, with Fable's second opinion (`docs/research/same-thing-review-2026-11-09.md`).
+
 ## 0.52.0 (2026-11-09)
 
 - **Links in the index, explored** (tentative matches, milestone 7), two settings, both off, for the owner to take or leave: `link_gaps`, what a plausible link's other subject gives that a subject doesn't, as the weakest gaps ("if one item"), never looked for (on the controlled proposals pairs, 17 planted gaps the matches miss, about 1 right in 8); `linked_values`, a plausible link's other subject's values beside the subject's in the Subjects view, index.md and the export, not merged.
