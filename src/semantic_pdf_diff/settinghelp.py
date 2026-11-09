@@ -274,6 +274,8 @@ HELP = {
                               "Subjects view, index.md and the export, not merged"),
     "property_links": Help(_L, "comparisons: a property possibly given under another name (its names, its values' unit "
                                "kind and magnitude, the judge's pairing), not counted as a gap where plausibly given"),
+    "keyed_links": Help(_L, "proposals: two subjects keyed alike (a tag, the same words, other names) one unless "
+                            "either has more properties in common with another subject; else a plausible link"),
     "link_read": Help(_L, "proposals: each link read by the model against a decoy, the other source's next "
                           "likeliest; the decoy or neither picked leaves it possible"),
     "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "

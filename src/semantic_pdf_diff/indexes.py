@@ -167,12 +167,14 @@ def renamed(subjects, alias):
         out.append((key, name, cs))
     return out
 
-def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=()):
+def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=(), firm=None):
     """The sources' subjects matched across them: [{source: (key, name, claims)}], each subject once. Two sources'
     subjects are one where the findings pair their claims (by_findings: revisions), the most pairs first and one to
     one; else where they're keyed alike (a tag, or the same words), or named as other names of one thing (alias);
     then as the model matched them (matches: [((source, name), (source, name), relation)], crossmatch.py), each alone
-    till then; the rest alone."""
+    till then; the rest alone. firm: whether two sources' subjects keyed alike are one ((source, (key, name, claims))
+    each; the keyed_links lever's, firm_keyed): those it says aren't stay alone, each saying the other's (source, key)
+    as "keyed"."""
     of = {c["id"]: (source, key) for source in sources for key, _, claims in found[source] for c in claims}
     by = {(source, key): (key, name, claims) for source in sources for key, name, claims in found[source]}
     links = Counter()
@@ -201,6 +203,12 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
                 apart.append({source: by[(source, k)], "matched_by": ""})
             else:
                 group[source] = by[(source, k)]
+        two = [source for source in sources if source in group]
+        if firm is not None and len(two) == 2 and not firm(*((source, group[source]) for source in two)):
+            a, b = two  # keyed alike alone: apart, a link's (links: "keyed"), the model's to match
+            merged += [{a: group[a], "matched_by": "", "keyed": (b, group[b][0])},
+                       {b: group[b], "matched_by": "", "keyed": (a, group[a][0])}, *apart]
+            continue
         merged += [group, *apart]
     named = {(source, name): k for source in sources for k, name, _ in found[source]}
     for a, b, relation in matches:
@@ -210,9 +218,35 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
         ga, gb = (next((g for g in merged if g.get(x[0], (None,))[0] == k), None) for x, k in ((a, ka), (b, kb)))
         if ga is None or gb is None or ga["matched_by"] or gb["matched_by"]:
             continue  # each alone till then
-        ga.update({k: v for k, v in gb.items() if k != "matched_by"}, matched_by=f"model: {MATCHED[relation]}")
+        if ga.get("keyed") == (b[0], kb):
+            continue  # keyed alike and kept apart (firm): the model, shown the key, says nothing more
+        ga.update({k: v for k, v in gb.items() if k not in ("matched_by", "keyed")},
+                  matched_by=f"model: {MATCHED[relation]}")
+        ga.pop("keyed", None)
         merged.remove(gb)
     return merged
+
+def firm_keyed(found, data, sources):
+    """Whether two proposals' subjects keyed alike are one (the keyed_links lever; tentative matches, milestone 14; the
+    gotchas review, item 2: "P-101 in two designs is a numbering habit, not identity"): one unless their properties
+    say otherwise, either having more properties in common with another of the other source's subjects than with
+    the other, two or more (one alike is too little, as for a link). A tag, the same words or other names are the
+    names' evidence; the judge and the model, shown the two because they're keyed alike or by names that hold the
+    key, add nothing of their own (Birch Hollow's knob, 2026-11-09: each of its wrong groups held by the judge's
+    "different", then by the model picking the tag it was shown over a decoy); a second family required of every
+    group split right ones too (seed 1, offline: Pine Ridge's 57 right groups 19). Those it isn't stay apart, a
+    plausible link (the owner, 2026-11-09, asked whether plausible or possible: "A plausible link is good."), each
+    alone for the model's match to another."""
+    properties = {source: {key: {plain(c["attribute"]) for c in cs} for key, _, cs in found[source]}
+                  for source in sources}
+
+    def firm(a, b):
+        (sa, (ka, _, _)), (sb, (kb, _, _)) = a, b
+        common = len(properties[sa][ka] & properties[sb][kb])
+        sides = ((properties[sa][ka], properties[sb], kb), (properties[sb][kb], properties[sa], ka))
+        return not any(len(mine & q) > max(common, 1) for mine, others, own in sides
+                       for k, q in others.items() if k != own)
+    return firm
 
 LISTING = re.compile(r"\s*(?:,\s*(?:and|or)|,|;|&|and|or)\s*", re.IGNORECASE)  # between a list's items
 
@@ -289,7 +323,11 @@ def built(data):
     matches = [((c["source"], c["subject"]), (c["other_source"], c["other"]), c["relation"])
                for c in (data.get("commentary") or {}).get("entries", [])
                if c["kind"] == "match" and c.get("relation") in MATCHED and not c.get("taken")]
-    for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals", matches):
+    firm = (firm_keyed(found, data, sources) if data.get("mode") == "proposals" and len(sources) == 2
+            and (data.get("settings") or {}).get("keyed_links") else None)
+    halves = {}  # (source, key): (its subject, the other half's (source, key)): kept apart, keyed alike (firm)
+    for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals", matches,
+                         firm):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
         properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)
@@ -313,10 +351,15 @@ def built(data):
                                         **({"listed": listing(c["entity"])} if listing(c["entity"]) else {})}
                                        for c in cs]}
                            for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
+        if group.get("keyed"):
+            halves[mine[0][0], mine[0][1][0]] = (subjects[-1], group["keyed"])
     listed(subjects, by_tag, {e["id"]: plain(e["attribute"]) for e in data.get("evidence", [])})
     subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
+    at = {id(s): i for i, s in enumerate(subjects)}
+    keyed = {tuple(sorted((at[id(s)], at[id(halves[other][0])]))) for s, other in halves.values()
+             if other in halves and id(s) in at and id(halves[other][0]) in at}
     from .links import linked  # subjects possibly one, kept apart (tentative matches, milestone 2)
-    for i, found in linked(data, {"sources": sources, "subjects": subjects}).items():
+    for i, found in linked(data, {"sources": sources, "subjects": subjects, "keyed": keyed}).items():
         subjects[i]["links"] = found
     if (data.get("settings") or {}).get("linked_values"):  # a plausible link's other subject's values beside it,
         by = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}  # kept apart

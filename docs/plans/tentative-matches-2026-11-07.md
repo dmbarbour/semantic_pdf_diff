@@ -314,6 +314,30 @@ The owner, 2026-11-09: "Not viable for me to mark things. I'm dealing with proje
 
 From [the gotchas review](../research/gotchas-review-2026-11-09.md) (its item 2, with 1): a shared tag, name or other name a strong name signal, a group firm only with a second family (the judge's pairings, the model's match, distinct properties), as links already need. A group with a shared tag or name alone becomes a plausible link (the owner, 2026-11-09, asked whether plausible or possible: "A plausible link is good."): kept apart, its values beside the subject's, its gaps "if one item". Its knob first: a proposals design keeping the other's tags with roles permuted. The lab's scorer tightened with it (its item 13), so firm errors show.
 
+- **Knob built 2026-11-09** (Birch Hollow against Harrow Creek, `wtp-s{seed}-birch-proposals`, a fourth proposals pair; `proposals.birch_hollow`): Harrow Creek's tags P-101A to C on Birch Hollow's backwash, sludge and washwater recycle pumps, its raw water pumps P-201A to C. Recorded $0.18.
+  - **Baseline** (seed 1): 15 wrong firm groups on it, 3 in every format, each by its tag; Cedar Falls 4 (by other names: the gotchas review's item 1); the others none.
+  - **The scorer** sees them: no group's side mixes items (a minority of 2 bound claims or more) on any pair, so its majority hides nothing here; not tightened.
+- **Built 2026-11-09** (`indexes.firm_keyed`, `keyed_links`, off), changed from "two families" (Claude's change, measured):
+  - **The second families at hand are the key's own:** alignment pairs two designs' claims by the key, so the judge compares them because they're keyed alike (on the knob's PDF, every keyed group firm by the judge's verdicts, 14 of 14); the model's read, shown a subject named by its tag, picked the tag's partner over its decoy each time. A second family of properties alone, setting the two apart, split right groups too (offline, Pine Ridge's 57 right groups 19).
+  - **So firm unless contested:** two subjects keyed alike are one unless either has more properties in common, two or more, with another of the other source's subjects. Contested, they stay apart: a plausible link (`keyed`: "a tag or name both give"), each alone for the model's match to another, never to each other.
+  - **Measured** (seed 1, every format, a recorded arm against the base; $0.013 for both arms):
+
+    | Pair | Wrong firm groups, off → on | Right firm groups lost | Plausible links right / wrong, off → on |
+    |---|---|---|---|
+    | Birch Hollow (the knob) | 15 → 0 | 1 of 55 | 5 / 0 → 14 / 15 |
+    | Pine Ridge | 0 → 0 | 1 of 57 | 8 / 0 → 9 / 1 |
+    | Cedar Falls | 4 → 1 | 1 of 34 | 10 / 0 → 16 / 1 |
+    | Cyclone | 0 → 0 | 0 of 45 | 6 / 1 → 6 / 1 |
+
+    - The knob's 15 wrong plausible links are its contested tags, plausible as the owner chose; their right counterparts (P-101A and P-201A) are plausible links too.
+  - **Held-out rule, written 2026-11-09 before seeds 8 and 9 were generated:**
+    - **Units:** one proposals pair in one format, seeds 8 and 9, the four pairs (the knob among them; the sealed template left out): 40 units.
+    - **Arms:** `keyed_links` off and on, each a recorded run (on asks the model of the subjects it keeps apart), every other setting today's defaults.
+    - **Target:** wrong firm groups fewer, summed over the units, at p < 0.1 by a sign flip over the units that change.
+    - **Guard:** right firm groups lost, summed, at most 3% of the off arm's.
+    - **Reported, not judged:** plausible links right and wrong, possible links, the keys' items a right group holds.
+    - **Checked once,** on the code as committed.
+
 ### 15. Values keyed by unit kind
 
 The gotchas review's item 3: a richer unit table keying values by kind (gpm and gal/min, psi and kPa), for alignment and `_fits`. A revisions lever changing no request; its knob first, a revision converting a schedule's units.

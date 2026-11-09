@@ -1483,6 +1483,15 @@ class PropertyLinks(Lever):
     # `property_gaps` on together.")
     property_links: Annotated[bool, _selecting(roles=COMPARE)] = True
 
+class KeyedLinks(Lever):
+    lever_name, stage, off = "keyed_links", "comparison", {"keyed_links": False}
+    # comparisons, between proposals: two subjects keyed alike (a tag, the same words, other names) one unless their
+    # properties say otherwise, either having more in common with another subject (indexes.firm_keyed; the judge and
+    # the model, shown them by the key, saying nothing more), else a plausible link (milestone 14;
+    # the gotchas review, item 2: "P-101 in two designs is a numbering habit, not identity"; the owner, 2026-11-09:
+    # "A plausible link is good.")
+    keyed_links: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
     # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
@@ -1621,7 +1630,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks, LinkRead,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks,
+                 KeyedLinks, LinkRead,
                  LinkMeaning,
                  LinkRerank,
                  LookGaps,

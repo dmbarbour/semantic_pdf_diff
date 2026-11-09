@@ -54,6 +54,11 @@ plausible matches "should feed links and topics for now").
   possible link it picks over its decoy is plausible; "neither" lowers nothing (on seeds 2 and 3, read as a test it
   lowered 10 plausible links, every one right: siblings the reads can't tell apart, which the weights already weigh).
   Links are ordered by score for the cap. A link says its score and the share of matches it says (`likely`).
+- **Keyed alike, kept apart, where the keyed_links setting says** (milestone 14; indexes.firm_keyed): between
+  proposals, two subjects keyed alike (a tag, the same words, other names) whose properties say otherwise (either
+  has more in common with another subject) aren't one; they're a link (`keyed`, of the names' family), plausible
+  however little else is said (the owner, 2026-11-09: "A plausible link is good."), its tests and the model's read
+  lowering it as any link's.
 - **Kept in the index** (indexes.built: each subject's "links"), shown as links and in topics, never in the merged
   index's values nor its gaps, never a finding.
 """
@@ -72,7 +77,7 @@ MEANING = 0.8  # two names' embeddings' cosine, at least, for names alike in mea
 # signals of one family, counted once toward a level: the names' (words, spelling, meaning), and a model's reading of
 # the two (the reranker's, the model's match, its pick over a decoy: the turbine pair's IEA "15-MW turbine" and NREL's
 # "Region 2½" were plausible by the reranker and the read alone)
-FAMILY = {"meaning": "name", "reranked": "model", "read": "model"}
+FAMILY = {"meaning": "name", "reranked": "model", "read": "model", "keyed": "name"}
 FIT = 10  # times apart, at most, two designs' values of one property may be for their items to correspond
 RERANKED = 0.8  # the reranker's score, at least, of a subject's likest for it to count (the turbine pair: its right
 # pair 0.98, but wrong ones as high: it scores relevance, not identity; those under 0.8 mostly wrong)
@@ -278,7 +283,8 @@ def candidates(data, index):
     settings: [{"i", "j" (the subjects' indices, the lower first), "evidence" (as a link shows it), "alike" (names
     alike: a rare word, most words, or the spelling), "distinct" (two properties or more in common, more than either
     has with any other candidate), "fits" (proposals: the values of the properties in common fit; None where none are
-    weighed), "read" (the model's read against a decoy, or None)}], A to Z by the pair. A level is worked out from
+    weighed), "read" (the model's read against a decoy, or None), "keyed" (keyed alike, kept apart: index["keyed"])}],
+    A to Z by the pair. A level is worked out from
     these (linked: the rubric; tentative matches, milestone 6: numbers)."""
     subjects, mode = index.get("subjects", []), data.get("mode", "")
     sources = index.get("sources", [])
@@ -294,6 +300,8 @@ def candidates(data, index):
         if i not in values:
             values[i] = _values(subjects[i], evidence)
         return values[i]
+    keyed = {p for p in index.get("keyed", ()) if all(len(subjects[x]["claims"]) == 1 for x in p)}  # keyed alike,
+    # kept apart (indexes.firm_keyed: the keyed_links lever's)
     reads = {}  # the model's reads of links against decoys (crossmatch.read_links): {(i, j): relation}
     # the model's answers (crossmatch.py), taken or not
     named = {(next(iter(s["claims"])), s["name"]): i for i, s in enumerate(subjects) if len(s["claims"]) == 1}
@@ -312,7 +320,7 @@ def candidates(data, index):
         for w in _name_words(t) | {("property", p) for p in _properties(t)}:
             by[w].add(j)
     held = Counter(w for s in subjects for w in _name_words(s))  # how many subjects' names hold each word
-    pairs = set(paired)
+    pairs = set(paired) | keyed
     pairs |= _spelled_pairs(alone, sources)
     likest = _meaning(data, subjects, alone, sources)  # names alike in meaning: {(i, j): cosine}, mutual likest
     pairs |= set(likest)
@@ -364,8 +372,11 @@ def candidates(data, index):
                 if x not in by_property:
                     by_property[x] = _by_property(subjects[x], evidence)
             fits = _fits(by_property[i], by_property[j], ev["properties"])
+        if (i, j) in keyed:
+            ev["keyed"] = True
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
-                    "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j))})
+                    "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
+                    "keyed": (i, j) in keyed})
     return out
 
 def linked(data, index):
@@ -383,10 +394,11 @@ def linked(data, index):
         i, j, ev = c["i"], c["j"], dict(c["evidence"])
         if table is not None:
             s, likely = scored(table, c, mode)
-            if s < table["thresholds"]["possible"]:
+            if s < table["thresholds"]["possible"] and not c["keyed"]:
                 continue
-            level = LEVELS[0] if s >= table["thresholds"]["plausible"] or c["read"] == "picked" else LEVELS[1]
-            signals = [k for k, counts in (("name", c["alike"]), ("meaning", "meaning" in ev),
+            level = (LEVELS[0] if s >= table["thresholds"]["plausible"] or c["read"] == "picked" or c["keyed"]
+                     else LEVELS[1])
+            signals = [k for k, counts in (("name", c["alike"]), ("keyed", c["keyed"]), ("meaning", "meaning" in ev),
                                            ("properties", c["distinct"]), ("judged", any(
                                                ev["judged"].get(r) for r in STRONG[mode])),
                                            ("model", bool(ev["model"])), ("read", c["read"] == "picked")) if counts]
@@ -398,7 +410,7 @@ def linked(data, index):
         own = len(ev["properties"]) >= 2 and (not tests or c["distinct"])
         if tests and len(ev["properties"]) >= 2 and not own:
             ev["shared_by_siblings"] = True
-        signals = [k for k, counts in (("name", c["alike"]), ("meaning", "meaning" in ev),
+        signals = [k for k, counts in (("name", c["alike"]), ("keyed", c["keyed"]), ("meaning", "meaning" in ev),
                                        ("reranked", "reranked" in ev),
                                        ("properties", own),
                                        ("values", mode == "revisions" and ev["values"] > 0),
@@ -407,7 +419,8 @@ def linked(data, index):
                                        ("read", c["read"] == "picked")) if counts]
         if not signals:
             continue
-        level = LEVELS[0] if len({FAMILY.get(x, x) for x in signals}) >= 2 else LEVELS[1]
+        # two families plausible; keyed alike alone too (indexes.firm_keyed; the owner: "A plausible link is good.")
+        level = LEVELS[0] if len({FAMILY.get(x, x) for x in signals}) >= 2 or c["keyed"] else LEVELS[1]
         if tests and mode == "proposals" and ev["properties"] and c["fits"] is False:
             ev["misfit"], level = True, LEVELS[1]  # values that don't fit: possible at most
         if c["read"] in ("decoy", "neither"):
@@ -425,7 +438,8 @@ def linked(data, index):
     return dict(out)
 
 SAID = {"same": "the same as", "corresponding": "the counterpart of", "state": "a state of"}  # how a link reads
-SIGNALS = {"name": "names", "meaning": "names alike in meaning", "reranked": "the reranker's likest",
+SIGNALS = {"name": "names", "keyed": "a tag or name both give",
+           "meaning": "names alike in meaning", "reranked": "the reranker's likest",
            "read": "the model's pick over a decoy",
            "properties": "properties in common",
            "values": "values in common",

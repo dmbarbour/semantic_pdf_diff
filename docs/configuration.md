@@ -209,6 +209,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `link_gaps` | `true` | selecting | link_index | compare | - |
 | `linked_values` | `true` | selecting | link_index | compare | - |
 | `property_links` | `true` | selecting | property_links | compare | - |
+| `keyed_links` | `false` | selecting | keyed_links | compare | - |
 | `link_read` | `true` | selecting | link_read | compare | - |
 | `link_meaning` | `false` | selecting | link_meaning | compare | - |
 | `link_rerank` | `false` | selecting | link_rerank | compare | - |

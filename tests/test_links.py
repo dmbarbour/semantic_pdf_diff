@@ -269,6 +269,67 @@ class Properties(unittest.TestCase):
         self.assertEqual(sorted(gaps(False)), [("a", "average day flow"), ("b", "design flow (average day)")])
         self.assertEqual(gaps(True), [])
 
+class Keyed(unittest.TestCase):
+    """Milestone 14: between proposals, a tag both designs give isn't one item where their properties say otherwise
+    (keyed_links; off). The gotchas review: "P-101 in two designs is a numbering habit, not identity"."""
+    A = [claim("A-1", "ca", "Raw water pump P-101A", "capacity", "6261", "gpm"),
+         claim("A-2", "ca", "Raw water pump P-101A", "total dynamic head", "112", "ft"),
+         claim("A-3", "ca", "Raw water pump P-101A", "motor power", "287", "hp"),
+         claim("A-4", "ca", "Filter F-1", "filtration rate", "3.2", "gpm/ft2"),
+         claim("A-5", "ca", "Filter F-1", "area", "836", "ft2")]
+    B = [claim("B-1", "cb", "Backwash pump P-101A", "capacity", "3395", "gpm"),
+         claim("B-2", "cb", "Backwash pump P-101A", "total dynamic head", "67.9", "ft"),
+         claim("B-3", "cb", "Raw water pump P-201A", "capacity", "7739", "gpm"),
+         claim("B-4", "cb", "Raw water pump P-201A", "total dynamic head", "137", "ft"),
+         claim("B-5", "cb", "Raw water pump P-201A", "motor power", "210", "hp"),
+         claim("B-6", "cb", "Filter F-1", "filtration rate", "4.1", "gpm/ft2"),
+         claim("B-7", "cb", "Filter F-1", "area", "910", "ft2")]
+
+    def built(self, on, findings=(), mode="proposals", **more):
+        return indexes.built(report(self.A + self.B, list(findings), ("a", "b"), mode=mode,
+                                    settings={"keyed_links": on, "link_tests": True}, **more))
+
+    @staticmethod
+    def firm(index):
+        return sorted(s["name"] for s in index["subjects"] if len(s["claims"]) == 2)
+
+    def test_a_tag_both_give_another_fitting_better_a_plausible_link_not_one(self):
+        self.assertEqual(self.firm(self.built(False)), ["Filter F-1", "Raw water pump P-101A"])
+        on = self.built(True)
+        self.assertEqual(self.firm(on), ["Filter F-1"])  # P-101A shares 3 properties with P-201A, 2 with its tag's
+        pump = next(s for s in on["subjects"] if s["name"] == "Raw water pump P-101A")
+        self.assertEqual([(x["other"], x["level"], x["signals"]) for x in pump["links"]],
+                         [("Raw water pump P-201A", "plausible", ["name", "properties"]),
+                          ("Backwash pump P-101A", "plausible", ["name", "keyed"])])  # the owner: "A plausible link"
+        self.assertIn("a tag or name both give", links.link_said(pump["links"][1]))
+        self.assertEqual(self.firm(self.built(True, mode="revisions")), ["Filter F-1", "Raw water pump P-101A"])
+
+    def test_the_judge_and_the_model_shown_them_by_their_key_say_nothing_more(self):
+        judged = self.built(True, [{"a": "A-1", "b": "B-1", "relation": "different"}])
+        self.assertEqual(self.firm(judged), ["Filter F-1"])  # alignment paired them by the tag
+        match = {"kind": "match", "source": "a", "subject": "Raw water pump P-101A", "other_source": "b",
+                 "other": "Backwash pump P-101A", "relation": "corresponding"}
+        self.assertEqual(self.firm(self.built(True, commentary={"entries": [match]})), ["Filter F-1"])
+
+    def test_one_where_nothing_fits_better_by_two_properties(self):
+        a = [claim("A-1", "ca", "Chlorine feed", "dose", "2.1", "mg/L"),
+             claim("A-2", "ca", "Chlorine feed", "maximum dose", "4.4", "mg/L")]
+        b = [claim("B-1", "cb", "Chlorine feed", "dosage", "4.0", "mg/L"),
+             claim("B-2", "cb", "Alum feed", "dose", "38", "mg/L")]
+        built = lambda more: indexes.built(report(a + b + more, [], ("a", "b"), mode="proposals",  # noqa: E731
+                                                  settings={"keyed_links": True}))
+        self.assertEqual(self.firm(built([])), ["Chlorine feed"])  # the alum feed's one property alike: too little
+        alum = [claim("B-3", "cb", "Alum feed", "maximum dose", "55", "mg/L")]
+        self.assertEqual(self.firm(built(alum)), [])  # two: it fits better
+
+    def test_kept_apart_the_models_match_joins_the_counterpart(self):
+        match = {"kind": "match", "source": "a", "subject": "Raw water pump P-101A", "other_source": "b",
+                 "other": "Raw water pump P-201A", "relation": "corresponding"}
+        index = self.built(True, commentary={"entries": [match]})
+        joined = next(s for s in index["subjects"] if len(s["claims"]) == 2 and s["name"] != "Filter F-1")
+        self.assertEqual((joined["matched_by"], sorted(joined["names"])),
+                         ("model: the corresponding element", ["Raw water pump P-101A", "Raw water pump P-201A"]))
+
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):
         data = report(A + B, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b"), mode="proposals")
