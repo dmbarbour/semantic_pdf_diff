@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.55.0 (2026-11-09)
+
+- **`link_gaps` and `property_links` on by default** (the owner: "Please turn `link_gaps` and `property_gaps` on together."): a plausible link's other subject's properties a subject doesn't give are reported as the weakest gaps ("if one item"), and a gap isn't counted where the lacking side plausibly gives the property under another name. No requests added (link gaps aren't looked for). Round 0's settings keep both off.
+- Tentative matches, milestone 14: between proposals, a group sharing only a tag or a name will be a plausible link (the owner: "A plausible link is good.").
+
 ## 0.54.0 (2026-11-09)
 
 - **Ctrl+C ends a run wherever it lands.** PyMuPDF's table detection caught the interrupt and the run went on; under load it could also land in garbage collection, printing a traceback above the resume note. The interrupt is now marked as it comes and checked at each page and each wait for answers, and one Python can't raise isn't printed. (0.53.0's "no longer races" fixed the test, not the cause.)
