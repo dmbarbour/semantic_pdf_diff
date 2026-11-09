@@ -119,6 +119,8 @@
   "whole_lines": false,
   "summaries": [],
   "look_gaps": false,
+  "link_tests": false,
+  "link_read": false,
   "leave_text": "none",
   "images_first": false,
   "text_spans": "section",

@@ -1448,18 +1448,21 @@ class LinkTests(Lever):
     # comparisons: a link's evidence tested by code (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone
     # 4; the owner, 2026-11-07: "let's just adapt the normal levers approaches"): properties in common counted only
     # where they set the pair apart from its siblings; between proposals, values of the properties in common that
-    # don't fit (another kind of unit, or more than ten times apart) leave a link possible at most. No requests
-    link_tests: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # don't fit (another kind of unit, or more than ten times apart) leave a link possible at most. No requests. On by
+    # default since 2026-11-09, after passing its held-out rule (the owner: "Yes, turn both on by default.")
+    link_tests: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
     # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
     # (crossmatch.read_links; tentative matches, milestone 4; Fable's review: a question with a wrong answer, values
-    # hidden between proposals): picked, evidence; the decoy or neither, possible at most
-    link_read: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # hidden between proposals): picked, evidence; the decoy or neither, possible at most. On by default since
+    # 2026-11-09, after passing its held-out rule (the owner: "Yes, turn both on by default."). Proposals only, as held
+    # out: between revisions a split's other half was its decoy, both right, and the model said neither
+    link_read: Annotated[bool, _selecting(roles=COMPARE)] = True
 
     def reads_links(self, mode):
-        return self.link_read and mode != "analysis"
+        return self.link_read and mode == "proposals"
 
 class LinkMeaning(Lever):
     lever_name, stage, off = "link_meaning", "comparison", {"link_meaning": False}
@@ -1845,7 +1848,7 @@ class Platform(Composable):
     @chosen
     def reads_links(self, mode):
         """Whether a comparison's links are read by the model against decoys (crossmatch.read_links): the platform's,
-        never; the link_read lever's, in comparisons when on."""
+        never; the link_read lever's, in proposals when on."""
         return False
 
     @chosen

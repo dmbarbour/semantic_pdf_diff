@@ -144,7 +144,7 @@ The owner: "let's just adapt the normal levers approaches perhaps". Each test a 
     - **`link_tests`:** wrong plausible links 55 → 0 (18 units changed, p < 0.0001); precision in each format 46–82% → 100%.
     - **`link_read`:** right plausible links 32 → 57 (20 units changed, p < 0.0001); precision 95% overall, 87.5% at least in each format (Markdown and PDF 7 of 8 and 14 of 16; the rest all right).
     - **Reported, not judged:** right links at any level 122 → 94 with the tests (siblings' pairs that nothing sets apart lose their link; the reads keep 94), wrong ones 155 → 59.
-    - **Defaults** are the owner's call (the owner: "I'm inclined to add them").
+    - **Defaults:** both on since 2026-11-09 (the owner: "Yes, turn both on by default."; 0.50.0); round 0's settings keep them off. `link_read` asks between proposals only, as it was held out: between revisions the split revision's two right links were read each with the other as its decoy, the model said neither, and both fell to possible. A decoy that's never a subject's other link is an idea in the lever index, to be measured and held out again.
   - **Not built:** *a look as a test.* Links aren't looked for (the owner: links feed "links and topics for now"), so no look tests one. *Part-of neighbours* (the tower of the matched turbine). *The same item within a source:* links are across sources so far.
 
 ### 5. A controlled proposals pair
