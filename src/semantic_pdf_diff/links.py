@@ -119,8 +119,12 @@ def _fits(a, b, common):
 def _name_words(subject):
     return {w for n in subject["names"] for w in words(n)} - STOP - GENERIC
 
-def _properties(subject):
+def property_keys(subject):
+    """A subject's properties as links count them in common: each name's words, sorted (plurals folded, stop words
+    out)."""
     return {" ".join(sorted(words(n))) for p in subject["properties"] for n in p.get("names", [p["name"]])} - {""}
+
+_properties = property_keys
 
 def _values(subject, evidence):
     out = set()

@@ -579,7 +579,7 @@ def if_one_item(subjects):
     alone with OTHER_CLAIMS of its own or more, each property its linked subject gives under no name it gives; where
     expected, its first place; why, the link and the other's value; its claims, the other's. The weakest kind, never
     looked for (the owner, 2026-11-07, of plausible matches: "links and topics for now")."""
-    from .links import SAID
+    from .links import SAID, property_keys
     by = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}
     out = []
     for s in subjects:
@@ -589,13 +589,14 @@ def if_one_item(subjects):
         own = [v for p in s["properties"] for v in p["values"] if not v.get("several")]
         if len(own) < OTHER_CLAIMS:
             continue
-        mine = {n.casefold() for p in s["properties"] for n in p.get("names", [p["name"]])}
+        mine = property_keys(s)  # as the link counts properties in common (Fable's review, 2026-11-09: a property
+        # counted as the link's shared evidence was emitted as its gap, names compared exactly here)
         for link in s.get("links", []):
             other = by.get((link["source"], link["other"]))
             if link["level"] != "plausible" or other is None:
                 continue
             for p in other["properties"]:
-                if {n.casefold() for n in p.get("names", [p["name"]])} & mine:
+                if property_keys({"properties": [p]}) & mine:
                     continue
                 given_ = [v for v in p["values"] if not v.get("several")]
                 if not given_:
