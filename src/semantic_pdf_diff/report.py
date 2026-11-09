@@ -859,9 +859,16 @@ def subjects_html(subjects, sources, gaps=()):
         words = ' '.join([s['name'], *names, *(p['name'] for p in s['properties']),
                           *(x['other'] for x in s.get('links', []))])  # a search for one finds the other
         claims = [v['claim'] for p in s['properties'] for v in p['values']]
+        beside = ''.join(  # a plausible link's other subject's values, kept apart (the linked_values setting)
+            f'<p class="meta">{esc(link_said(x)[0].upper() + link_said(x)[1:])}, its values (not merged):</p>'
+            '<table><tbody>' + ''.join(f'<tr><td>{esc(v["property"])}</td><td><a href="#claim={esc(v["claim"])}">'
+                                       f'{esc(v["said"])}</a> <small>{esc(v["where"])}</small></td></tr>'
+                                       for v in x["values"]) + '</tbody></table>'
+            for x in s.get('links', []) if x.get('values'))
         out.append(f'<div class="subject" {searched(words, claims)}><h3>{esc(s["name"])}</h3>'
                    + (f'<p class="meta">{esc("; ".join(meta))}</p>' if meta else '')
-                   + f'<table><thead><tr><th>Property</th>{heads}</tr></thead><tbody>{rows}</tbody></table></div>')
+                   + f'<table><thead><tr><th>Property</th>{heads}</tr></thead><tbody>{rows}</tbody></table>'
+                   + beside + '</div>')
     return ('<section data-for="subjects" class="index" hidden><p class="meta">Each subject as its claims name it '
             '(a tag, else its words), its properties and every value given, each linked to its claim'
             + ('; a source giving nothing for one is marked “—”: not saying isn\'t evidence of absence' if many else '')

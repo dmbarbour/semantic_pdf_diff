@@ -396,6 +396,11 @@ def subject_chunks(data, index, files, size=CHUNK, notes=None):
                                       + (f"; {g['why']}" if g["why"] else "") + ")"
                                       + (f"; looked for on {g['looked']}" if g.get("looked") else "")
                                       for g in missing]))
+        valued = [x for x in s.get("links", []) if x.get("values")]  # the linked_values setting's: not merged
+        if valued:
+            from .links import link_said
+            lines.append("\n".join(f"{link_said(x)[0].upper() + link_said(x)[1:]}, its values (not merged): "
+                                    + "; ".join(f"{v['property']}: {v['said']}" for v in x["values"]) for x in valued))
         also = [n for n in s["names"] if n.casefold() != s["name"].casefold()]
         noted = any(notes.get(c) for c in ids)
         lead = (f"What {' and '.join(index['sources'])} {'say' if many else 'says'} about {s['name']}"

@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built). [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built); [7](#7-indexing-with-weighted-relationships-explored) explored 2026-11-09 (`link_gaps`, `linked_values`, off: the owner's to take or leave). [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -238,6 +238,21 @@ The owner: "until we're confident in our tooling and we have a good idea on how 
   - the export's chunks (a subject's linked subjects named).
 - **Measured** by milestone 1's scorer, and by eye on the owner's documents' kinds (the turbine pair).
 - **The owner decides** what, if anything, moves from links into the index.
+- **Explored 2026-11-09** (the owner: "Please proceed."; with the rubric's levels, the weights not being trusted: milestone 6), two settings, both off (`link_index`), for the owner to take or leave:
+  - **`link_gaps`, gaps "if one item":** a property a plausible link's other subject gives that a subject (of two claims or more) gives under no name, the weakest gap kind, never looked for. On the controlled proposals pairs, rebuilt from their recorded reports:
+
+    | Seeds | Planted gaps found by firm matches | More by links | Their false ones |
+    |---|---|---|---|
+    | 1 | 14 of 30 | 3 | 22 |
+    | 2 and 3 | 24 of 60 | 7 | 46 |
+    | 4 and 5 | 29 of 60 | 7 | 51 |
+
+    - So links find 17 planted gaps the matches miss (67 → 84 of 150), at about 1 right in 8. The false ones are nearly all properties both designs give under other names. A look where it'd be would answer most "given" (9 of 10 such for the firm matches' gaps, milestone 7 of single-document analysis); links aren't looked for, by the owner's answer.
+  - **`linked_values`:** a plausible link's other subject's values beside the subject's, not merged: in the Subjects view (a table under the link), index.md (a line a value under the link) and the export's subject chunks. On Cedar Falls' pair the plant shows Harrow Creek's design flow, peak flow and population under "Possibly the counterpart of Harrow Creek Water Treatment Plant (plausible: names, properties in common, claims the judge paired, the model's pick over a decoy)".
+  - **Not built:**
+    - *the linked values in the subject's own table,* filling its "—" cells, marked;
+    - *search ranked by a link's weight:* the page's search filters, it doesn't rank, and links already make either name find the other;
+    - *weighted edges* until the weights are trusted (milestone 6).
 
 ## Measurement
 

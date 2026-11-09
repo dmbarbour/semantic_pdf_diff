@@ -55,7 +55,10 @@ def markdown(index):
             lines.append("Claims: " + "; ".join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
                          + (f" (matched by {s['matched_by']})" if s["matched_by"] else ""))
             from .links import link_said  # subjects possibly one, kept apart (links.py)
-            lines += [link_said(x)[0].upper() + link_said(x)[1:] for x in s.get("links", [])]
+            for x in s.get("links", []):
+                lines.append(link_said(x)[0].upper() + link_said(x)[1:]
+                             + (", its values (not merged):" if x.get("values") else ""))
+                lines += [f"  - {v['property']}: {v['said']} ({v['where']})" for v in x.get("values", [])]
         lines.append("")
         for p in s["properties"]:
             also = [n for n in p.get("names", []) if n.casefold() != p["name"].casefold()]
@@ -119,7 +122,7 @@ def placed(x, k):
 # The gaps' kinds, as index.md, the workbook and the page head them
 GAP_TITLES = {"other_source": "Another source gives it", "siblings": "Missing among siblings",
               "blank": "Left blank in a table", "reference": "Cited, not found", "placeholder": "Placeholders",
-              "likely": "Likely missing, read together"}
+              "likely": "Likely missing, read together", "if_one_item": "If one item: what a linked subject gives"}
 INCONSISTENCIES_NOTE = ("Two claims of one subject that the second pass, reading its claims together, says contradict "
                         "each other: other values for the same thing under the same conditions. Ours, not the "
                         "document's: check both against their places.")

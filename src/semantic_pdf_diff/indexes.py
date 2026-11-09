@@ -318,6 +318,14 @@ def built(data):
     from .links import linked  # subjects possibly one, kept apart (tentative matches, milestone 2)
     for i, found in linked(data, {"sources": sources, "subjects": subjects}).items():
         subjects[i]["links"] = found
+    if (data.get("settings") or {}).get("linked_values"):  # a plausible link's other subject's values beside it,
+        by = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}  # kept apart
+        for s in subjects:
+            for link in s.get("links", []):
+                other = by.get((link["source"], link["other"]))
+                if link["level"] == "plausible" and other is not None:
+                    link["values"] = [{"property": p["name"], "said": said(v), "where": v["where"], "claim": v["claim"]}
+                                      for p in other["properties"] for v in p["values"][:1]]
     regroup = None
     if data.get("kind_check"):  # the model's names and moves (the confirm_kinds lever, kindcheck.py)
         regroup = lambda groups: regrouped(groups, subjects, data["kind_check"])  # noqa: E731
@@ -484,7 +492,7 @@ SIBLINGS = 3  # a kind's items in a source, at least, for one lacking what most 
 # A value that holds a place for one not given ("N/A" says it doesn't apply, not that it's missing)
 PLACEHOLDER = re.compile(r"^\W*(?:TBD|TBC|TBA|TBV|TBR|to be (?:determined|confirmed|provided|advised|verified|decided|"
                          r"agreed|supplied|issued))\b", re.IGNORECASE)
-GAP_KINDS = ("other_source", "siblings", "blank", "reference", "placeholder", "likely")
+GAP_KINDS = ("other_source", "siblings", "blank", "reference", "placeholder", "likely", "if_one_item")
 OTHER_CLAIMS = 2  # a source's claims of a matched subject, at least, for what another source gives it to be a gap
 BLANK_ROWS = 3  # a table's rows, at least, for a cell left blank to say anything
 # a gap looked for, in a kind: the reader's misses first, then what the place leaves blank, those not looked for,
@@ -501,6 +509,8 @@ def gaps(data, subjects, found_kinds, where):
     (dossiers.looks) also has "looked" (where, and what was found there) and "look" (dossiers.LOOKS), and comes in its
     kind in LOOKED's order."""
     out = given_elsewhere(data, subjects, found_kinds)
+    if (data.get("settings") or {}).get("link_gaps"):  # what a plausible link's other subject gives (tentative
+        out += if_one_item(subjects)  # matches, milestone 7)
     for k in found_kinds:
         for source in data_sources(data):
             members = [i for i in k["subjects"] if given(subjects[i], source)]
@@ -562,6 +572,41 @@ def gaps(data, subjects, found_kinds, where):
     rank = {id(g): 0 if g.pop("siblings_give", True) else 1 for g in out}
     return sorted(out, key=lambda g: (GAP_KINDS.index(g["kind"]), LOOKED.get(g.get("look"), 2), rank[id(g)],
                                       g["source"], natural(g["subject"]), natural(g["property"]), natural(g["where"])))
+
+def if_one_item(subjects):
+    """What a subject's plausible links' other subjects give that it doesn't, were they one item (the link_gaps
+    setting's; docs/plans/tentative-matches-2026-11-07.md, milestone 7: links in the index explored): of a subject
+    alone with OTHER_CLAIMS of its own or more, each property its linked subject gives under no name it gives; where
+    expected, its first place; why, the link and the other's value; its claims, the other's. The weakest kind, never
+    looked for (the owner, 2026-11-07, of plausible matches: "links and topics for now")."""
+    from .links import SAID
+    by = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}
+    out = []
+    for s in subjects:
+        if len(s["claims"]) != 1:
+            continue
+        source = next(iter(s["claims"]))
+        own = [v for p in s["properties"] for v in p["values"] if not v.get("several")]
+        if len(own) < OTHER_CLAIMS:
+            continue
+        mine = {n.casefold() for p in s["properties"] for n in p.get("names", [p["name"]])}
+        for link in s.get("links", []):
+            other = by.get((link["source"], link["other"]))
+            if link["level"] != "plausible" or other is None:
+                continue
+            for p in other["properties"]:
+                if {n.casefold() for n in p.get("names", [p["name"]])} & mine:
+                    continue
+                given_ = [v for v in p["values"] if not v.get("several")]
+                if not given_:
+                    continue
+                v = given_[0]
+                out.append({"kind": "if_one_item", "source": source, "subject": s["name"], "property": p["name"],
+                            "where": own[0]["where"],
+                            "why": f"if it's {SAID.get(link['relation'], 'the same as')} {other['name']} "
+                                   f"({link['source']}; plausible): it gives {said(v)} ({v['where']})",
+                            "claims": [x["claim"] for x in given_[:3]]})
+    return out
 
 def given_elsewhere(data, subjects, found_kinds):
     """What another source gives a matched subject that a source describing it doesn't (milestone 7): of a subject

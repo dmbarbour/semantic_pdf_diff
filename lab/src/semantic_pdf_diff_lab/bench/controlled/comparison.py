@@ -242,8 +242,10 @@ def _gaps(report, side, keys, renames, kinds, bound):
     items = [Counter(item(fid) for fid in fs) for fs in facts]
     planted = {fid: lacking for kind, lacking in (("added", 0), ("removed", 1)) for fid in kinds[kind]
                if items[lacking][item(fid)] >= indexes.OTHER_CLAIMS}
-    found = [g for g in (report.get("index") or {}).get("gaps", []) if g["kind"] == "other_source"]
-    if not planted and not found:
+    gaps = (report.get("index") or {}).get("gaps", [])
+    found = [g for g in gaps if g["kind"] == "other_source"]
+    linked = [g for g in gaps if g["kind"] == "if_one_item"]  # a plausible link's (the link_gaps setting's)
+    if not planted and not found and not linked:
         return {}
     names = [s["name"] for s in report["sources"]]
     both = set(kinds["unchanged"]) | set(kinds["changed"]) | set(kinds["conditions"])
@@ -254,8 +256,18 @@ def _gaps(report, side, keys, renames, kinds, bound):
         right |= hit
         read["right" if hit else "both give it" if fids & both else "another fact" if fids else "unbound"] += 1
     looks = Counter(g["look"] for g in found if g.get("look"))
-    return {"gaps_found": f"{len(right)}/{len(planted)}", "gaps": dict(sorted(read.items())),
-            **({"gap_looks": dict(sorted(looks.items()))} if looks else {})}
+    out = {"gaps_found": f"{len(right)}/{len(planted)}", "gaps": dict(sorted(read.items())),
+           **({"gap_looks": dict(sorted(looks.items()))} if looks else {})}
+    if linked:
+        more, read_linked = set(), Counter()
+        for g in linked:
+            fids = {fid for c in g["claims"] for fid in bound.get(c, {})}
+            hit = {fid for fid in fids if planted.get(fid) == names.index(g["source"])}
+            more |= hit
+            read_linked["right" if hit else "both give it" if fids & both else "another fact" if fids
+                        else "unbound"] += 1
+        out["if_one_item"] = {**dict(sorted(read_linked.items())), "found_beside": len(more - right)}
+    return out
 
 def _bound(report, side, keys, renames):
     """{claim id: {fact id: outcome}}: the facts each claim is bound to, the later revision's renamed to the

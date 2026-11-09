@@ -216,6 +216,32 @@ class Weighed(unittest.TestCase):
         self.assertEqual(level(read), "plausible")
         self.assertEqual(level({**read, "relation": "neither"}), "possible")
 
+class Indexed(unittest.TestCase):
+    """Milestone 7: links in the index, explored (link_gaps, linked_values; both off)."""
+    PLANTS = (A[:2] + [claim("A-9", "ca", "Harrow Creek Water Treatment Plant", "raw water turbidity", "37.6", "NTU")]
+              + B[:2])
+
+    def test_what_a_plausible_links_other_subject_gives_a_gap_if_one_item(self):
+        data = report(self.PLANTS, [], ("a", "b"), mode="proposals", settings={"link_gaps": True})
+        gaps = [(g["kind"], g["source"], g["subject"], g["property"]) for g in indexes.built(data)["gaps"]]
+        self.assertEqual(gaps, [("if_one_item", "b", "Pine Ridge Water Treatment Plant", "raw water turbidity")])
+        why = indexes.built(data)["gaps"][0]["why"]
+        self.assertTrue(why.startswith("if it's the counterpart of Harrow Creek Water Treatment Plant (a; plausible): "
+                                       "it gives 37.6 NTU"))
+        off = report(self.PLANTS, [], ("a", "b"), mode="proposals")
+        self.assertEqual(indexes.built(off)["gaps"], [])  # off: links feed no gaps
+
+    def test_a_plausible_links_values_beside_kept_apart(self):
+        data = report(self.PLANTS, [], ("a", "b"), mode="proposals", settings={"linked_values": True})
+        index = indexes.built(data)
+        page = indexfiles.markdown(index)
+        self.assertIn("Possibly the counterpart of Pine Ridge Water Treatment Plant (b; plausible: names, "
+                      "properties in common), its values (not merged):\n  - design flow: 16.3 MGD (b.pdf, page 1)",
+                      page)
+        shown = subjects_html(index["subjects"], index["sources"])
+        self.assertIn("its values (not merged):</p><table><tbody><tr><td>design flow</td>", shown)
+        self.assertEqual(len(index["subjects"]), 2)  # not merged
+
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):
         data = report(A + B, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b"), mode="proposals")

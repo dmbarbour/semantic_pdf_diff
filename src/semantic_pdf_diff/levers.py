@@ -1460,6 +1460,17 @@ class LinkLevels(Lever):
     # Revisions keep the rubric
     link_levels: Annotated[Literal["rubric", "weights"], _selecting(roles=COMPARE)] = "rubric"
 
+class LinkIndex(Lever):
+    lever_name, stage, off = "link_index", "comparison", {"link_gaps": False, "linked_values": False}
+    # comparisons: links in the index, explored (docs/plans/tentative-matches-2026-11-07.md, milestone 7; the owner,
+    # 2026-11-07: plausible matches "should feed links and topics for now, until we're confident in our tooling and
+    # we have a good idea on how to index with weighted relationships. Exploring those options should be a plan
+    # step"): link_gaps, what a plausible link's other subject gives that a subject doesn't, as the weakest gaps,
+    # never looked for; linked_values, its values beside the subject's in the Subjects view, index.md and the export,
+    # not merged. Both the owner's to take or leave
+    link_gaps: Annotated[bool, _selecting(roles=COMPARE)] = False
+    linked_values: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
     # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
@@ -1598,7 +1609,8 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  SheetRecords, TableHolders, CarriedHolders, ViewAttitudes, ViewRows, HedgesApart, Reconcile,
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
-                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkRead, LinkMeaning, LinkRerank,
+                 JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, LinkRead, LinkMeaning,
+                 LinkRerank,
                  LookGaps,
                  JudgeGlossary,
                  NameTopics,
