@@ -15,6 +15,12 @@ its own way, some by what they do rather than how they're spelled (clarifiers, a
 other names miss some; keeps others alike; drops a role; adds a decoy of a role it keeps; and drops one property and
 adds another of items both keep.
 
+A held-out template (HELDOUT_PAIRS; tentative matches, milestone 6, 2026-11-09: the weights passed their held-out rule
+on new seeds of the templates they were fitted on, then made 9 plausible links of the turbine pair by names alone):
+the Harbor Telemetry Link against the Lakeshore one, a protocol whose items are named alike by nature ("Session ID
+Length field", "Session ID field"), renamed by role, with decoys named like its other items. Never in development's
+corpus: `controlled.py heldout` makes and reads it.
+
 Scored by comparison.score_proposals: matching by role (each subject's claims bound to the keys' facts, a fact's role
 its id's), and the gaps another source fills.
 """
@@ -49,8 +55,10 @@ ITEMS = {"Harrow Creek Water Treatment Plant": ("Pine Ridge Water Treatment Plan
          "Option B, chlorine contact basin": ("Chlorine contact tank", ("chlorine contact tank", "contact tank"))}
 LOADING = re.compile(r"; the surface loading rate is [\d.,]+ gpm/ft² at design flow")
 
-def _edit(project, edit):
-    """Every printed string edited: paragraphs, tables' captions, headers and cells."""
+def _edit(project, edit, titles=False):
+    """Every printed string edited: paragraphs, tables' captions, headers and cells; with titles, the sections'."""
+    if titles:
+        project.sections[:] = [(edit(title), blocks) for title, blocks in project.sections]
     for _, blocks in project.sections:
         for i, block in enumerate(blocks):
             if block[0] == "p":
@@ -69,14 +77,14 @@ def _drop_column(project, caption_word, column):
                 return
     raise ValueError(f"{project.id}: no table of {caption_word}")
 
-def _renamed(p, words, items, pattern=None):
-    """Every printed string's words replaced (words: [(old, new)]; pattern: a regex to strike), and each role's
-    entity and aliases (items: {old entity: (new entity, aliases)})."""
+def _renamed(p, words, items, pattern=None, titles=False):
+    """Every printed string's words replaced (words: [(old, new)]; pattern: a regex to strike; titles: the sections'
+    too), and each role's entity and aliases (items: {old entity: (new entity, aliases)})."""
     def edit(text):
         for old, new in words:
             text = text.replace(old, new)
         return pattern.sub("", text) if pattern else text
-    _edit(p, edit)
+    _edit(p, edit, titles)
     p.facts[:] = [f if f.entity not in items else replace(f, entity=items[f.entity][0], aliases=items[f.entity][1])
                   for f in p.facts]
 
@@ -186,13 +194,68 @@ def cyclone(seed):
                       d.number(52, 78), "ft"))
     return p
 
+HARBOR_WORDS = (("Lakeshore Telemetry Link", "Harbor Telemetry Link"),
+                ("Status Report Formats", "Buffer Report Formats"),
+                ("extended short status report", "extended compact buffer report"),
+                ("short status report", "compact buffer report"), ("long status report", "full buffer report"),
+                ("Session ID Length", "Connection ID Length"), ("Session ID", "Connection ID"),
+                ("Packet Number Length", "Sequence Number Length"), ("Packet Number", "Sequence Number"),
+                ("Measurement Report", "Radio Report"), ("measurement report", "radio report"),
+                ("Link Failure Detection", "Link Loss Detection"), ("A link failure is declared",
+                                                                     "A link loss is declared"),
+                ("retransmission timer", "resend timer"), ("send window", "transmit window"))
+HARBOR_ITEMS = {"Short status report": ("Compact buffer report", ("compact report", "compact buffer report")),
+                "Extended short status report": ("Extended compact buffer report",
+                                                 ("extended compact report", "extended compact buffer report")),
+                "Long status report": ("Full buffer report", ("full report", "full buffer report")),
+                "Session ID Length field": ("Connection ID Length field", ("Connection ID Length",)),
+                "Session ID field": ("Connection ID field", ("Connection ID",)),
+                "Packet Number Length field": ("Sequence Number Length field", ("Sequence Number Length",)),
+                "Packet Number field": ("Sequence Number field", ("Sequence Number",)),
+                "Measurement report": ("Radio report", ("radio report", "the report")),
+                "Link failure detection": ("Link loss detection", ("link loss", "loss detection")),
+                "Retransmission timer": ("Resend timer", ("resend timer",)),
+                "Send window": ("Transmit window", ("transmit window", "window"))}
+TIMING = re.compile(r"^– the timing advance, [\d,]+ bits\.?$")
+
+def harbor(seed):
+    """The Harbor Telemetry Link: the Lakeshore protocol's template from the next seed, its items renamed by role;
+    its Version field gone; decoys named like the Lakeshore items (a status report period, a measurement interval);
+    its measurement report's timing advance not given and its transmit window's growth step given (2 gaps)."""
+    p = PROJECTS["spec"](seed + 1)
+    p.id, p.title = f"spec-s{seed}-proposal", "Harbor Telemetry Link: Protocol Specification"
+    p.edits = []
+    drop_row(p, "Version")
+    gone = {"meas.ta"}
+    for _, blocks in p.sections:
+        blocks[:] = [b for b in blocks if not (b[0] == "p" and TIMING.match(b[1]))]
+    _renamed(p, HARBOR_WORDS, HARBOR_ITEMS, titles=True)
+    p.facts[:] = [f for f in p.facts if f.id not in gone]
+    p.edits.append({"kind": "removed", "facts": sorted(gone)})
+    d = drawer(p)
+    add_sentence(p, "short.field", "A status report period of {v} ms applies to every buffer report.",
+                 Fact("status.period", "Status report period", ("status report period", "report period"), "period",
+                      ("reporting period",), d.number(20, 200), "ms"))
+    add_sentence(p, "timer.congested", "The measurement interval is {v} ms.",
+                 Fact("meas.interval", "Measurement interval", ("measurement interval",), "interval",
+                      ("measurement period",), d.number(250, 950), "ms"))
+    window = p.fact("window.idle")
+    add_sentence(p, "window.idle", "The transmit window grows by {v} packets per round trip.",
+                 Fact("window.growth", window.entity, window.aliases, "growth step", ("increment",),
+                      d.number(2, 12), "packets"))
+    return p
+
 # (the corpus project's key, the other design's maker and id's ending, the pair's id's ending)
 PAIRS = (("wtp", pine_ridge, "proposal", "proposals"), ("wtp", cedar_falls, "cedar", "cedar-proposals"),
          ("coaster", cyclone, "proposal", "proposals"))
 
-def pairs(seed=1):
-    """Each pair's documents, by id (nothing generated)."""
-    return [Pair(f"{key}-s{seed}-{name}", f"{key}-s{seed}", f"{key}-s{seed}-{other}") for key, _, other, name in PAIRS]
+# held out only: never in development's corpus (controlled.py heldout)
+HELDOUT_PAIRS = (("spec", harbor, "proposal", "proposals"),)
+
+def pairs(seed=1, heldout=False):
+    """Each pair's documents, by id (nothing generated); with heldout, the held-out templates' too."""
+    listed = PAIRS + (HELDOUT_PAIRS if heldout else ())
+    return [Pair(f"{key}-s{seed}-{name}", f"{key}-s{seed}", f"{key}-s{seed}-{other}") for key, _, other, name in listed]
 
 def check(project):
     """A proposal's key is honest: its facts all placed (render raises otherwise), each value naming one fact."""
@@ -202,10 +265,10 @@ def check(project):
     if len(values) != len(set(values)):
         raise ValueError(f"{project.id}: a value names two facts")
 
-def proposed(seed=1):
-    """[(Pair, the generated design)], checked."""
+def proposed(seed=1, heldout=False):
+    """[(Pair, the generated design)], checked; with heldout, the held-out templates' too."""
     out = []
-    for (_, make, _, _), pair in zip(PAIRS, pairs(seed)):
+    for (_, make, _, _), pair in zip(PAIRS + (HELDOUT_PAIRS if heldout else ()), pairs(seed, heldout)):
         project = make(seed)
         check(project)
         out.append((pair, project))

@@ -449,8 +449,9 @@ def heldout(seeds, variant_path, max_cost, jobs=1):
     from semantic_pdf_diff_lab.bench.controlled.corpus import PROJECTS
     folders = {".pdf": HELDOUT / "docs", ".md": HELDOUT / "docs-md", ".docx": HELDOUT / "docs-docx",
                ".pptx": HELDOUT / "docs-pptx", ".xlsx": HELDOUT / "docs-xlsx"}
-    projects = [PROJECTS[key](seed) for seed in seeds for key in sorted({key for key, *_ in proposals.PAIRS})]
-    projects += [project for seed in seeds for _, project in proposals.proposed(seed)]
+    listed = proposals.PAIRS + proposals.HELDOUT_PAIRS
+    projects = [PROJECTS[key](seed) for seed in seeds for key in sorted({key for key, *_ in listed})]
+    projects += [project for seed in seeds for _, project in proposals.proposed(seed, heldout=True)]
     for project in projects:
         controlled.write(project, folders[".pdf"])
         lines = representations.markdown(project)
@@ -460,7 +461,7 @@ def heldout(seeds, variant_path, max_cost, jobs=1):
         workbooks.write(folders[".xlsx"], project, workbooks.workbook(project))
     name, config, _ = variant(variant_path, folder=HELDOUT_RUNS)
     runs = HELDOUT_RUNS / name
-    pairs = [pair for seed in seeds for pair in proposals.pairs(seed)]
+    pairs = [pair for seed in seeds for pair in proposals.pairs(seed, heldout=True)]
     alone = [(f, f, runs / "docs" / f.name, f.name, "proposals") for suffix, folder in folders.items()
              for f in sorted(folder.glob(f"*{suffix}"))]
     compared = [(folders[s] / f"{p.earlier}{s}", folders[s] / f"{p.later}{s}", runs / f"{p.id}{s}", f"pair {p.id}{s}",

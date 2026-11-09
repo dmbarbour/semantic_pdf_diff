@@ -215,6 +215,17 @@ The owner: "then figure out how to analyze or evidence a fuzzy, weighted, or pro
       - a held-out template the weights never saw (the convention center, the link protocol), with decoys named alike;
       - the names' weight bounded, or the rubric's two families required of the weights too;
       - EM on real pairs without keys, a rater of its own.
+  - **Followed up 2026-11-09** (the owner: "Please proceed."; the advisor checked the approach, its decision rule written before looking: refit, then the turbine pair; promoted to a held-out check only if it beats the rubric on validation and looks right on the turbine):
+    - **Two families required of the weights** (as the rubric requires): on validation they then choose the rubric's very pairs, 57 of 60. All the weights had gained came from links on one family, mostly names alone.
+    - **Decoys named alike not added to development:** the fitted names' weight would then only say how many Claude chose to plant.
+    - **The non-matches' rates (u) from real documents instead** (the standard way: across two real documents nearly every candidate pair is a non-match), the matches' (m) still from the keys. The development slices' only comparison of two documents but the turbines (kept for the check) is the drawings pair: 487 candidates, the same generator.
+      - **What the keys had misled:** the controlled designs' non-matches seldom share exactly one property; the drawings' candidates do 47% of the time (sheet titles, scales).
+      - **Refitted:** names alike +2.4 (was +6.1), one property in common −1.4 (was +5.1), distinct properties +5.8, one counting verdict +4.0.
+      - **The turbine pair:** no candidate scores above 2, so names alone no longer make a link plausible.
+      - **Validation,** the cap and the read applied: 57 of 60, a tie with the rubric. The rule stops there: not promoted, and the Harbor template (below) stays sealed for a candidate that beats the rubric.
+    - **A template held out for that check** (`proposals.HELDOUT_PAIRS`, never in development's corpus): the Harbor Telemetry Link against the Lakeshore protocol, renamed by role, its Version field gone, decoys named like the other's items (a status report period, a measurement interval), 2 gaps. Built, not yet run: seeing its links would spend it.
+    - **`likely` is calibrated on the controlled templates only.** On the turbine pair, wrong links said 0.82–0.90 under weights/1; it isn't calibrated for real documents.
+    - **So, on today's signals, the rubric's two families do the work.** The numbers wait for richer signals recorded in settings closer to real use: meaning, the reranker, the model's match. `link_levels` stays `rubric`; `link_weights.json` keeps weights/1, off.
 
 ### 7. Indexing with weighted relationships, explored
 
