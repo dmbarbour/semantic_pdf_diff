@@ -1,6 +1,6 @@
 # Tentative matches: hypotheses with levels, their evidence kept
 
-- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built); [7](#7-indexing-with-weighted-relationships-explored) explored 2026-11-09 (`linked_values` on, `link_gaps` off). Milestones 8 to 13 added 2026-11-09 from [the same-thing review](../research/same-thing-review-2026-11-09.md) (the owner: "The proposed order looks good."). [Design questions](#design-questions) all answered 2026-11-07.
+- **Status:** Active (2026-11-07): milestones [1](#1-a-scorer-for-matching), [5](#5-a-controlled-proposals-pair) and [2](#2-links-and-their-evidence-by-code-stage-1) built 2026-11-07 (5 before 2, so links are scored on proposals); [3](#3-more-signals-candidates-by-meaning) built 2026-11-08 but for both directions; [5](#5-a-controlled-proposals-pair) extended and [4](#4-tied-together-and-tested-stage-2-as-levers) built 2026-11-08; [6](#6-levels-from-numbers) built 2026-11-09 (passed its held-out rule; Fellegi-Sunter, proposals only; EM without keys not built); [7](#7-indexing-with-weighted-relationships-explored) explored 2026-11-09 (`linked_values` on, `link_gaps` off). Milestones 8 to 13 added 2026-11-09 from [the same-thing review](../research/same-thing-review-2026-11-09.md) (the owner: "The proposed order looks good."), 14 to 16 from [the gotchas review](../research/gotchas-review-2026-11-09.md); taken in the order 8, 14, 15, 16, 9 to 13. [Design questions](#design-questions) all answered 2026-11-07.
 - **The owner, 2026-11-07,** after [single-document analysis](single-document-analysis-2026-10-28.md)' milestone 7 (subjects across documents) was built: "I suspect we might want to support weaker, plausible or tentative matches in some way, for our reports, analysis, etc.. Any ideas on that? Match candidates by meaning might help, but I think we probably first need a viable model for "possibly relevant or a match, not sure, investigate further and see if things fit when tied together" instead of all-or-nothing."
 - **The owner, answering Claude's suggestion (2026-11-07):**
   - "Three levels is a start. Outside of embeddings and cross-encoders, it's difficult to turn model confidence into numbers. Perhaps we start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match (Bayesian, BM25, etc.). I'd like a review from Fable on our ideas here and suggestions to improve them."
@@ -286,6 +286,18 @@ Part of, connected to, serves: a `neighbour` band; a proposals pair from the sch
 ### 13. A panel of judges for real documents
 
 The owner, 2026-11-09: "Not viable for me to mark things. I'm dealing with projects large enough that investigating each link or verifying a contradiction is an hour of work. But bringing back our panel of judges is something we could try, if we can ensure we provide enough context for their judgements to be meaningful." Links, gaps and contradictions on public real pairs judged by a model panel ([0018](../decisions/0018-several-raters-none-ground-truth.md)), each shown what it needs: both subjects' claims, their sections and abouts, their places' crops.
+
+### 14. Firm matches between proposals with two families
+
+From [the gotchas review](../research/gotchas-review-2026-11-09.md) (its item 2, with 1): a shared tag, name or other name a strong name signal, a group firm only with a second family (the judge's pairings, the model's match, distinct properties), as links already need. Its knob first: a proposals design keeping the other's tags with roles permuted. The lab's scorer tightened with it (its item 13), so firm errors show.
+
+### 15. Values keyed by unit kind
+
+The gotchas review's item 3: a richer unit table keying values by kind (gpm and gal/min, psi and kPa), for alignment and `_fits`. A revisions lever changing no request; its knob first, a revision converting a schedule's units.
+
+### 16. Other names as evidence
+
+The gotchas review's item 1: glossary terms and the model's groups of other names as a link's evidence with a level, not a key joined by union-find; terms the sources define differently left out. Its knob first: one abbreviation with two meanings across a proposals pair.
 
 ## Measurement
 
