@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.59.0 (2026-11-10)
+
+- **`other_names_fit`** (off; tentative matches, milestone 16): between proposals, two subjects joined by other names alone (the model's, a glossary's) are one only where they share a property; the model's groups no longer chain two of one document's names into one subject. Else a plausible link. Held out on new seeds: wrong firm groups 4 → 0, right ones lost 2 of 927.
+
 ## 0.58.0 (2026-11-10)
 
 - **`unit_kinds`** (off; tentative matches, milestone 15): in links' fit test and property_links' values, a value whose unit the product's table doesn't know (gpm, ft, hp, psi) is weighed by its kind and size, so a design in metric units fits one in US units. Held out on new seeds: false gaps 85 → 64, plausible links right 95 → 100, wrong unchanged.

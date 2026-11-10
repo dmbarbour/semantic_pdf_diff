@@ -381,6 +381,11 @@ The gotchas review's item 1: glossary terms and the model's groups of other name
     - **Guard:** right firm groups lost, summed, at most 1% of the off arm's.
     - **Reported, not judged:** plausible and possible links right and wrong.
     - **Checked once,** on the code as committed.
+  - **Held out, 2026-11-10** (seeds 12 to 15, 100 units, both arms recorded, $2.19; the off arm in two jobs, resumed after a shared spending cap stopped them): **passed.**
+    - **Target met:** wrong firm groups 4 → 0 (all Cedar Falls'), 4 units changed, p = 0.0625 (the least four units can give).
+    - **Guard met:** right firm groups lost 2 of 927 (0.2%; at most 1%): the coaster's lift hill and Cedar Falls' flocculation basins, their properties under names not alike.
+    - **Reported:** plausible links right 180 → 187, wrong 65 → 65; possible links right 94 → 94, wrong 201 → 206.
+    - **The default** is the owner's call.
 
 ## Measurement
 
