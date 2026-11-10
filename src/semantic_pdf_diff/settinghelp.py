@@ -276,6 +276,8 @@ HELP = {
                                "kind and magnitude, the judge's pairing), not counted as a gap where plausibly given"),
     "keyed_links": Help(_L, "proposals: two subjects keyed alike (a tag, the same words, other names) one unless "
                             "either has more properties in common with another subject; else a plausible link"),
+    "other_names_fit": Help(_L, "proposals: two subjects joined by other names alone one only where they share a "
+                                "property; of a document's subjects one such name holds, the one sharing most"),
     "unit_kinds": Help(_L, "comparisons: values in units the product's table doesn't know (gpm, ft, hp, psi) "
                            "weighed by kind and size in links' fit test and property_links' values"),
     "link_read": Help(_L, "proposals: each link read by the model against a decoy, the other source's next "

@@ -1493,6 +1493,14 @@ class KeyedLinks(Lever):
     # Please turn `keyed_links` on, then proceed.")
     keyed_links: Annotated[bool, _selecting(roles=COMPARE)] = True
 
+class OtherNamesFit(Lever):
+    lever_name, stage, off = "other_names_fit", "comparison", {"other_names_fit": False}
+    # comparisons, between proposals: two subjects joined by other names alone (the glossary's, the model's) one only
+    # where they share a property, by name or alike; of a source's subjects one such key holds, the one sharing the
+    # most properties taken (indexes.firm_keyed; tentative matches, milestone 16; the gotchas review, item 1: other
+    # names chain and ignore disagreement). Else a plausible link, as keyed_links leaves a tag
+    other_names_fit: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class UnitKinds(Lever):
     lever_name, stage, off = "unit_kinds", "comparison", {"unit_kinds": False}
     # comparisons: a value whose unit the product's table doesn't know (gpm, ft, hp, psi) weighed by the search's table
@@ -1640,7 +1648,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks,
-                 KeyedLinks, UnitKinds, LinkRead,
+                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead,
                  LinkMeaning,
                  LinkRerank,
                  LookGaps,

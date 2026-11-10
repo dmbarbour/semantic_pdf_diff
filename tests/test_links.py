@@ -301,7 +301,7 @@ class Keyed(unittest.TestCase):
         self.assertEqual([(x["other"], x["level"], x["signals"]) for x in pump["links"]],
                          [("Raw water pump P-201A", "plausible", ["name", "properties"]),
                           ("Backwash pump P-101A", "plausible", ["name", "keyed"])])  # the owner: "A plausible link"
-        self.assertIn("a tag or name both give", links.link_said(pump["links"][1]))
+        self.assertIn("a tag, name or other name both give", links.link_said(pump["links"][1]))
         self.assertEqual(self.firm(self.built(True, mode="revisions")), ["Filter F-1", "Raw water pump P-101A"])
 
     def test_the_judge_and_the_model_shown_them_by_their_key_say_nothing_more(self):
@@ -329,6 +329,36 @@ class Keyed(unittest.TestCase):
         joined = next(s for s in index["subjects"] if len(s["claims"]) == 2 and s["name"] != "Filter F-1")
         self.assertEqual((joined["matched_by"], sorted(joined["names"])),
                          ("model: the corresponding element", ["Raw water pump P-101A", "Raw water pump P-201A"]))
+
+class OtherNames(unittest.TestCase):
+    """Milestone 16: between proposals, subjects joined by other names alone one only where they share a property, and
+    the model's groups not chaining one document's names (other_names_fit; off). The gotchas review: other names chain
+    and ignore disagreement."""
+    A = [claim("A-1", "ca", "Option B: chlorine contact", "capital cost", "2.82", "$M"),
+         claim("A-2", "ca", "Option B: chlorine contact", "contact time", "49", "min"),
+         claim("A-3", "ca", "chlorine", "dosage", "3.3", "mg/L")]
+    B = [claim("B-1", "cb", "sodium hypochlorite", "dosage", "2.1", "mg/L"),
+         claim("B-2", "cb", "UV reactors", "capital cost", "6.35", "$M"),
+         claim("B-3", "cb", "UV reactors", "annual energy use", "771", "MWh/yr")]
+
+    def built(self, on, groups):
+        return indexes.built(report(self.A + self.B, [], ("a", "b"), mode="proposals", synonyms={"items": groups},
+                                    settings={"keyed_links": True, "other_names_fit": on}))
+
+    def test_a_chain_through_the_other_documents_name_joins_nothing(self):
+        chained = [["Option B: chlorine contact", "sodium hypochlorite"], ["chlorine", "sodium hypochlorite"]]
+        off = next(s for s in self.built(False, chained)["subjects"] if len(s["claims"]) == 2)
+        self.assertEqual(off["names"], ["Option B: chlorine contact", "chlorine", "sodium hypochlorite"])
+        on = self.built(True, chained)
+        self.assertEqual([s["name"] for s in on["subjects"] if len(s["claims"]) == 2], [])
+        option = next(s for s in on["subjects"] if s["name"] == "Option B: chlorine contact")
+        self.assertEqual([(x["other"], x["level"], x["signals"]) for x in option["links"]],
+                         [("sodium hypochlorite", "plausible", ["keyed"])])  # no property shared: a link
+
+    def test_other_names_sharing_a_property_one(self):
+        on = self.built(True, [["chlorine", "sodium hypochlorite"]])
+        self.assertEqual([(s["name"], s["matched_by"]) for s in on["subjects"] if len(s["claims"]) == 2],
+                         [("chlorine", "other names")])
 
 class Kinds(unittest.TestCase):
     """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The

@@ -106,10 +106,22 @@ def aliases(data):
     """The names one thing goes by, as the run found them: each glossary term reaching its document (or a
     discipline's sheets) with its meaning (a mark described, or a meaning of more than 80 characters, isn't a name),
     and the model's other names (the search_names lever's groups), a property's joined only where every two of the
-    names joined can be one property (kin). A function giving a name its group's first name (folded, the least A to
-    Z), or None for a name in no group."""
+    names joined can be one property (kin). Between proposals, where the other_names_fit setting says (tentative
+    matches, milestone 16), the model's groups don't chain two names one source gives into one unless a group holds
+    both (seeds 9 and 11: "Option B: chlorine contact" and "chlorine", each grouped with the other design's "sodium
+    hypochlorite", became one subject). A function giving a name its group's first name (folded, the least A to Z),
+    or None for a name in no group."""
     from .terms import drawn
     parent, members = {}, {}
+    apart = None
+    if (data.get("settings") or {}).get("other_names_fit") and data.get("mode") == "proposals":
+        where, given = Where(data), defaultdict(set)
+        for e in data.get("evidence", []):
+            given[alias_key(e["entity"])].add(where.source.get(e["content"], ""))
+        grouped = {frozenset((alias_key(x), alias_key(y))) for group in (data.get("synonyms") or {}).get("items", [])
+                   for x in group for y in group}
+        apart = lambda x, y: (x == y or not given.get(x, set()) & given.get(y, set())  # noqa: E731
+                              or frozenset((x, y)) in grouped)
 
     def root(x):
         parent.setdefault(x, x)
@@ -130,7 +142,7 @@ def aliases(data):
     for kind in ("items", "properties"):
         for group in (data.get("synonyms") or {}).get(kind, []):
             for name in group[1:]:
-                join(alias_key(group[0]), alias_key(name), kin if kind == "properties" else None)
+                join(alias_key(group[0]), alias_key(name), kin if kind == "properties" else apart)
     return lambda name: root(alias_key(name)) if alias_key(name) in parent else None
 
 def words_of(name):
@@ -167,14 +179,15 @@ def renamed(subjects, alias):
         out.append((key, name, cs))
     return out
 
-def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=(), firm=None):
+def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=(), firm=None, rank=None):
     """The sources' subjects matched across them: [{source: (key, name, claims)}], each subject once. Two sources'
     subjects are one where the findings pair their claims (by_findings: revisions), the most pairs first and one to
     one; else where they're keyed alike (a tag, or the same words), or named as other names of one thing (alias);
     then as the model matched them (matches: [((source, name), (source, name), relation)], crossmatch.py), each alone
     till then; the rest alone. firm: whether two sources' subjects keyed alike are one ((source, (key, name, claims))
-    each; the keyed_links lever's, firm_keyed): those it says aren't stay alone, each saying the other's (source, key)
-    as "keyed"."""
+    each; the keyed_links and other_names_fit levers', firm_keyed): those it says aren't stay alone, each saying the
+    other's (source, key) as "keyed". rank: the subjects keyed alike, in the order they're taken (a source's first
+    joins, the rest stand apart)."""
     of = {c["id"]: (source, key) for source in sources for key, _, claims in found[source] for c in claims}
     by = {(source, key): (key, name, claims) for source in sources for key, name, claims in found[source]}
     links = Counter()
@@ -195,6 +208,7 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
             if (source, key) not in joined:
                 keyed[alias(name) or key].append((source, key))
     for members in keyed.values():
+        members = rank(members) if rank else members
         apart = []
         group = {"matched_by": ("name" if len({k for _, k in members}) == 1 else "other names")
                  if len({s for s, _ in members}) > 1 else ""}
@@ -226,27 +240,51 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
         merged.remove(gb)
     return merged
 
-def firm_keyed(found, data, sources):
-    """Whether two proposals' subjects keyed alike are one (the keyed_links lever; tentative matches, milestone 14; the
-    gotchas review, item 2: "P-101 in two designs is a numbering habit, not identity"): one unless their properties
-    say otherwise, either having more properties in common with another of the other source's subjects than with
-    the other, two or more (one alike is too little, as for a link). A tag, the same words or other names are the
-    names' evidence; the judge and the model, shown the two because they're keyed alike or by names that hold the
-    key, add nothing of their own (Birch Hollow's knob, 2026-11-09: each of its wrong groups held by the judge's
-    "different", then by the model picking the tag it was shown over a decoy); a second family required of every
-    group split right ones too (seed 1, offline: Pine Ridge's 57 right groups 19). Those it isn't stay apart, a
-    plausible link (the owner, 2026-11-09, asked whether plausible or possible: "A plausible link is good."), each
-    alone for the model's match to another."""
+def firm_keyed(found, data, sources, contest=True, fit=False):
+    """(firm, rank) for matched: whether two proposals' subjects keyed alike are one, and the order a key's subjects
+    are taken in (tentative matches, milestones 14 and 16).
+
+    - contest (the keyed_links lever; the gotchas review, item 2: "P-101 in two designs is a numbering habit, not
+      identity"): one unless their properties say otherwise, either having more properties in common with another of
+      the other source's subjects than with the other, two or more (one alike is too little, as for a link). A tag,
+      the same words or other names are the names' evidence; the judge and the model, shown the two because they're
+      keyed alike or by names that hold the key, add nothing of their own (Birch Hollow's knob, 2026-11-09: each of
+      its wrong groups held by the judge's "different", then by the model picking the tag it was shown over a decoy);
+      a second family required of every group split right ones too (seed 1, offline: Pine Ridge's 57 right groups
+      19).
+    - fit (the other_names_fit lever; the gotchas review, item 1: other names chain and ignore disagreement): two
+      subjects joined by other names alone (their keys differ) one only where they share a property, by name or
+      alike (links' property names); and of a source's subjects one key holds, the one sharing the most properties
+      with the other source's taken first. On seeds 1 and 8 to 11 every right group by other names shared one (288);
+      the wrong ones shared none (3: the model calling a chlorine contact basin "sodium hypochlorite") or were the
+      key's wrong subject of two (2: the chlorine feed beside it).
+
+    Those firm says aren't stay apart, a plausible link (the owner, 2026-11-09, asked whether plausible or possible:
+    "A plausible link is good."), each alone for the model's match to another."""
+    from .links import _name_alike
     properties = {source: {key: {plain(c["attribute"]) for c in cs} for key, _, cs in found[source]}
                   for source in sources}
 
+    def alike(p, q):
+        return bool(p & q) or any(_name_alike([x], [y]) for x in p for y in q)
+
     def firm(a, b):
         (sa, (ka, _, _)), (sb, (kb, _, _)) = a, b
-        common = len(properties[sa][ka] & properties[sb][kb])
-        sides = ((properties[sa][ka], properties[sb], kb), (properties[sb][kb], properties[sa], ka))
-        return not any(len(mine & q) > max(common, 1) for mine, others, own in sides
-                       for k, q in others.items() if k != own)
-    return firm
+        mine, theirs = properties[sa][ka], properties[sb][kb]
+        if fit and ka != kb and mine and theirs and not alike(mine, theirs):
+            return False
+        common = len(mine & theirs)
+        sides = ((mine, properties[sb], kb), (theirs, properties[sa], ka))
+        return not (contest and any(len(own & q) > max(common, 1) for own, others, k0 in sides
+                                    for k, q in others.items() if k != k0))
+
+    def rank(members):
+        if not fit:
+            return members
+        shared = lambda m: max((len(properties[m[0]][m[1]] & properties[o[0]][o[1]])  # noqa: E731
+                                for o in members if o[0] != m[0]), default=0)
+        return sorted(members, key=lambda m: -shared(m))  # stable: ties as they were
+    return firm, rank
 
 LISTING = re.compile(r"\s*(?:,\s*(?:and|or)|,|;|&|and|or)\s*", re.IGNORECASE)  # between a list's items
 
@@ -323,11 +361,14 @@ def built(data):
     matches = [((c["source"], c["subject"]), (c["other_source"], c["other"]), c["relation"])
                for c in (data.get("commentary") or {}).get("entries", [])
                if c["kind"] == "match" and c.get("relation") in MATCHED and not c.get("taken")]
-    firm = (firm_keyed(found, data, sources) if data.get("mode") == "proposals" and len(sources) == 2
-            and (data.get("settings") or {}).get("keyed_links") else None)
+    settings = data.get("settings") or {}
+    firm, rank = (firm_keyed(found, data, sources, bool(settings.get("keyed_links")),
+                             bool(settings.get("other_names_fit")))
+                  if data.get("mode") == "proposals" and len(sources) == 2
+                  and (settings.get("keyed_links") or settings.get("other_names_fit")) else (None, None))
     halves = {}  # (source, key): (its subject, the other half's (source, key)): kept apart, keyed alike (firm)
     for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals", matches,
-                         firm):
+                         firm, rank):
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
         properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)

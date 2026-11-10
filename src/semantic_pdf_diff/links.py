@@ -456,7 +456,7 @@ def linked(data, index):
     return dict(out)
 
 SAID = {"same": "the same as", "corresponding": "the counterpart of", "state": "a state of"}  # how a link reads
-SIGNALS = {"name": "names", "keyed": "a tag or name both give",
+SIGNALS = {"name": "names", "keyed": "a tag, name or other name both give",
            "meaning": "names alike in meaning", "reranked": "the reranker's likest",
            "read": "the model's pick over a decoy",
            "properties": "properties in common",

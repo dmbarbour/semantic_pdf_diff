@@ -210,6 +210,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `linked_values` | `true` | selecting | link_index | compare | - |
 | `property_links` | `true` | selecting | property_links | compare | - |
 | `keyed_links` | `true` | selecting | keyed_links | compare | - |
+| `other_names_fit` | `false` | selecting | other_names_fit | compare | - |
 | `unit_kinds` | `false` | selecting | unit_kinds | compare | - |
 | `link_read` | `true` | selecting | link_read | compare | - |
 | `link_meaning` | `false` | selecting | link_meaning | compare | - |

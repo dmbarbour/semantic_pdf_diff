@@ -369,6 +369,19 @@ The gotchas review's item 3: a richer unit table keying values by kind (gpm and 
 
 The gotchas review's item 1: glossary terms and the model's groups of other names as a link's evidence with a level, not a key joined by union-find; terms the sources define differently left out. Its knob first: one abbreviation with two meanings across a proposals pair.
 
+- **No knob needed** (2026-11-10): seeds 8 to 11 being spent, their recorded reports (with seed 1's) are development's. Every wrong firm group left with `keyed_links` on (5) was joined by the model's groups of other names, none by a glossary: the model calling Harrow Creek's chlorine contact basin (Option B) Cedar Falls' "sodium hypochlorite" (3; no property in common, no rival sharing two, so `keyed_links` can't contest it), and twice that with its chlorine feed's own group, chaining the basin and the feed into one subject. A two-glossary knob would test the wrong thing.
+- **Built 2026-11-10** (`other_names_fit`, off; `indexes.firm_keyed`, `indexes.aliases`), the narrow fix, not the full redesign (other names as a link's evidence with a level):
+  - **Shared properties:** between proposals, two subjects joined by other names alone (their keys differ) are one only where they share a property, by name or alike; else a plausible link, as a contested tag is. On seeds 1 and 8 to 11 every right group by other names shared one (288); the wrong ones didn't (3).
+  - **No chains in one document:** the model's groups don't join two names one source gives unless a group holds both; and of a source's subjects one key holds, the one sharing the most properties with the other source's is taken.
+  - **Measured** (seeds 1 and 8 to 11, the recorded reports rebuilt, 125 units): wrong firm groups 5 → 0; right firm groups 921 → 918 (lost: a rapid mix basin already mixed with the flocculation basins, and the coaster's lift hill twice, its height under names not alike); plausible links right 176 → 179, wrong 76 → 82. Seed 1 recorded ($0.000): Cedar Falls' wrong group 1 → 0, none lost.
+  - **Held-out rule, written 2026-11-10 before seeds 12 to 15 were generated:**
+    - **Units:** one proposals pair in one format, seeds 12 to 15, the five pairs (the sealed template left out): 100 units. Four seeds, not two: wrong firm groups are about one a seed, too few to reach p < 0.1 on two.
+    - **Arms:** `other_names_fit` off and on, each a recorded run, every other setting today's defaults.
+    - **Target:** wrong firm groups fewer, summed over the units, at p < 0.1 by a sign flip over the units that change.
+    - **Guard:** right firm groups lost, summed, at most 1% of the off arm's.
+    - **Reported, not judged:** plausible and possible links right and wrong.
+    - **Checked once,** on the code as committed.
+
 ## Measurement
 
 - **The scorer** (milestone 1) on the controlled pairs, every format: each level's count and share right, the keys' items matched at no level, before and after each milestone.
