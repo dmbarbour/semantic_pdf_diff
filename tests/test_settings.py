@@ -109,6 +109,7 @@ NOT_EXERCISED = {
     'linked_values': "needs plausible links between subjects alone in each document; run in tests/test_links.py",
     'property_links': "needs gaps of properties named otherwise across the documents; run in tests/test_links.py",
     'keyed_links': "needs proposals' subjects keyed alike across the documents; run in tests/test_links.py",
+    'unit_kinds': "needs proposals' values in units the product's table doesn't know; run in tests/test_links.py",
     'link_read': "needs links between subjects alone in each document; run with the model's reads in "
                  "tests/test_links.py",
     'link_rerank': "needs a reranker (rerank_model) and subjects alone in each document; run with ranks in "

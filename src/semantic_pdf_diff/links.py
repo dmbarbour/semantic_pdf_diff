@@ -64,7 +64,7 @@ plausible matches "should feed links and topics for now").
 """
 from collections import Counter, defaultdict
 
-from .align import GENERIC, STOP, identifiers, value_key, words
+from .align import GENERIC, STOP, identifiers, unit, value_key, words
 from .schema import Evidence
 
 RUBRIC = "rubric/1"
@@ -91,14 +91,31 @@ def stable(data):
     topics, the other names a request a topic), so what's built from it is the same whenever."""
     return {k: v for k, v in data.items() if k not in ("synonyms", "commentary")}
 
-def _by_property(subject, evidence):
-    """{a property's key (its names' words): [its values' keys]} (align.value_key)."""
+INCH = 0.0254  # metres: alignment keys a length in feet and inches as inches
+
+def measured(claim, kinds=False):
+    """A claim's value key (align.value_key); with kinds (the unit_kinds lever; tentative matches, milestone 15; the
+    gotchas review, item 3: "150 psi and 1,034 kPa never meet"), a number whose unit the product's table doesn't know
+    keyed by the search's (values.search_unit): its kind and its size in the kind's base, as the product's units are,
+    so 5,151 gpm and 325 L/s are one kind; a length in inches in metres. Alignment keeps its own keys."""
+    from .values import search_unit
+    key = value_key(claim)
+    if not kinds or key is None or len(key) < 2 or not isinstance(key[1], (int, float)):
+        return key
+    if key[0] == "in":
+        return ("length", round(key[1] * INCH, 9)) + key[2:]
+    said = (claim.unit or "").strip()
+    found = search_unit(said) if said and not unit(said) else None
+    return (found[0], round(key[1] * found[1], 9)) + key[2:] if found else key
+
+def _by_property(subject, evidence, kinds=False):
+    """{a property's key (its names' words): [its values' keys]} (measured)."""
     out = defaultdict(list)
     for p in subject["properties"]:
         keys = {" ".join(sorted(words(n))) for n in p.get("names", [p["name"]])} - {""}
         for v in p["values"]:
             e = evidence.get(v["claim"])
-            key = value_key(Evidence.model_validate(e)) if e is not None else None
+            key = measured(Evidence.model_validate(e), kinds) if e is not None else None
             if key is not None:
                 for k in keys:
                     out[k].append(key)
@@ -290,6 +307,7 @@ def candidates(data, index):
     sources = index.get("sources", [])
     if len(sources) != 2 or mode not in RELATION:
         return []
+    kinds = bool((data.get("settings") or {}).get("unit_kinds"))
     alone = _alone(index)
     owner = {c: i for i, s in enumerate(subjects) if len(s["claims"]) == 1 for c in next(iter(s["claims"].values()))}
     evidence = {e["id"]: e for e in data.get("evidence", [])}
@@ -370,7 +388,7 @@ def candidates(data, index):
         if mode == "proposals" and ev["properties"]:
             for x in (i, j):
                 if x not in by_property:
-                    by_property[x] = _by_property(subjects[x], evidence)
+                    by_property[x] = _by_property(subjects[x], evidence, kinds)
             fits = _fits(by_property[i], by_property[j], ev["properties"])
         if (i, j) in keyed:
             ev["keyed"] = True
@@ -459,10 +477,11 @@ def link_said(link):
 # rules them out), and the judge's pairing of their claims. Two families: plausible; one: possible.
 
 def property_evidence(data):
-    """(each claim's value key (align.value_key), the pairs of claims the judge paired by a relation that counts)."""
-    keys = {}
+    """(each claim's value key (measured: by unit kind where the unit_kinds setting says), the pairs of claims the
+    judge paired by a relation that counts)."""
+    keys, kinds = {}, bool((data.get("settings") or {}).get("unit_kinds"))
     for e in data.get("evidence", []):
-        key = value_key(Evidence.model_validate(e))
+        key = measured(Evidence.model_validate(e), kinds)
         if key is not None:
             keys[e["id"]] = key
     strong = STRONG.get(data.get("mode", ""), STRONG["proposals"])

@@ -347,6 +347,19 @@ From [the gotchas review](../research/gotchas-review-2026-11-09.md) (its item 2,
 
 The gotchas review's item 3: a richer unit table keying values by kind (gpm and gal/min, psi and kPa), for alignment and `_fits`. A revisions lever changing no request; its knob first, a revision converting a schedule's units.
 
+- **Knobs built 2026-11-09 and 10** (`revisions.convert`):
+  - **A revision converting its units,** nothing else changed (`wtp-s1-converted`: the flows in m³/h, the basins in metres, the pump schedule in L/s, metres and kW; recorded $0.04). The lab's scorer gains a "converted" class (one quantity in two units of a kind, within 0.5%). **Today's comparison confirms all 14 converted facts unchanged in every format** (70 of 70), no false change: revisions pair claims by names and attributes, and the judge converts. Nothing to build for revisions.
+  - **A proposals design in metric** (`wtp-s{seed}-metric-proposals`: Pine Ridge's design, its values the same quantities in metric units; the Pine Ridge pair in US units its control; recorded $0.085). Against the control (seed 1, every format): misfit links 0 → 18 (each side), plausible links right 9 → 5, false link gaps 1 → 9. Links' fit test and property_links' values key a unit the product's table doesn't know (gpm, ft, hp) as written, and feet as inches, so 5,151 gpm and 325 L/s are other kinds.
+- **Built 2026-11-10** (`links.measured`, `unit_kinds`, off): in links' fit test and property_links' values, a number whose unit the product's table doesn't know keyed by the search's table (its kind and its size in the kind's base), a length in inches in metres; alignment's keys unchanged.
+  - **Measured** (seed 1, a recorded arm, $0.001): the metric pair's misfit links 18 → 0, plausible right 5 → 8 (the control 9), false link gaps 9 → 1 (the control 1); of 158 recorded pair reports, only the metric pair's 5 change.
+  - **Held-out rule, written 2026-11-10 before seeds 10 and 11 were generated:**
+    - **Units:** one proposals pair in one format, seeds 10 and 11, the five pairs (the metric knob among them; the sealed template left out): 50 units.
+    - **Arms:** `unit_kinds` off and on, each a recorded run, every other setting today's defaults.
+    - **Target:** false gaps (the bucket "both give it", both kinds) fewer, summed over the units, at p < 0.1 by a sign flip over the units that change.
+    - **Guard:** plausible links right not fewer, summed; plausible links wrong at most 2 more.
+    - **Reported, not judged:** misfit links, possible links, firm groups.
+    - **Checked once,** on the code as committed.
+
 ### 16. Other names as evidence
 
 The gotchas review's item 1: glossary terms and the model's groups of other names as a link's evidence with a level, not a key joined by union-find; terms the sources define differently left out. Its knob first: one abbreviation with two meanings across a proposals pair.

@@ -330,6 +330,43 @@ class Keyed(unittest.TestCase):
         self.assertEqual((joined["matched_by"], sorted(joined["names"])),
                          ("model: the corresponding element", ["Raw water pump P-101A", "Raw water pump P-201A"]))
 
+class Kinds(unittest.TestCase):
+    """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The
+    gotchas review: "150 psi and 1,034 kPa never meet"."""
+    A = [claim("A-1", "ca", "intake pump", "capacity", "5,151", "gpm"),
+         claim("A-2", "ca", "intake pump", "total dynamic head", "96.8", "ft")]
+    B = [claim("B-1", "cb", "low-lift pump", "capacity", "325.0", "L/s"),
+         claim("B-2", "cb", "low-lift pump", "total dynamic head", "29.5", "m")]
+
+    def built(self, on):
+        return indexes.built(report(self.A + self.B, [], ("a", "b"), mode="proposals",
+                                    settings={"unit_kinds": on, "link_tests": True}))
+
+    def test_a_metric_design_fits_a_us_one(self):
+        link = lambda index: next(x for s in index["subjects"] for x in s.get("links", []))  # noqa: E731
+        off = link(self.built(False))
+        self.assertEqual((off["level"], off["evidence"].get("misfit")), ("possible", True))  # gpm and L/s apart
+        on = link(self.built(True))
+        self.assertEqual((on["level"], on["signals"], on["evidence"].get("misfit")),
+                         ("plausible", ["name", "properties"], None))
+
+    def test_measured_by_kind_and_size(self):
+        from semantic_pdf_diff.schema import Evidence
+        gpm, lps, ft = (links.measured(Evidence.model_validate(c), True) for c in (self.A[0], self.B[0], self.A[1]))
+        self.assertEqual((gpm[0], lps[0], ft[0]), ("flow", "flow", "length"))
+        self.assertAlmostEqual(gpm[1] / lps[1], 1.0, places=3)  # 5,151 gpm is 325.0 L/s
+        self.assertAlmostEqual(ft[1], 96.8 * 0.3048, places=6)
+        self.assertEqual(links.measured(Evidence.model_validate(self.A[0])), ("gpm", 5151.0))  # off: as written
+
+    def test_property_values_of_one_kind_across_units(self):
+        a = [claim("A-1", "ca", "plant", "design flow", "5,151", "gpm")]
+        b = [claim("B-1", "cb", "plant", "flow", "325.0", "L/s")]
+        for on, expected in ((False, (None, [])), (True, ("plausible", ["name", "values"]))):
+            data = report(a + b, [], ("a", "b"), mode="proposals", settings={"unit_kinds": on})
+            keys, judged = links.property_evidence(data)
+            self.assertEqual(links.property_alike(["design flow"], ["A-1"], ["flow"], ["B-1"], keys, judged),
+                             expected)  # off: gpm and L/s another kind each, ruled out
+
 class Shown(unittest.TestCase):
     def test_in_the_index_the_subjects_view_its_search_and_the_topics(self):
         data = report(A + B, [{"a": "A-1", "b": "B-1", "relation": "unrelated"}], ("a", "b"), mode="proposals")

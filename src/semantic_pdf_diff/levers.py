@@ -1493,6 +1493,14 @@ class KeyedLinks(Lever):
     # Please turn `keyed_links` on, then proceed.")
     keyed_links: Annotated[bool, _selecting(roles=COMPARE)] = True
 
+class UnitKinds(Lever):
+    lever_name, stage, off = "unit_kinds", "comparison", {"unit_kinds": False}
+    # comparisons: a value whose unit the product's table doesn't know (gpm, ft, hp, psi) weighed by the search's table
+    # in links' fit test and property_links' values (links.measured: its kind and its size in the kind's base), so a
+    # design in metric units fits one in US units (tentative matches, milestone 15; the gotchas review, item 3: "150 psi
+    # and 1,034 kPa never meet"). Alignment's keys unchanged: revisions converting their units pair already
+    unit_kinds: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
     # comparisons: each link read by the model against a decoy, the other source's next likeliest, a request a link
@@ -1632,7 +1640,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks,
-                 KeyedLinks, LinkRead,
+                 KeyedLinks, UnitKinds, LinkRead,
                  LinkMeaning,
                  LinkRerank,
                  LookGaps,
