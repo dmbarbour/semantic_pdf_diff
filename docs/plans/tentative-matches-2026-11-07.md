@@ -359,6 +359,11 @@ The gotchas review's item 3: a richer unit table keying values by kind (gpm and 
     - **Guard:** plausible links right not fewer, summed; plausible links wrong at most 2 more.
     - **Reported, not judged:** misfit links, possible links, firm groups.
     - **Checked once,** on the code as committed.
+  - **Held out, 2026-11-10** (seeds 10 and 11, 50 units, both arms recorded, $1.10): **passed.**
+    - **Target met:** false gaps 85 → 64, 6 units changed, p = 0.016; the metric pairs' 23 → 3.
+    - **Guard met:** plausible links right 95 → 100; wrong 37 → 37.
+    - **Reported:** misfit links 27 → 6; right gaps 52 → 54; possible links right 45 → 39 (raised to plausible), wrong 105 → 105; firm groups unchanged (474 right, 2 wrong).
+    - **The default** is the owner's call.
 
 ### 16. Other names as evidence
 

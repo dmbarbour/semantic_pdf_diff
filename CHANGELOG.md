@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.58.0 (2026-11-10)
+
+- **`unit_kinds`** (off; tentative matches, milestone 15): in links' fit test and property_links' values, a value whose unit the product's table doesn't know (gpm, ft, hp, psi) is weighed by its kind and size, so a design in metric units fits one in US units. Held out on new seeds: false gaps 85 → 64, plausible links right 95 → 100, wrong unchanged.
+- Two test documents in the controlled corpus: a revision converting its units (which comparisons already handle: 70 of 70 converted facts confirmed unchanged), and Pine Ridge's design in metric units as a fifth proposals pair.
+
 ## 0.57.1 (2026-11-09)
 
 - The slices replay fixture re-recorded for `keyed_links` on: 0.57.0 was released with it missing 9 answers (the full suite's slow replay test failed; the commit gate's quick suite skips it).
