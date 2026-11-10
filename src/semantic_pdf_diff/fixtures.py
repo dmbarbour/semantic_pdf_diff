@@ -28,6 +28,7 @@ import hashlib
 import io
 import json
 import sqlite3
+import time
 import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
@@ -102,13 +103,30 @@ class Fixture:
         new = not self.path.exists()
         self.db = (sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True) if readonly
                    else sqlite3.connect(self.path))
-        if new:
-            with self.db:
-                self.db.executescript(SCHEMA)
-                self.db.execute("INSERT INTO meta VALUES ('schema_version', ?)", (str(SCHEMA_VERSION),))
         self.db.execute(f"PRAGMA busy_timeout = {BUSY_MS}")  # other processes recording into it wait their turn
-        if not readonly:
-            self.db.execute("PRAGMA journal_mode = WAL")  # readers and one writer at a time, across processes
+        if new:  # made once: processes opening a new fixture at once (an export's workers) wait for the first to make
+            # it, then find it made (2026-11-10: two of a pack's workers both made it, "table meta already exists")
+            self.db.execute("BEGIN IMMEDIATE")
+            try:
+                if not self.db.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'meta'").fetchone():
+                    for statement in SCHEMA.split(";"):
+                        if statement.strip():
+                            self.db.execute(statement)
+                    self.db.execute("INSERT INTO meta VALUES ('schema_version', ?)", (str(SCHEMA_VERSION),))
+                self.db.execute("COMMIT")
+            except BaseException:
+                self.db.execute("ROLLBACK")
+                raise
+        if not readonly:  # readers and one writer at a time, across processes; the file keeps it, so set once, the
+            # change waiting out the others opening a new fixture at once (it doesn't wait as busy_timeout says)
+            deadline = time.monotonic() + BUSY_MS / 1000
+            while self.db.execute("PRAGMA journal_mode").fetchone()[0] != "wal":
+                try:
+                    self.db.execute("PRAGMA journal_mode = WAL")
+                except sqlite3.OperationalError:
+                    if time.monotonic() > deadline:
+                        raise
+                    time.sleep(0.02)
         version = self.db.execute("SELECT value FROM meta WHERE key='schema_version'").fetchone()
         if not version or int(version[0]) != SCHEMA_VERSION:
             self.db.close()

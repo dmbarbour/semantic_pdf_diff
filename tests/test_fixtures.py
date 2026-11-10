@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
-from semantic_pdf_diff import cli
+from semantic_pdf_diff import cli, fixtures
 from test_concurrency import jittery_model, make_pdf
 
 UNREACHABLE = 'http://127.0.0.1:9/v1'  # replay must never call the model
@@ -115,6 +115,31 @@ class OpenModes(unittest.TestCase):
             self.assertEqual(fixtures.Replayer(f, 'replay-or-record', 'm').lookup('bad', None, json.loads)[0], 'ask')
             fresh = fixtures.Replayer(f, 'replay', 'm', fresh_regions=['tile'])
             self.assertEqual((fresh.sample(('extract', 'tile')), fresh.sample(('extract', 'text'))), (1, 0))
+
+def _open_new(path, start):
+    start.wait()
+    fixtures.Fixture(path, create=True).close()
+
+class MadeOnce(unittest.TestCase):
+    def test_processes_opening_a_new_fixture_at_once_make_it_once(self):
+        # a pack's workers export into one new fixture: two both made its tables, "table meta already exists"
+        # (2026-11-10)
+        import multiprocessing
+        context = multiprocessing.get_context("fork")
+        with tempfile.TemporaryDirectory() as d:
+            for attempt in range(5):
+                path = Path(d) / f"new-{attempt}.sqlite"
+                start = context.Event()
+                workers = [context.Process(target=_open_new, args=(path, start)) for _ in range(8)]
+                for w in workers:
+                    w.start()
+                start.set()
+                for w in workers:
+                    w.join(60)
+                self.assertEqual([w.exitcode for w in workers], [0] * 8)
+                db = sqlite3.connect(path)
+                self.assertEqual(db.execute("SELECT value FROM meta").fetchall(), [(str(fixtures.SCHEMA_VERSION),)])
+                db.close()
 
 class RecordAndReplay(unittest.TestCase):
     def setUp(self):
