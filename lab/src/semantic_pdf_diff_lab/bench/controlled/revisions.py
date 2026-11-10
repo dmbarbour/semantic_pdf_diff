@@ -698,6 +698,50 @@ def units_changed_later(p, d):
         f.unit = "m"
     p.edits.append({"kind": "unit", "facts": [f.id for f in heights], "from": "ft", "to": "m"})
 
+def convert(project, conversions, headers=()):
+    """Facts restated in another unit of their kind, the quantity kept (a revision converting its units): conversions
+    [(fact ids, the new unit, the factor, decimals)], each value printed anew wherever it's printed, "<value> <unit>"
+    in prose and the value alone in a cell; headers [(old, new)]: a table's column headers ("Capacity (gpm)")."""
+    cells, prose, converted = {}, [], []
+    for ids, new_unit, factor, decimals in conversions:
+        for fid in ids:
+            fact = project.fact(fid)
+            value = f"{parse_number(fact.value) * factor:,.{decimals}f}"
+            cells[fact.value] = value
+            prose.append((_pattern(f"{fact.value} {fact.unit}"), f"{value} {new_unit}"))
+            converted.append({"fact": fid, "from": f"{fact.value} {fact.unit}", "to": f"{value} {new_unit}"})
+            fact.value, fact.unit = value, new_unit
+
+    def edit(text):
+        if text in cells:
+            return cells[text]
+        for pattern, new in prose:
+            text = pattern.sub(new, text)
+        return text
+    _rewrite(project, edit)
+    for _, blocks in project.sections:
+        for i, block in enumerate(blocks):
+            if block[0] == "table":
+                blocks[i] = (block[0], block[1], [dict(headers).get(h, h) for h in block[2]], *block[3:])
+    values = [f.value for f in project.facts if not f.relation]
+    if len(values) != len(set(values)):
+        raise ValueError(f"{project.id}: a converted value names two facts")
+    project.edits.append({"kind": "converted", "facts": converted})
+
+PUMPS = ("P-101A", "P-101B", "P-101C")
+
+def converted_later(p, d):
+    """Revision B of the treatment plant's design basis in metric units, nothing else changed (tentative matches,
+    milestone 15; the gotchas review, item 3: "1,250 gpm" isn't "1250 gal/min", 150 psi and 1,034 kPa never meet):
+    the plant's flows in m³/h, the sedimentation basins' measures in metres, and the raw water pumps' schedule in L/s,
+    metres and kW, its headers too."""
+    convert(p, [(("plant.design_flow", "plant.peak_flow"), "m³/h", 694.444 / 4.40287, 0),
+                (("sed.length", "sed.width", "sed.depth"), "m", 0.3048, 1),
+                (tuple(f"{t}.capacity" for t in PUMPS), "L/s", 1 / 15.8503, 1),
+                (tuple(f"{t}.head" for t in PUMPS), "m", 0.3048, 1),
+                (tuple(f"{t}.motor" for t in PUMPS), "kW", 0.7457, 0)],
+            headers=(("Capacity (gpm)", "Capacity (L/s)"), ("TDH (ft)", "TDH (m)"), ("Motor (hp)", "Motor (kW)")))
+
 def attach_later(p, d):
     """Revision B of the attach procedure: a Key Challenge inserted after the Key Request, the 15 steps after it
     renumbered; the lookup timeout (before the insertion) and the setup timer (after it, so renumbered too)
@@ -752,7 +796,9 @@ PAIRS = ((PROJECTS["wtp"], None, wtp_later, False, "revised"),
          # properties no longer given, or given anew, of items both revisions keep: gaps another revision fills
          # (single-document analysis, milestone 7)
          (TABLE_PROJECTS["wtp-tables"], "clean", wtp_tables_gaps, False, "gaps"),
-         (PROJECTS["wtp"], None, wtp_gaps, False, "gaps"))
+         (PROJECTS["wtp"], None, wtp_gaps, False, "gaps"),
+         # a revision converting its units, the quantities kept (tentative matches, milestone 15)
+         (PROJECTS["wtp"], None, converted_later, False, "converted"))
 
 def _base(make, knob, seed):
     p = make(seed)

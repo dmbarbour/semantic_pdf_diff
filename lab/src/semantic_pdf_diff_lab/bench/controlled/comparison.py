@@ -84,6 +84,9 @@ def changes(earlier, later):
     both = a.keys() & b.keys()
     same = lambda x, y: " ".join(x.casefold().split()) == " ".join(y.casefold().split())
     value = lambda f: (f["value"], f.get("unit", ""))  # a unit restated, the number kept, is a changed value
+    converted = {i for i in both if value(a[i]) != value(b[i]) and same(a[i].get("conditions", ""),
+                                                                        b[i].get("conditions", ""))
+                 and _converted(a[i], b[i])}
     kept = {i for i in both if value(a[i]) == value(b[i])
             and same(a[i].get("conditions", ""), b[i].get("conditions", ""))}
     declared = lambda f: (f.get("context") or {}).get("declared", "")
@@ -93,14 +96,28 @@ def changes(earlier, later):
     hedged = {i for i in kept if not same(a[i].get("strength", ""), b[i].get("strength", ""))}  # firmer or weaker
     kept -= hedged
     restated = {i for i in kept if not same(declared(a[i]), declared(b[i]))}
-    return {"changed": sorted(i for i in both if value(a[i]) != value(b[i])),
+    return {"changed": sorted(i for i in both if value(a[i]) != value(b[i]) and i not in converted),
             "conditions": sorted(i for i in both if value(a[i]) == value(b[i])
                                  and not same(a[i].get("conditions", ""), b[i].get("conditions", ""))),
             "added": sorted(b.keys() - a.keys()), "removed": sorted(a.keys() - b.keys()),
             "unchanged": sorted(kept - restated),
             **({"context": sorted(restated)} if restated else {}),
             **({"holder": sorted(credited)} if credited else {}),
-            **({"hedge": sorted(hedged)} if hedged else {})}
+            **({"hedge": sorted(hedged)} if hedged else {}),
+            **({"converted": sorted(converted)} if converted else {})}
+
+CONVERTED = 0.005  # a quantity restated in another unit of its kind: within this share, the conversion's rounding
+
+def _converted(a, b):
+    """Whether two facts' values are one quantity in two units of one kind (values.unit_kind): a converted value, no
+    change (tentative matches, milestone 15)."""
+    from semantic_pdf_diff.values import parse_number, unit_kind
+    ka, kb = unit_kind(a.get("unit", "")), unit_kind(b.get("unit", ""))
+    x, y = parse_number(str(a["value"])), parse_number(str(b["value"]))
+    if not ka or not kb or ka[0] != kb[0] or a.get("unit") == b.get("unit") or x is None or y is None:
+        return False
+    x, y = x * ka[1], y * kb[1]
+    return abs(x - y) <= CONVERTED * max(abs(x), abs(y))
 
 def sides(report):
     """{claim id: 0 (the earlier revision's) or 1 (the later's)}, by the source its file is in."""
@@ -135,6 +152,8 @@ def score_comparison(earlier, later, report):
             "removals_found": f"{count('removed', 'reported')}/{len(kinds['removed'])}",
             "unchanged_confirmed": f"{count('unchanged', 'confirmed')}/{len(kinds['unchanged'])}",
             "false_changes": count("unchanged", "false change"),
+            **({"converted_confirmed": f"{count('converted', 'confirmed')}/{len(kinds['converted'])}",
+                "converted_false_changes": count("converted", "false change")} if "converted" in kinds else {}),
             **({"context_found": f"{count('context', 'reported')}/{len(kinds['context'])}"}
                if "context" in kinds else {}),
             **({"holders_noticed": f"{len(kinds['holder']) - count('holder', 'settled')}/{len(kinds['holder'])}"}
@@ -248,7 +267,7 @@ def _gaps(report, side, keys, renames, kinds, bound):
     if not planted and not found and not linked:
         return {}
     names = [s["name"] for s in report["sources"]]
-    both = set(kinds["unchanged"]) | set(kinds["changed"]) | set(kinds["conditions"])
+    both = set(kinds["unchanged"]) | set(kinds["changed"]) | set(kinds["conditions"]) | set(kinds.get("converted", ()))
     right, read = set(), Counter()
     for g in found:
         fids = {fid for c in g["claims"] for fid in bound.get(c, {})}
@@ -342,8 +361,9 @@ def _outcomes(report, kinds, claims_of, read):
                        else "settled" if pairs & settled and not between[fid] - {"equivalent"}
                        else "judged " + "/".join(sorted(between[fid])) if between[fid] else "unpaired")
     for kind, (different, equivalent) in (("changed", ("reported", "called equivalent")),
-                                          ("unchanged", ("false change", "confirmed"))):
-        for fid in kinds[kind]:
+                                          ("unchanged", ("false change", "confirmed")),
+                                          ("converted", ("false change", "confirmed"))):
+        for fid in kinds.get(kind, ()):
             found = between[fid]
             detail[fid] = ("unextracted" if not all(claims_of[fid]) else different if "different" in found
                            else equivalent if "equivalent" in found else "uncertain" if "uncertain" in found

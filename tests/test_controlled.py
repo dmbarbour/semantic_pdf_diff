@@ -470,7 +470,11 @@ class Revisions(unittest.TestCase):
                     "wtp-s1-abbreviated": (2, 0, 0, 0),
                     # properties no longer given or given anew of items both keep (single-document analysis,
                     # milestone 7): the valves' stroke time column dropped; two sentences dropped, two added
-                    "wtp-tables-s1-clean-gaps": (0, 0, 20, 0), "wtp-s1-gaps": (0, 2, 2, 0)}
+                    "wtp-tables-s1-clean-gaps": (0, 0, 20, 0), "wtp-s1-gaps": (0, 2, 2, 0),
+                    # units converted, the quantities kept (tentative matches, milestone 15): no value changed, 14
+                    # restated in metric
+                    "wtp-s1-converted": (0, 0, 0, 0)}
+        converted = {"wtp-s1-converted": 14}
         # facts whose declared context was restated, value and conditions kept: the plan's 7 rooms' widths and
         # depths, the coaster's 5 element heights; and a proposal credited to another company, its value kept
         restated = {"lcc-plan-s1-clean-notes": 14, "coaster-tables-s1-clean-datum": 5}
@@ -489,6 +493,7 @@ class Revisions(unittest.TestCase):
                 self.assertEqual(tuple(len(kinds[k]) for k in ("changed", "added", "removed", "conditions")),
                                  expected[pair.id])
                 self.assertEqual(len(kinds.get("context", ())), restated.get(pair.id, 0))
+                self.assertEqual(len(kinds.get("converted", ())), converted.get(pair.id, 0))
                 self.assertEqual(kinds.get("holder", []), credited.get(pair.id, []))
                 self.assertEqual(kinds.get("hedge", []), hedged.get(pair.id, []))
         # the narrated change: the later coaster prints the old lift height as superseded, the earlier as current
