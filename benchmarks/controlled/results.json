@@ -9722,6 +9722,192 @@
     "text": "8/8"
    }
   },
+  "wtp-s1-metric": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 40,
+   "outcomes": {
+    "loose": 1,
+    "right": 38,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    },
+    "visual": {
+     "loose": 1,
+     "right": 34,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9",
+    "visual": "10/10"
+   }
+  },
+  "wtp-s1-metric.docx": {
+   "facts": 32,
+   "found": 31,
+   "recall": 0.9688,
+   "found_right": 30,
+   "missed": [
+    "floc.stages"
+   ],
+   "claims": 31,
+   "outcomes": {
+    "loose": 1,
+    "right": 30
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "docx-prose": 0.9524,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.md": {
+   "facts": 32,
+   "found": 31,
+   "recall": 0.9688,
+   "found_right": 30,
+   "missed": [
+    "floc.stages"
+   ],
+   "claims": 32,
+   "outcomes": {
+    "loose": 1,
+    "right": 30,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "md-prose": 0.9524,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.pptx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 32,
+   "outcomes": {
+    "loose": 1,
+    "right": 31
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.6562
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11
+    },
+    "text": {
+     "loose": 1,
+     "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.xlsx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "loose": 1,
+    "right": 31,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2812,
+    "text": 0.7188
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 9
+    },
+    "text": {
+     "loose": 1,
+     "right": 22,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-notes.pptx": {
    "facts": 33,
    "found": 33,
@@ -21296,6 +21482,192 @@
     "text": "8/8"
    }
   },
+  "wtp-s1-metric": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 40,
+   "outcomes": {
+    "loose": 1,
+    "right": 38,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    },
+    "visual": {
+     "loose": 1,
+     "right": 34,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9",
+    "visual": "10/10"
+   }
+  },
+  "wtp-s1-metric.docx": {
+   "facts": 32,
+   "found": 31,
+   "recall": 0.9688,
+   "found_right": 30,
+   "missed": [
+    "floc.stages"
+   ],
+   "claims": 31,
+   "outcomes": {
+    "loose": 1,
+    "right": 30
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "docx-prose": 0.9524,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.md": {
+   "facts": 32,
+   "found": 31,
+   "recall": 0.9688,
+   "found_right": 30,
+   "missed": [
+    "floc.stages"
+   ],
+   "claims": 32,
+   "outcomes": {
+    "loose": 1,
+    "right": 30,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "md-prose": 0.9524,
+    "md-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.pptx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 32,
+   "outcomes": {
+    "loose": 1,
+    "right": 31
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.6562
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11
+    },
+    "text": {
+     "loose": 1,
+     "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.xlsx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "loose": 1,
+    "right": 31,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2812,
+    "text": 0.7188
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 9
+    },
+    "text": {
+     "loose": 1,
+     "right": 22,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-notes.pptx": {
    "facts": 33,
    "found": 33,
@@ -31632,6 +32004,159 @@
     "text": "8/8"
    }
   },
+  "wtp-s1-metric": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 39,
+   "outcomes": {
+    "loose": 1,
+    "right": 37,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    },
+    "visual": {
+     "loose": 1,
+     "right": 34,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9",
+    "visual": "10/10"
+   }
+  },
+  "wtp-s1-metric.docx": {
+   "facts": 32,
+   "found": 31,
+   "recall": 0.9688,
+   "found_right": 30,
+   "missed": [
+    "floc.stages"
+   ],
+   "claims": 32,
+   "outcomes": {
+    "loose": 1,
+    "right": 30,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "docx-prose": 0.9524,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.pptx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "loose": 1,
+    "right": 31,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.6562
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.xlsx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "loose": 1,
+    "right": 31,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2812,
+    "text": 0.7188
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 9
+    },
+    "text": {
+     "loose": 1,
+     "right": 22,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10"
+   }
+  },
   "wtp-s1-notes.pptx": {
    "facts": 33,
    "found": 33,
@@ -41679,6 +42204,159 @@
    "conditions_by_reader": {
     "table": "1/1",
     "text": "8/8"
+   }
+  },
+  "wtp-s1-metric": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 39,
+   "outcomes": {
+    "loose": 1,
+    "right": 37,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "prose": 1.0,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625,
+    "visual": 1.0
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    },
+    "visual": {
+     "loose": 1,
+     "right": 34,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9",
+    "visual": "10/10"
+   }
+  },
+  "wtp-s1-metric.docx": {
+   "facts": 32,
+   "found": 31,
+   "recall": 0.9688,
+   "found_right": 30,
+   "missed": [
+    "floc.stages"
+   ],
+   "claims": 32,
+   "outcomes": {
+    "loose": 1,
+    "right": 30,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "docx-prose": 0.9524,
+    "docx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.625
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 19
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.pptx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "loose": 1,
+    "right": 31,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "pptx-prose": 1.0,
+    "pptx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3438,
+    "text": 0.6562
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 11,
+     "text": 1
+    },
+    "text": {
+     "loose": 1,
+     "right": 20
+    }
+   },
+   "conditions_by_reader": {
+    "table": "1/1",
+    "text": "9/9"
+   }
+  },
+  "wtp-s1-metric.xlsx": {
+   "facts": 32,
+   "found": 32,
+   "recall": 1.0,
+   "found_right": 31,
+   "missed": [],
+   "claims": 33,
+   "outcomes": {
+    "loose": 1,
+    "right": 31,
+    "text": 1
+   },
+   "conditions_kept": "10/10",
+   "recall_by_form": {
+    "xlsx-prose": 1.0,
+    "xlsx-table": 1.0
+   },
+   "by_reader": {
+    "table": 0.2812,
+    "text": 0.7188
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "right": 9
+    },
+    "text": {
+     "loose": 1,
+     "right": 22,
+     "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "10/10"
    }
   },
   "wtp-s1-notes.pptx": {

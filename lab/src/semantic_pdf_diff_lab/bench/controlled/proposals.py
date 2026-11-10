@@ -29,7 +29,7 @@ from dataclasses import dataclass, replace
 
 from .corpus import PROJECTS
 from .model import Draw, Fact
-from .revisions import add_row, add_sentence, drawer, drop_row, rewrite
+from .revisions import PUMPS, add_row, add_sentence, convert, drawer, drop_row, rewrite
 
 @dataclass
 class Pair:
@@ -115,6 +115,21 @@ def pine_ridge(seed):
     add_sentence(p, "filters.rate", "A backwash pump delivers {v} gpm to the filters.",
                  Fact("bw.capacity", "Backwash pump", ("backwash pump", "the backwash pump"), "capacity",
                       ("flow", "rated flow"), d.number(3000, 6000), "gpm"))
+    return p
+
+def pine_ridge_metric(seed):
+    """Pine Ridge's design basis in metric units (tentative matches, milestone 15's knob; the gotchas review, item 3:
+    "150 psi and 1,034 kPa never meet"): the same design, its values the same quantities, its flows in m³/h, its
+    basins in metres and its pumps in L/s, metres and kW; against Harrow Creek's, the Pine Ridge pair in imperial units
+    is its control."""
+    p = pine_ridge(seed)
+    p.id = f"wtp-s{seed}-metric"
+    convert(p, [(("plant.design_flow", "plant.peak_flow"), "m³/h", 694.444 / 4.40287, 0),
+                (("sed.length", "sed.width", "sed.depth"), "m", 0.3048, 1),
+                (tuple(f"{t}.capacity" for t in PUMPS) + ("bw.capacity",), "L/s", 1 / 15.8503, 1),
+                (tuple(f"{t}.head" for t in PUMPS), "m", 0.3048, 1),
+                (tuple(f"{t}.motor" for t in PUMPS), "kW", 0.7457, 0)],
+            headers=(("Capacity (gpm)", "Capacity (L/s)"), ("TDH (ft)", "TDH (m)"), ("Motor (hp)", "Motor (kW)")))
     return p
 
 CEDAR_WORDS = (("Harrow Creek", "Cedar Falls"), ("The rapid mix basin provides", "The coagulation tank provides"),
@@ -283,7 +298,8 @@ def harbor(seed):
 
 # (the corpus project's key, the other design's maker and id's ending, the pair's id's ending)
 PAIRS = (("wtp", pine_ridge, "proposal", "proposals"), ("wtp", cedar_falls, "cedar", "cedar-proposals"),
-         ("coaster", cyclone, "proposal", "proposals"), ("wtp", birch_hollow, "birch", "birch-proposals"))
+         ("coaster", cyclone, "proposal", "proposals"), ("wtp", birch_hollow, "birch", "birch-proposals"),
+         ("wtp", pine_ridge_metric, "metric", "metric-proposals"))
 
 # held out only: never in development's corpus (controlled.py heldout)
 HELDOUT_PAIRS = (("spec", harbor, "proposal", "proposals"),)

@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 24080,
-   "evidence": 13665,
+   "claims": 24299,
+   "evidence": 13831,
    "frame in conditions": 36,
-   "grounded": 6421,
+   "grounded": 6489,
    "list records": 36,
    "no content words": 4,
    "note records": 11,
@@ -14,13 +14,13 @@
    "partly": 64,
    "partly (image)": 38,
    "positioned": 124,
-   "printed": 8888,
+   "printed": 9017,
    "sheet records": 11,
-   "table records": 381,
+   "table records": 388,
    "unsupported": 39,
    "unsupported (image)": 820,
-   "with conditions": 7386,
-   "with records": 6896
+   "with conditions": 7454,
+   "with records": 6938
   },
   "placed": {
    "bound": {
@@ -29,8 +29,8 @@
     "nowhere": 53
    },
    "frame": {
-    "attribute": 17,
-    "conditions": 151,
+    "attribute": 20,
+    "conditions": 158,
     "frame": 195,
     "records": 109
    },
@@ -42,8 +42,8 @@
     "nowhere": 5
    },
    "scope": {
-    "attribute": 44,
-    "conditions": 2064,
+    "attribute": 48,
+    "conditions": 2100,
     "nowhere": 6
    },
    "sibling": {
@@ -64,7 +64,7 @@
     "shown, not used": 48
    },
    "frame": {
-    "shown, not used": 17
+    "shown, not used": 20
    },
    "provenance": {
     "in conditions": 5,
@@ -72,7 +72,7 @@
    },
    "scope": {
     "image only": 4,
-    "shown, not used": 46
+    "shown, not used": 50
    },
    "sibling": {
     "in conditions": 145,
@@ -110,13 +110,13 @@
      "share": 0.584
     },
     "<0.95": {
-     "readings": 11844,
-     "right": 11696,
+     "readings": 11928,
+     "right": 11780,
      "share": 0.988
     },
     "<=1.0": {
-     "readings": 33366,
-     "right": 30518,
+     "readings": 33710,
+     "right": 30850,
      "share": 0.915
     }
    },
@@ -132,15 +132,15 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 22678,
-     "right": 20674,
+     "readings": 22792,
+     "right": 20786,
      "share": 0.912
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 11504,
-     "right": 11476,
+     "readings": 11588,
+     "right": 11560,
      "share": 0.998
     }
    },
@@ -161,9 +161,9 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 10688,
-     "right": 9844,
-     "share": 0.921
+     "readings": 10918,
+     "right": 10064,
+     "share": 0.922
     }
    }
   }
@@ -9130,6 +9130,208 @@
     "examples": {
      "scope: shown, not used": [
       "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-metric": {
+   "inventory": {
+    "claims": 91,
+    "grounded": 29,
+    "with conditions": 29,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 11,
+    "printed": 31,
+    "evidence": 38,
+    "context_bytes_per_request": 164,
+    "data_bytes_per_request": 612,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-metric.docx": {
+   "inventory": {
+    "claims": 31,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 11,
+    "printed": 27,
+    "evidence": 31,
+    "context_bytes_per_request": 268,
+    "data_bytes_per_request": 1198,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 7,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-metric.md": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 17,
+    "evidence": 32,
+    "context_bytes_per_request": 589,
+    "data_bytes_per_request": 249,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-metric.pptx": {
+   "inventory": {
+    "claims": 32,
+    "grounded": 10,
+    "with conditions": 10,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 11,
+    "printed": 28,
+    "evidence": 32,
+    "context_bytes_per_request": 597,
+    "data_bytes_per_request": 238,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 7,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
+     ]
+    }
+   }
+  },
+  "wtp-s1-metric.xlsx": {
+   "inventory": {
+    "claims": 33,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 1
+    },
+    "with records": 9,
+    "printed": 26,
+    "evidence": 33,
+    "context_bytes_per_request": 512,
+    "data_bytes_per_request": 180,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 6,
+      "attribute": 2
+     },
+     "frame": {
+      "conditions": 1,
+      "attribute": 1
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 2
+     },
+     "frame": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ],
+     "frame: shown, not used": [
+      "plant.raw_turbidity: wanted '95th percentile'; read 95th percentile turbidity | measured over five years"
      ]
     }
    }

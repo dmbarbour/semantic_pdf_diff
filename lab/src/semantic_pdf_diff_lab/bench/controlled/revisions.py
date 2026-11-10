@@ -701,12 +701,18 @@ def units_changed_later(p, d):
 def convert(project, conversions, headers=()):
     """Facts restated in another unit of their kind, the quantity kept (a revision converting its units): conversions
     [(fact ids, the new unit, the factor, decimals)], each value printed anew wherever it's printed, "<value> <unit>"
-    in prose and the value alone in a cell; headers [(old, new)]: a table's column headers ("Capacity (gpm)")."""
+    in prose and the value alone in a cell, a decimal more where another fact's value would be printed alike (a value
+    names one fact); headers [(old, new)]: a table's column headers ("Capacity (gpm)")."""
     cells, prose, converted = {}, [], []
+    moving = {fid for ids, _, _, _ in conversions for fid in ids}
+    taken = {f.value for f in project.facts if not f.relation and f.id not in moving}
     for ids, new_unit, factor, decimals in conversions:
         for fid in ids:
             fact = project.fact(fid)
-            value = f"{parse_number(fact.value) * factor:,.{decimals}f}"
+            places = decimals
+            while (value := f"{parse_number(fact.value) * factor:,.{places}f}") in taken:
+                places += 1
+            taken.add(value)
             cells[fact.value] = value
             prose.append((_pattern(f"{fact.value} {fact.unit}"), f"{value} {new_unit}"))
             converted.append({"fact": fid, "from": f"{fact.value} {fact.unit}", "to": f"{value} {new_unit}"})

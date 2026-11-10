@@ -14385,6 +14385,203 @@
     "unrelated": 92
    },
    "unmatched": 7
+  },
+  "wtp-s1-metric-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "gap_looks": {
+    "no_place": 2
+   },
+   "if_one_item": {
+    "both give it": 4,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 20,
+    "equivalent": 9,
+    "uncertain": 32,
+    "unrelated": 81
+   },
+   "unmatched": 32
+  },
+  "wtp-s1-metric-proposals.md": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 8,
+    "links": {
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 17,
+    "equivalent": 11,
+    "uncertain": 22,
+    "unrelated": 58
+   },
+   "unmatched": 17
+  },
+  "wtp-s1-metric-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 5,
+    "links": {
+     "possible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 13,
+    "equivalent": 6,
+    "uncertain": 28,
+    "unrelated": 57
+   },
+   "unmatched": 25
+  },
+  "wtp-s1-metric-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 12,
+    "equivalent": 6,
+    "uncertain": 30,
+    "unrelated": 62
+   },
+   "unmatched": 29
+  },
+  "wtp-s1-metric-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 3,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 6,
+    "uncertain": 26,
+    "unrelated": 57
+   },
+   "unmatched": 21
   }
  },
  "replay": {
@@ -28773,6 +28970,203 @@
     "unrelated": 92
    },
    "unmatched": 7
+  },
+  "wtp-s1-metric-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "gap_looks": {
+    "no_place": 2
+   },
+   "if_one_item": {
+    "both give it": 4,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 20,
+    "equivalent": 9,
+    "uncertain": 32,
+    "unrelated": 81
+   },
+   "unmatched": 32
+  },
+  "wtp-s1-metric-proposals.md": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 8,
+    "links": {
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 17,
+    "equivalent": 10,
+    "uncertain": 23,
+    "unrelated": 58
+   },
+   "unmatched": 19
+  },
+  "wtp-s1-metric-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 5,
+    "links": {
+     "possible": {
+      "links": 4,
+      "right": 1,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 13,
+    "equivalent": 6,
+    "uncertain": 28,
+    "unrelated": 57
+   },
+   "unmatched": 25
+  },
+  "wtp-s1-metric-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 12,
+    "equivalent": 5,
+    "uncertain": 31,
+    "unrelated": 62
+   },
+   "unmatched": 31
+  },
+  "wtp-s1-metric-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 3,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 5,
+    "uncertain": 27,
+    "unrelated": 57
+   },
+   "unmatched": 23
   }
  },
  "recorded-rows": {
@@ -40460,6 +40854,176 @@
     "unrelated": 89
    },
    "unmatched": 3
+  },
+  "wtp-s1-metric-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 4,
+      "right": 3,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "gap_looks": {
+    "no_place": 2
+   },
+   "if_one_item": {
+    "both give it": 4,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 27,
+    "equivalent": 13,
+    "uncertain": 21,
+    "unrelated": 81
+   },
+   "unmatched": 17
+  },
+  "wtp-s1-metric-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 5,
+    "links": {
+     "possible": {
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 16,
+    "equivalent": 9,
+    "uncertain": 25,
+    "unrelated": 63
+   },
+   "unmatched": 20
+  },
+  "wtp-s1-metric-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 9,
+    "uncertain": 23,
+    "unrelated": 59
+   },
+   "unmatched": 18
+  },
+  "wtp-s1-metric-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 5,
+      "right": 2,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 7,
+    "uncertain": 25,
+    "unrelated": 57
+   },
+   "unmatched": 20
   }
  },
  "replay-rows": {
@@ -52147,6 +52711,176 @@
     "unrelated": 89
    },
    "unmatched": 3
+  },
+  "wtp-s1-metric-proposals": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 11,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 4,
+      "right": 3,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "gap_looks": {
+    "no_place": 2
+   },
+   "if_one_item": {
+    "both give it": 4,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 2,
+    "different": 27,
+    "equivalent": 13,
+    "uncertain": 21,
+    "unrelated": 81
+   },
+   "unmatched": 17
+  },
+  "wtp-s1-metric-proposals.docx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 9,
+    "matched": 5,
+    "links": {
+     "possible": {
+      "links": 6,
+      "right": 3,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "findings": {
+    "complementary": 1,
+    "different": 16,
+    "equivalent": 9,
+    "uncertain": 25,
+    "unrelated": 63
+   },
+   "unmatched": 20
+  },
+  "wtp-s1-metric-proposals.pptx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 11,
+    "right": 11,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 8,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 1,
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 16,
+    "equivalent": 8,
+    "uncertain": 25,
+    "unrelated": 59
+   },
+   "unmatched": 20
+  },
+  "wtp-s1-metric-proposals.xlsx": {
+   "facts": {
+    "changed": 29,
+    "conditions": 0,
+    "added": 2,
+    "removed": 3,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 9,
+    "right": 9,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 6,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 2,
+      "wrong": 1
+     },
+     "possible": {
+      "links": 5,
+      "right": 2,
+      "wrong": 3
+     }
+    }
+   },
+   "gaps_found": "2/2",
+   "gaps": {
+    "right": 2
+   },
+   "if_one_item": {
+    "both give it": 5,
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 3,
+    "different": 17,
+    "equivalent": 7,
+    "uncertain": 25,
+    "unrelated": 57
+   },
+   "unmatched": 20
   }
  }
 }
