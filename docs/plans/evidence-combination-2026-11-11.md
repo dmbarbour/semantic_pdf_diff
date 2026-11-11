@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestone 0 built 2026-11-11.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 and 1 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -41,6 +41,9 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 - **`links.candidates`** gains each rule's inputs as numbers (`candidates/2`): the shared words' IDF, the spelling share, the cosine and the reranker's score where asked, properties in common and the best rival's count, the values' ratio and unit kinds, the key or other names shared, the model's match and read, the judge's verdicts with their confidence (logged, weighing nothing until measured: the owner doubts it).
 - **Today's levels kept;** the recorded reports (the controlled corpus's, seeds 1 and 8 to 15, the slices') rebuild identically. No requests.
 - **The consumers inventoried** (2026-11-11): linked values, gaps given otherwise and link gaps (`indexes`), topics (`report.report_topics`) gate on "plausible"; the Subjects view and index.md show `link_said`; the lab's scorer counts by level; link reads aren't chosen by level, but by the link set (so a new set changes requests).
+- **Built 2026-11-11** (`candidates/3`): each candidate pair carries `features`: the rarest shared name word's IDF over the subjects' names, the names' words' share in common, their spelling's (trigrams), the cosine and the reranker's score where asked, properties in common and the most either has with another candidate, the values' largest ratio of one unit kind and how many pairs are of other kinds, values in common, keyed, the model's answers and read, the judge's verdicts with its confidence, alignment's groupings. Kept beside the link, not in it: a report's links are unchanged, and the features are made again from any recorded report.
+  - **Behaviour preserved:** the 693 recorded comparison reports' indexes (the controlled pairs and every held-out arm) rebuild identically.
+  - **Found on the way, fixed first** (two commits of their own): an index differed between two runs of the same code, a set's order, set by the process's hash seed, deciding ties: a property's names ("Height" and "height" tie on `natural`, which folds case), and a kind of tagged items' name (its most said word, "track" and "element" tying). Every recorded comparison report's index is now the same under any seed.
 
 ### 2. A scorer that ranks and calibrates (the lab, before any combiner)
 

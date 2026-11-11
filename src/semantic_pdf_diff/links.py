@@ -62,6 +62,7 @@ plausible matches "should feed links and topics for now").
 - **Kept in the index** (indexes.built: each subject's "links"), shown as links and in topics, never in the merged
   index's values nor its gaps, never a finding.
 """
+import math
 from collections import Counter, defaultdict
 
 from .align import GENERIC, STOP, identifiers, unit, value_key, words
@@ -69,8 +70,9 @@ from .schema import Evidence
 
 RUBRIC = "rubric/1"
 # What candidates() makes, versioned: a weight table fitted on another version is stale (weights). candidates/1 until
-# keyed_links (2026-11-09) added pairs keyed alike and kept apart; candidates/2 since
-CANDIDATES = "candidates/2"
+# keyed_links (2026-11-09) added pairs keyed alike and kept apart; candidates/2 since; candidates/3 since each pair's
+# evidence was also kept as numbers (features; evidence combined numerically, milestone 1, 2026-11-11)
+CANDIDATES = "candidates/3"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -141,6 +143,25 @@ def _fits(a, b, common):
                     return False
     return True
 
+def _fit_measure(a, b, common):
+    """What _fits weighs, as numbers: {"ratio": the largest ratio of two values of one kind of unit (None where none
+    are weighed), "differ": how many pairs of values are of other kinds}."""
+    ratio, differ = None, 0
+    for k in common:
+        for x in a.get(k, []):
+            for y in b.get(k, []):
+                if x[0] == "text" or y[0] == "text" or len(x) < 2 or len(y) < 2:
+                    continue
+                if not isinstance(x[1], (int, float)) or not isinstance(y[1], (int, float)):
+                    continue
+                if x[0] != y[0]:
+                    differ += 1
+                    continue
+                small, large = sorted((abs(x[1]), abs(y[1])))
+                if small:
+                    ratio = max(ratio or 1.0, large / small)
+    return {"ratio": round(ratio, 3) if ratio is not None else None, "differ": differ}
+
 def _name_words(subject):
     return {w for n in subject["names"] for w in words(n)} - STOP - GENERIC
 
@@ -165,6 +186,18 @@ def _values(subject, evidence):
 def _trigrams(name):
     letters = "".join(c for c in name.casefold() if c.isalnum() or c == " ")
     return {letters[k:k + 3] for k in range(len(letters) - 2)} - {""}
+
+def _spelling(a, b):
+    """Two subjects' names' spelling alike, as a number: the largest share of trigrams in common of any two of their
+    names (0 where none)."""
+    best = 0.0
+    for x in a["names"]:
+        tx = _trigrams(x)
+        for y in b["names"]:
+            ty = _trigrams(y)
+            if tx and ty:
+                best = max(best, len(tx & ty) / len(tx | ty))
+    return best
 
 def _spelled(a, b):
     """Whether two subjects have names spelled alike (their trigrams' share in common, SPELLED at least)."""
@@ -201,12 +234,14 @@ def _alone(index):
 
 def _paired(data, owner):
     """The pairs of subjects the findings, alignment's groupings and the model's answers name: {(i, j): {"judged":
-    Counter, "grouped": [kinds], "model": [(relation, taken)]}} (i, j: subjects' indices, the first source's first)."""
-    out = defaultdict(lambda: {"judged": Counter(), "grouped": [], "model": []})
+    Counter, "grouped": [kinds], "model": [(relation, taken)], "verdicts": [(relation, the judge's confidence)]}}
+    (i, j: subjects' indices, the first source's first)."""
+    out = defaultdict(lambda: {"judged": Counter(), "grouped": [], "model": [], "verdicts": []})
     for f in data.get("findings", []):
         a, b = owner.get(f.get("a")), owner.get(f.get("b"))
         if a is not None and b is not None and a != b:
             out[tuple(sorted((a, b)))]["judged"][f.get("relation", "")] += 1
+            out[tuple(sorted((a, b)))]["verdicts"].append((f.get("relation", ""), f.get("confidence")))
     for g in data.get("groupings", []):
         if g.get("kind") in ("ambiguous", "split candidate", "merge candidate"):
             for x in {owner[c] for c in g.get("earlier_claims", []) if c in owner}:
@@ -313,8 +348,12 @@ def candidates(data, index):
     settings: [{"i", "j" (the subjects' indices, the lower first), "evidence" (as a link shows it), "alike" (names
     alike: a rare word, most words, or the spelling), "distinct" (two properties or more in common, more than either
     has with any other candidate), "fits" (proposals: the values of the properties in common fit; None where none are
-    weighed), "read" (the model's read against a decoy, or None), "keyed" (keyed alike, kept apart: index["keyed"])}],
-    A to Z by the pair. A level is worked out from
+    weighed), "read" (the model's read against a decoy, or None), "keyed" (keyed alike, kept apart: index["keyed"]),
+    "features" (the evidence as numbers, for a combiner: the rarest shared name word's IDF over the subjects' names,
+    the names' words' share in common, their spelling's, the cosine and the reranker's score where asked, properties
+    in common and the most either has with another candidate, the values' largest ratio of one unit kind and how many
+    are of other kinds, values in common, keyed, the model's answers and read, the judge's verdicts with its
+    confidence, alignment's groupings)}], A to Z by the pair. A level is worked out from
     these (linked: the rubric; tentative matches, milestone 6: numbers)."""
     subjects, mode = index.get("subjects", []), data.get("mode", "")
     sources = index.get("sources", [])
@@ -375,6 +414,17 @@ def candidates(data, index):
     def distinct(i, j):
         n = len(common[i, j])
         return all(most[x, "size"] == n and most[x, "count"] == 1 for x in (i, j))
+    overlaps = defaultdict(list)  # each subject's properties in common with each candidate: [(how many, the other)]
+    for (i, j), c in common.items():
+        overlaps[i].append((len(c), j))
+        overlaps[j].append((len(c), i))
+
+    def rival(x, partner):
+        """The most properties x has in common with a candidate other than its partner."""
+        return max((n for n, o in overlaps[x] if o != partner), default=0)
+
+    def idf(w):
+        return math.log(len(subjects) / held[w]) if held[w] else 0.0
     out = []
     for i, j in sorted(pairs):
         s, t = subjects[i], subjects[j]
@@ -405,9 +455,24 @@ def candidates(data, index):
             fits = _fits(by_property[i], by_property[j], ev["properties"])
         if (i, j) in keyed:
             ev["keyed"] = True
+        if ev["properties"]:
+            for x in (i, j):
+                if x not in by_property:
+                    by_property[x] = _by_property(subjects[x], evidence, kinds)
+        measure = (_fit_measure(by_property[i], by_property[j], ev["properties"]) if ev["properties"]
+                   else {"ratio": None, "differ": 0})
+        union = names[0] | names[1]
+        features = {  # the evidence as numbers, for a combiner (evidence combined numerically, milestone 1)
+            "name_idf": round(max((idf(w) for w in ev["name"]), default=0.0), 3),
+            "name_share": round(len(ev["name"]) / len(union), 3) if union else 0.0,
+            "spelling": round(_spelling(s, t), 3), "meaning": ev.get("meaning"), "reranked": ev.get("reranked"),
+            "properties": len(ev["properties"]), "rival": max(rival(i, j), rival(j, i)),
+            "value_ratio": measure["ratio"], "kinds_differ": measure["differ"], "values": ev["values"],
+            "keyed": (i, j) in keyed, "model": [r for r, _ in said["model"]], "read": reads.get((i, j)),
+            "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"]))}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
-                    "keyed": (i, j) in keyed})
+                    "keyed": (i, j) in keyed, "features": features})
     return out
 
 def linked(data, index):

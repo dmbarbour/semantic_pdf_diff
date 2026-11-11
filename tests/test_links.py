@@ -76,6 +76,26 @@ class Linked(unittest.TestCase):
         found = links_of(report(a + b, [], ("a", "b"), mode="proposals"))
         self.assertEqual(len(found), links.LINKS)
 
+class Features(unittest.TestCase):
+    """Evidence combined numerically, milestone 1: each candidate pair's evidence as numbers beside the rubric's
+    booleans, the rubric's levels unchanged."""
+    def test_a_pairs_evidence_as_numbers(self):
+        judged = [{"a": "A-3", "b": "B-3", "relation": "different", "confidence": 0.8}]
+        data = report(A + B, judged, ("a", "b"), mode="proposals")
+        index = indexes.built(data)
+        names = {i: s["name"] for i, s in enumerate(index["subjects"])}
+        found = {(names[c["i"]], names[c["j"]]): c["features"] for c in links.candidates(data, index)}
+        plants = found["Harrow Creek Water Treatment Plant", "Pine Ridge Water Treatment Plant"]
+        self.assertEqual((plants["properties"], plants["rival"], plants["kinds_differ"], plants["keyed"]),
+                         (2, 0, 0, False))
+        self.assertEqual(plants["name_share"], round(3 / 7, 3))  # water, treatment, plant of seven words
+        self.assertGreater(plants["name_idf"], 0)
+        self.assertEqual(plants["value_ratio"], round(25.9 / 16.3, 3))  # the larger of the two flows' ratios
+        alum = found["Alum", "ferric sulfate"]
+        self.assertEqual((alum["name_share"], alum["verdicts"]), (0.0, [("different", 0.8)]))
+        self.assertEqual(alum["value_ratio"], round(38.8 / 18.5, 3))
+        self.assertEqual(links_of(data)["Alum", "ferric sulfate"][0], "plausible")  # the levels as before
+
 class Signals(unittest.TestCase):
     """Milestone 3: names spelled alike, and alike in meaning (the link_meaning lever's)."""
     def test_names_spelled_alike_count_as_names(self):
