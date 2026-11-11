@@ -297,6 +297,8 @@ The owner, 2026-11-09: "So it seems weighted/fuzzy joining of properties hasn't 
 
 ### 10. Place, use and context, fitted
 
+- **Under review, 2026-11-11:** "place" below meant document position; the owner meant where a component is used in a system ([place review](../research/place-review-2026-11-11.md)).
+
 The owner, 2026-11-09: "We'll also add context of use as something to compare heuristically"; "we need place/use/context relationships that are also 'fitted' based on intelligence and heuristics, generally fuzzy not all or nothing."
 
 - **Sections matched across sources,** softly (headings, abouts, the firm matches in them): a link's `place` band.
