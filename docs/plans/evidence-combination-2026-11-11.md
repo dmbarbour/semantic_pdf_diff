@@ -137,6 +137,13 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
   - **Guards:** combined firm groups 98% right or more overall (development 99.3%); the keys' items a right group holds not fewer, summed; right gaps (both kinds) not fewer, summed.
   - **Reported, not judged:** the candidate pairs' average precision; log loss and calibration by band; false gaps; firm groups wrong, listed; Harbor's units apart (the template nothing was tuned on).
   - **Checked once,** on the code as committed (0.62.0); the default the owner's call.
+- **Held out, 2026-11-11** (seeds 16 and 17, 70 units, both arms recorded, $1.57; Harbor spent): **passed.**
+  - **Target met:** all pairs' average precision 0.954 → 0.973, 53 units changed, p < 0.0001.
+  - **Guards met:** combined firm groups 737 right of 745 (98.9%); items matched 446 → 474 of 589; right gaps 60 → 60.
+  - **Reported:** the candidate pairs' average precision 0.722 → 0.748; log loss 0.282; false gaps 66 → 19; calibration cautious above 0.5 (said 0.62, right 92%; 0.81, 96%; 0.95, 99.5%), close below (0.25, 28%; 0.32, 38%; 0.03, 0%).
+  - **By template** (mean average precision, today's → combined): Harbor, sealed, 0.984 → 0.983 (flat); Birch Hollow 0.916 → 0.984; Cedar Falls 0.899 → 0.935; Pine Ridge 0.946 → 0.966, in metric 0.961 → 0.977; Spruce Lake 0.998 → 1.000; Cyclone 0.970 → 0.964.
+  - **The 8 wrong firm groups,** each joined by evidence at 0.71 to 0.82: Harrow Creek's UV option and a chlorine contact basin (5, the hard case of development); Harbor's extended short status report and short status report (1, its look-alike decoy); Spruce Lake's filters and the building's (2: the place decoy, which the reader's names kept apart on development; place's work, milestone 10).
+  - **The default** is the owner's call.
 
 ### 7. Graded model answers (a prompt lever, off)
 
