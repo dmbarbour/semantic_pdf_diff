@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 3 built 2026-11-11.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 4 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -96,6 +96,12 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 
 - **The caps, floors and splits** (link_tests' misfit, link_read's decoy or neither, keyed_links' floor and contest, other_names_fit's split, `distinct`) become weights; `property_alike` the same combiner in miniature.
 - **Shown:** `link_said`, the Subjects view and index.md say a probability and each point's contribution.
+- **Built 2026-11-11** (under `link_levels: combined`):
+  - **The caps and floor of links are weights in the combiner already** (milestone 3: the misfit, the decoy, a key, a rival sharing more); the splits of firm groups (`keyed_links`' contest, `other_names_fit`) move to milestone 6, where firm groups go on the score.
+  - **Properties by weight** (`links.property_combined`): names alike +1.5, values of one kind that fit +1.0, far apart −1.0, only other kinds −2.5 (once a veto), the judge's pairing +1.5, a prior −1.5, families capped; `indexes.given_otherwise` drops a gap from 0.6, notes "possibly given as X (0.50)" from 0.35.
+  - **Shown:** a combined link says its probability and each family's signed part ("possibly the counterpart of Pine Ridge Water Treatment Plant (b; 0.90: names +1.5, properties +1.5, values +0.4)"), in the Subjects view, index.md and the export; a link gap says the link's probability.
+  - **Identifiers that differ** (Room 104, Room 105) recorded as a feature, weighing nothing between proposals: 0.33 of such pairs right on development, 0.31 by chance.
+  - **Measured** (development, gaps, the recorded reports rebuilt): gaps another source fills unchanged (155 right, 26 both give it); link gaps 26 right of 310 under the rubric, 26 right of 36 combined (the combiner's plausible links no longer the contested tags').
 
 ### 5. Consumers on the probability
 

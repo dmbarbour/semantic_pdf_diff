@@ -664,10 +664,12 @@ def gaps(data, subjects, found_kinds, where):
 
 def given_otherwise(data, subjects, gaps):
     """The gaps another source fills, and "if one item", less those whose property the lacking side plausibly gives
-    under another name (links.property_alike: two families of names, values and the judge's pairing); one possibly
-    given (a family) kept, its why saying so (the property_links setting's; tentative matches, milestone 8)."""
-    from .links import property_alike, property_evidence
+    under another name (links.property_alike: two families of names, values and the judge's pairing; or by weight,
+    links.property_combined, where link_levels says "combined": its probability from SHOWN's plausible); one possibly
+    given kept, its why saying so (the property_links setting's; tentative matches, milestone 8)."""
+    from .links import SHOWN, property_alike, property_combined, property_evidence
     keys, judged = property_evidence(data)
+    combining = (data.get("settings") or {}).get("link_levels") == "combined"  # by weight (milestone 4)
     by_name = defaultdict(list)
     for s in subjects:
         by_name[s["name"]].append(s)
@@ -681,9 +683,14 @@ def given_otherwise(data, subjects, gaps):
         given = g["claims"]  # the other side's claims of the property
         best = None
         for q in mine:
-            level, families = property_alike([g["property"]], given, q.get("names", [q["name"]]),
-                                             [v["claim"] for v in q["values"] if v["source"] == g["source"]],
-                                             keys, judged)
+            theirs = [v["claim"] for v in q["values"] if v["source"] == g["source"]]
+            if combining:
+                p, by = property_combined([g["property"]], given, q.get("names", [q["name"]]), theirs, keys, judged)
+                level = next((name for name, at in SHOWN.items() if p >= at), None)
+                families = [f"{p:.2f}"]
+            else:
+                level, families = property_alike([g["property"]], given, q.get("names", [q["name"]]), theirs, keys,
+                                                 judged)
             if level and (best is None or (level == "plausible" and best[0] != "plausible")):
                 best = (level, families, q["name"])
         if best and best[0] == "plausible":
@@ -715,6 +722,7 @@ def if_one_item(subjects):
             other = by.get((link["source"], link["other"]))
             if link["level"] != "plausible" or other is None:
                 continue
+            standing = f"{link['probability']:.2f}" if "probability" in link else "plausible"  # combined: its number
             for p in other["properties"]:
                 if property_keys({"properties": [p]}) & mine:
                     continue
@@ -725,7 +733,7 @@ def if_one_item(subjects):
                 out.append({"kind": "if_one_item", "source": source, "subject": s["name"], "property": p["name"],
                             "where": own[0]["where"],
                             "why": f"if it's {SAID.get(link['relation'], 'the same as')} {other['name']} "
-                                   f"({link['source']}; plausible): it gives {said(v)} ({v['where']})",
+                                   f"({link['source']}; {standing}): it gives {said(v)} ({v['where']})",
                             "claims": [x["claim"] for x in given_[:3]]})
     return out
 

@@ -559,7 +559,8 @@ def candidates(data, index):
             "properties": len(ev["properties"]), "rival": max(rival(i, j), rival(j, i)),
             "value_ratio": measure["ratio"], "kinds_differ": measure["differ"], "values": ev["values"],
             "keyed": (i, j) in keyed, "model": [r for r, _ in said["model"]], "read": reads.get((i, j)),
-            "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"]))}
+            "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"])),
+            "ids_differ": bool(ids[0] and ids[1] and not ids[0] & ids[1])}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
                     "keyed": (i, j) in keyed, "features": features})
@@ -642,11 +643,20 @@ SIGNALS = {"name": "names", "keyed": "a tag, name or other name both give",
            "values": "values in common",
            "judged": "claims the judge paired", "grouped": "grouped by alignment", "model": "the model's match"}
 
+FAMILIES = {"names": "names", "model": "the model's readings", "properties": "properties", "values": "values",
+            "judge": "the judge", "alignment": "alignment"}  # a combined link's families, as said
+
 def link_said(link):
     """A link as the index and the page say it: "possibly the counterpart of Alum (a.pdf; plausible: properties in
-    common, claims the judge paired)"."""
-    return (f"possibly {SAID.get(link['relation'], 'the same as')} {link['other']} ({link['source']}; {link['level']}: "
-            + ", ".join(SIGNALS.get(x, x) for x in link["signals"]) + ")")
+    common, claims the judge paired)"; combined (link_levels "combined"), its probability and each family's part:
+    "(a.pdf; 0.86: names +1.5, the model's readings +1.5, properties −1.2)" (evidence combined numerically, milestone
+    4; the owner: "I think it's a good idea to report confidence scores numerically.")."""
+    said = f"possibly {SAID.get(link['relation'], 'the same as')} {link['other']} ({link['source']}; "
+    if "probability" in link:
+        parts = [f"{FAMILIES.get(f, f)} {'+' if v > 0 else '−'}{abs(v):g}"
+                 for f, v in sorted(link.get("contributions", {}).items(), key=lambda x: -abs(x[1])) if v]
+        return said + f"{link['probability']:.2f}" + (": " + ", ".join(parts) if parts else "") + ")"
+    return said + f"{link['level']}: " + ", ".join(SIGNALS.get(x, x) for x in link["signals"]) + ")"
 
 
 # --- properties possibly one (tentative matches, milestone 8; the owner, 2026-11-09: "weighted/fuzzy joining of
@@ -698,3 +708,30 @@ def property_alike(p_names, p_claims, q_names, q_claims, keys, judged):
     if not families:
         return None, []
     return (LEVELS[0] if len(families) >= 2 else LEVELS[1]), families
+
+PROPERTY_PRIOR = -1.5  # two properties of a subject, one from each source, being one before their evidence
+
+def property_combined(p_names, p_claims, q_names, q_claims, keys, judged):
+    """(the probability two properties are one, {family: its log-odds}): property_alike's evidence combined as links'
+    is (combined; evidence combined numerically, milestone 4): names alike +1.5; values of one unit kind that fit
+    +1.0, all far apart −1.0, only other kinds −2.5 (once a veto); the judge pairing their claims +1.5; a prior
+    (PROPERTY_PRIOR), each family within FAMILY_CAP, kept off 0 and 1. Its level as links' (SHOWN): two families
+    plausible, one possible, as the rubric said, but by weight."""
+    by = {}
+    if _name_alike(p_names, q_names):
+        by["names"] = 1.5
+    a = [keys[c] for c in p_claims if c in keys and len(keys[c]) >= 2 and isinstance(keys[c][1], (int, float))]
+    b = [keys[c] for c in q_claims if c in keys and len(keys[c]) >= 2 and isinstance(keys[c][1], (int, float))]
+    if a and b:
+        if not {x[0] for x in a} & {y[0] for y in b}:
+            by["values"] = -2.5
+        elif any(x[0] == y[0] and (x[1] == y[1] or (min(abs(x[1]), abs(y[1])) and max(abs(x[1]), abs(y[1]))
+                                                    / min(abs(x[1]), abs(y[1])) <= FIT)) for x in a for y in b):
+            by["values"] = 1.0
+        else:
+            by["values"] = -1.0
+    if any(frozenset((c, d)) in judged for c in p_claims for d in q_claims):
+        by["judge"] = 1.5
+    total = PROPERTY_PRIOR + sum(min(FAMILY_CAP, v) for v in by.values())
+    p = 1 / (1 + math.exp(-total))
+    return round(min(max(p, CLIP), 1 - CLIP), 3), by

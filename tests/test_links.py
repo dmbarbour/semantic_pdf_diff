@@ -129,12 +129,45 @@ class Combined(unittest.TestCase):
                       settings={"link_levels": "combined"})
         found = [x for s in indexes.built(data)["subjects"] for x in s.get("links", [])]
         self.assertTrue(found)
+        plants = next(x for x in found if x["other"] == "Pine Ridge Water Treatment Plant")
+        said = links.link_said(plants)
+        self.assertTrue(said.startswith(f"possibly the counterpart of Pine Ridge Water Treatment Plant (b; "
+                                        f"{plants['probability']:.2f}: "), said)
+        self.assertIn("properties +", said)  # each family's part, signed
         for x in found:
             self.assertEqual(x["rubric"], links.COMBINED)
             self.assertTrue(links.CLIP <= x["probability"] <= 1 - links.CLIP)
             self.assertEqual(x["level"], "plausible" if x["probability"] >= links.SHOWN["plausible"] else "possible")
             self.assertTrue(set(x["contributions"]) <= {"names", "model", "properties", "values", "judge",
                                                         "alignment"})
+
+class CombinedProperties(unittest.TestCase):
+    """Evidence combined numerically, milestone 4: properties possibly one by weight, and the numbers said."""
+    def test_names_values_and_the_judge_by_weight_another_unit_kind_against_not_a_veto(self):
+        a = [claim("A-1", "ca", "plant", "design flow (average day)", "25.9", "MGD")]
+        b = [claim("B-1", "cb", "plant", "average day flow", "16.3", "MGD"), claim("B-2", "cb", "plant", "flow", "3",
+                                                                                 "Hz")]
+        keys, judged = links.property_evidence(report(a + b, [], ("a", "b"), mode="proposals"))
+        p, by = links.property_combined(["design flow (average day)"], ["A-1"], ["average day flow"], ["B-1"], keys,
+                                        judged)
+        self.assertEqual(by, {"names": 1.5, "values": 1.0})
+        self.assertGreaterEqual(p, links.SHOWN["plausible"])
+        p, by = links.property_combined(["design flow (average day)"], ["A-1"], ["flow"], ["B-2"], keys, judged)
+        self.assertEqual(by, {"names": 1.5, "values": -2.5})  # a frequency isn't a flow: strongly against
+        self.assertLess(p, links.SHOWN["possible"])
+
+    def test_gaps_given_otherwise_by_weight_and_link_gaps_saying_their_number(self):
+        a = [claim("A-1", "ca", "P-101", "design flow (average day)", "25.9", "MGD"),
+             claim("A-2", "ca", "P-101", "head", "40", "ft")]
+        b = [claim("B-1", "cb", "P-101", "average day flow", "16.3", "MGD"), claim("B-2", "cb", "P-101", "head", "42",
+                                                                                   "ft")]
+        data = report(a + b, [], ("a", "b"), mode="proposals", settings={"property_links": True,
+                                                                         "link_levels": "combined"})
+        self.assertEqual(indexes.built(data)["gaps"], [])  # each plausibly given under the other's name
+        data = report(Indexed.PLANTS, [], ("a", "b"), mode="proposals",
+                      settings={"link_gaps": True, "link_levels": "combined"})
+        (gap,) = indexes.built(data)["gaps"]
+        self.assertRegex(gap["why"], r"^if it's the counterpart of Harrow Creek Water Treatment Plant \(a; 0\.\d\d\): ")
 
 class Signals(unittest.TestCase):
     """Milestone 3: names spelled alike, and alike in meaning (the link_meaning lever's)."""
