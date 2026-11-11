@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.60.2 (2026-11-11)
+
+- **An index is the same from run to run:** a property's names alike but for case ("Height", "height") and a kind of tagged items' name were ordered by chance (the process's hash seed); now by the names themselves.
+- `link_levels: weights` no longer applies a weight table fitted on other evidence (link_weights.json's weights/1 is now stale; the rubric decides, with a warning).
+- Each candidate pair of subjects keeps its evidence as numbers (evidence combined numerically, milestone 1); reports unchanged.
+
 ## 0.60.1 (2026-11-11)
 
 - `other_names_fit`'s help says what it ranks: a document's subjects one key holds (a tag, the same words or other names), not only other names'.
