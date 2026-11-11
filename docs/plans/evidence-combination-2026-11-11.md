@@ -128,6 +128,16 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
     - The 12 wrong: Harrow Creek's UV option and another design's chlorine contact tank, joined by evidence (two properties in common, the read's pick, the judge's pairing), the tank's keyed counterpart contested by a rival; a hard case the evidence points the wrong way on.
   - **Recorded** (seed 1, $0.007, against today's defaults as recorded): firm 329 right, 3 wrong (308, 0); items matched 232 of 278 (215); all pairs' average precision 0.969 (0.954), the candidate pairs' 0.826 (0.725); gaps right 27 (27), both give it 7 (36).
 
+### The combiner held out (milestones 3 to 6 together)
+
+- **Held-out rule, written 2026-11-11 before seeds 16 and 17 were generated** (decision 0037; by template, the sealed Harbor among them, spent by it):
+  - **Units:** one proposals pair in one format, seeds 16 and 17: the six development templates' pairs and the sealed Harbor template (`controlled.py heldout --sealed`): 70 units.
+  - **Arms:** today's defaults (`link_levels: rubric`) and `link_levels: combined`, each a recorded run.
+  - **Target:** all pairs' average precision higher combined, unit by unit, at p < 0.1 by a sign flip over the units that change.
+  - **Guards:** combined firm groups 98% right or more overall (development 99.3%); the keys' items a right group holds not fewer, summed; right gaps (both kinds) not fewer, summed.
+  - **Reported, not judged:** the candidate pairs' average precision; log loss and calibration by band; false gaps; firm groups wrong, listed; Harbor's units apart (the template nothing was tuned on).
+  - **Checked once,** on the code as committed (0.62.0); the default the owner's call.
+
 ### 7. Graded model answers (a prompt lever, off)
 
 - `match_subjects` and `link_read` answer with a grade (possible, plausible, firm) besides their pick. Judged against a null arm; the proposals seeds, the corpus and the slices re-recorded (about $0.2 a seed set).
