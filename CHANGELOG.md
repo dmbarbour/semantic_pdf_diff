@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.60.0 (2026-11-10)
+
+- **`unit_kinds` and `other_names_fit` on by default** (the owner: "I suppose we can turn these on by default then proceed."): links weigh values in units the product's table doesn't know by kind and size, and between proposals other names join two subjects only where they share a property. Round 0's settings keep both off. The controlled corpus and the slices fixture re-recorded ($0.0002).
+- Re-recording no longer fails when several workers open a new fixture at once ("table meta already exists").
+
 ## 0.59.0 (2026-11-10)
 
 - **`other_names_fit`** (off; tentative matches, milestone 16): between proposals, two subjects joined by other names alone (the model's, a glossary's) are one only where they share a property; the model's groups no longer chain two of one document's names into one subject. Else a plausible link. Held out on new seeds: wrong firm groups 4 → 0, right ones lost 2 of 927.
