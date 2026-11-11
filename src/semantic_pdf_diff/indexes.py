@@ -563,7 +563,8 @@ def kinds(subjects, shapes=(), regroup=None):
         elif how == "tag":
             said = Counter(w for i in members for n in subjects[i]["names"] if not several(n)
                            for w in words(TAG.sub(" ", n)) if not any(c.isdigit() for c in w))
-            name = f"{said.most_common(1)[0][0]} ({key})" if said else f"{key}-"
+            # the most said word, A to Z among ties (words() gives a set, whose order the hash seed sets)
+            name = f"{min(said, key=lambda w: (-said[w], w))} ({key})" if said else f"{key}-"
         else:
             name = Counter(NUMBERED_NAME.match(" ".join(_alone(subjects[i])[0].split()))[1].strip(" .#-")
                            for i in members).most_common(1)[0][0]

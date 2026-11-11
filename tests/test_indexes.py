@@ -34,7 +34,8 @@ ONE = [claim("A-1", "ca", "P-101 feed pump", "rated power", "10", "kW"),
 class Reproducible(unittest.TestCase):
     def test_names_alike_but_for_case_ordered_the_same_whatever_the_hash_seed(self):
         # a recorded report's index differed between processes: "Height" and "height" tie on natural's case folding
-        # and a set's order, which the hash seed sets, decided (2026-11-11)
+        # and a set's order, which the hash seed sets, decided; and a kind of tagged items named by its most said
+        # word, "track" or "element" tying (2026-11-11)
         import os
         import subprocess
         import sys
@@ -44,7 +45,9 @@ from semantic_pdf_diff import indexes
 from test_indexes import claim, report
 claims = [claim("A-1", "ca", "Camelback", "height", "41", "ft"), claim("A-2", "ca", "Camelback", "Height", "42", "ft"),
           claim("A-3", "ca", "Camelback", "fall height", "40", "ft")]
-print(json.dumps(indexes.built(report(claims))["subjects"], sort_keys=True))
+claims += [claim(f"T-{k}", "ca", f"E{k} track element", "height", str(10 + k), "ft") for k in range(1, 4)]
+index = indexes.built(report(claims))
+print(json.dumps([index["subjects"], index["kinds"]], sort_keys=True))
 """
         here = os.path.dirname(os.path.abspath(__file__))
         seen = {subprocess.run([sys.executable, "-c", script], cwd=here, capture_output=True, text=True, check=True,
