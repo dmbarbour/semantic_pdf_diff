@@ -351,6 +351,14 @@ DECAY = 0.5  # within a family, each further point for counts this share of the 
 FAMILY_CAP = 1.5  # a family's points for, at most: one family alone (names, or the model's readings) stays under
 # plausible, as two families of evidence once did by rule (the turbine pair: "Rotor Speed" and "rotor-speed error" by
 # their spelling, IEA's turbine and "Region 2½" by the reranker and the read)
+FAMILY_CAPS = {"key": 2.6}  # but a key both give: near 0.8 alone (the owner: "Perhaps firm group is only 80% without
+# corroborating evidence"; development's first pass, milestone 6: 1,749 of 1,876 keyed pairs one, 0.93)
+# Proposals' firm groups: a pair joined from this probability (milestone 6), one to one, by MERGE_MARGIN over the next
+# likeliest pair either side has. By analysis of development (182 units, firm groups right / wrong, items matched):
+# 0.70: 1,842 / 12, 1,226; 0.75: 1,780 / 12, 1,164; the rubric 1,734 / 0, 1,158. A key alone (near 0.8) joins; a key
+# with no property in common (0.62) doesn't
+MERGE = 0.7
+MERGE_MARGIN = 0.1
 # A link's level from its probability, for consumers gating on one (until milestone 5): set by analysis of development's
 # candidates (2026-11-11): from 0.35 up about 90% right, under it mostly a weak name; plausible above what one family
 # alone reaches (FAMILY_CAP with the prior: 0.57)
@@ -389,7 +397,9 @@ def contributions(c, mode):
     if f["meaning"]:
         out["names"].append(("alike in meaning", round(max(0.0, (f["meaning"] - 0.7) * 10), 3)))
     if f["keyed"]:
-        out["names"].append(("a key both give", 2.2))  # with the prior near 0.8 alone (the owner)
+        out["key"].append(("a key both give", 2.6))  # a family of its own: with the prior near 0.8 alone (the owner)
+        if not f["properties"] and min(f.get("own", [0])) > 0:  # other_names_fit's rule as a weight: 187 of 302 such
+            out["key"].append(("a key, no property in common", -0.9))  # keyed pairs one (0.62, against 0.93)
     for r in f["model"]:
         out["model"].append((f"the model's match ({r})", 2.0))
     out["model"] += {"picked": [("picked over a decoy", 1.5)], "decoy": [("the decoy picked", -2.5)],  # 0.95, 0
@@ -423,7 +433,7 @@ def contributions(c, mode):
     # right: milestone 14, the read picking the tag it was shown)
     siblings = n and rival >= n
     for family, points in out.items():
-        if f["keyed"] and family in ("judge", "model"):
+        if f["keyed"] and family in ("judge", "model", "names"):
             out[family] = [(name + ", shown by the key", 0.0) if w > 0 and name != "a key both give" else (name, w)
                            for name, w in points]
         elif siblings and family in ("judge", "values"):
@@ -437,12 +447,34 @@ def combined(c, mode):
     total, by = PRIOR, {}
     for family, points in contributions(c, mode).items():
         weights_for = sorted((w for _, w in points if w > 0), reverse=True)
-        value = (min(FAMILY_CAP, sum(w * DECAY ** k for k, w in enumerate(weights_for)))
+        value = (min(FAMILY_CAPS.get(family, FAMILY_CAP), sum(w * DECAY ** k for k, w in enumerate(weights_for)))
                  + sum(w for _, w in points if w < 0))
         by[family] = round(value, 3)
         total += value
     p = 1 / (1 + math.exp(-max(-30.0, min(30.0, total))))
     return round(min(max(p, CLIP), 1 - CLIP), 3), by
+
+def merges(data, index):
+    """Proposals' firm groups by evidence (milestone 6): [(i, j, probability)] of the candidate pairs to join, one to
+    one, the likeliest first: at MERGE or above, and by MERGE_MARGIN over the next likeliest pair either side has."""
+    scored = sorted(((combined(c, data.get("mode", ""))[0], c["i"], c["j"]) for c in candidates(data, index)),
+                    reverse=True)
+    best = defaultdict(list)  # each subject's pairs' probabilities, the likeliest first
+    for p, i, j in scored:
+        best[i].append(p)
+        best[j].append(p)
+    out, taken = [], set()
+    for p, i, j in scored:
+        if p < MERGE:
+            break
+        if i in taken or j in taken:
+            continue
+        rival = max([q for q in best[i][1:]] + [q for q in best[j][1:]] + [0.0])  # each side's next likeliest
+        if p - rival < MERGE_MARGIN:
+            continue
+        out.append((i, j, p))
+        taken |= {i, j}
+    return out
 
 def candidates(data, index):
     """Every pair of subjects alone in the two sources that a link may join, with what's known of it, whatever the
@@ -571,7 +603,8 @@ def candidates(data, index):
             "value_ratio": measure["ratio"], "kinds_differ": measure["differ"], "values": ev["values"],
             "keyed": (i, j) in keyed, "model": [r for r, _ in said["model"]], "read": reads.get((i, j)),
             "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"])),
-            "ids_differ": bool(ids[0] and ids[1] and not ids[0] & ids[1])}
+            "ids_differ": bool(ids[0] and ids[1] and not ids[0] & ids[1]),
+            "own": [len(_properties(s)), len(_properties(t))]}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
                     "keyed": (i, j) in keyed, "features": features})
@@ -654,8 +687,8 @@ SIGNALS = {"name": "names", "keyed": "a tag, name or other name both give",
            "values": "values in common",
            "judged": "claims the judge paired", "grouped": "grouped by alignment", "model": "the model's match"}
 
-FAMILIES = {"names": "names", "model": "the model's readings", "properties": "properties", "values": "values",
-            "judge": "the judge", "alignment": "alignment"}  # a combined link's families, as said
+FAMILIES = {"key": "a key both give", "names": "names", "model": "the model's readings", "properties": "properties",
+            "values": "values", "judge": "the judge", "alignment": "alignment"}  # a combined link's families, as said
 
 def link_said(link):
     """A link as the index and the page say it: "possibly the counterpart of Alum (a.pdf; plausible: properties in

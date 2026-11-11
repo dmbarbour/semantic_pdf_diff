@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 5 built 2026-11-11.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 6 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -114,6 +114,19 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 - **`indexes.matched`' proposals branch** joins where the pair's probability passes the merge threshold, an assignment with a margin as `align` does; a shared key a strong point (near 0.8 alone), a contest weighing against it. The owner: "Not only is it okay, I'm pretty sure it's necessary."
 - **Architectural, so not a lever at first; the exception recommended:** the old path kept behind a setting until milestone 2's measures pass on development and held out, then removed.
 - **Revisions later:** their findings-based groups carry a probability too (nothing pinned), the findings the dominant evidence; after proposals.
+- **Built 2026-11-11** (under `link_levels: combined`, which keeps the old path behind it: the rubric's indexes byte-identical, the 693 recorded reports checked):
+  - **Two passes** (`indexes.built`, `links.merges`): every pair keyed alike kept apart and the model's matches as evidence, not joins; each candidate pair's probability; joined one to one, the likeliest first, from `MERGE` (0.70) and by `MERGE_MARGIN` (0.1) over each side's next likeliest; built again, a keyed pair joined by its key (matched by "name" or "other names"), any other by "evidence", each group carrying its probability (shown by `matched_by`'s readers).
+  - **The universe changed, so the weights were measured again** (the first pass: 11,144 candidate pairs, 3,692 matches): a key both give 1,749 of 1,876 right (0.93; contested ones 13 of 133), so a family of its own, +2.6 (near 0.8 alone, the owner's figure); names, the judge and the read count nothing beside a key (shown by it); a key with no property in common (both giving some) 187 of 302 (0.62): −0.9, `other_names_fit`'s rule as a weight. The judge's "unrelated" (0.24 right) tried at −0.4 and dropped: right groups 1,842 → 1,787.
+  - **The merge cut by analysis** (development, 182 units rebuilt, firm groups right / wrong, items matched of 1,621, all pairs' average precision, false gaps):
+
+    | | Firm right / wrong | Items matched | Average precision | Gaps both give it |
+    |---|---|---|---|---|
+    | The rubric (today's defaults) | 1,734 / 0 | 1,158 | 0.938 | 226 |
+    | Combined, from 0.70 | 1,842 / 12 | 1,226 | 0.963 | 40 |
+    | Combined, from 0.75 | 1,780 / 12 | 1,164 | 0.961 | 40 |
+
+    - The 12 wrong: Harrow Creek's UV option and another design's chlorine contact tank, joined by evidence (two properties in common, the read's pick, the judge's pairing), the tank's keyed counterpart contested by a rival; a hard case the evidence points the wrong way on.
+  - **Recorded** (seed 1, $0.007, against today's defaults as recorded): firm 329 right, 3 wrong (308, 0); items matched 232 of 278 (215); all pairs' average precision 0.969 (0.954), the candidate pairs' 0.826 (0.725); gaps right 27 (27), both give it 7 (36).
 
 ### 7. Graded model answers (a prompt lever, off)
 

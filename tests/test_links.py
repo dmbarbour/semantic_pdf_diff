@@ -106,10 +106,12 @@ class Combined(unittest.TestCase):
         return {"features": {**base, **features}}
 
     def test_never_0_nor_1_one_family_alone_under_plausible(self):
-        strong = self.pair(spelling=1.0, name_share=1.0, name_idf=3.0, meaning=0.99, keyed=True)
+        strong = self.pair(spelling=1.0, name_share=1.0, name_idf=3.0, meaning=0.99)
         p, by = links.combined(strong, "proposals")
         self.assertEqual(by["names"], links.FAMILY_CAP)
         self.assertLess(p, links.SHOWN["plausible"])  # names alone, however many points
+        key, by = links.combined(self.pair(keyed=True, spelling=1.0, name_share=1.0), "proposals")
+        self.assertEqual((by["names"], round(key, 2)), (0, 0.8))  # a key alone (the owner: "only 80%"), the names its
         both = self.pair(spelling=1.0, properties=3, read="picked")
         self.assertGreaterEqual(links.combined(both, "proposals")[0], links.SHOWN["plausible"])
         nothing = self.pair(read="decoy", kinds_differ=2, properties=0, rival=3)
@@ -125,15 +127,17 @@ class Combined(unittest.TestCase):
         self.assertEqual([w for _, w in keyed["model"] + keyed["judge"]], [0.0, 0.0])  # shown by the key
 
     def test_links_carry_a_probability_and_each_familys_part(self):
-        data = report(A + B, [{"a": "A-3", "b": "B-3", "relation": "different"}], ("a", "b"), mode="proposals",
-                      settings={"link_levels": "combined"})
-        found = [x for s in indexes.built(data)["subjects"] for x in s.get("links", [])]
+        data = report(A + B, [], ("a", "b"), mode="proposals", settings={"link_levels": "combined"})
+        index = indexes.built(data)
+        found = [x for s in index["subjects"] for x in s.get("links", [])]
         self.assertTrue(found)
-        plants = next(x for x in found if x["other"] == "Pine Ridge Water Treatment Plant")
-        said = links.link_said(plants)
-        self.assertTrue(said.startswith(f"possibly the counterpart of Pine Ridge Water Treatment Plant (b; "
-                                        f"{plants['probability']:.2f}: "), said)
+        alum = next(x for x in found if x["other"] == "ferric sulfate")
+        said = links.link_said(alum)
+        self.assertTrue(said.startswith(f"possibly the counterpart of ferric sulfate (b; {alum['probability']:.2f}: "),
+                        said)
         self.assertIn("properties +", said)  # each family's part, signed
+        plants = next(s for s in index["subjects"] if len(s["claims"]) == 2)  # milestone 6: joined by evidence
+        self.assertEqual((plants["matched_by"], plants["probability"] >= links.MERGE), ("evidence", True))
         for x in found:
             self.assertEqual(x["rubric"], links.COMBINED)
             self.assertTrue(links.CLIP <= x["probability"] <= 1 - links.CLIP)
@@ -164,10 +168,35 @@ class CombinedProperties(unittest.TestCase):
         data = report(a + b, [], ("a", "b"), mode="proposals", settings={"property_links": True,
                                                                          "link_levels": "combined"})
         self.assertEqual(indexes.built(data)["gaps"], [])  # each plausibly given under the other's name
-        data = report(Indexed.PLANTS, [], ("a", "b"), mode="proposals",
+        coagulants = A[2:4] + B[2:4] + [claim("B-8", "cb", "ferric sulfate", "storage", "30", "days")]
+        data = report(coagulants, [{"a": "A-3", "b": "B-3", "relation": "different"}], ("a", "b"), mode="proposals",
                       settings={"link_gaps": True, "link_levels": "combined"})
-        (gap,) = indexes.built(data)["gaps"]
-        self.assertRegex(gap["why"], r"^if it's the counterpart of Harrow Creek Water Treatment Plant \(a; 0\.\d\d\): ")
+        with mock.patch.object(links, "MERGE", 0.9):  # a link, not one group: the merge cut above it
+            (gap,) = indexes.built(data)["gaps"]
+        self.assertRegex(gap["why"], r"^if it's the counterpart of ferric sulfate \(b; 0\.\d\d\): it gives 30 days")
+
+class FirmByEvidence(unittest.TestCase):
+    """Evidence combined numerically, milestone 6: proposals' firm groups by their evidence's probability (link_levels
+    "combined"): the owner, "Firm groups aren't like a 100% on a Bayesian that cannot be shifted by evidence"."""
+    def test_a_key_joins_with_its_probability_a_reused_tag_doesnt_its_counterpart_joins_by_evidence(self):
+        data = report(Keyed.A + Keyed.B, [], ("a", "b"), mode="proposals",
+                      settings={"keyed_links": True, "link_tests": True, "link_levels": "combined"})
+        groups = {s["name"]: (s["matched_by"], s.get("probability")) for s in indexes.built(data)["subjects"]
+                  if len(s["claims"]) == 2}
+        self.assertEqual(set(groups), {"Filter F-1", "Raw water pump P-101A"})
+        self.assertEqual(groups["Filter F-1"][0], "name")  # a key, uncontested, its properties alike
+        self.assertEqual(groups["Raw water pump P-101A"][0], "evidence")  # with P-201A, not the backwash pump
+        self.assertTrue(all(links.MERGE <= p < 1 for _, p in groups.values()))  # never pinned at 1
+
+    def test_a_key_with_no_property_in_common_stays_apart(self):
+        claims = OtherNames.A + OtherNames.B
+        data = report(claims, [], ("a", "b"), mode="proposals", synonyms={"items": [["chlorine", "UV reactors"]]},
+                      settings={"keyed_links": True, "link_levels": "combined"})
+        index = indexes.built(data)
+        self.assertEqual([s["name"] for s in index["subjects"] if len(s["claims"]) == 2], [])
+        chlorine = next(s for s in index["subjects"] if s["name"] == "chlorine")
+        link = next(x for x in chlorine["links"] if x["other"] == "UV reactors")  # kept apart: a link, the key and
+        self.assertEqual(link["contributions"]["key"], round(2.6 - 0.9, 3))  # its want of a property in common said
 
 class Consumers(unittest.TestCase):
     """Evidence combined numerically, milestone 5: each consumer takes a combined link by its probability."""

@@ -179,15 +179,18 @@ def renamed(subjects, alias):
         out.append((key, name, cs))
     return out
 
-def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=(), firm=None, rank=None):
+def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=(), firm=None, rank=None,
+            joins=()):
     """The sources' subjects matched across them: [{source: (key, name, claims)}], each subject once. Two sources'
     subjects are one where the findings pair their claims (by_findings: revisions), the most pairs first and one to
     one; else where they're keyed alike (a tag, or the same words), or named as other names of one thing (alias);
     then as the model matched them (matches: [((source, name), (source, name), relation)], crossmatch.py), each alone
     till then; the rest alone. firm: whether two sources' subjects keyed alike are one ((source, (key, name, claims))
     each; the keyed_links and other_names_fit levers', firm_keyed): those it says aren't stay alone, each saying the
-    other's (source, key) as "keyed". rank: the subjects keyed alike, in the order they're taken (a source's first
-    joins, the rest stand apart)."""
+    other's (source, key) as "keyed"; where it says a probability (a number, not True), the group keeps it. rank:
+    the subjects keyed alike, in the order they're taken (a source's first joins, the rest stand apart). joins:
+    [((source, key), (source, key), probability)]: two subjects alone joined by their evidence's probability, matched
+    by "evidence" (evidence combined numerically, milestone 6)."""
     of = {c["id"]: (source, key) for source in sources for key, _, claims in found[source] for c in claims}
     by = {(source, key): (key, name, claims) for source in sources for key, name, claims in found[source]}
     links = Counter()
@@ -218,12 +221,24 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
             else:
                 group[source] = by[(source, k)]
         two = [source for source in sources if source in group]
-        if firm is not None and len(two) == 2 and not firm(*((source, group[source]) for source in two)):
+        verdict = firm(*((source, group[source]) for source in two)) if firm is not None and len(two) == 2 else True
+        if not verdict:
             a, b = two  # keyed alike alone: apart, a link's (links: "keyed"), the model's to match
             merged += [{a: group[a], "matched_by": "", "keyed": (b, group[b][0])},
                        {b: group[b], "matched_by": "", "keyed": (a, group[a][0])}, *apart]
             continue
+        if isinstance(verdict, float):
+            group["probability"] = verdict
         merged += [group, *apart]
+    for (sa, ka), (sb, kb), p in joins:  # joined by their evidence, each alone till then
+        ga, gb = (next((g for g in merged if g.get(s, (None,))[0] == k and not g["matched_by"]), None)
+                  for s, k in ((sa, ka), (sb, kb)))
+        if ga is None or gb is None or ga is gb:
+            continue
+        ga.update({k: v for k, v in gb.items() if k not in ("matched_by", "keyed")}, matched_by="evidence",
+                  probability=p)
+        ga.pop("keyed", None)
+        merged.remove(gb)
     named = {(source, name): k for source in sources for k, name, _ in found[source]}
     for a, b, relation in matches:
         ka, kb = named.get(a), named.get(b)
@@ -357,7 +372,6 @@ def built(data):
     alias = aliases(data)
     found = {source: renamed(subjects_of(claims[source]), alias) for source in sources}
     paired = [(f["a"], f["b"]) for f in data.get("findings", []) if f.get("relation") in PAIRING]
-    subjects, by_tag = [], {}
     matches = [((c["source"], c["subject"]), (c["other_source"], c["other"]), c["relation"])
                for c in (data.get("commentary") or {}).get("entries", [])
                if c["kind"] == "match" and c.get("relation") in MATCHED and not c.get("taken")]
@@ -366,9 +380,28 @@ def built(data):
                              bool(settings.get("other_names_fit")))
                   if data.get("mode") == "proposals" and len(sources) == 2
                   and (settings.get("keyed_links") or settings.get("other_names_fit")) else (None, None))
-    halves = {}  # (source, key): (its subject, the other half's (source, key)): kept apart, keyed alike (firm)
-    for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals", matches,
-                         firm, rank):
+
+    def grouped(firm, matches, joins=()):
+        """(the subjects, A to Z; the pairs of them keyed alike and kept apart; each subject's (source, key)s)."""
+        subjects, by_tag, origins = [], {}, {}
+        halves = {}  # (source, key): (its subject, the other half's (source, key)): kept apart, keyed alike (firm)
+        for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals",
+                             matches, firm, rank, joins):
+            subject = make(group, by_tag, len(subjects))
+            subjects.append(subject)
+            origins[id(subject)] = [(source, group[source][0]) for source in sources if source in group]
+            if group.get("keyed"):
+                source = next(s for s in sources if s in group)
+                halves[source, group[source][0]] = (subject, group["keyed"])
+        listed(subjects, by_tag, {e["id"]: plain(e["attribute"]) for e in data.get("evidence", [])})
+        subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
+        at = {id(s): i for i, s in enumerate(subjects)}
+        keyed = {tuple(sorted((at[id(s)], at[id(halves[other][0])]))) for s, other in halves.values()
+                 if other in halves and id(s) in at and id(halves[other][0]) in at}
+        return subjects, keyed, [origins.get(id(s), []) for s in subjects]
+
+    def make(group, by_tag, index):
+        """A group's subject: its name, names, how it was matched, its claims and properties."""
         mine = [(source, group[source]) for source in sources if source in group]
         names = Counter(c["entity"] for _, (_, _, cs) in mine for c in cs)
         properties = joined([c for _, (_, _, cs) in mine for c in cs], paired, alias)
@@ -377,11 +410,12 @@ def built(data):
             name = next((n for n in sorted(names, key=lambda n: (-names[n], natural(n)))
                          if not several(n) and not listing(n)), mine[0][1][0] if listing(name) else name)
         for _, (key, _, _) in mine:
-            by_tag.setdefault(key, len(subjects))
-        subjects.append({
+            by_tag.setdefault(key, index)
+        return {
             "name": name, "names": sorted(names, key=lambda n: (-names[n], natural(n))),
             **({"several": several(name)} if several(name) else {}),
             "matched_by": group["matched_by"],
+            **({"probability": group["probability"]} if "probability" in group else {}),
             "claims": {source: [c["id"] for c in cs] for source, (_, _, cs) in mine},
             "properties": [{"name": Counter(plain(c["attribute"]) for c in cs).most_common(1)[0][0],
                             "names": sorted({plain(c["attribute"]) for c in cs}, key=lambda n: (natural(n), n)),
@@ -391,17 +425,26 @@ def built(data):
                                         **({"several": several(c["entity"])} if several(c["entity"]) else {}),
                                         **({"listed": listing(c["entity"])} if listing(c["entity"]) else {})}
                                        for c in cs]}
-                           for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]})
-        if group.get("keyed"):
-            halves[mine[0][0], mine[0][1][0]] = (subjects[-1], group["keyed"])
-    listed(subjects, by_tag, {e["id"]: plain(e["attribute"]) for e in data.get("evidence", [])})
-    subjects.sort(key=lambda s: (natural(s["name"]), s["names"]))
-    at = {id(s): i for i, s in enumerate(subjects)}
-    keyed = {tuple(sorted((at[id(s)], at[id(halves[other][0])]))) for s, other in halves.values()
-             if other in halves and id(s) in at and id(halves[other][0]) in at}
-    from .links import linked, trusted  # subjects possibly one, kept apart (tentative matches, milestone 2)
-    for i, found in linked(data, {"sources": sources, "subjects": subjects, "keyed": keyed}).items():
-        subjects[i]["links"] = found
+                           for _, cs in sorted(properties.items(), key=lambda x: natural(x[0]))]}
+
+    from .links import linked, merges, trusted  # subjects possibly one, kept apart (tentative matches, milestone 2)
+    if data.get("mode") == "proposals" and len(sources) == 2 and settings.get("link_levels") == "combined":
+        # firm groups by the evidence's probability (evidence combined numerically, milestone 6; the owner, of firm
+        # groups on the score: "Not only is it okay, I'm pretty sure it's necessary"): every pair keyed alike kept
+        # apart and the model's matches as evidence (a first pass), then joined where their probability says
+        apart, keyed, origins = grouped(lambda a, b: False, ())
+        chosen = [(i, j, p) for i, j, p in merges(data, {"sources": sources, "subjects": apart, "keyed": keyed})
+                  if origins[i] and origins[j]]
+        by_keys = {frozenset((origins[i][0], origins[j][0])): p for i, j, p in chosen}
+        pairs_keyed = {frozenset((origins[i][0], origins[j][0])) for i, j in keyed}
+        subjects, keyed, _ = grouped(
+            lambda a, b: by_keys.get(frozenset(((a[0], a[1][0]), (b[0], b[1][0]))), False), (),
+            [(origins[i][0], origins[j][0], p) for i, j, p in chosen
+             if frozenset((origins[i][0], origins[j][0])) not in pairs_keyed])
+    else:
+        subjects, keyed, _ = grouped(firm, matches)
+    for i, found_links in linked(data, {"sources": sources, "subjects": subjects, "keyed": keyed}).items():
+        subjects[i]["links"] = found_links
     if (data.get("settings") or {}).get("linked_values"):  # a plausible link's other subject's values beside it,
         by = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}  # kept apart
         for s in subjects:
