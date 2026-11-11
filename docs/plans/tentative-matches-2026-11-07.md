@@ -289,6 +289,10 @@ The owner, 2026-11-09: "So it seems weighted/fuzzy joining of properties hasn't 
 
 - Section titles renamed and reordered in the proposals designs; roles among siblings (duty, standby); a same-named decoy in another section.
 - A second sealed template of another genre (schedules or drawings), so each held-out check has a fresh template (the owner, 2026-11-09, of keeping templates sealed: "use your best judgement").
+- **Built 2026-11-11** (Spruce Lake against Harrow Creek, `wtp-s{seed}-spruce-proposals`, a sixth proposals pair; `proposals.spruce_lake`): Harrow Creek's sections renamed and reordered ("2 Treatment Process" its "4 Process Units"), its filters named granular media beds, and ahead of them in a building services section a decoy: the air handling units' filters, a schedule's column headed "Filters", with the real filters' three property names. Recorded $0.18.
+  - **Baseline** (seed 1, every format): no wrong firm group (66 right). The real filters joined by other names or linked plausibly. The decoy never keyed with Harrow Creek's filters: the reader names it from its section's lead-in ("administration building air handling unit filters"), as a sentence or as a schedule's column; 2 possible links to it, wrong.
+  - **Not built:** roles among siblings (Harrow Creek, every pair's first document, gives none to match against); a second sealed template (Harbor is unspent, its titles renamed already); a schematics pair (milestone 12's own).
+  - **What it says for milestone 10:** the reader carries place into names, and renamed, reordered sections don't disturb matching. The place family's work is elsewhere (seeds 12 to 15, development now): links resting on the judge's pairing alone are possible and 150 of 197 wrong; plausible links wrong are mostly the contested tags (45 of 51), whose decoys sit in other sections than their counterparts.
 
 ### 10. Place, use and context, fitted
 

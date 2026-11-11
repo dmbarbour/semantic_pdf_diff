@@ -132,6 +132,46 @@ def pine_ridge_metric(seed):
             headers=(("Capacity (gpm)", "Capacity (L/s)"), ("TDH (ft)", "TDH (m)"), ("Motor (hp)", "Motor (kW)")))
     return p
 
+SPRUCE_WORDS = (("Harrow Creek", "Spruce Lake"), ("Filtration uses", "Granular filtration uses"),
+                ("dual-media filters", "granular media beds"), ("With one filter out of service",
+                                                                "With one bed out of service"))
+SPRUCE_ITEMS = {"Harrow Creek Water Treatment Plant": ("Spruce Lake Water Treatment Plant", ("Spruce Lake WTP",
+                                                                                              "the plant")),
+                "Filters": ("Granular media beds", ("granular media beds", "media beds", "filter beds"))}
+# Harrow Creek's sections as Spruce Lake titles and orders them, a building services section among them
+SPRUCE_SECTIONS = (("Design Basis", "Basis of Design"), (None, "Building Services"),
+                   ("Chemical Feed", "Chemical Systems"), ("Treatment Process", "Process Units"),
+                   ("Disinfection Options", "Disinfection"))
+
+def spruce_lake(seed):
+    """Spruce Lake's design basis (tentative matches, milestone 9: test material for place and use): Harrow Creek's
+    template from a seed further on, its sections renamed and reordered (Harrow Creek's "2 Treatment Process" its "4
+    Process Units"), its filters named granular media beds, and in a building services section ahead of them the air
+    handling units' filters, a schedule's column named as Harrow Creek names its own and given by the same three
+    properties (a decoy only where it is, and what it serves, can tell apart; written as a sentence, the reader named
+    it "administration building air handling unit filter", 2026-11-11)."""
+    p = PROJECTS["wtp"](seed + 4)
+    p.id, p.title = f"wtp-s{seed}-spruce", "Spruce Lake Water Treatment Plant"
+    p.edits = []
+    _renamed(p, SPRUCE_WORDS, SPRUCE_ITEMS)
+    d = Draw(f"{p.id}-proposal")
+    d.used |= {f.value for f in p.facts}
+    # the key names the decoy apart (the scorer's items are its entities); the page names it as a schedule would
+    aliases = ("filters", "air filters", "building filters")
+    count, area, rate = d.number(18, 40), d.number(3, 8, 1), d.number(250, 500)
+    decoy = [Fact("air.count", "Building filters", aliases, "number of filters", ("count", "filter count"), count, ""),
+             Fact("air.area", "Building filters", aliases, "area per filter", ("filter area", "area"), area, "ft²"),
+             Fact("air.rate", "Building filters", aliases, "filtration rate", ("loading rate",), rate, "cfm/ft²")]
+    services = [("p", "The administration building's air handling units are served as follows."),
+                ("table", "Table 3. Filters", ["", "Filters"],
+                 [["Number of filters", count], ["Area per filter (ft²)", area], ["Filtration rate (cfm/ft²)", rate]])]
+    by = {title.split(" ", 1)[1]: blocks for title, blocks in p.sections}
+    layout = [(new, by[old] if old else services) for old, new in SPRUCE_SECTIONS]
+    p.sections[:] = [(f"{k} {title}", blocks) for k, (title, blocks) in enumerate(layout, 1)]
+    p.facts.extend(decoy)
+    p.edits.append({"kind": "added", "facts": [f.id for f in decoy]})
+    return p
+
 CEDAR_WORDS = (("Harrow Creek", "Cedar Falls"), ("The rapid mix basin provides", "The coagulation tank provides"),
                ("Flocculation follows in", "Slow mixing follows in"),
                ("sedimentation basins, each", "settling basins, each"), ("Raw water pumps", "Low-lift pumps"),
@@ -299,7 +339,7 @@ def harbor(seed):
 # (the corpus project's key, the other design's maker and id's ending, the pair's id's ending)
 PAIRS = (("wtp", pine_ridge, "proposal", "proposals"), ("wtp", cedar_falls, "cedar", "cedar-proposals"),
          ("coaster", cyclone, "proposal", "proposals"), ("wtp", birch_hollow, "birch", "birch-proposals"),
-         ("wtp", pine_ridge_metric, "metric", "metric-proposals"))
+         ("wtp", pine_ridge_metric, "metric", "metric-proposals"), ("wtp", spruce_lake, "spruce", "spruce-proposals"))
 
 # held out only: never in development's corpus (controlled.py heldout)
 HELDOUT_PAIRS = (("spec", harbor, "proposal", "proposals"),)

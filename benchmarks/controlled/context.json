@@ -1,10 +1,10 @@
 {
  "totals": {
   "inventory": {
-   "claims": 24299,
-   "evidence": 13831,
+   "claims": 24563,
+   "evidence": 14017,
    "frame in conditions": 36,
-   "grounded": 6489,
+   "grounded": 6571,
    "list records": 36,
    "no content words": 4,
    "note records": 11,
@@ -14,13 +14,13 @@
    "partly": 64,
    "partly (image)": 38,
    "positioned": 124,
-   "printed": 9017,
+   "printed": 9163,
    "sheet records": 11,
-   "table records": 388,
+   "table records": 399,
    "unsupported": 39,
    "unsupported (image)": 820,
-   "with conditions": 7454,
-   "with records": 6938
+   "with conditions": 7536,
+   "with records": 6999
   },
   "placed": {
    "bound": {
@@ -30,7 +30,7 @@
    },
    "frame": {
     "attribute": 20,
-    "conditions": 158,
+    "conditions": 168,
     "frame": 195,
     "records": 109
    },
@@ -42,8 +42,8 @@
     "nowhere": 5
    },
    "scope": {
-    "attribute": 48,
-    "conditions": 2100,
+    "attribute": 53,
+    "conditions": 2140,
     "nowhere": 6
    },
    "sibling": {
@@ -72,7 +72,7 @@
    },
    "scope": {
     "image only": 4,
-    "shown, not used": 50
+    "shown, not used": 54
    },
    "sibling": {
     "in conditions": 145,
@@ -110,14 +110,14 @@
      "share": 0.584
     },
     "<0.95": {
-     "readings": 11928,
-     "right": 11780,
+     "readings": 12050,
+     "right": 11902,
      "share": 0.988
     },
     "<=1.0": {
-     "readings": 33710,
-     "right": 30850,
-     "share": 0.915
+     "readings": 34108,
+     "right": 31244,
+     "share": 0.916
     }
    },
    "image": {
@@ -132,15 +132,15 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 22792,
-     "right": 20786,
+     "readings": 22964,
+     "right": 20954,
      "share": 0.912
     }
    },
    "table rules": {
     "<0.95": {
-     "readings": 11588,
-     "right": 11560,
+     "readings": 11710,
+     "right": 11682,
      "share": 0.998
     }
    },
@@ -161,9 +161,9 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 10918,
-     "right": 10064,
-     "share": 0.922
+     "readings": 11144,
+     "right": 10290,
+     "share": 0.923
     }
    }
   }
@@ -9924,6 +9924,178 @@
     "evidence": 33,
     "context_bytes_per_request": 600,
     "data_bytes_per_request": 238,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 1
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-spruce": {
+   "inventory": {
+    "claims": 122,
+    "grounded": 38,
+    "with conditions": 38,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 16,
+    "printed": 37,
+    "evidence": 44,
+    "context_bytes_per_request": 149,
+    "data_bytes_per_request": 467,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-spruce.docx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 16,
+    "printed": 32,
+    "evidence": 35,
+    "context_bytes_per_request": 323,
+    "data_bytes_per_request": 1308,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 8,
+      "attribute": 1
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-spruce.md": {
+   "inventory": {
+    "claims": 37,
+    "grounded": 13,
+    "with conditions": 13,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 16,
+    "evidence": 37,
+    "context_bytes_per_request": 598,
+    "data_bytes_per_request": 214,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 9
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "wtp-s1-spruce.pptx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 3
+    },
+    "with records": 16,
+    "printed": 31,
+    "evidence": 35,
+    "context_bytes_per_request": 662,
+    "data_bytes_per_request": 176,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "scope": {
+      "conditions": 6,
+      "attribute": 3
+     },
+     "frame": {
+      "conditions": 2
+     }
+    },
+    "audit": {
+     "scope": {
+      "shown, not used": 3
+     }
+    },
+    "named": {},
+    "examples": {
+     "scope: shown, not used": [
+      "optB.contact: wanted 'at peak flow'; read Contact time at peak flow | ",
+      "plant.design_flow: wanted 'average day'; read design flow (average day) | ",
+      "plant.peak_flow: wanted 'maximum day'; read peak flow (maximum day) | "
+     ]
+    }
+   }
+  },
+  "wtp-s1-spruce.xlsx": {
+   "inventory": {
+    "claims": 35,
+    "grounded": 11,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "records": {
+     "table": 2
+    },
+    "with records": 13,
+    "printed": 30,
+    "evidence": 35,
+    "context_bytes_per_request": 601,
+    "data_bytes_per_request": 168,
     "examples": {}
    },
    "keyed": {

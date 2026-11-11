@@ -14575,6 +14575,174 @@
     "unrelated": 57
    },
    "unmatched": 23
+  },
+  "wtp-s1-spruce-proposals": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "unscorable": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 25,
+    "different": 55,
+    "equivalent": 5,
+    "uncertain": 12,
+    "unrelated": 90
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.md": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 3
+     },
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 22,
+    "different": 41,
+    "equivalent": 1,
+    "uncertain": 13,
+    "unrelated": 78
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.docx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
+   },
+   "findings": {
+    "complementary": 26,
+    "different": 43,
+    "equivalent": 1,
+    "uncertain": 6,
+    "unrelated": 68
+   },
+   "unmatched": 2
+  },
+  "wtp-s1-spruce-proposals.pptx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 16,
+    "different": 23,
+    "equivalent": 1,
+    "uncertain": 29,
+    "unrelated": 77
+   },
+   "unmatched": 10
+  },
+  "wtp-s1-spruce-proposals.xlsx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 23,
+    "different": 42,
+    "equivalent": 1,
+    "uncertain": 6,
+    "unrelated": 74
+   },
+   "unmatched": 3
   }
  },
  "replay": {
@@ -29153,6 +29321,174 @@
     "unrelated": 57
    },
    "unmatched": 23
+  },
+  "wtp-s1-spruce-proposals": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "unscorable": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 25,
+    "different": 55,
+    "equivalent": 5,
+    "uncertain": 12,
+    "unrelated": 90
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.md": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 3
+     },
+     "possible": {
+      "links": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 1
+   },
+   "findings": {
+    "complementary": 22,
+    "different": 41,
+    "equivalent": 1,
+    "uncertain": 13,
+    "unrelated": 78
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.docx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     }
+    }
+   },
+   "findings": {
+    "complementary": 26,
+    "different": 43,
+    "equivalent": 1,
+    "uncertain": 6,
+    "unrelated": 68
+   },
+   "unmatched": 2
+  },
+  "wtp-s1-spruce-proposals.pptx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 16,
+    "different": 23,
+    "equivalent": 1,
+    "uncertain": 29,
+    "unrelated": 77
+   },
+   "unmatched": 10
+  },
+  "wtp-s1-spruce-proposals.xlsx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 23,
+    "different": 42,
+    "equivalent": 1,
+    "uncertain": 6,
+    "unrelated": 74
+   },
+   "unmatched": 3
   }
  },
  "recorded-rows": {
@@ -41006,6 +41342,143 @@
     "unrelated": 57
    },
    "unmatched": 20
+  },
+  "wtp-s1-spruce-proposals": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "unscorable": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 24,
+    "different": 57,
+    "equivalent": 6,
+    "uncertain": 11,
+    "unrelated": 90
+   },
+   "unmatched": 2
+  },
+  "wtp-s1-spruce-proposals.docx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 3
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 1
+   },
+   "if_one_item": {
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 23,
+    "different": 39,
+    "equivalent": 1,
+    "uncertain": 13,
+    "unrelated": 75
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.pptx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 19,
+    "different": 39,
+    "equivalent": 1,
+    "uncertain": 11,
+    "unrelated": 75
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.xlsx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 19,
+    "different": 40,
+    "equivalent": 1,
+    "uncertain": 11,
+    "unrelated": 74
+   },
+   "unmatched": 4
   }
  },
  "replay-rows": {
@@ -52859,6 +53332,143 @@
     "unrelated": 57
    },
    "unmatched": 20
+  },
+  "wtp-s1-spruce-proposals": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 13,
+    "right": 13,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 12,
+    "matched": 12,
+    "links": {
+     "plausible": {
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "unscorable": 1,
+      "wrong": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 24,
+    "different": 57,
+    "equivalent": 6,
+    "uncertain": 11,
+    "unrelated": 90
+   },
+   "unmatched": 2
+  },
+  "wtp-s1-spruce-proposals.docx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 12,
+    "right": 12,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 9,
+    "links": {
+     "plausible": {
+      "links": 3,
+      "right": 3
+     }
+    }
+   },
+   "gaps_found": "0/0",
+   "gaps": {
+    "unbound": 1
+   },
+   "if_one_item": {
+    "unbound": 1,
+    "found_beside": 0
+   },
+   "findings": {
+    "complementary": 23,
+    "different": 39,
+    "equivalent": 1,
+    "uncertain": 13,
+    "unrelated": 75
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.pptx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 19,
+    "different": 39,
+    "equivalent": 1,
+    "uncertain": 11,
+    "unrelated": 75
+   },
+   "unmatched": 5
+  },
+  "wtp-s1-spruce-proposals.xlsx": {
+   "facts": {
+    "changed": 32,
+    "conditions": 0,
+    "added": 3,
+    "removed": 0,
+    "unchanged": 1
+   },
+   "matching": {
+    "groups": 14,
+    "right": 14,
+    "wrong": 0,
+    "unscorable": 0,
+    "items": 10,
+    "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    }
+   },
+   "findings": {
+    "complementary": 19,
+    "different": 40,
+    "equivalent": 1,
+    "uncertain": 11,
+    "unrelated": 74
+   },
+   "unmatched": 4
   }
  }
 }
