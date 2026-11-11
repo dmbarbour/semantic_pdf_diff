@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.63.0 (2026-11-11)
+
+- **`link_levels: combined` on by default** (the owner: "D1. Yes, turn it on by default."): a link's standing is a probability from its evidence (names, the model's readings, properties, values, the judge, a key), shown with each family's part; plausible and possible are cuts on it (0.6, 0.35); proposals' firm groups join at 0.70, never certain; linked values, link gaps and topics take a link by its probability. `link_levels: rubric` keeps the old levels; round 0's settings pin it. The controlled corpus and the slices fixture re-recorded ($0.003): firm groups 2,445 right and 1 wrong to 2,466 and 4 (the three new ones Harrow Creek's UV option joined to a chlorine contact basin), mean average precision 0.991 to 0.994.
+
 ## 0.62.1 (2026-11-11)
 
 - Each candidate pair of subjects also records whether their identifiers differ, each side's property count, and their place in document order (neighbours whose counterparts are each other's neighbours); none of these weighs anything yet.
