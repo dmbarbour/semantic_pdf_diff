@@ -416,7 +416,8 @@ def built(data):
     found_kinds = kinds(subjects, sheet_shapes(data), regroup)
     return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data),
             "kinds": found_kinds, "gaps": gaps(data, subjects, found_kinds, where),
-            "inconsistencies": inconsistencies(data, where)}
+            "inconsistencies": inconsistencies(data, where),
+            **({"keyed": sorted([i, j] for i, j in keyed)} if keyed else {})}  # kept apart, keyed alike: for links
 
 # An item named with a number: its kind's name before the number ("Room 104", "blower 3", "Pump No. 2").
 NUMBERED_NAME = re.compile(r"^(.*?[A-Za-z][A-Za-z ./&'-]*?)[\s#-]*(?:no\.?\s*)?\d+[A-Za-z]?$", re.IGNORECASE)

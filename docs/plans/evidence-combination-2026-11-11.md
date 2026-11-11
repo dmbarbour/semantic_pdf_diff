@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0, 1 and 2 built 2026-11-11.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 3 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -70,6 +70,27 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 - **Signed weights per point,** families bounded (a family's points by maximum or a decaying sum), a prior, the probability clipped away from 0 and 1. Set by eye (the owner: "hand-set weights adjusted by eye"), checked by milestone 2's measures on seeds 1 and 8 to 15 (development now), on the turbine pair and on the knobs (Birch Hollow, the metric pair, Spruce Lake).
 - **Tuned to the keys' right outcomes,** not to today's levels: reproducing the rubric would re-encode it.
 - **A decision record** when it lands: evidence combined numerically, nothing pinned.
+- **Built 2026-11-11** (`link_levels: combined`, `links.contributions`, `links.combined`, `combined/1`, off; [decision 0041](../decisions/0041-evidence-combined-numerically.md)):
+  - **Weights by eye, guided by development's points** (seeds 1 and 8 to 15, 2,357 candidate pairs, 0.31 matches by chance; each weight about its log-likelihood ratio, shrunk toward 0, the strongest capped):
+
+    | Point | Share right | Weight |
+    |---|---|---|
+    | Properties in common, no rival as many | 0.93 | +0.9 each, at most 2.5 |
+    | Spelled alike | 1.00 | up to +1.5 (capped lower: the turbine pair) |
+    | Picked over a decoy | 0.95 | +1.5 |
+    | Magnitudes close; the judge paired them | 0.95; 0.94 | +0.4; +0.6 to +0.8 |
+    | Words in common, a rare one | 0.38 | +0.6 × share; +0.15 × IDF |
+    | Properties in common, a rival as many | 0.31 | 0 |
+    | A rival shares more | 0.05 | −1.2 each, at most −2.4 |
+    | The decoy picked; other kinds of unit | 0.00; 0.21 | −2.5; −0.5 |
+    | A key both give | (contested ones only) | +2.2: with the prior near 0.8 alone (the owner) |
+
+  - **Correlated evidence counted less:** between siblings (a rival shares as many properties), values close and the judge's pairings at 0.3 of their weight (0.31 right: chance, against 0.95 apart); for a pair keyed alike, the judge's pairing and the read count nothing (0.10 right: the key put them there, milestone 14).
+  - **Families bounded:** a family's points for decay by half each and are capped at 1.5, so one family alone (names, or the model's readings) stays under plausible: the rubric's two families, made soft. Prior −1.2; probabilities kept within 0.02 of 0 and 1.
+  - **Levels shown by the probability** (for consumers, until milestone 5): possible from 0.35 (development: above it about 90% right, under it mostly a weak name), plausible from 0.6 (above one family alone, 0.57).
+  - **Measured** (development, 182 units, the recorded reports rebuilt offline; the null arm's in parentheses): the candidate pairs' average precision 0.794 (0.634), every template better (Birch Hollow 0.834, from 0.372); all pairs' 0.964 (0.939); log loss 0.416; calibrated by band: said 0.03, right 3%; 0.24, 23%; 0.33, 33%; 0.60, 82%; 0.74, 98%; 0.95, 95%.
+  - **The turbine pair, by eye:** plausible only the two the rubric calls plausible (DOWEC's turbine and "turbine"; IEA's 15-MW and NREL's 5-MW, 0.86 each); six possible (the rubric ten), the single family's at 0.52 to 0.57 ("Rotor Speed" and "rotor-speed error", IEA's turbine and "Region 2½").
+  - **Off:** held out by template (Harbor, then milestone 8's second) before any default.
 
 ### 4. Rules into weights, numbers shown
 

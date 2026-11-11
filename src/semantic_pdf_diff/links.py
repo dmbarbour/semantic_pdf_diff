@@ -343,6 +343,96 @@ def scored(table, candidate, mode):
     odds = (p / (1 - p)) * 2 ** s if 0 < p < 1 else 0.0
     return round(s, 3), round(odds / (1 + odds), 3)
 
+COMBINED = "combined/1"  # the hand-set combiner's version (evidence combined numerically, milestone 3)
+PRIOR = -1.2  # a candidate pair's log-odds of being one before its evidence (0.23; development's candidates are 729
+# matches of 2,357, but most bear some evidence, so the prior sits lower: set by the calibration of 2026-11-11)
+CLIP = 0.02  # a probability kept this far from 0 and 1 (the owner: "nothing should ever be pinned at 0% or 100%")
+DECAY = 0.5  # within a family, each further point for counts this share of the one before it
+FAMILY_CAP = 1.5  # a family's points for, at most: one family alone (names, or the model's readings) stays under
+# plausible, as two families of evidence once did by rule (the turbine pair: "Rotor Speed" and "rotor-speed error" by
+# their spelling, IEA's turbine and "Region 2½" by the reranker and the read)
+# A link's level from its probability, for consumers gating on one (until milestone 5): set by analysis of development's
+# candidates (2026-11-11): from 0.35 up about 90% right, under it mostly a weak name; plausible above what one family
+# alone reaches (FAMILY_CAP with the prior: 0.57)
+SHOWN = {"plausible": 0.6, "possible": 0.35}
+
+def contributions(c, mode):
+    """A candidate pair's evidence as signed log-odds, by family (evidence combined numerically, milestone 3; hand-set
+    and adjusted by eye, the owner: "we can start with hand-set weights adjusted by eye"): {family: [(point, weight)]}.
+    Names: the rarest shared word, the words' share, the spelling, the meaning, a key both give (near 0.8 alone with
+    the prior: the owner, "Perhaps firm group is only 80% without corroborating evidence"). The model: its match, its
+    pick over a decoy, the decoy or neither picked (against), the reranker's score. Properties: in common, little
+    where a rival shares as many (siblings), against where a rival shares more. Values: other kinds of unit, or
+    magnitudes far apart (against), close (for); in common between revisions. The judge: its verdicts that count
+    (its numeric confidence weighs nothing: the owner doubts models'). Alignment: its groupings."""
+    # By eye, guided by development's candidates (seeds 1 and 8 to 15, 2,357 pairs): each point's share right against
+    # 0.31 by chance, the weight about its log-likelihood ratio shrunk toward 0, the strongest capped (2026-11-11)
+    f, out = c["features"], defaultdict(list)
+    if f["name_idf"]:
+        out["names"].append(("a rare word in common", round(min(f["name_idf"], 3.0) * 0.15, 3)))  # 0.38 right
+    if f["name_share"]:
+        out["names"].append(("words in common", round(0.6 * f["name_share"], 3)))
+    if f["spelling"] >= 0.3:
+        out["names"].append(("spelled alike", round(min(1.5, 3.0 * f["spelling"]), 3)))  # 160 of 160 right
+        # on the controlled designs, capped lower: on the turbine pair, "Rotor Speed" and "rotor-speed error"
+    if f["meaning"]:
+        out["names"].append(("alike in meaning", round(max(0.0, (f["meaning"] - 0.7) * 10), 3)))
+    if f["keyed"]:
+        out["names"].append(("a key both give", 2.2))  # with the prior near 0.8 alone (the owner)
+    for r in f["model"]:
+        out["model"].append((f"the model's match ({r})", 2.0))
+    out["model"] += {"picked": [("picked over a decoy", 1.5)], "decoy": [("the decoy picked", -2.5)],  # 0.95, 0
+                     "neither": [("neither picked", -0.1)]}.get(f["read"], [])  # 0.29: near chance
+    if f["reranked"] is not None:
+        out["model"].append(("the reranker's likest", round(max(0.0, (f["reranked"] - 0.5) * 2), 3)))
+    n, rival = f["properties"], f["rival"]
+    if n and rival < n:
+        out["properties"].append((f"{n} in common, no rival as many", round(min(2.5, n * 0.9), 3)))  # 0.93 right
+    elif n:
+        out["properties"].append((f"{n} in common, as a rival has", 0.0))  # 0.31: chance
+    if rival > max(n, 1):
+        out["properties"].append(("a rival shares more", round(-1.2 * min(rival - n, 2), 3)))  # 0.05 right
+    if f["kinds_differ"]:
+        out["values"].append(("values of other kinds of unit", -0.5))  # 0.21 right
+    elif f["value_ratio"] is not None:
+        if f["value_ratio"] > FIT:
+            out["values"].append(("magnitudes far apart", -1.0))
+        elif f["value_ratio"] <= 2:
+            out["values"].append(("magnitudes close", 0.4))  # 0.95 right but between siblings
+    if mode == "revisions" and f["values"]:
+        out["values"].append(("values in common", 1.5))
+    strong = [r for r, _ in f["verdicts"] if r in STRONG[mode]]
+    if strong:
+        out["judge"].append((f"the judge paired {len(strong)}", 0.8 if len(strong) > 1 else 0.6))  # 0.94, ditto
+    if f["grouped"]:
+        out["alignment"].append(("grouped by alignment", 1.0))
+    # Evidence that follows from other evidence counts less (correlated, not independent): siblings' values and the
+    # judge's pairings follow from what siblings share (0.31 right, chance, against 0.95 apart: a little still orders
+    # siblings among themselves); a key both give put the two before the judge and the read, which count nothing (0.10
+    # right: milestone 14, the read picking the tag it was shown)
+    siblings = n and rival >= n
+    for family, points in out.items():
+        if f["keyed"] and family in ("judge", "model"):
+            out[family] = [(name + ", shown by the key", 0.0) if w > 0 and name != "a key both give" else (name, w)
+                           for name, w in points]
+        elif siblings and family in ("judge", "values"):
+            out[family] = [(name + ", as siblings", round(w * 0.3, 3)) if w > 0 else (name, w) for name, w in points]
+    return dict(out)
+
+def combined(c, mode):
+    """(a candidate pair's probability of being one, {family: its log-odds}): each family's points for decaying
+    (DECAY: one family's many points don't count as many families), its points against summed, the families and the
+    prior (PRIOR) summed, the probability kept off 0 and 1 (CLIP)."""
+    total, by = PRIOR, {}
+    for family, points in contributions(c, mode).items():
+        weights_for = sorted((w for _, w in points if w > 0), reverse=True)
+        value = (min(FAMILY_CAP, sum(w * DECAY ** k for k, w in enumerate(weights_for)))
+                 + sum(w for _, w in points if w < 0))
+        by[family] = round(value, 3)
+        total += value
+    p = 1 / (1 + math.exp(-max(-30.0, min(30.0, total))))
+    return round(min(max(p, CLIP), 1 - CLIP), 3), by
+
 def candidates(data, index):
     """Every pair of subjects alone in the two sources that a link may join, with what's known of it, whatever the
     settings: [{"i", "j" (the subjects' indices, the lower first), "evidence" (as a link shows it), "alike" (names
@@ -370,8 +460,8 @@ def candidates(data, index):
         if i not in values:
             values[i] = _values(subjects[i], evidence)
         return values[i]
-    keyed = {p for p in index.get("keyed", ()) if all(len(subjects[x]["claims"]) == 1 for x in p)}  # keyed alike,
-    # kept apart (indexes.firm_keyed: the keyed_links lever's)
+    # keyed alike, kept apart (indexes.firm_keyed: the keyed_links lever's); pairs, or lists read from a report
+    keyed = {tuple(p) for p in index.get("keyed", ()) if all(len(subjects[x]["claims"]) == 1 for x in p)}
     reads = {}  # the model's reads of links against decoys (crossmatch.read_links): {(i, j): relation}
     # the model's answers (crossmatch.py), taken or not
     named = {(next(iter(s["claims"])), s["name"]): i for i, s in enumerate(subjects) if len(s["claims"]) == 1}
@@ -485,9 +575,20 @@ def linked(data, index):
     table = weights() if (data.get("settings") or {}).get("link_levels") == "weights" else None
     if table is not None and table["mode"] != mode:
         table = None  # revisions keep the rubric: the weights are proposals'
+    combining = (data.get("settings") or {}).get("link_levels") == "combined" and mode == "proposals"
     found = []
     for c in candidates(data, index):
         i, j, ev = c["i"], c["j"], dict(c["evidence"])
+        if combining:  # evidence combined numerically (milestone 3): a probability, its level only shown by it
+            p, by = combined(c, mode)
+            level = next((name for name, at in SHOWN.items() if p >= at), None)
+            if level is None:
+                continue
+            signals = [family for family, value in by.items() if value > 0]
+            relation = ev["model"][0] if ev["model"] else RELATION[mode]
+            found.append(((p, 0), i, j, {"relation": relation, "level": level, "signals": signals, "evidence": ev,
+                                         "probability": p, "contributions": by, "rubric": COMBINED}))
+            continue
         if table is not None:
             s, likely = scored(table, c, mode)
             if s < table["thresholds"]["possible"] and not c["keyed"]:

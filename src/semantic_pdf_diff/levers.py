@@ -1457,8 +1457,10 @@ class LinkLevels(Lever):
     # proposals: a link's level from the rubric's signals, or from numbers: its features' Fellegi-Sunter weights
     # summed against the thresholds of link_weights.json (links.py, linkfit.py; tentative matches, milestone 6; the
     # owner, 2026-11-07: "figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match").
-    # Revisions keep the rubric
-    link_levels: Annotated[Literal["rubric", "weights"], _selecting(roles=COMPARE)] = "rubric"
+    # Or "combined": a probability from the evidence by hand-set weights, families bounded, kept off 0 and 1, its
+    # level only shown by it (links.combined; evidence combined numerically, milestone 3; the owner, 2026-11-11: "we
+    # can start with hand-set weights adjusted by eye"). Revisions keep the rubric
+    link_levels: Annotated[Literal["rubric", "weights", "combined"], _selecting(roles=COMPARE)] = "rubric"
 
 class LinkIndex(Lever):
     lever_name, stage, off = "link_index", "comparison", {"link_gaps": False, "linked_values": False}

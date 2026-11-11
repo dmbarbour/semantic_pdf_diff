@@ -96,6 +96,46 @@ class Features(unittest.TestCase):
         self.assertEqual(alum["value_ratio"], round(38.8 / 18.5, 3))
         self.assertEqual(links_of(data)["Alum", "ferric sulfate"][0], "plausible")  # the levels as before
 
+class Combined(unittest.TestCase):
+    """Evidence combined numerically, milestone 3: link_levels "combined", a probability from hand-set weights."""
+    @staticmethod
+    def pair(**features):
+        base = {"name_idf": 0.0, "name_share": 0.0, "spelling": 0.0, "meaning": None, "reranked": None,
+                "properties": 0, "rival": 0, "value_ratio": None, "kinds_differ": 0, "values": 0, "keyed": False,
+                "model": [], "read": None, "verdicts": [], "grouped": []}
+        return {"features": {**base, **features}}
+
+    def test_never_0_nor_1_one_family_alone_under_plausible(self):
+        strong = self.pair(spelling=1.0, name_share=1.0, name_idf=3.0, meaning=0.99, keyed=True)
+        p, by = links.combined(strong, "proposals")
+        self.assertEqual(by["names"], links.FAMILY_CAP)
+        self.assertLess(p, links.SHOWN["plausible"])  # names alone, however many points
+        both = self.pair(spelling=1.0, properties=3, read="picked")
+        self.assertGreaterEqual(links.combined(both, "proposals")[0], links.SHOWN["plausible"])
+        nothing = self.pair(read="decoy", kinds_differ=2, properties=0, rival=3)
+        self.assertGreaterEqual(links.combined(nothing, "proposals")[0], links.CLIP)  # never pinned at 0
+
+    def test_evidence_that_follows_from_other_evidence_counts_less(self):
+        siblings = links.contributions(self.pair(properties=2, rival=2, value_ratio=1.1,
+                                                 verdicts=[("different", 0.9)]), "proposals")
+        alone = links.contributions(self.pair(properties=2, rival=0, value_ratio=1.1,
+                                              verdicts=[("different", 0.9)]), "proposals")
+        self.assertLess(siblings["judge"][0][1], alone["judge"][0][1])
+        keyed = links.contributions(self.pair(keyed=True, read="picked", verdicts=[("different", 0.9)]), "proposals")
+        self.assertEqual([w for _, w in keyed["model"] + keyed["judge"]], [0.0, 0.0])  # shown by the key
+
+    def test_links_carry_a_probability_and_each_familys_part(self):
+        data = report(A + B, [{"a": "A-3", "b": "B-3", "relation": "different"}], ("a", "b"), mode="proposals",
+                      settings={"link_levels": "combined"})
+        found = [x for s in indexes.built(data)["subjects"] for x in s.get("links", [])]
+        self.assertTrue(found)
+        for x in found:
+            self.assertEqual(x["rubric"], links.COMBINED)
+            self.assertTrue(links.CLIP <= x["probability"] <= 1 - links.CLIP)
+            self.assertEqual(x["level"], "plausible" if x["probability"] >= links.SHOWN["plausible"] else "possible")
+            self.assertTrue(set(x["contributions"]) <= {"names", "model", "properties", "values", "judge",
+                                                        "alignment"})
+
 class Signals(unittest.TestCase):
     """Milestone 3: names spelled alike, and alike in meaning (the link_meaning lever's)."""
     def test_names_spelled_alike_count_as_names(self):

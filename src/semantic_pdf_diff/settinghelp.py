@@ -266,8 +266,9 @@ HELP = {
     "link_tests": Help(_L, "comparisons: a link's evidence tested by code: properties in common counted only where "
                            "they set the pair apart from its siblings; proposals' values that don't fit leave it "
                            "possible"),
-    "link_levels": Help(_L, "proposals: a link's level from the rubric's signals (rubric) or from its features' "
-                            "fitted weights against thresholds (weights)"),
+    "link_levels": Help(_L, "proposals: a link's level from the rubric's signals (rubric), its features' fitted "
+                            "weights (weights), or a probability combining its evidence by hand-set weights, each "
+                            "family bounded, never 0 or 1 (combined)"),
     "link_gaps": Help(_L, "comparisons: what a plausible link's other subject gives that a subject doesn't, as the "
                           "weakest gaps (if one item), never looked for"),
     "linked_values": Help(_L, "comparisons: a plausible link's other subject's values beside the subject's in the "

@@ -284,20 +284,23 @@ def _ranking(report, subjects, names, most, read):
             if j is not None:
                 linked[tuple(sorted((i, j)))] = link
     alone = []  # the candidate pairs' alone: the links' own ranking, firm groups apart
+    combining = (report.get("settings") or {}).get("link_levels") == "combined" and report.get("mode") == "proposals"
     for c in links.candidates(report, report["index"]):
         right = read(most(next(iter(subjects[c["i"]]["claims"].values()))),
                      most(next(iter(subjects[c["j"]]["claims"].values()))))
         if right == "unscorable":
             continue
         link = linked.get((c["i"], c["j"]))
-        p = link.get("probability") if link else None
+        # every candidate's probability where the combiner gives one, linked or not (the whole range calibrated)
+        p = links.combined(c, report["mode"])[0] if combining else link.get("probability") if link else None
         scored.append((p if p is not None else LEVEL_SCORE.get(link["level"], 0) if link else 0, right == "right"))
         alone.append(scored[-1])
         if p is not None:
             probable.append((p, right == "right"))
     if not scored:
         return {}
-    cut = lambda level: [label for s, label in scored if s >= LEVEL_SCORE[level]]  # noqa: E731
+    at = links.SHOWN if combining else LEVEL_SCORE  # a level's cut: the combiner's probability, else the level's code
+    cut = lambda level: [label for s, label in scored if s >= at[level]]  # noqa: E731
     out = {"pairs": len(scored), "matches": sum(1 for _, label in scored if label),
            "average_precision": measures.average_precision(scored),
            "candidates": {"pairs": len(alone), "matches": sum(1 for _, label in alone if label),
