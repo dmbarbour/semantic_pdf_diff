@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.61.0 (2026-11-11)
+
+- **`link_levels: combined`** (off; evidence combined numerically, milestone 3): a link's standing as a probability from its evidence, each point a hand-set weight by family (names, the model's readings, properties, values, the judge), a family bounded so none decides alone, never 0 or 1; the link shows its probability and each family's part, its level only shown by it. Decision 0041: possible, plausible and firm grade one point of evidence; combining is numerical.
+- The lab's scorer ranks and calibrates links (average precision, log loss), today's levels the baseline: 0.634 on development's candidate pairs, the combiner 0.794.
+
 ## 0.60.2 (2026-11-11)
 
 - **An index is the same from run to run:** a property's names alike but for case ("Height", "height") and a kind of tagged items' name were ordered by chance (the process's hash seed); now by the names themselves.
