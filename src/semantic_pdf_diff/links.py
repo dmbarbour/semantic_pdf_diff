@@ -71,8 +71,9 @@ from .schema import Evidence
 RUBRIC = "rubric/1"
 # What candidates() makes, versioned: a weight table fitted on another version is stale (weights). candidates/1 until
 # keyed_links (2026-11-09) added pairs keyed alike and kept apart; candidates/2 since; candidates/3 since each pair's
-# evidence was also kept as numbers (features; evidence combined numerically, milestone 1, 2026-11-11)
-CANDIDATES = "candidates/3"
+# evidence was also kept as numbers (features; evidence combined numerically, milestone 1, 2026-11-11); candidates/4
+# since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10)
+CANDIDATES = "candidates/4"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -476,6 +477,52 @@ def merges(data, index):
         taken |= {i, j}
     return out
 
+# Place by neighbours (milestone 10, a feature weighing nothing): a pair whose neighbours' counterparts are each
+# other's neighbours. On development's first pass, half or more 0.56 right, some 0.19, none 0.01 (12 of 861); weighed
+# (+0.8, −0.6, −2.5, or against only) it moved nothing on development or seeds 16 and 17: where it would help (Spruce
+# Lake's decoy, in a section of its own), too few anchors are near to say (2026-11-11)
+NEIGHBOURS = 3  # a subject's neighbours in its document: this many before it and after it
+
+def _position(e):
+    """A claim's place in its document's order, however it was read: (page, its line, paragraph or height)."""
+    loc = e.get("locator") or {}
+    offset = (loc.get("lines") or loc.get("paragraphs") or [None])[0]
+    if offset is None:
+        offset = (loc.get("bbox") or [0, 0])[1]
+    return (loc.get("page") or 0, offset or 0)
+
+def _places(subjects, evidence, sources, anchors):
+    """Each subject's neighbours in each source it's given in ({(subject, source): its NEIGHBOURS nearest each side,
+    in document order}), and each subject's counterparts by the anchors ({subject: {subjects}}: firm groups are
+    their own, a keyed pair each other's)."""
+    order = defaultdict(list)
+    for i, s in enumerate(subjects):
+        for source, ids in s["claims"].items():
+            spots = sorted(_position(evidence[c]) for c in ids if c in evidence)
+            if spots:
+                order[source].append((spots[len(spots) // 2], i))
+    near = {}
+    for source, placed in order.items():
+        placed.sort()
+        for k, (_, i) in enumerate(placed):
+            near[i, source] = {x for _, x in placed[max(0, k - NEIGHBOURS):k + NEIGHBOURS + 1] if x != i}
+    counterpart = defaultdict(set)
+    for i, s in enumerate(subjects):
+        if len(s["claims"]) == 2:
+            counterpart[i].add(i)  # a firm group: itself in each source
+    for i, j in anchors:
+        counterpart[i].add(j)
+        counterpart[j].add(i)
+    return near, counterpart
+
+def _place(i, j, sources, near, counterpart):
+    """(anchors near both of a pair, anchors near either): the pair's neighbours whose counterparts are the other's
+    neighbours, of those with a counterpart in the other source (place, milestone 10)."""
+    mine, theirs = near.get((i, sources[0]), set()) - {j}, near.get((j, sources[1]), set()) - {i}
+    others = lambda x: counterpart.get(x, set()) - {i, j}  # noqa: E731 (the pair isn't its own anchor)
+    shared = {x for x in mine if others(x) & theirs}
+    return len(shared), max(sum(1 for x in mine if others(x)), sum(1 for y in theirs if others(y)))
+
 def candidates(data, index):
     """Every pair of subjects alone in the two sources that a link may join, with what's known of it, whatever the
     settings: [{"i", "j" (the subjects' indices, the lower first), "evidence" (as a link shows it), "alike" (names
@@ -558,6 +605,7 @@ def candidates(data, index):
 
     def idf(w):
         return math.log(len(subjects) / held[w]) if held[w] else 0.0
+    near, counterpart = _places(subjects, evidence, sources, keyed)
     out = []
     for i, j in sorted(pairs):
         s, t = subjects[i], subjects[j]
@@ -604,7 +652,8 @@ def candidates(data, index):
             "keyed": (i, j) in keyed, "model": [r for r, _ in said["model"]], "read": reads.get((i, j)),
             "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"])),
             "ids_differ": bool(ids[0] and ids[1] and not ids[0] & ids[1]),
-            "own": [len(_properties(s)), len(_properties(t))]}
+            "own": [len(_properties(s)), len(_properties(t))],
+            "place": _place(i, j, sources, near, counterpart)}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
                     "keyed": (i, j) in keyed, "features": features})

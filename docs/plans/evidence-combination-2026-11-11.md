@@ -165,6 +165,10 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 ### 10. Place and use, as weighted evidence (tentative matches' milestone 10)
 
 - Sections matched across sources (headings, abouts, the groups already in them) as a place point; a subject's use (sections, kind, role words, conditions) as the model's context. Spruce Lake's baseline: the reader already carries place into names; place's work is the links resting on the judge alone (150 of 197 wrong on seeds 12 to 15) and the contested tags.
+- **Tried 2026-11-11: place by neighbours in document order** (a feature, `links._places`, `_place`; weighing nothing): the controlled PDFs have no outline, so their sections are page ranges with no heading (the gotchas review's item 11), and sections can't say place there. Instead, each subject's neighbours in its document (its claims' middle position: page and line, paragraph or height), and a pair's neighbours whose counterparts (firm groups, keyed pairs) are each other's neighbours.
+  - **As evidence** (development's first pass, 11,144 pairs, 0.33 by chance): half or more of them in common 0.56 right; some 0.19; none 0.01 (12 of 861); too few anchors near to say 0.28.
+  - **Weighed** (+0.8, −0.6, −2.5; or against only) **it moved nothing** on development (firm 1,834 to 1,942 right, 12 to 16 wrong; average precision ±0.001) or on seeds 16 and 17 (spent; the six development pairs: average precision 0.971 → 0.969 with it, 0.971 against only): siblings share neighbours, so "in common" lifts wrong siblings; and where place would help (Spruce Lake's decoy, its own section), too few anchors are near to say.
+  - **Next for place:** sections from a PDF's headings where it has no outline (by type size and weight: the lever index's row), so place by sections; or use (milestone 10's other half) as the model's context.
 
 ## Later
 
