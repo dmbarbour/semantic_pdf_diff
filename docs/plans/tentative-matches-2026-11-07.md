@@ -363,7 +363,7 @@ The gotchas review's item 3: a richer unit table keying values by kind (gpm and 
     - **Target met:** false gaps 85 → 64, 6 units changed, p = 0.016; the metric pairs' 23 → 3.
     - **Guard met:** plausible links right 95 → 100; wrong 37 → 37.
     - **Reported:** misfit links 27 → 6; right gaps 52 → 54; possible links right 45 → 39 (raised to plausible), wrong 105 → 105; firm groups unchanged (474 right, 2 wrong).
-    - **The default** is the owner's call.
+    - **On by default,** 2026-11-10 (the owner: "I suppose we can turn these on by default then proceed."). Round 0 keeps it off.
 
 ### 16. Other names as evidence
 
@@ -385,7 +385,7 @@ The gotchas review's item 1: glossary terms and the model's groups of other name
     - **Target met:** wrong firm groups 4 → 0 (all Cedar Falls'), 4 units changed, p = 0.0625 (the least four units can give).
     - **Guard met:** right firm groups lost 2 of 927 (0.2%; at most 1%): the coaster's lift hill and Cedar Falls' flocculation basins, their properties under names not alike.
     - **Reported:** plausible links right 180 → 187, wrong 65 → 65; possible links right 94 → 94, wrong 201 → 206.
-    - **The default** is the owner's call.
+    - **On by default,** 2026-11-10 (the owner: "I suppose we can turn these on by default then proceed."). Round 0 keeps it off.
 
 ## Measurement
 

@@ -13855,28 +13855,26 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
+    "groups": 7,
     "right": 7,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 6,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 3,
+      "right": 3
      },
      "possible": {
-      "links": 8,
+      "links": 9,
       "right": 3,
-      "wrong": 5
+      "wrong": 6
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "both give it": 1
-   },
+   "gaps": {},
    "findings": {
     "complementary": 3,
     "different": 27,
@@ -14415,10 +14413,6 @@
    "gap_looks": {
     "no_place": 2
    },
-   "if_one_item": {
-    "both give it": 4,
-    "found_beside": 0
-   },
    "findings": {
     "complementary": 2,
     "different": 20,
@@ -14444,7 +14438,7 @@
     "items": 9,
     "matched": 8,
     "links": {
-     "possible": {
+     "plausible": {
       "links": 1,
       "right": 1
      }
@@ -14457,11 +14451,11 @@
    "findings": {
     "complementary": 1,
     "different": 17,
-    "equivalent": 11,
-    "uncertain": 22,
+    "equivalent": 10,
+    "uncertain": 23,
     "unrelated": 58
    },
-   "unmatched": 17
+   "unmatched": 19
   },
   "wtp-s1-metric-proposals.docx": {
    "facts": {
@@ -14479,9 +14473,12 @@
     "items": 9,
     "matched": 5,
     "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
      "possible": {
-      "links": 4,
-      "right": 1,
+      "links": 3,
       "wrong": 3
      }
     }
@@ -14516,12 +14513,8 @@
     "matched": 9,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
-     },
-     "possible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     }
    },
@@ -14532,11 +14525,11 @@
    "findings": {
     "complementary": 3,
     "different": 12,
-    "equivalent": 6,
-    "uncertain": 30,
+    "equivalent": 5,
+    "uncertain": 31,
     "unrelated": 62
    },
-   "unmatched": 29
+   "unmatched": 31
   },
   "wtp-s1-metric-proposals.xlsx": {
    "facts": {
@@ -14570,18 +14563,18 @@
     "right": 2
    },
    "if_one_item": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1,
     "found_beside": 0
    },
    "findings": {
     "complementary": 3,
     "different": 17,
-    "equivalent": 6,
-    "uncertain": 26,
+    "equivalent": 5,
+    "uncertain": 27,
     "unrelated": 57
    },
-   "unmatched": 21
+   "unmatched": 23
   }
  },
  "replay": {
@@ -28440,28 +28433,26 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
+    "groups": 7,
     "right": 7,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 6,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 3,
+      "right": 3
      },
      "possible": {
-      "links": 8,
+      "links": 9,
       "right": 3,
-      "wrong": 5
+      "wrong": 6
      }
     }
    },
    "gaps_found": "0/2",
-   "gaps": {
-    "both give it": 1
-   },
+   "gaps": {},
    "findings": {
     "complementary": 3,
     "different": 27,
@@ -29000,10 +28991,6 @@
    "gap_looks": {
     "no_place": 2
    },
-   "if_one_item": {
-    "both give it": 4,
-    "found_beside": 0
-   },
    "findings": {
     "complementary": 2,
     "different": 20,
@@ -29029,7 +29016,7 @@
     "items": 9,
     "matched": 8,
     "links": {
-     "possible": {
+     "plausible": {
       "links": 1,
       "right": 1
      }
@@ -29064,9 +29051,12 @@
     "items": 9,
     "matched": 5,
     "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
      "possible": {
-      "links": 4,
-      "right": 1,
+      "links": 3,
       "wrong": 3
      }
     }
@@ -29101,12 +29091,8 @@
     "matched": 9,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
-     },
-     "possible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     }
    },
@@ -29155,7 +29141,7 @@
     "right": 2
    },
    "if_one_item": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1,
     "found_beside": 0
    },
@@ -40885,10 +40871,6 @@
    "gap_looks": {
     "no_place": 2
    },
-   "if_one_item": {
-    "both give it": 4,
-    "found_beside": 0
-   },
    "findings": {
     "complementary": 2,
     "different": 27,
@@ -40914,9 +40896,13 @@
     "items": 9,
     "matched": 5,
     "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
      "possible": {
-      "links": 6,
-      "right": 3,
+      "links": 5,
+      "right": 2,
       "wrong": 3
      }
     }
@@ -40951,13 +40937,9 @@
     "matched": 8,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 2,
+      "links": 4,
+      "right": 3,
       "wrong": 1
-     },
-     "possible": {
-      "links": 1,
-      "right": 1
      }
     }
    },
@@ -40972,12 +40954,12 @@
    },
    "findings": {
     "complementary": 3,
-    "different": 17,
-    "equivalent": 9,
-    "uncertain": 23,
+    "different": 16,
+    "equivalent": 8,
+    "uncertain": 25,
     "unrelated": 59
    },
-   "unmatched": 18
+   "unmatched": 20
   },
   "wtp-s1-metric-proposals.xlsx": {
    "facts": {
@@ -41012,7 +40994,7 @@
     "right": 2
    },
    "if_one_item": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1,
     "found_beside": 0
    },
@@ -52742,10 +52724,6 @@
    "gap_looks": {
     "no_place": 2
    },
-   "if_one_item": {
-    "both give it": 4,
-    "found_beside": 0
-   },
    "findings": {
     "complementary": 2,
     "different": 27,
@@ -52771,9 +52749,13 @@
     "items": 9,
     "matched": 5,
     "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     },
      "possible": {
-      "links": 6,
-      "right": 3,
+      "links": 5,
+      "right": 2,
       "wrong": 3
      }
     }
@@ -52808,13 +52790,9 @@
     "matched": 8,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 2,
+      "links": 4,
+      "right": 3,
       "wrong": 1
-     },
-     "possible": {
-      "links": 1,
-      "right": 1
      }
     }
    },
@@ -52869,7 +52847,7 @@
     "right": 2
    },
    "if_one_item": {
-    "both give it": 5,
+    "both give it": 1,
     "unbound": 1,
     "found_beside": 0
    },

@@ -1498,16 +1498,18 @@ class OtherNamesFit(Lever):
     # comparisons, between proposals: two subjects joined by other names alone (the glossary's, the model's) one only
     # where they share a property, by name or alike; of a source's subjects one such key holds, the one sharing the
     # most properties taken (indexes.firm_keyed; tentative matches, milestone 16; the gotchas review, item 1: other
-    # names chain and ignore disagreement). Else a plausible link, as keyed_links leaves a tag
-    other_names_fit: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # names chain and ignore disagreement). Else a plausible link, as keyed_links leaves a tag. On by default since
+    # 2026-11-10, after passing its held-out rule (the owner: "I suppose we can turn these on by default then proceed.")
+    other_names_fit: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class UnitKinds(Lever):
     lever_name, stage, off = "unit_kinds", "comparison", {"unit_kinds": False}
     # comparisons: a value whose unit the product's table doesn't know (gpm, ft, hp, psi) weighed by the search's table
     # in links' fit test and property_links' values (links.measured: its kind and its size in the kind's base), so a
     # design in metric units fits one in US units (tentative matches, milestone 15; the gotchas review, item 3: "150 psi
-    # and 1,034 kPa never meet"). Alignment's keys unchanged: revisions converting their units pair already
-    unit_kinds: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # and 1,034 kPa never meet"). Alignment's keys unchanged: revisions converting their units pair already. On by
+    # default since 2026-11-10, after passing its held-out rule (the owner, as for other_names_fit)
+    unit_kinds: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class LinkRead(Lever):
     lever_name, stage, off = "link_read", "comparison", {"link_read": False}
