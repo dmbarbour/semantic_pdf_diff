@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.60.1 (2026-11-11)
+
+- `other_names_fit`'s help says what it ranks: a document's subjects one key holds (a tag, the same words or other names), not only other names'.
+- A sixth proposals pair in the controlled corpus, Spruce Lake: sections renamed and reordered, and a decoy named as the other design's filters in another section (the reader names it by its section: no wrong match).
+
 ## 0.60.0 (2026-11-10)
 
 - **`unit_kinds` and `other_names_fit` on by default** (the owner: "I suppose we can turn these on by default then proceed."): links weigh values in units the product's table doesn't know by kind and size, and between proposals other names join two subjects only where they share a property. Round 0's settings keep both off. The controlled corpus and the slices fixture re-recorded ($0.0002).
