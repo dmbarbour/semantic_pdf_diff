@@ -143,7 +143,7 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
   - **Reported:** the candidate pairs' average precision 0.722 → 0.748; log loss 0.282; false gaps 66 → 19; calibration cautious above 0.5 (said 0.62, right 92%; 0.81, 96%; 0.95, 99.5%), close below (0.25, 28%; 0.32, 38%; 0.03, 0%).
   - **By template** (mean average precision, today's → combined): Harbor, sealed, 0.984 → 0.983 (flat); Birch Hollow 0.916 → 0.984; Cedar Falls 0.899 → 0.935; Pine Ridge 0.946 → 0.966, in metric 0.961 → 0.977; Spruce Lake 0.998 → 1.000; Cyclone 0.970 → 0.964.
   - **The 8 wrong firm groups,** each joined by evidence at 0.71 to 0.82: Harrow Creek's UV option and a chlorine contact basin (5, the hard case of development); Harbor's extended short status report and short status report (1, its look-alike decoy); Spruce Lake's filters and the building's (2: the place decoy, which the reader's names kept apart on development; place's work, milestone 10).
-  - **The default** is the owner's call.
+  - **On by default,** 2026-11-11 (the owner: "D1. Yes, turn it on by default."). Round 0 keeps the rubric.
 
 ### 7. Graded model answers (a prompt lever, off)
 

@@ -1459,8 +1459,9 @@ class LinkLevels(Lever):
     # owner, 2026-11-07: "figure out how to analyze or evidence a fuzzy, weighted, or probabilistic numeric match").
     # Or "combined": a probability from the evidence by hand-set weights, families bounded, kept off 0 and 1, its
     # level only shown by it (links.combined; evidence combined numerically, milestone 3; the owner, 2026-11-11: "we
-    # can start with hand-set weights adjusted by eye"). Revisions keep the rubric
-    link_levels: Annotated[Literal["rubric", "weights", "combined"], _selecting(roles=COMPARE)] = "rubric"
+    # can start with hand-set weights adjusted by eye"). Revisions keep the rubric. "combined" the default since
+    # 2026-11-11, after passing its held-out rule (the owner: "D1. Yes, turn it on by default.")
+    link_levels: Annotated[Literal["rubric", "weights", "combined"], _selecting(roles=COMPARE)] = "combined"
 
 class LinkIndex(Lever):
     lever_name, stage, off = "link_index", "comparison", {"link_gaps": False, "linked_values": False}

@@ -129,7 +129,8 @@ class Looked(unittest.TestCase):
         log = found["commentary"]
         self.assertEqual(log["matched"], {"asked": 1, "matched": 1, "taken": 0, "dropped": 0, "failed": 0})
         self.assertEqual(log["looked"], {"asked": 2, "failed": 0, "skipped": 0})
-        self.assertIn("(matched by model: the corresponding element)", index)
+        # the model's pick is one point of evidence; with the shared property it joins them (link_levels: combined)
+        self.assertIn("### turbine (also machine)\nClaims: a.pdf 1; b.pdf 1 (matched by evidence)", index)
         self.assertIn("### Another source gives it", index)
         self.assertIn("- a.pdf: **P101: NPSH** (a.pdf, page 2; b.pdf gives 3 m (b.pdf, page 2)); looked for on a.pdf, "
                       "page 1: it gives 3.1 m", index)  # expected where its first value is; looked for where named
