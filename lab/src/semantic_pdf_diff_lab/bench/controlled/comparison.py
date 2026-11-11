@@ -42,7 +42,12 @@ ways), another fact, or unbound; with what each look found, where the look_gaps 
 the revisions (as the run wrote them), each scored by the keys' items its claims are bound to: right where each
 side's most bound item is the same, wrong where it isn't, unscorable where a side's claims are bound to none; and of
 the items both revisions' claims give (OTHER_CLAIMS bound claims or more on each side), how many a right match holds.
-Its links (links.py: subjects possibly one, kept apart; milestone 2) are scored alike, by level.
+Its links (links.py: subjects possibly one, kept apart; milestone 2) are scored alike, by level. And ranked
+(evidence combined numerically, milestone 2): every firm group and every candidate pair of subjects left alone
+(links.candidates), labelled by the keys as above (the unscorable left out), scored by its probability where the
+report gives one, else by today's level (a firm group 3, a plausible link 2, a possible one 1, a candidate not linked
+0: the null arm a combiner has to beat): the ranking's average precision, the precision of the pairs at plausible or
+above and at possible or above, and where probabilities are given their log loss and calibration.
 """
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -249,7 +254,59 @@ def _matching(report, side, keys, renames, bound, splits=()):
     return {"matching": {**{k: counts[k] for k in ("groups", "right", "wrong", "unscorable")}, "items": len(both),
                          "matched": len(both & matched),
                          **({"links": {level: dict(sorted(c.items())) for level, c in sorted(linked.items())}}
-                            if linked else {})}}
+                            if linked else {}),
+                         **_ranking(report, subjects, names, most, read)}}
+
+LEVEL_SCORE = {"firm": 3, "plausible": 2, "possible": 1}  # the null arm: today's levels as a score
+
+def _ranking(report, subjects, names, most, read):
+    """{"ranking": {"pairs", "matches", "average_precision", "candidates": the same of the candidate pairs alone (the
+    links' own ranking, firm groups apart), "precision": {"plausible": share right of the pairs at plausible or above,
+    "possible": ...}, and where the report gives probabilities "log_loss", "calibration"}} (see the module's note), or
+    nothing without a scorable pair."""
+    from semantic_pdf_diff import links
+
+    from . import measures
+    scored, probable = [], []
+    for s in subjects:
+        if len(s["claims"]) == 2:
+            right = read(*(most(s["claims"].get(name, [])) for name in names))
+            if right != "unscorable":
+                p = s.get("probability")
+                scored.append((p if p is not None else LEVEL_SCORE["firm"], right == "right"))
+                if p is not None:
+                    probable.append((p, right == "right"))
+    linked = {}  # (subject's index, its other's): its link
+    at = {(next(iter(s["claims"])), s["name"]): i for i, s in enumerate(subjects) if len(s["claims"]) == 1}
+    for i, s in enumerate(subjects):
+        for link in s.get("links", []):
+            j = at.get((link["source"], link["other"]))
+            if j is not None:
+                linked[tuple(sorted((i, j)))] = link
+    alone = []  # the candidate pairs' alone: the links' own ranking, firm groups apart
+    for c in links.candidates(report, report["index"]):
+        right = read(most(next(iter(subjects[c["i"]]["claims"].values()))),
+                     most(next(iter(subjects[c["j"]]["claims"].values()))))
+        if right == "unscorable":
+            continue
+        link = linked.get((c["i"], c["j"]))
+        p = link.get("probability") if link else None
+        scored.append((p if p is not None else LEVEL_SCORE.get(link["level"], 0) if link else 0, right == "right"))
+        alone.append(scored[-1])
+        if p is not None:
+            probable.append((p, right == "right"))
+    if not scored:
+        return {}
+    cut = lambda level: [label for s, label in scored if s >= LEVEL_SCORE[level]]  # noqa: E731
+    out = {"pairs": len(scored), "matches": sum(1 for _, label in scored if label),
+           "average_precision": measures.average_precision(scored),
+           "candidates": {"pairs": len(alone), "matches": sum(1 for _, label in alone if label),
+                          "average_precision": measures.average_precision(alone)},
+           "precision": {level: round(sum(cut(level)) / len(cut(level)), 4) if cut(level) else None
+                         for level in ("plausible", "possible")}}
+    if probable:
+        out.update(log_loss=measures.log_loss(probable), calibration=measures.calibration(probable))
+    return {"ranking": out}
 
 def _gaps(report, side, keys, renames, kinds, bound):
     """The gaps another revision fills, scored (see the module's note): {"gaps_found": "found/planted", "gaps": {how

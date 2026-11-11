@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 and 1 built 2026-11-11.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0, 1 and 2 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -50,6 +50,20 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 - **`comparison._matching`** gains average precision over candidate pairs, log loss, and calibration by probability band (`linkfit.calibration` moved in), the keys one rater (0018).
 - **A null arm:** today's levels as a two-valued score (plausible high, possible low, no link lowest), which a combiner has to beat in average precision.
 - **Level counts** kept as guards at most, never a target (the targets of milestones 4 to 16 counted levels: part of the drift).
+- **Built 2026-11-11** (`comparison._ranking`, `linkfit.average_precision`, `linkfit.log_loss`; `tests/test_linkfit.py`): every scored proposals report's matching gains "ranking": every firm group and candidate pair, labelled by the keys, scored by its probability where given, else by today's level (firm 3, plausible 2, possible 1, not linked 0); its average precision (ties counted together), the same of the candidate pairs alone (the links' own ranking, firm groups apart), the precision at plausible and at possible or above, and log loss and calibration where probabilities are given.
+- **The null arm's baseline** (development: seeds 1 and 8 to 15, the recorded reports rebuilt offline at today's defaults; mean of the units' average precision):
+
+  | Template | Units | All pairs | Candidate pairs alone |
+  |---|---|---|---|
+  | Every one | 182 | 0.939 | 0.634 (175 units) |
+  | Pine Ridge | 37 | 0.949 | 0.681 |
+  | Cedar Falls | 37 | 0.907 | 0.685 |
+  | Cyclone | 37 | 0.968 | 0.722 |
+  | Birch Hollow (the tags' knob) | 37 | 0.916 | 0.372 |
+  | Pine Ridge in metric | 29 | 0.947 | 0.689 |
+  | Spruce Lake (seed 1 only) | 5 | 1.000 | 1.000 |
+
+  - Firm groups, mostly right, lift every ranking; the candidate pairs' alone is where a combiner shows: Birch Hollow's contested tags, plausible and wrong, rank above its right links.
 
 ### 3. The combiner, hand-set (a lever, off)
 

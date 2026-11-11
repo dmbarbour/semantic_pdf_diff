@@ -23,6 +23,8 @@ numeric match (Bayesian, BM25, etc.)").
 import math
 from collections import Counter, defaultdict
 
+from .measures import calibration  # noqa: F401 (linkfit.calibration, as before)
+
 SMOOTH = 0.5  # added to each band's count
 FEATURES = ("alike", "meaning", "properties", "distinct", "fits", "judged", "model")
 
@@ -132,16 +134,3 @@ def threshold(scored, precision):
         if last and right / total >= precision and (best is None or right > best[1]):
             best = (s, right, total)
     return best
-
-def calibration(scored, edges=(0.1, 0.3, 0.5, 0.7, 0.9)):
-    """[(band, pairs, matches, mean predicted)]: pairs by predicted share of matches, against the share observed.
-    scored: [(predicted, label)]."""
-    out = []
-    lows = (0.0,) + tuple(edges)
-    highs = tuple(edges) + (1.01,)
-    for lo, hi in zip(lows, highs):
-        mine = [(p, label) for p, label in scored if lo <= p < hi]
-        if mine:
-            out.append((f"{lo:.1f}-{min(hi, 1.0):.1f}", len(mine), sum(label for _, label in mine),
-                        round(sum(p for p, _ in mine) / len(mine), 3)))
-    return out
