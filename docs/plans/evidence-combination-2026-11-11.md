@@ -156,6 +156,7 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 - **A second sealed template of another genre** (schedules or drawings), so held-out checks are by template, not seed; Harbor spent only on a combiner candidate.
 - **A model panel on public real pairs** (tentative matches' milestone 13, moved here): each member grades sampled pairs, shown what the read shows plus sections, abouts and crops; agreement reported, disagreements shown; sampled across the probability range so calibration is measured everywhere.
 - **Winkler's EM on unlabelled real pairs** for non-match rates: a rater of its own.
+- **Built 2026-11-11: the second sealed template** (`proposals.westlake`, `HELDOUT_PAIRS`; Harbor, spent by the combiner's check, moved to `SPENT_PAIRS`): the Westlake convention center against the Lakeshore one, a domain no development template has and a genre of prose (templated paragraphs, a rooms table), its items renamed by role (Hall C the West Pavilion, AHU-3 rooftop unit RTU-2, the options schemes, meeting rooms 101 to 104 breakout rooms 201 to 204, section titles too), the indoor design temperatures not given and a rigging capacity given (3 gaps), and a decoy named as the other's hall (the storage "Hall C", a floor area and a clear ceiling height as the exhibit hall has). Rendered in every format; generated and read only by `controlled.py heldout --sealed`, never seen until a candidate's check spends it.
 
 ### 9. Weights fitted
 

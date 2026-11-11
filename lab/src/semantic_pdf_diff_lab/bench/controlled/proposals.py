@@ -27,7 +27,7 @@ its id's), and the gaps another source fills.
 import re
 from dataclasses import dataclass, replace
 
-from .corpus import PROJECTS
+from .corpus import PROJECTS, PROSE_PROJECTS
 from .model import Draw, Fact
 from .revisions import PUMPS, add_row, add_sentence, convert, drawer, drop_row, rewrite
 
@@ -342,7 +342,79 @@ PAIRS = (("wtp", pine_ridge, "proposal", "proposals"), ("wtp", cedar_falls, "ced
          ("wtp", pine_ridge_metric, "metric", "metric-proposals"), ("wtp", spruce_lake, "spruce", "spruce-proposals"))
 
 # held out only: never in development's corpus (controlled.py heldout)
-HELDOUT_PAIRS = (("spec", harbor, "proposal", "proposals"),)
+WESTLAKE_WORDS = (("Hall C", "West Pavilion"), ("The four halls together", "The pavilions together"),
+                  ("Across the four halls", "Across the pavilions"),
+                  ("Air handling units (AHUs)", "Rooftop units (RTUs)"), ("AHU-3", "RTU-2"),
+                  ("Option 1, chilled beams", "Scheme A, chilled beams"), ("Option 2, a VAV", "Scheme B, a VAV"),
+                  ("Meeting Rooms", "Breakout Rooms"), ("Meeting rooms", "Breakout rooms"),
+                  ("meeting rooms", "breakout rooms"),
+                  ("Room 101", "Breakout 201"), ("Room 102", "Breakout 202"), ("Room 103", "Breakout 203"),
+                  ("Room 104", "Breakout 204"))
+WESTLAKE_ITEMS = {"Hall C": ("West Pavilion", ("the pavilion", "the new pavilion", "West Pavilion exhibit floor")),
+                  "Halls A to D": ("The campus", ("all pavilions", "the pavilions", "the campus")),
+                  "AHU-3": ("RTU-2", ("rooftop unit 2", "RTU 2")),
+                  "AHU-3 supply fan motor": ("RTU-2 supply fan motor", ("RTU-2 supply fan", "fan motor")),
+                  "Option 1, chilled beams": ("Scheme A, chilled beams", ("Scheme A", "chilled beams")),
+                  "Option 2, VAV baseline": ("Scheme B, VAV baseline", ("Scheme B", "VAV baseline")),
+                  **{f"Hall C meeting room {r}": (f"West Pavilion breakout room {int(r) + 100}",
+                                                  (f"breakout {int(r) + 100}", f"breakout room {int(r) + 100}"))
+                     for r in ("101", "102", "103", "104")}}
+TEMPERATURES = "Hall C's indoor design temperature ranges from {tmin} °F to {tmax} °F."
+
+def westlake(seed):
+    """The Westlake convention center's design basis (evidence combined numerically, milestone 8: a sealed template of
+    another domain and genre, prose, after Harbor was spent): the Lakeshore template from the next seed, its items
+    renamed by role (Hall C the West Pavilion, AHU-3 rooftop unit RTU-2, the options schemes, meeting rooms 101 to 104
+    breakout rooms 201 to 204, its sections' titles too); the indoor design temperatures not given (2 gaps) and a
+    rigging capacity given (1); and a decoy named as the other's hall, the storage "Hall C", with a floor area and a
+    clear ceiling height as the exhibit hall has."""
+    p = PROSE_PROJECTS["lcc"](seed + 1)
+    p.id, p.title = f"lcc-s{seed}-proposal", "Westlake Convention Center Expansion: Design Basis"
+    p.edits = []
+    gone = {"hallc.tmin", "hallc.tmax"}
+    p.texts = {k: tuple(t.replace(" " + TEMPERATURES, "").replace(TEMPERATURES, "") for t in pair)
+               for k, pair in p.texts.items()}
+    p.texts = {k: tuple(t.replace(" Indoor conditions are held between {tmin} and {tmax} °F.", "") for t in pair)
+               for k, pair in p.texts.items()}
+
+    def edit(text):
+        for old, new in WESTLAKE_WORDS:
+            text = text.replace(old, new)
+        return text
+    _edit(p, edit, titles=True)
+    p.texts = {k: tuple(edit(t) for t in pair) for k, pair in p.texts.items()}
+    for _, blocks in p.sections:  # the rooms' table: its captions and cells
+        for i, block in enumerate(blocks):
+            if block[0] == "rooms":
+                blocks[i] = (block[0], tuple(edit(c) for c in block[1]), [edit(c) for c in block[2]],
+                             [[edit(c) for c in row] for row in block[3]], *block[4:])
+    p.facts[:] = [f if f.entity not in WESTLAKE_ITEMS else replace(f, entity=WESTLAKE_ITEMS[f.entity][0],
+                                                                    aliases=WESTLAKE_ITEMS[f.entity][1])
+                  for f in p.facts if f.id not in gone]
+    p.edits.append({"kind": "removed", "facts": sorted(gone)})
+    d = Draw(f"{p.id}-proposal")
+    d.used |= {f.value for f in p.facts}
+    pavilion, rigging = p.fact("hallc.area"), d.number(1000, 4000)
+    p.sections[0][1].append(("p", f"West Pavilion's roof trusses carry a rigging capacity of {rigging} lb at each pick "
+                                  f"point."))
+    p.facts.append(Fact("hallc.rigging", pavilion.entity, pavilion.aliases, "rigging capacity",
+                        ("rigging load", "pick point capacity"), rigging, "lb"))
+    storage = ("Storage hall C", ("Hall C", "storage hall", "Hall C storage"))
+    area, height = d.number(8000, 30000), d.number(16, 26)
+    for _, blocks in p.sections:
+        if any(b[0] == "p" and "Construction proceeds" in b[1] for b in blocks):
+            blocks.append(("p", f"Hall C, the storage hall behind the loading docks, has a floor area of {area} ft² "
+                                f"and a clear ceiling height of {height} ft."))
+    p.facts += [Fact("storage.area", *storage, "floor area", ("area",), area, "ft²"),
+                Fact("storage.height", *storage, "clear ceiling height", ("ceiling height", "clear height"), height,
+                     "ft")]
+    p.edits.append({"kind": "added", "facts": ["hallc.rigging", "storage.area", "storage.height"]})
+    return p
+
+# held out only: never in development's corpus (controlled.py heldout); Westlake since Harbor was spent (2026-11-11)
+HELDOUT_PAIRS = (("lcc", westlake, "proposal", "proposals"),)
+# spent: held out once, development's since (the combiner's check, 2026-11-11)
+SPENT_PAIRS = (("spec", harbor, "proposal", "proposals"),)
 
 def pairs(seed=1, heldout=False):
     """Each pair's documents, by id (nothing generated); with heldout, the held-out templates' too."""

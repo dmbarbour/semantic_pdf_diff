@@ -450,11 +450,12 @@ def heldout(seeds, variant_path, max_cost, jobs=1, sealed=False):
     from semantic_pdf_diff.progress import setup_logging
     from semantic_pdf_diff_lab.bench import controlled
     from semantic_pdf_diff_lab.bench.controlled import proposals, representations, slides, workbooks
-    from semantic_pdf_diff_lab.bench.controlled.corpus import PROJECTS
+    from semantic_pdf_diff_lab.bench.controlled.corpus import PROJECTS, PROSE_PROJECTS
     folders = {".pdf": HELDOUT / "docs", ".md": HELDOUT / "docs-md", ".docx": HELDOUT / "docs-docx",
                ".pptx": HELDOUT / "docs-pptx", ".xlsx": HELDOUT / "docs-xlsx"}
     listed = proposals.PAIRS + (proposals.HELDOUT_PAIRS if sealed else ())
-    projects = [PROJECTS[key](seed) for seed in seeds for key in sorted({key for key, *_ in listed})]
+    makers = {**PROJECTS, **PROSE_PROJECTS}  # the sealed Westlake's template is the convention center's prose
+    projects = [makers[key](seed) for seed in seeds for key in sorted({key for key, *_ in listed})]
     projects += [project for seed in seeds for _, project in proposals.proposed(seed, heldout=sealed)]
     for project in projects:
         controlled.write(project, folders[".pdf"])
