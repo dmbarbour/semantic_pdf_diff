@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 4 built 2026-11-11.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestones 0 to 5 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -107,6 +107,7 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 
 - Linked values, gaps given otherwise, link gaps and topics take the pair's probability with a threshold each, rank by it and show it; a gap given otherwise kept with "possibly given as X (p)" below its threshold.
 - **Thresholds** set by analysis of the recorded reports first (the owner: "initially by analysis").
+- **Built 2026-11-11** (`links.USES`, `links.trusted`): linked values, link gaps and topics take a combined link where its probability reaches their cut, a rubric's by its level; gaps given otherwise by `SHOWN` (milestone 4). Link gaps from 0.6 (development: all 26 right ones from 0.5 to 0.8, the fewest wrong, 10, at 0.6 and 0.7); linked values and topics at 0.6 for now. Link gaps come in their links' order, the most probable first.
 
 ### 6. Firm groups between proposals on the score
 

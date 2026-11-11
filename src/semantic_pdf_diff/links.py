@@ -355,6 +355,17 @@ FAMILY_CAP = 1.5  # a family's points for, at most: one family alone (names, or 
 # candidates (2026-11-11): from 0.35 up about 90% right, under it mostly a weak name; plausible above what one family
 # alone reaches (FAMILY_CAP with the prior: 0.57)
 SHOWN = {"plausible": 0.6, "possible": 0.35}
+# Each consumer's cut on a combined link's probability (evidence combined numerically, milestone 5; Claude's, the owner:
+# "You'll be the one tuning things based on measurement and initially by analysis"): link gaps from 0.6 (development:
+# all 26 right ones from 0.5 to 0.8, the fewest wrong, 10, at 0.6 and 0.7); the rest as shown plausible for now
+USES = {"link_gaps": 0.6, "linked_values": 0.6, "topics": 0.6}
+
+def trusted(link, use):
+    """Whether a consumer (USES) takes a link: a combined link by its probability against the consumer's cut, a
+    rubric's by its level (plausible)."""
+    if "probability" in link:
+        return link["probability"] >= USES[use]
+    return link["level"] == "plausible"
 
 def contributions(c, mode):
     """A candidate pair's evidence as signed log-odds, by family (evidence combined numerically, milestone 3; hand-set

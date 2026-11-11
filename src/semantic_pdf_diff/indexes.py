@@ -399,7 +399,7 @@ def built(data):
     at = {id(s): i for i, s in enumerate(subjects)}
     keyed = {tuple(sorted((at[id(s)], at[id(halves[other][0])]))) for s, other in halves.values()
              if other in halves and id(s) in at and id(halves[other][0]) in at}
-    from .links import linked  # subjects possibly one, kept apart (tentative matches, milestone 2)
+    from .links import linked, trusted  # subjects possibly one, kept apart (tentative matches, milestone 2)
     for i, found in linked(data, {"sources": sources, "subjects": subjects, "keyed": keyed}).items():
         subjects[i]["links"] = found
     if (data.get("settings") or {}).get("linked_values"):  # a plausible link's other subject's values beside it,
@@ -407,7 +407,7 @@ def built(data):
         for s in subjects:
             for link in s.get("links", []):
                 other = by.get((link["source"], link["other"]))
-                if link["level"] == "plausible" and other is not None:
+                if trusted(link, "linked_values") and other is not None:
                     link["values"] = [{"property": p["name"], "said": said(v), "where": v["where"], "claim": v["claim"]}
                                       for p in other["properties"] for v in p["values"][:1]]
     regroup = None
@@ -706,7 +706,7 @@ def if_one_item(subjects):
     alone with OTHER_CLAIMS of its own or more, each property its linked subject gives under no name it gives; where
     expected, its first place; why, the link and the other's value; its claims, the other's. The weakest kind, never
     looked for (the owner, 2026-11-07, of plausible matches: "links and topics for now")."""
-    from .links import SAID, property_keys
+    from .links import SAID, property_keys, trusted
     by = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}
     out = []
     for s in subjects:
@@ -720,7 +720,7 @@ def if_one_item(subjects):
         # counted as the link's shared evidence was emitted as its gap, names compared exactly here)
         for link in s.get("links", []):
             other = by.get((link["source"], link["other"]))
-            if link["level"] != "plausible" or other is None:
+            if not trusted(link, "link_gaps") or other is None:
                 continue
             standing = f"{link['probability']:.2f}" if "probability" in link else "plausible"  # combined: its number
             for p in other["properties"]:

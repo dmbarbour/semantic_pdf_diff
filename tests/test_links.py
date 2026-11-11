@@ -169,6 +169,15 @@ class CombinedProperties(unittest.TestCase):
         (gap,) = indexes.built(data)["gaps"]
         self.assertRegex(gap["why"], r"^if it's the counterpart of Harrow Creek Water Treatment Plant \(a; 0\.\d\d\): ")
 
+class Consumers(unittest.TestCase):
+    """Evidence combined numerically, milestone 5: each consumer takes a combined link by its probability."""
+    def test_a_combined_link_by_its_probability_a_rubrics_by_its_level(self):
+        for use in links.USES:
+            self.assertTrue(links.trusted({"probability": links.USES[use], "level": "plausible"}, use))
+            self.assertFalse(links.trusted({"probability": links.USES[use] - 0.01, "level": "plausible"}, use))
+            self.assertTrue(links.trusted({"level": "plausible"}, use))
+            self.assertFalse(links.trusted({"level": "possible"}, use))
+
 class Signals(unittest.TestCase):
     """Milestone 3: names spelled alike, and alike in meaning (the link_meaning lever's)."""
     def test_names_spelled_alike_count_as_names(self):

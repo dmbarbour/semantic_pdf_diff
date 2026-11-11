@@ -609,9 +609,9 @@ def linked_names(data):
         return {}
     from .indexes import built
     out = {}
-    from .links import stable
+    from .links import stable, trusted
     for s in built(stable(data))['subjects']:
-        names = ' '.join(x['other'] for x in s.get('links', []) if x['level'] == 'plausible')
+        names = ' '.join(x['other'] for x in s.get('links', []) if trusted(x, 'topics'))
         if names:
             for ids in s['claims'].values():
                 out.update(dict.fromkeys(ids, names))
