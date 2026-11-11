@@ -2,6 +2,15 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.62.0 (2026-11-11)
+
+- **Under `link_levels: combined`** (off; evidence combined numerically, milestones 4 to 6):
+  - **Proposals' firm groups by the probability:** two subjects keyed alike, or any two, joined where their evidence's probability reaches 0.70, one to one; each group carries its probability (a key alone near 0.8; a key whose sides share no property 0.62, kept apart). The owner: "Firm groups aren't like a 100% on a Bayesian that cannot be shifted by evidence."
+  - **Properties by weight**, a gap given under another name dropped or noted with its number.
+  - **Numbers shown:** a link says its probability and each family's part ("0.86: a key both give +2.6, properties −1.2"); a link gap its link's.
+  - **Consumers by their cuts:** linked values, link gaps and topics take a link by its probability.
+- Development (rebuilt offline): firm groups 1,842 right, 12 wrong against the rubric's 1,734 and 0; false gaps 40 against 226.
+
 ## 0.61.0 (2026-11-11)
 
 - **`link_levels: combined`** (off; evidence combined numerically, milestone 3): a link's standing as a probability from its evidence, each point a hand-set weight by family (names, the model's readings, properties, values, the judge), a family bounded so none decides alone, never 0 or 1; the link shows its probability and each family's part, its level only shown by it. Decision 0041: possible, plausible and firm grade one point of evidence; combining is numerical.
