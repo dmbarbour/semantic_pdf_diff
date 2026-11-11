@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.62.1 (2026-11-11)
+
+- Each candidate pair of subjects also records whether their identifiers differ, each side's property count, and their place in document order (neighbours whose counterparts are each other's neighbours); none of these weighs anything yet.
+- A second sealed template for held-out checks in the lab: the Westlake convention center (Harbor was spent by the combiner's check).
+
 ## 0.62.0 (2026-11-11)
 
 - **Under `link_levels: combined`** (off; evidence combined numerically, milestones 4 to 6):
