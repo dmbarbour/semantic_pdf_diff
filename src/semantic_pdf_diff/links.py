@@ -68,6 +68,9 @@ from .align import GENERIC, STOP, identifiers, unit, value_key, words
 from .schema import Evidence
 
 RUBRIC = "rubric/1"
+# What candidates() makes, versioned: a weight table fitted on another version is stale (weights). candidates/1 until
+# keyed_links (2026-11-09) added pairs keyed alike and kept apart; candidates/2 since
+CANDIDATES = "candidates/2"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -277,14 +280,24 @@ def bands(candidate, mode):
             "judged": str(min(judged, 2)),
             "model": {"": "none", "same": "match", "corresponding": "match"}.get(model, model)}
 
-_WEIGHTS = {}
+_WEIGHTS, _STALE = {}, []
 
 def weights():
-    """The weight table (link_weights.json), read once."""
+    """The weight table (link_weights.json), read once; None where it was fitted on what another version of
+    candidates() made (its "candidates" isn't CANDIDATES): link_levels "weights" then keeps the rubric, a warning
+    saying so once (evidence combined numerically, milestone 0: weights/1 was fitted on candidates/1, unchecked)."""
     if not _WEIGHTS:
         import json
         from pathlib import Path
         _WEIGHTS.update(json.loads((Path(__file__).with_name("link_weights.json")).read_text(encoding="utf-8")))
+    if _WEIGHTS.get("candidates") != CANDIDATES:
+        if not _STALE:
+            import logging
+            logging.getLogger("semantic_pdf_diff").warning(
+                f"link_levels weights: link_weights.json ({_WEIGHTS.get('version')}) was fitted on "
+                f"{_WEIGHTS.get('candidates')}, links are now {CANDIDATES}; the rubric decides instead")
+            _STALE.append(True)
+        return None
     return _WEIGHTS
 
 def scored(table, candidate, mode):

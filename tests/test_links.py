@@ -4,6 +4,7 @@ now"; revisions' and proposals' evidence weighed apart ("I'll accept these recom
 import stubs  # noqa: F401 (a clean environment)
 import json
 import unittest
+from unittest import mock
 
 from semantic_pdf_diff import indexes, indexfiles, links
 from semantic_pdf_diff.report import linked_names, subjects_html
@@ -178,7 +179,24 @@ class Tested(unittest.TestCase):
             self.assertEqual(links_of(with_read)["P-101", "LL-1"][0], level)
 
 class Weighed(unittest.TestCase):
-    """Milestone 6: a link's level from its features' weights (link_levels: weights; proposals only)."""
+    """Milestone 6: a link's level from its features' weights (link_levels: weights; proposals only), the table taken
+    as fitted on today's candidates (link_weights.json's own, weights/1, is stale: test_a_stale_table)."""
+    def setUp(self):
+        links.weights()  # read, then stamped as today's for these tests
+        stamp = mock.patch.dict(links._WEIGHTS, {"candidates": links.CANDIDATES})
+        stamp.start()
+        self.addCleanup(stamp.stop)
+
+    def test_a_stale_table_leaves_the_rubric_deciding(self):
+        # evidence combined numerically, milestone 0: weights/1 was fitted on candidates/1, and nothing checked it
+        data = report(A + B, [], ("a", "b"), mode="proposals", settings={"link_levels": "weights"})
+        with mock.patch.dict(links._WEIGHTS, {"candidates": "candidates/1"}), \
+                mock.patch.object(links, "_STALE", []), self.assertLogs("semantic_pdf_diff", "WARNING") as logged:
+            found = [x for s in indexes.built(data)["subjects"] for x in s.get("links", [])]
+            self.assertIsNone(links.weights())
+        self.assertTrue(found and all(x["rubric"] == links.RUBRIC and "score" not in x for x in found))
+        self.assertIn("fitted on candidates/1", logged.output[0])
+
     def test_a_pairs_score_its_bands_weights_its_level_by_the_thresholds(self):
         data = report(A + B, [{"a": "A-3", "b": "B-3", "relation": "different"}], ("a", "b"), mode="proposals",
                       settings={"link_levels": "weights"})

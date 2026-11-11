@@ -1,6 +1,6 @@
 # Evidence combined numerically: grades per point, a probability per pair
 
-- **Status:** Draft (2026-11-11), for the owner's review; nothing built yet.
+- **Status:** Active (2026-11-11; the owner: "I've reviewed and don't see anything obviously wrong. Please get started."). Milestone 0 built 2026-11-11.
 - **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **The owner's answers to the review's questions (2026-11-11), in their words:**
   - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
@@ -33,6 +33,8 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 ### 0. The weights table's stamp (a bug)
 
 `link_weights.json` says the candidate generator it was fitted on (`candidates/1`); nothing checks it, and it predates `keyed_links` and `unit_kinds`. Checked where it's read, or the table retired (`link_levels: weights` is off).
+
+- **Built 2026-11-11:** `links.CANDIDATES` versions what `candidates()` makes (`candidates/2` since `keyed_links` added pairs keyed alike); `links.weights()` returns a table only where its stamp is that version, so weights/1 is stale and `link_levels: weights` keeps the rubric, a warning saying so once. weights/1 stays in the repository until milestone 9 refits.
 
 ### 1. Evidence recorded continuously (behaviour-preserving)
 
@@ -100,7 +102,6 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 - **Held out:** by template (Harbor, then milestone 8's), rules written before they're run.
 - **Cost:** milestones 0 to 6 no requests but where a new link set changes the reads; milestone 7 and the panel pennies a pair; estimated first, asked above $5.
 
-## Open questions for the owner
+## Questions answered
 
-1. **Tentative matches' milestone 11** (link gaps looked for, a lever the owner approved): build it now, on today's link gaps, or after milestone 5, on probabilities?
-2. **Revisions' groups:** on probability after proposals (as above), or alongside milestone 6?
+1. **Tentative matches' milestone 11** (link gaps looked for) and 2. **revisions' groups on probability**, asked whether now or later: "We'll wait until after the relevant evidence combo repairs." Milestone 11 after milestone 5; revisions' groups after milestone 6.
