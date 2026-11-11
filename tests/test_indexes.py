@@ -31,6 +31,26 @@ ONE = [claim("A-1", "ca", "P-101 feed pump", "rated power", "10", "kW"),
        claim("A-3", "ca", "P-102 pump", "rated power", "12", "kW"),
        claim("A-4", "ca", "P-102 pump", "Rated  power", "12.5", "kW", page=9)]
 
+class Reproducible(unittest.TestCase):
+    def test_names_alike_but_for_case_ordered_the_same_whatever_the_hash_seed(self):
+        # a recorded report's index differed between processes: "Height" and "height" tie on natural's case folding
+        # and a set's order, which the hash seed sets, decided (2026-11-11)
+        import os
+        import subprocess
+        import sys
+        script = """
+import json
+from semantic_pdf_diff import indexes
+from test_indexes import claim, report
+claims = [claim("A-1", "ca", "Camelback", "height", "41", "ft"), claim("A-2", "ca", "Camelback", "Height", "42", "ft"),
+          claim("A-3", "ca", "Camelback", "fall height", "40", "ft")]
+print(json.dumps(indexes.built(report(claims))["subjects"], sort_keys=True))
+"""
+        here = os.path.dirname(os.path.abspath(__file__))
+        seen = {subprocess.run([sys.executable, "-c", script], cwd=here, capture_output=True, text=True, check=True,
+                               env={**os.environ, "PYTHONHASHSEED": str(seed)}).stdout for seed in range(8)}
+        self.assertEqual(len(seen), 1)
+
 class Subjects(unittest.TestCase):
     def test_a_sources_claims_by_subject_and_property(self):
         index = indexes.built(report(ONE))

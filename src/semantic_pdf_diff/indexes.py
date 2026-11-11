@@ -384,7 +384,7 @@ def built(data):
             "matched_by": group["matched_by"],
             "claims": {source: [c["id"] for c in cs] for source, (_, _, cs) in mine},
             "properties": [{"name": Counter(plain(c["attribute"]) for c in cs).most_common(1)[0][0],
-                            "names": sorted({plain(c["attribute"]) for c in cs}, key=natural),
+                            "names": sorted({plain(c["attribute"]) for c in cs}, key=lambda n: (natural(n), n)),
                             "values": [{"source": where.source.get(c["content"], ""), "value": c["value"],
                                         "unit": c["unit"], "conditions": c.get("conditions", ""), "claim": c["id"],
                                         "where": where(c),
@@ -522,9 +522,10 @@ def _kind(name, members, subjects):
     shown = {n: next(g[n][0] for g in gives_.values() if n in g) for n in count}
     properties = []
     for r, names in group.items():
-        first = max(sorted(names, key=natural), key=lambda n: count[n])
+        # names alike but for case ("Height", "height") tie on natural: the name itself decides, not a set's order
+        first = max(sorted(names, key=lambda n: (natural(n), n)), key=lambda n: count[n])
         properties.append({"name": shown[first], "names": [shown[n] for n in sorted(names, key=lambda n: (-count[n],
-                                                                                                    natural(n)))],
+                                                                                                    natural(n), n))],
                            "given": sum(1 for g in gives_.values() if names & set(g))})
     properties.sort(key=lambda p: (-p["given"], natural(p["name"])))
     return {"kind": name, "subjects": members, "properties": properties}
