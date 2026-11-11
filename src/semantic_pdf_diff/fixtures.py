@@ -100,15 +100,17 @@ class Fixture:
         self.path, self.readonly = Path(path), readonly
         if not self.path.exists() and not create:
             raise FixtureError(f"{self.path}: no such fixture")
-        new = not self.path.exists()
         self.db = (sqlite3.connect(self.path.resolve().as_uri() + "?mode=ro", uri=True) if readonly
                    else sqlite3.connect(self.path))
         self.db.execute(f"PRAGMA busy_timeout = {BUSY_MS}")  # other processes recording into it wait their turn
-        if new:  # made once: processes opening a new fixture at once (an export's workers) wait for the first to make
-            # it, then find it made (2026-11-10: two of a pack's workers both made it, "table meta already exists")
+        made = "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'meta'"
+        if create and not readonly and not self.db.execute(made).fetchone():
+            # made once, whoever made the file: processes opening a new fixture at once (an export's workers) wait
+            # for the first to make its tables, then find them made (2026-11-10: two of a pack's workers both made
+            # them, "table meta already exists"; one finding the file another had just made, "no such table: meta")
             self.db.execute("BEGIN IMMEDIATE")
             try:
-                if not self.db.execute("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'meta'").fetchone():
+                if not self.db.execute(made).fetchone():
                     for statement in SCHEMA.split(";"):
                         if statement.strip():
                             self.db.execute(statement)
