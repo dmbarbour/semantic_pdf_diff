@@ -248,5 +248,22 @@ class Batches(unittest.TestCase):
         self.assertNotIn('SECRET-RESPONDER', prompt)
         self.assertTrue(images and all(Path(p).exists() for p in images))
 
+    def test_links_are_sampled_blind_to_their_probability_and_scored(self):
+        folder = Path(self.dir.name) / 'links'
+        with contextlib.redirect_stdout(io.StringIO()):
+            cli.main(['review', 'sample', str(folder), '--store', f'SECRET-RESPONDER={self.store}', '--claims', '0',
+                      '--abouts', '0', '--pairs', '0', '--links', '4'])
+        batch = json.loads((folder / 'batch.json').read_text())
+        links = [i for i in batch['items'] if i['type'] == 'link']
+        self.assertTrue(links)
+        self.assertTrue(all(set(i['shown']) == {'A', 'B'} and 'probability' in i['hidden'] for i in links))
+        self.assertTrue(all('hidden' not in i and 'store' not in i for i in review.public_items(batch)))
+        self.assertNotIn('"hidden"', (folder / 'review.html').read_text())
+        panel = FakePanel()
+        review.judge(folder, panel, 'panel/model-x')
+        self.assertTrue(all('probability' not in prompt for prompt, _ in panel.prompts))
+        scores = review.link_scores(folder)
+        self.assertEqual((list(scores), scores['SECRET-RESPONDER']['items']), (['SECRET-RESPONDER'], len(links)))
+
 if __name__ == '__main__':
     unittest.main()

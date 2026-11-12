@@ -113,6 +113,20 @@ PAIR_FLAGS = [
        "but they aren't, or it's unclear", "e.g. two turbines' pitch settings"),
 ]
 
+LINK_FLAGS = [
+    _f("Names", "named_alike_different", "Named alike, but different things",
+       "e.g. the administration building's air filters and the treatment plant's filters"),
+    _f("Names", "named_differently_same", "Named differently, but one thing",
+       "e.g. a flash mixer and a rapid mix basin"),
+    _f("Structure", "part_and_whole", "One is a part of the other, or holds it", "e.g. a tower and its base"),
+    _f("Structure", "units_of_a_bank", "Units of one bank or series, interchangeable",
+       "e.g. two designs' raw water pumps P-101A to C and IP-1 to 3"),
+    _f("Structure", "alternatives", "Alternatives for one purpose", "e.g. UV reactors and a chlorine contact basin"),
+    _f("Structure", "two_things_in_one", "A side mixes two things", "its claims are of different items"),
+    _f("Context", "different_system", "Used in different systems", "e.g. building services against the process"),
+    _f("Context", "different_duty", "A different duty or service", "e.g. a backwash pump against a raw water pump"),
+]
+
 TAXONOMY = {
     "claim": {"verdicts": [
         {"name": "correct", "label": "Correct",
@@ -136,10 +150,22 @@ TAXONOMY = {
                  "subject or property; uncertain = correspondence can't be established"},
         {"name": "wrong", "label": "Relation wrong", "help": "Flag what it should be"}],
         "flags": PAIR_FLAGS},
+    # Two subjects of two sources, one thing or not (evidence combined numerically, milestone 8: a panel on public
+    # real pairs); "comparable" the owner's: "whether two things are the same or at least comparable" (2026-11-12)
+    "link": {"verdicts": [
+        {"name": "same", "label": "The same",
+         "help": "One thing as each document describes it; in two designs, the counterpart playing the same part in "
+                 "each"},
+        {"name": "comparable", "label": "Comparable",
+         "help": "Not one thing, but worth comparing: units of one bank, alternatives for one purpose, a part and its "
+                 "whole"},
+        {"name": "different", "label": "Different", "help": "Different things, not worth comparing"}],
+        "flags": LINK_FLAGS},
 }
 
 # The coarse question agreement is best measured on: is the result usable?
-USABLE = {"claim": {"correct", "flawed"}, "about": {"good", "acceptable"}, "pair": {"right"}}
+USABLE = {"claim": {"correct", "flawed"}, "about": {"good", "acceptable"}, "pair": {"right"},
+          "link": {"same", "comparable"}}
 
 # Quick per-field answers shown next to each part of an item: the fastest way to say what's wrong.
 FIELD_ANSWERS = [
@@ -171,10 +197,15 @@ FIELDS = {
              _field("b", "Claim B is read correctly"),
              _field("same_subject", "Same subject, or counterparts in two designs"),
              _field("relation", "The judged relation is right")],
+    # a link's parts: ok where the two agree, wrong where they differ (the owner's families, 2026-11-12: "function"
+    # and "integration")
+    "link": [_field("kind", "The same kind of thing", "pump, filter, room, tower"),
+             _field("function", "The same function", "what each does and handles: service, medium, duty"),
+             _field("integration", "The same place in its system", "part of, serves, fed by, feeds, location")],
 }
 
 # Suggested verdict from field answers (the reviewer can always choose another).
-CORE_FIELDS = {"claim": {"entity", "attribute", "value"}, "about": {"about"}, "pair": {"relation"}}
+CORE_FIELDS = {"claim": {"entity", "attribute", "value"}, "about": {"about"}, "pair": {"relation"}, "link": set()}
 
 # --- judging questions (the model's input, before seeing its answer) ---------------------
 
@@ -257,6 +288,8 @@ def suggested_verdict(kind, fields):
         return "wrong" if wrong & CORE_FIELDS["claim"] else "flawed" if wrong else "correct"
     if kind == "about":
         return "wrong" if wrong & CORE_FIELDS["about"] else "acceptable" if wrong else "good"
+    if kind == "link":  # agreeing parts don't decide between the same and comparable
+        return None
     return "wrong" if "relation" in wrong else "right"
 
 def flag_names(kind):

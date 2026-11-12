@@ -121,9 +121,10 @@ class Source:
 def _headings(source, content):
     return {s.id: " > ".join(s.heading_path) for s in source.store.sections(content)}
 
-def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1):
+def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0):
     """Write a batch: a stratified random sample of claims (round-robin over claim kinds),
-    about statements and claim pairs from each store. Each item shows the exact request
+    about statements, claim pairs and links (two subjects of two sources, round-robin over
+    the combiner's probability bands) from each store. Each item shows the exact request
     (instructions and input) that produced it, from the store's query log."""
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
@@ -135,6 +136,7 @@ def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1):
             found = _sample_claims(source, folder, rng, claims)
             found += _sample_abouts(source, folder, rng, abouts)
             found += _sample_pairs(source, folder, rng, pairs)
+            found += _sample_links(source, folder, rng, links)
             requests = Requests(source.store)
             for item in found:
                 item["request"] = requests.describe(item, source, folder)
@@ -176,6 +178,8 @@ class Requests:
         elif item["type"] == "about":
             kind = "figure" if "figure" in item["target"] else "section"
             found = self.index.get(("triage", item["target"]["content"], kind, item["target"][kind]))
+        elif item["type"] == "link":  # code's evidence and several requests', not one request
+            return None
         else:
             found = self.index.get(("compare", item["target"]["a"], item["target"]["b"]))
         if found is None:
@@ -354,11 +358,76 @@ def _sample_pairs(source, folder, rng, n):
                       **({"texts": texts} if texts else {})})
     return items
 
+# A link's probability bands, sampled round-robin: [(lowest, name)]; groups joined without one are "joined by name"
+LINK_BANDS = ((0.0, "under 0.2"), (0.2, "0.2 to 0.35"), (0.35, "0.35 to 0.6"), (0.6, "0.6 to 0.8"),
+              (0.8, "0.8 and over"))
+LINK_CLAIMS = 6  # a side's claims shown, at most
+
+def _link_pairs(data):
+    """Every pair of subjects of a comparison's two sources that a link may join, with the combiner's probability:
+    [(probability or None, how, [(source, claim ids)] in the sources' order)]: candidates (links.candidates) and the
+    groups already joined (their probability, None where names joined them)."""
+    from semantic_pdf_diff import links
+    index = data.get("index") or {}
+    subjects, order = index.get("subjects", []), index.get("sources", [])
+    if len(order) != 2:
+        return []
+
+    def sides(*subjects_):
+        found = {src: ids for s in subjects_ for src, ids in s["claims"].items()}
+        return [(src, found[src]) for src in order]
+    mode = data.get("mode", "")
+    out = [(round(links.combined(c, mode)[0], 3), "candidate", sides(subjects[c["i"]], subjects[c["j"]]))
+           for c in links.candidates(data, index)]
+    out += [(s.get("probability"), s.get("matched_by") or "joined", sides(s))
+            for s in subjects if len(s["claims"]) == 2]
+    return out
+
+def _sample_links(source, folder, rng, n):
+    """Up to n links of the store's comparison (its report.json's index), round-robin over LINK_BANDS: each side's
+    names, claims and sections, and its first claim's views; blind to the probability and how it was reached."""
+    report = source.folder / "report.json"
+    if not n or not report.exists():
+        return []
+    data = json.loads(report.read_text(encoding="utf-8"))
+    evidence = {e["id"]: e for e in source.claims()}
+    groups = {}
+    for p, how, sides in _link_pairs(data):
+        band = "joined by name" if p is None else [name for low, name in LINK_BANDS if p >= low][-1]
+        groups.setdefault(band, []).append((p, how, sides))
+    items = []
+    for p, how, sides in _stratified(rng, groups, n):
+        iid = item_id("link", source.label, *(f"{src}:{','.join(ids)}" for src, ids in sides))
+        images, texts, context, shown = [], [], {}, {}
+        for side, (src, ids) in zip("AB", sides):
+            claims = [evidence[c] for c in ids if c in evidence]
+            if not claims:
+                break
+            views, context[side], lines = _claim_views(source, folder, claims[0], f"{iid}-{side.lower()}")
+            images += [dict(i, caption=f"{side}: {i['caption']}") for i in views]
+            texts += [dict(t, caption=f"{side}: {t['caption']}") for t in lines]
+            headings = _headings(source, claims[0]["content"])
+            shown[side] = {"document": source.names.get(claims[0]["content"], src),
+                           "names": sorted({e["entity"] for e in claims}),
+                           "claims": [{k: e[k] for k in ("entity", "attribute", "value", "unit", "conditions", "quote")
+                                       if e.get(k)} for e in claims[:LINK_CLAIMS]],
+                           "more_claims": max(0, len(claims) - LINK_CLAIMS),
+                           "sections": sorted({headings.get(e.get("section", ""), "") for e in claims} - {""})}
+        else:
+            band = "joined by name" if p is None else [name for low, name in LINK_BANDS if p >= low][-1]
+            items.append({"id": iid, "type": "link", "store": source.label,
+                          "target": {side: {"source": src, "claims": ids} for side, (src, ids) in zip("AB", sides)},
+                          "hidden": {"probability": p, "band": band, "how": how},
+                          "images": images, "context": context, "shown": shown, **({"texts": texts} if texts else {})})
+    return items
+
 # --- the review page ---------------------------------------------------------------------
 
+PRIVATE = ("store", "hidden")  # what reviewers never see: the responder, a link's probability and how it was reached
+
 def public_items(batch):
-    """Items as the page (and panel models) see them: no store labels, which name responders."""
-    return [{k: v for k, v in item.items() if k != "store"} for item in batch["items"]]
+    """Items as the page (and panel models) see them: no store labels, which name responders, nor what's hidden."""
+    return [{k: v for k, v in item.items() if k not in PRIVATE} for item in batch["items"]]
 
 def question_items(batch):
     """Items as the questions page (and panel models judging questions) see them: only the
@@ -607,6 +676,10 @@ QUESTIONS = {
     "pair": "An automated retrieval step paired these two claims and a model judged their relation. A and B come from "
             "different sources: competing proposals (different designs) or revisions of one document. Is the pairing "
             "sensible, and is the judged relation right by the definitions given with the verdicts?",
+    "link": "A and B are two subjects, each as one source describes it (its names, claims and sections): two "
+            "competing designs, or two revisions of one document. Are they the same thing, comparable, or different, "
+            "by the definitions given with the verdicts? In fields, answer ok where A and B agree, wrong where they "
+            "differ, unsure where the item doesn't say.",
 }
 
 JUDGE = """You are one reviewer on a panel checking an automated system that reads engineering documents.
@@ -834,3 +907,36 @@ def consensus(folder, gate=False, stage="answers"):
                               "contested": posteriors[i][best] < CONTESTED, "votes": given[i]})
         result[kind] = {"reviewers": reviewers, "items": items_out}
     return result
+
+def link_scores(folder):
+    """The panel's consensus on a batch's links (Dawid-Skene over the same, comparable, different) against the
+    combiner's probabilities, per store: the consensus by band; how the probability ranks and is calibrated
+    against "the same" (measures.average_precision, log_loss, calibration), and ranks "the same or comparable".
+    A rater of real pairs, none of them ground truth (decision 0018)."""
+    from .ranking import average_precision, calibration, log_loss
+    batch = json.loads((Path(folder) / "batch.json").read_text(encoding="utf-8"))
+    labels = load_labels(folder)
+    items = [i for i in batch["items"] if i["type"] == "link"]
+    given = {i["id"]: {r: labels[r][i["id"]]["verdict"] for r in labels
+                       if labels[r].get(i["id"], {}).get("verdict")} for i in items}
+    given = {i: g for i, g in given.items() if g}
+    if not given:
+        return {}
+    posteriors, _ = dawid_skene(given, [v["name"] for v in TAXONOMY["link"]["verdicts"]])
+    out = {}
+    for store in sorted({i["store"] for i in items}):
+        mine = [i for i in items if i["store"] == store and i["id"] in posteriors]
+        by_band = {}
+        for i in mine:
+            best = max(posteriors[i["id"]], key=posteriors[i["id"]].get)
+            by_band.setdefault(i["hidden"]["band"], Counter())[best] += 1
+        scored = [(i["hidden"]["probability"], posteriors[i["id"]]) for i in mine
+                  if i["hidden"]["probability"] is not None]
+        same = [(p, q["same"] > 0.5) for p, q in scored]
+        worth = [(p, q["same"] + q["comparable"] > 0.5) for p, q in scored]
+        out[store] = {"items": len(mine),
+                      "by_band": {b: dict(sorted(c.items())) for b, c in sorted(by_band.items())},
+                      "same": {"average_precision": average_precision(same), "log_loss": log_loss(same),
+                               "calibration": calibration(same)},
+                      "same_or_comparable": {"average_precision": average_precision(worth)}}
+    return out
