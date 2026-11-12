@@ -65,15 +65,16 @@ plausible matches "should feed links and topics for now").
 import math
 from collections import Counter, defaultdict
 
-from .align import GENERIC, STOP, identifiers, unit, value_key, words
+from .align import GENERIC, STOP, identifiers, series, unit, value_key, words
 from .schema import Evidence
 
 RUBRIC = "rubric/1"
 # What candidates() makes, versioned: a weight table fitted on another version is stale (weights). candidates/1 until
 # keyed_links (2026-11-09) added pairs keyed alike and kept apart; candidates/2 since; candidates/3 since each pair's
 # evidence was also kept as numbers (features; evidence combined numerically, milestone 1, 2026-11-11); candidates/4
-# since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10)
-CANDIDATES = "candidates/4"
+# since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10); candidates/5
+# since units of two series (align.series) were marked (2026-11-12)
+CANDIDATES = "candidates/5"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -434,7 +435,13 @@ def contributions(c, mode):
     # right: milestone 14, the read picking the tag it was shown)
     siblings = n and rival >= n
     for family, points in out.items():
-        if f["keyed"] and family in ("judge", "model", "names"):
+        if f.get("series") and family in ("model", "judge", "names"):  # two series' units: the model's match, the
+            # judge's pairings and the tags' spelling follow their numbering, which tells nothing of a bank's units
+            # (Harrow Creek's P-101A and Pine Ridge's IP-1, paired by order: the owner, 2026-11-12, align.series);
+            # their kind's words still count
+            out[family] = [(name + ", units of two series", 0.0) if w > 0 and (family != "names" or name ==
+                           "spelled alike") else (name, w) for name, w in points]
+        elif f["keyed"] and family in ("judge", "model", "names"):
             out[family] = [(name + ", shown by the key", 0.0) if w > 0 and name != "a key both give" else (name, w)
                            for name, w in points]
         elif siblings and family in ("judge", "values"):
@@ -606,6 +613,10 @@ def candidates(data, index):
     def idf(w):
         return math.log(len(subjects) / held[w]) if held[w] else 0.0
     near, counterpart = _places(subjects, evidence, sources, keyed)
+    # units of a series in their source (a bank's pumps), by their tags: two of two series are told apart by numbering
+    tagged = series({(source, n) for source, alone_in in alone.items() for _, x in alone_in for n in x["names"]})
+    unit_of = {i: {tag for (source, n), tag in tagged.items() if n in x["names"]}
+               for alone_in in alone.values() for i, x in alone_in}
     out = []
     for i, j in sorted(pairs):
         s, t = subjects[i], subjects[j]
@@ -653,7 +664,9 @@ def candidates(data, index):
             "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"])),
             "ids_differ": bool(ids[0] and ids[1] and not ids[0] & ids[1]),
             "own": [len(_properties(s)), len(_properties(t))],
-            "place": _place(i, j, sources, near, counterpart)}
+            "place": _place(i, j, sources, near, counterpart),
+            "series": bool(mode == "proposals" and unit_of.get(i) and unit_of.get(j)
+                           and not unit_of[i] & unit_of[j])}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
                     "keyed": (i, j) in keyed, "features": features})

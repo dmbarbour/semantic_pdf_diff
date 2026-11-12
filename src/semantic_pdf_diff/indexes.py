@@ -109,11 +109,19 @@ def aliases(data):
     names joined can be one property (kin). Between proposals, where the other_names_fit setting says (tentative
     matches, milestone 16), the model's groups don't chain two names one source gives into one unless a group holds
     both (seeds 9 and 11: "Option B: chlorine contact" and "chlorine", each grouped with the other design's "sodium
-    hypochlorite", became one subject). A function giving a name its group's first name (folded, the least A to Z),
-    or None for a name in no group."""
+    hypochlorite", became one subject). Between proposals, nor two names tagged as units of series with tags of their
+    own (align.series: Harrow Creek's P-101A and Pine Ridge's IP-1, which the model grouped by order). A function
+    giving a name its group's first name (folded, the least A to Z), or None for a name in no group."""
+    from .align import series
     from .terms import drawn
     parent, members = {}, {}
     apart = None
+    numbered = {}  # between proposals, a name's tag where it's a unit of a series in a source: {alias key: tags}
+    if data.get("mode") == "proposals":
+        where = Where(data)
+        named = {(where.source.get(e["content"], ""), e["entity"]) for e in data.get("evidence", [])}
+        for (_, name), tag in series(named).items():
+            numbered.setdefault(alias_key(name), set()).add(tag)
     if (data.get("settings") or {}).get("other_names_fit") and data.get("mode") == "proposals":
         where, given = Where(data), defaultdict(set)
         for e in data.get("evidence", []):
@@ -139,10 +147,13 @@ def aliases(data):
     for t in (data.get("glossary") or {}).get("terms", []):
         if t.get("reach", "document") in NAMES and not drawn(t["term"]) and len(t["meaning"]) <= 80:
             join(alias_key(t["term"]), alias_key(t["meaning"]))
+    def may(x, y):  # two items' names joined by the model's groups
+        return (apart is None or apart(x, y)) and not (numbered.get(x) and numbered.get(y)
+                                                       and not numbered[x] & numbered[y])
     for kind in ("items", "properties"):
         for group in (data.get("synonyms") or {}).get(kind, []):
             for name in group[1:]:
-                join(alias_key(group[0]), alias_key(name), kin if kind == "properties" else apart)
+                join(alias_key(group[0]), alias_key(name), kin if kind == "properties" else may)
     return lambda name: root(alias_key(name)) if alias_key(name) in parent else None
 
 def words_of(name):

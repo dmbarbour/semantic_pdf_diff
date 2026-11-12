@@ -162,15 +162,31 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 
 - Where the training sets allow: non-match rates from real pairs (the drawings pair showed synthetic ones mislead), match rates from the keys, shrunk toward the hand-set weights (53 matches are too few alone). Held out by template.
 
-### 10. Place and use, as weighted evidence (tentative matches' milestone 10)
+### 10. Function and integration, as weighted evidence (tentative matches' milestone 10, redefined 2026-11-12)
 
-- **Under review, 2026-11-11:** place here was a component's position in its document; the owner meant its position in a system ("I was thinking more about where a component is used in a system"). The design below waits on the [place review](../research/place-review-2026-11-11.md)'s questions. Answered 2026-11-12; the [system use review](../research/system-use-review-2026-11-12.md) sets out the evidence (mostly against: medium, container, duty), its sources in today's claims and the steps; this milestone is rewritten from it once its questions are answered.
+The owner, 2026-11-11: "I was thinking more about where a component is used in a system. Not where the section discussing a component appears in a document discussing the component". Designed in the [place review](../research/place-review-2026-11-11.md) and the [system use review](../research/system-use-review-2026-11-12.md).
 
-- Sections matched across sources (headings, abouts, the groups already in them) as a place point; a subject's use (sections, kind, role words, conditions) as the model's context. Spruce Lake's baseline: the reader already carries place into names; place's work is the links resting on the judge alone (150 of 197 wrong on seeds 12 to 15) and the contested tags.
-- **Tried 2026-11-11: place by neighbours in document order** (a feature, `links._places`, `_place`; weighing nothing): the controlled PDFs have no outline, so their sections are page ranges with no heading (the gotchas review's item 11), and sections can't say place there. Instead, each subject's neighbours in its document (its claims' middle position: page and line, paragraph or height), and a pair's neighbours whose counterparts (firm groups, keyed pairs) are each other's neighbours.
-  - **As evidence** (development's first pass, 11,144 pairs, 0.33 by chance): half or more of them in common 0.56 right; some 0.19; none 0.01 (12 of 861); too few anchors near to say 0.28.
-  - **Weighed** (+0.8, −0.6, −2.5; or against only) **it moved nothing** on development (firm 1,834 to 1,942 right, 12 to 16 wrong; average precision ±0.001) or on seeds 16 and 17 (spent; the six development pairs: average precision 0.971 → 0.969 with it, 0.971 against only): siblings share neighbours, so "in common" lifts wrong siblings; and where place would help (Spruce Lake's decoy, its own section), too few anchors are near to say.
-  - **Next for place (superseded by the place review):** sections from a PDF's headings where it has no outline (by type size and weight: the lever index's row), so place by sections; or use (milestone 10's other half) as the model's context.
+- **Two families** (the owner: "Two families seems wiser given there's a clear split."; their names: "Perhaps "function" and "integration"", constants in code):
+  - **Function:** what a component does and handles: kind, medium, service, arrangement (duty and standby, N+1).
+  - **Integration:** where it sits in its system: part of, serves, fed by, feeds, location.
+  - Mostly evidence against (media, containers or duties in conflict), agreement weakly for (siblings share every positive cue); "comparable" an answer.
+- **Siblings** (the owner: "whether we can compare them one vs. one depends on if they are meaningfully differentiated"): one to one only where both sets are differentiated and their differentiators correspond; otherwise a set-to-set link (count, each unit's range, total and firm capacity, arrangement). Differentiated by function or integration, a stated reason for a size class weighing as function ("looking for that reason as a distinguishing role"), the model's guess less, a tag's letter never.
+- **Steps, cheapest first** (bugs first):
+  1. **Units of two series not paired by their numbering** (a fix): the model's name groups, its match, the judge's pairings and the tags' spelling.
+  2. **A subject split within one source** where its claims carry two containers or two media (a fix: Spruce Lake's "Filters").
+  3. **Medium from units** (function): a unit → medium table of its own; logged weighing nothing, each point's share right measured, then weighed by eye.
+  4. **Container and kind** from context records and names; **service and targets** from names' modifiers and quotes.
+  5. **Sibling sets and set-to-set links:** sets a source by tag series and names' head words (not `indexes.kinds`); a table of document patterns; the kind dossier asked whether a kind's items are interchangeable, quoting the passages (a prompt lever against a null arm, with a trap knob).
+  6. **Shown to the model** in `match_subjects` and the read (a prompt lever).
+  7. **The second pass's system line,** contested subjects first (a prompt lever).
+  8. **One reader rule,** last.
+- **Sections:** a weak signal only where a heading names a subject (the owner: "especially when the sections are naming components or subsystems").
+- **Measured by:** Spruce Lake's "Filters" ~ "filtration" (0.943) under 0.7 on fresh seeds; the within-source split caught; Birch Hollow's keyed pumps held under 0.35 when their properties are named alike; development's average precision within ±0.005; knobs: siblings told apart by system position alone with sections by discipline, a bank of identical units, a differentiated bank (a jockey pump; north and south intakes), a stated "two duty, one standby", the trap (random values: "not stated"); a schematics proposals pair; the turbine pair by eye.
+- **Earlier, place as document position** (2026-11-11, kept at weight 0):
+    - **Place by neighbours in document order** (a feature, `links._places`, `_place`; weighing nothing): the controlled PDFs have no outline, so their sections are page ranges with no heading (the gotchas review's item 11), and sections can't say place there. Instead, each subject's neighbours in its document (its claims' middle position: page and line, paragraph or height), and a pair's neighbours whose counterparts (firm groups, keyed pairs) are each other's neighbours.
+    - **As evidence** (development's first pass, 11,144 pairs, 0.33 by chance): half or more of them in common 0.56 right; some 0.19; none 0.01 (12 of 861); too few anchors near to say 0.28.
+    - **Weighed** (+0.8, −0.6, −2.5; or against only) **it moved nothing** on development (firm 1,834 to 1,942 right, 12 to 16 wrong; average precision ±0.001) or on seeds 16 and 17 (spent; the six development pairs: average precision 0.971 → 0.969 with it, 0.971 against only): siblings share neighbours, so "in common" lifts wrong siblings; and where place would help (Spruce Lake's decoy, its own section), too few anchors are near to say.
+    - **Next for place (superseded by the place review):** sections from a PDF's headings where it has no outline (by type size and weight: the lever index's row), so place by sections; or use (milestone 10's other half) as the model's context.
 
 ## Later
 

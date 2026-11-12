@@ -509,6 +509,50 @@ class OtherNames(unittest.TestCase):
         self.assertEqual([(s["name"], s["matched_by"]) for s in on["subjects"] if len(s["claims"]) == 2],
                          [("chlorine", "other names")])
 
+class Series(unittest.TestCase):
+    """Between proposals, units of two series (a bank's pumps, tagged P-101A to C and IP-1 to 3) aren't paired by their
+    numbering: not by the model's groups, nor its match, nor the judge's pairings, nor the tags' spelling (the owner,
+    2026-11-12: "If it's just three fungible pumps coordinating in a shared role, then how would it make sense to match
+    them one to one?")."""
+    def pumps(self, tags):
+        return [claim(f"{s}-{k}{n}", f"c{s}", f"{name} {tag}", attribute, value, unit)
+                for s, name, tags_ in (("a", "Raw water pump", tags[0]), ("b", "Intake pump", tags[1]))
+                for n, tag in enumerate(tags_)
+                for k, (attribute, value, unit) in enumerate((("capacity", f"{5000 + 100 * n}", "gpm"),
+                                                             ("total dynamic head", "96", "ft")))]
+
+    def built(self, tags, matches=()):
+        groups = [[f"Raw water pump {x}", f"Intake pump {y}"] for x, y in zip(*tags)]
+        entries = [{"kind": "match", "source": "a", "subject": f"Raw water pump {x}", "other_source": "b",
+                    "other": f"Intake pump {y}", "relation": "corresponding", "taken": True} for x, y in matches]
+        data = report(self.pumps(tags), [], ("a", "b"), mode="proposals", synonyms={"items": groups},
+                      commentary={"entries": entries},
+                      settings={"keyed_links": True, "other_names_fit": True, "link_levels": "combined"})
+        data["index"] = indexes.built(data)
+        return data
+
+    def test_a_series_is_told_apart_by_its_tags_alone(self):
+        from semantic_pdf_diff.align import series
+        named = {("a", "Raw water pump P-101A"), ("a", "P-101B"), ("a", "P-102 sump pump"), ("b", "IP-1")}
+        self.assertEqual(series(named), {("a", "Raw water pump P-101A"): "P-101A", ("a", "P-101B"): "P-101B"})
+
+    def test_the_models_groups_and_match_pair_no_units_of_two_series(self):
+        tags = (("P-101A", "P-101B", "P-101C"), ("IP-1", "IP-2", "IP-3"))
+        data = self.built(tags, matches=[("P-101A", "IP-1")])
+        self.assertEqual([s["name"] for s in data["index"]["subjects"] if len(s["claims"]) == 2], [])
+        subjects = data["index"]["subjects"]
+        by = {(subjects[c["i"]]["name"], subjects[c["j"]]["name"]): c for c in links.candidates(data, data["index"])}
+        picked = by["Intake pump IP-1", "Raw water pump P-101A"]
+        self.assertTrue(picked["features"]["series"])
+        self.assertEqual(links.contributions(picked, "proposals")["model"],
+                         [("the model's match (corresponding), units of two series", 0.0)])
+        self.assertLess(links.combined(picked, "proposals")[0], links.SHOWN["possible"])
+
+    def test_one_unit_each_still_joined_by_the_models_groups(self):
+        data = self.built((("P-101",), ("IP-1",)))
+        self.assertEqual([(s["name"], s["matched_by"]) for s in data["index"]["subjects"] if len(s["claims"]) == 2],
+                         [("Raw water pump P-101", "other names")])
+
 class Kinds(unittest.TestCase):
     """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The
     gotchas review: "150 psi and 1,034 kPa never meet"."""

@@ -43,6 +43,22 @@ def shape(tag):
     """A tag's shape: its letters A, its digits 9 ("XA-501": "AA-999")."""
     return re.sub(r"\d", "9", re.sub(r"[A-Z]", "A", tag))
 
+def series(named):
+    """Names tagged as units of one series in their source (a bank's P-101A to C, IP-1 to 3): of [(source, name)],
+    {(source, name): its tag} for each whose tag's stem (all but its last letter or digit) two tags or more of its
+    source share. Between two designs a series' units are told apart by their numbering alone, which pairs nothing
+    (the owner, 2026-11-12: "If it's just three fungible pumps coordinating in a shared role, then how would it make
+    sense to match them one to one?")."""
+    tags = {}
+    for source, name in named:
+        found = TAG.search(name)
+        if found:
+            tags[source, name] = found[0]
+    stems = defaultdict(set)
+    for (source, _), tag in tags.items():
+        stems[source, tag[:-1]].add(tag)
+    return {k: tag for k, tag in tags.items() if len(stems[k[0], tag[:-1]]) >= 2}
+
 # Not "a": single letters name things (Option A, Revision A, valve A).
 STOP = {"the", "an", "of", "for", "per", "each", "at", "in", "on", "to", "and", "with", "is", "by", "its", "value",
         "no"}
