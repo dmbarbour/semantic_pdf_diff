@@ -108,6 +108,18 @@ def jaccard(a, b):
 GENERIC = {"dimension", "size", "measurement", "data", "figure", "amount", "parameter", "property", "spec",
            "specification", "item", "entry", "field", "column", "row", "line"}
 
+# Words naming a part of a document or drawing, not a thing of a design: a subject named by these alone ("sheet",
+# "detail", "grid line") is a reader's placeholder, which two documents share by habit (the first link panel on real
+# pairs, 2026-11-12: the drawings pair's "sheet" ~ "sheet" at 0.96 and "detail" ~ "detail" at 0.80, different things)
+DOCUMENT_PARTS = {"sheet", "detail", "drawing", "document", "section", "view", "page", "note", "component", "element",
+                  "grid", "callout", "label", "reference", "symbol", "revision", "title", "legend"}
+
+def generic(name):
+    """Whether a name names no thing of its own: its words all generic or a document's parts (DOCUMENT_PARTS), with no
+    identifier ("sheet", "Grid line"; not "component F", "Section A", "project")."""
+    w = words(name)
+    return bool(w) and w <= GENERIC | DOCUMENT_PARTS
+
 def attribute(claim):
     """An attribute's words without its identifiers or generic words: "dimension 1" and "dimension 2" are positions
     a reader gave, which shift between revisions, so the values decide between them. Empty: unnamed."""

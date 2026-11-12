@@ -553,6 +553,36 @@ class Series(unittest.TestCase):
         self.assertEqual([(s["name"], s["matched_by"]) for s in data["index"]["subjects"] if len(s["claims"]) == 2],
                          [("Raw water pump P-101", "other names")])
 
+class Generic(unittest.TestCase):
+    """Between proposals, a name of a document's parts alone ("sheet", "detail", "grid line") is no key, and those words
+    aren't a name's evidence (the first link panel on real pairs, 2026-11-12: two Solar Decathlon houses' drawings
+    joined "sheet" with "sheet" at 0.96, two different sheets)."""
+    def built(self, a_name, b_name):
+        claims = [claim("A-1", "ca", a_name, "scale", "1/4 in = 1 ft", ""),
+                  claim("A-2", "ca", a_name, "date", "2013", ""),
+                  claim("B-1", "cb", b_name, "scale", "3/8 in = 1 ft", ""),
+                  claim("B-2", "cb", b_name, "date", "2012", "")]
+        data = report(claims, [], ("a", "b"), mode="proposals",
+                      settings={"keyed_links": True, "other_names_fit": True, "link_levels": "combined"})
+        data["index"] = indexes.built(data)
+        return data
+
+    def test_a_document_part_alone_is_no_key(self):
+        from semantic_pdf_diff.align import generic
+        self.assertEqual([generic(n) for n in ("sheet", "Grid line", "the detail", "component F", "Section A",
+                                               "project")], [True, True, True, False, False, False])
+        joined = lambda data: [s["matched_by"] for s in data["index"]["subjects"] if len(s["claims"]) == 2]  # noqa
+        self.assertEqual(joined(self.built("detail", "detail")), [])
+        self.assertEqual(joined(self.built("project", "project")), ["name"])
+
+    def test_a_document_parts_words_spell_nothing(self):
+        data = self.built("Grid line", "Grid Line 4")
+        subjects = data["index"]["subjects"]
+        pair = next(c for c in links.candidates(data, data["index"]))
+        self.assertEqual(pair["features"]["spelling"], 0.0)
+        self.assertNotIn("names", links.contributions(pair, "proposals"))
+        self.assertEqual(sorted(s["name"] for s in subjects), ["Grid Line 4", "Grid line"])
+
 class Kinds(unittest.TestCase):
     """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The
     gotchas review: "150 psi and 1,034 kPa never meet"."""

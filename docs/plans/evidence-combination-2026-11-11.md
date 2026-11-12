@@ -164,6 +164,8 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
   - **Turbines:** the probability ranks "the same" with average precision 0.71 (the same or comparable 0.80); above 0.8, 7 of 9 the same; 0.7 to 0.9 said 0.83, observed 6 of 9. Wrong by consensus: generator speed ~ rotor speed (0.86), the integrated tower ~ the transition piece (0.77); comparable: tower mass ~ the tower, blade-pitch angle ~ blade pitch (an aspect against its thing).
   - **Drawings:** average precision 0.39; above 0.8, 2 of 8 the same. The panel's "different" are right on reading: generic names joined as keys or near them: "sheet" ~ "sheet" (0.96, two sheets), "detail" ~ "detail" (0.80), "component" ~ "component H" (a deck detail against a grid bubble), "A1" ~ "Bedroom Section (A1)".
   - **Calibration on real pairs:** overconfident above 0.6 (development's corpus has few generic names).
+  - **Its 72 links are development data now** (re-scored offline after each change, no requests); a held-out check takes a fresh sample without them.
+  - **Fixed 2026-11-12: a document's parts' names** ("sheet", "detail", "grid line") no key between proposals, nor names' evidence: "the same" ranked 0.46 to 0.63.
 
 ### 9. Weights fitted
 

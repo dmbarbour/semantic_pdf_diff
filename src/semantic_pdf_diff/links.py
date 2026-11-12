@@ -63,9 +63,10 @@ plausible matches "should feed links and topics for now").
   index's values nor its gaps, never a finding.
 """
 import math
+import re
 from collections import Counter, defaultdict
 
-from .align import GENERIC, STOP, identifiers, series, unit, value_key, words
+from .align import DOCUMENT_PARTS, GENERIC, STOP, identifiers, series, unit, value_key, words
 from .schema import Evidence
 
 RUBRIC = "rubric/1"
@@ -73,8 +74,9 @@ RUBRIC = "rubric/1"
 # keyed_links (2026-11-09) added pairs keyed alike and kept apart; candidates/2 since; candidates/3 since each pair's
 # evidence was also kept as numbers (features; evidence combined numerically, milestone 1, 2026-11-11); candidates/4
 # since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10); candidates/5
-# since units of two series (align.series) were marked (2026-11-12)
-CANDIDATES = "candidates/5"
+# since units of two series (align.series) were marked; candidates/6 since a document's parts' words ("sheet",
+# "detail") left proposals' names' words and spelling (2026-11-12)
+CANDIDATES = "candidates/6"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -189,27 +191,27 @@ def _trigrams(name):
     letters = "".join(c for c in name.casefold() if c.isalnum() or c == " ")
     return {letters[k:k + 3] for k in range(len(letters) - 2)} - {""}
 
-def _spelling(a, b):
+def _bare(name):
+    """A name without its generic words or a document's parts' ("Grid Line 4": "4"; "Bedroom Section (A1)": "Bedroom
+    A1"): between proposals, what spells a thing of its own (align.DOCUMENT_PARTS)."""
+    kept = re.sub(r"[A-Za-z0-9]+", lambda w: "" if words(w[0]) <= GENERIC | DOCUMENT_PARTS else w[0], name)
+    return " ".join(kept.split())  # the rest as written
+
+def _spelling(a, b, bare=False):
     """Two subjects' names' spelling alike, as a number: the largest share of trigrams in common of any two of their
-    names (0 where none)."""
+    names (0 where none); bare: their names without generic words (_bare)."""
     best = 0.0
     for x in a["names"]:
-        tx = _trigrams(x)
+        tx = _trigrams(_bare(x) if bare else x)
         for y in b["names"]:
-            ty = _trigrams(y)
+            ty = _trigrams(_bare(y) if bare else y)
             if tx and ty:
                 best = max(best, len(tx & ty) / len(tx | ty))
     return best
 
-def _spelled(a, b):
+def _spelled(a, b, bare=False):
     """Whether two subjects have names spelled alike (their trigrams' share in common, SPELLED at least)."""
-    for x in a["names"]:
-        tx = _trigrams(x)
-        for y in b["names"]:
-            ty = _trigrams(y)
-            if tx and ty and len(tx & ty) >= SPELLED * len(tx | ty):
-                return True
-    return False
+    return _spelling(a, b, bare) >= SPELLED
 
 def _spelled_pairs(alone, sources):
     """The pairs of subjects alone in the two sources whose names are spelled alike (_spelled), found through their
@@ -571,12 +573,16 @@ def candidates(data, index):
             a, b = named.get((c["source"], c["subject"])), named.get((c.get("other_source"), c.get("other")))
             if a is not None and b is not None:
                 reads[tuple(sorted((a, b)))] = c.get("relation", "")
+    # a name's words: between proposals not a document's parts' ("sheet", "detail": align.DOCUMENT_PARTS), which two
+    # designs' documents share by habit (the first link panel on real pairs, 2026-11-12)
+    bare = mode == "proposals"
+    name_words = (lambda s: _name_words(s) - DOCUMENT_PARTS) if bare else _name_words  # noqa: E731
     # candidates sharing a name word or a property's name, besides those named
     by = defaultdict(set)
     for j, t in alone.get(sources[1], []):
-        for w in _name_words(t) | {("property", p) for p in _properties(t)}:
+        for w in name_words(t) | {("property", p) for p in _properties(t)}:
             by[w].add(j)
-    held = Counter(w for s in subjects for w in _name_words(s))  # how many subjects' names hold each word
+    held = Counter(w for s in subjects for w in name_words(s))  # how many subjects' names hold each word
     pairs = set(paired) | keyed
     pairs |= _spelled_pairs(alone, sources)
     likest = _meaning(data, subjects, alone, sources)  # names alike in meaning: {(i, j): cosine}, mutual likest
@@ -584,7 +590,7 @@ def candidates(data, index):
     ranked = _ranked(data, subjects, alone)  # the reranker's likest: {(i, j): score}
     pairs |= set(ranked)
     for i, s in alone.get(sources[0], []):
-        for w in _name_words(s) | {("property", p) for p in _properties(s)}:
+        for w in name_words(s) | {("property", p) for p in _properties(s)}:
             pairs |= {tuple(sorted((i, j))) for j in by.get(w, ())}
     common = {}  # each pair's properties in common, for the distinctness test
     for i, j in pairs:
@@ -626,13 +632,13 @@ def candidates(data, index):
         if mode == "revisions" and ids[0] and ids[1] and not ids[0] & ids[1]:  # Room 104 isn't Room 105
             continue
         said = paired.get((i, j), {"judged": Counter(), "grouped": [], "model": []})
-        ev = {"name": sorted(_name_words(s) & _name_words(t)), "properties": sorted(_properties(s) & _properties(t)),
+        ev = {"name": sorted(name_words(s) & name_words(t)), "properties": sorted(_properties(s) & _properties(t)),
               "values": len(values_of(i) & values_of(j)),
               "judged": dict(sorted(said["judged"].items())), "grouped": sorted(set(said["grouped"])),
               "model": [r for r, _ in said["model"]]}
-        names = (_name_words(s), _name_words(t))
+        names = (name_words(s), name_words(t))
         alike = bool(any(held[w] <= RARE for w in ev["name"]) or (
-            ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1])) or _spelled(s, t))
+            ev["name"] and len(ev["name"]) >= NAME_SHARE * len(names[0] | names[1])) or _spelled(s, t, bare))
         if (i, j) in likest:
             ev["meaning"] = round(likest[i, j], 3)
         if (i, j) in ranked:
@@ -657,7 +663,7 @@ def candidates(data, index):
         features = {  # the evidence as numbers, for a combiner (evidence combined numerically, milestone 1)
             "name_idf": round(max((idf(w) for w in ev["name"]), default=0.0), 3),
             "name_share": round(len(ev["name"]) / len(union), 3) if union else 0.0,
-            "spelling": round(_spelling(s, t), 3), "meaning": ev.get("meaning"), "reranked": ev.get("reranked"),
+            "spelling": round(_spelling(s, t, bare), 3), "meaning": ev.get("meaning"), "reranked": ev.get("reranked"),
             "properties": len(ev["properties"]), "rival": max(rival(i, j), rival(j, i)),
             "value_ratio": measure["ratio"], "kinds_differ": measure["differ"], "values": ev["values"],
             "keyed": (i, j) in keyed, "model": [r for r, _ in said["model"]], "read": reads.get((i, j)),

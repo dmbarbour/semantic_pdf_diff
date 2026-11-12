@@ -51,7 +51,7 @@ import os
 import re
 from collections import Counter, defaultdict
 
-from .align import Side, shape
+from .align import Side, generic, shape
 from .glossary import natural
 from .terms import fold
 from .schema import Evidence
@@ -191,7 +191,7 @@ def renamed(subjects, alias):
     return out
 
 def matched(found, findings, sources, alias=lambda name: None, by_findings=True, matches=(), firm=None, rank=None,
-            joins=()):
+            joins=(), generic=None):
     """The sources' subjects matched across them: [{source: (key, name, claims)}], each subject once. Two sources'
     subjects are one where the findings pair their claims (by_findings: revisions), the most pairs first and one to
     one; else where they're keyed alike (a tag, or the same words), or named as other names of one thing (alias);
@@ -201,7 +201,8 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
     other's (source, key) as "keyed"; where it says a probability (a number, not True), the group keeps it. rank:
     the subjects keyed alike, in the order they're taken (a source's first joins, the rest stand apart). joins:
     [((source, key), (source, key), probability)]: two subjects alone joined by their evidence's probability, matched
-    by "evidence" (evidence combined numerically, milestone 6)."""
+    by "evidence" (evidence combined numerically, milestone 6). generic: whether a name is no key (between proposals,
+    align.generic: "sheet", "detail"), its subject alone but for its evidence."""
     of = {c["id"]: (source, key) for source in sources for key, _, claims in found[source] for c in claims}
     by = {(source, key): (key, name, claims) for source in sources for key, name, claims in found[source]}
     links = Counter()
@@ -220,7 +221,7 @@ def matched(found, findings, sources, alias=lambda name: None, by_findings=True,
     for source in sources:
         for key, name, _ in found[source]:
             if (source, key) not in joined:
-                keyed[alias(name) or key].append((source, key))
+                keyed[(source, key) if generic and generic(name) else alias(name) or key].append((source, key))
     for members in keyed.values():
         members = rank(members) if rank else members
         apart = []
@@ -397,7 +398,7 @@ def built(data):
         subjects, by_tag, origins = [], {}, {}
         halves = {}  # (source, key): (its subject, the other half's (source, key)): kept apart, keyed alike (firm)
         for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals",
-                             matches, firm, rank, joins):
+                             matches, firm, rank, joins, generic if data.get("mode") == "proposals" else None):
             subject = make(group, by_tag, len(subjects))
             subjects.append(subject)
             origins[id(subject)] = [(source, group[source][0]) for source in sources if source in group]
