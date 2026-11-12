@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.64.0 (2026-11-12)
+
+- **Links in the lab's review batches,** for a model panel on real pairs (evidence combined numerically, milestone 8): `review sample --links N` takes two subjects of a comparison's two sources across the combiner's probability range, shown blind with their names, claims, sections and crops; a panel grades them the same, comparable or different, with kind, function and integration; `review links` scores the panel's consensus against the probabilities.
+- The first panel (turbine and drawings pairs, three models, $2.05): the turbines' links rank well (average precision 0.71), the drawings' don't (0.39: generic names such as "sheet" and "detail" joined as keys); confident links are overconfident on real pairs.
+- The lab's ranking measures moved into evaluation (`eval/ranking.py`).
+
 ## 0.63.1 (2026-11-12)
 
 - **A bank's units no longer paired by their numbering between proposals:** names tagged as units of a series in their document (P-101A to C, IP-1 to 3) aren't joined by the model's other names, which paired them by order (P-101A with IP-1, as one item at 0.82); the model's match, the judge's pairings and the tags' spelling weigh nothing between them. Such banks show unmatched until they can be linked as sets. The owner: "If it's just three fungible pumps coordinating in a shared role, then how would it make sense to match them one to one?"
