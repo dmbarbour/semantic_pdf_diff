@@ -190,6 +190,12 @@ The order of the steps is Claude's; the second pass's request starts on conteste
 
 **Likely mistakes next:** building fungibility before removing the ordinal key; `indexes.kinds` as sibling sets; a margin near zero read as fungible; a size rule tuned on random draws; standbys paired; the base template's pumps made identical; asking the model "interchangeable?" without quotes and without the trap knob; the scorer's one-to-one ids taken as truth before the set rule.
 
+## The owner's answer on names (2026-11-12)
+
+- "Perhaps "function" and "integration". I think a conflict with code isn't too relevant so long as it's not a conflict in our jargon; we could be using global constants or enums within the Python code. Probably should be."
+- "Please proceed."
+- So the families are **function** (what a component does and handles: kind, medium, service, arrangement) and **integration** (where it sits in its system: part of, serves, fed by, feeds, location), named in code by constants.
+
 ## Checked by Claude
 
 - `values.search_unit("cfm/ft²")` is None; cfm and gpm are both "flow". True.

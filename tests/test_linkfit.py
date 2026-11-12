@@ -43,5 +43,23 @@ class Ranking(unittest.TestCase):
         self.assertEqual(ranked["precision"], {"plausible": 0.5, "possible": round(2 / 3, 4)})
         self.assertNotIn("log_loss", ranked)  # no probabilities given
 
+class Banks(unittest.TestCase):
+    def test_any_unit_of_a_bank_matches_any_of_the_others(self):
+        # Harrow Creek's raw water pumps against Pine Ridge's intake pumps, named by order in the template: IP-2's
+        # capacity is P-101B's role; a match of P-101A with IP-2 is comparable, of a pump with the alum feed not
+        def fact(entity):
+            return {"entity": entity}
+        facts = [{"P-101A.capacity": fact("Raw water pump P-101A"), "P-101B.capacity": fact("Raw water pump P-101B"),
+                  "chem.alum": fact("Alum feed")},
+                 {"P-101A.capacity": fact("Intake pump IP-1"), "P-101B.capacity": fact("Intake pump IP-2"),
+                  "chem.alum": fact("Alum feed")}]
+        item = comparison._items(facts)
+        a, b, alum = (item(f) for f in ("P-101A.capacity", "P-101B.capacity", "chem.alum"))
+        plain, _ = comparison._read(facts, item)
+        banked, bank = comparison._read(facts, item, banks={"raw water pumps": ("P-101A", "P-101B", "P-101C")})
+        self.assertEqual((plain({a}, {b}), banked({a}, {b}), banked({a}, {a})), ("wrong", "right", "right"))
+        self.assertEqual((banked({a}, {alum}), banked(set(), {b})), ("wrong", "unscorable"))
+        self.assertEqual(set(bank), {a, b})
+
 if __name__ == "__main__":
     unittest.main()

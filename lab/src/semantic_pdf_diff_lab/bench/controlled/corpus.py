@@ -26,6 +26,12 @@ def _phrase(draw, fact, templates):
     """One of a fact's phrasings, filled in."""
     return draw.pick(templates).format(e=fact.entity, a=fact.attribute, v=fact.value, u=fact.unit, c=fact.conditions)
 
+# Banks: units of one service numbered with one tag and a letter, their role ids' prefixes. Between proposals any unit
+# of one design's bank matched to any of the other's is right (comparable: the owner, 2026-11-12, "If it's just three
+# fungible pumps coordinating in a shared role, then how would it make sense to match them one to one?"), though each
+# draws its own values here (a real bank's are usually alike)
+BANKS = {"raw water pumps": ("P-101A", "P-101B", "P-101C")}
+
 def water_treatment(seed=1):
     """A water treatment plant: design basis, process units, raw water pumps, chemical feed, disinfection options."""
     d = Draw(f"wtp-{seed}")

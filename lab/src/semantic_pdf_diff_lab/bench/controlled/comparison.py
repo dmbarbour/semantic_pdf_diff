@@ -52,6 +52,7 @@ above and at possible or above, and where probabilities are given their log loss
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 
+from .corpus import BANKS
 from .score import classify, key_facts, ranges
 from .views import score_compared, score_echoes_compared
 
@@ -201,15 +202,32 @@ def score_proposals(a, b, report):
     bound = _bound(report, side, keys, {})
     kinds = changes(a, b)
     return {"facts": {k: len(v) for k, v in kinds.items()},
-            **_matching(report, side, keys, {}, bound),
+            **_matching(report, side, keys, {}, bound, banks=BANKS),
             **_gaps(report, side, keys, {}, kinds, bound),
             "findings": dict(sorted(Counter(f["relation"] for f in report["findings"]).items())),
             "unmatched": len(report["unmatched"])}
 
-def _matching(report, side, keys, renames, bound, splits=()):
+def _read(facts, item, splits=(), banks=None):
+    """How a match's two sides read against the keys (each side's items): "right" where they share an item, where an
+    item became two (splits: the keys' (earlier fact ids, later ones)), or where both are units of one bank (banks:
+    {name: its units' role ids' prefixes}, corpus.BANKS: between proposals any of one design's raw water pumps with
+    any of the other's); "unscorable" where a side has none."""
+    related = {(item(a), item(b)) for old, new in splits for a in old for b in new if a in facts[0] and b in facts[1]}
+    bank = {item(fid): name for name, units in (banks or {}).items() for side in facts for fid in side
+            if fid.split(".")[0] in units}
+
+    def read(x, y):
+        return ("unscorable" if not x or not y else
+                "right" if x & y or any((i, j) in related or bank.get(i) and bank.get(i) == bank.get(j)
+                                        for i in x for j in y)
+                else "wrong")
+    return read, bank
+
+def _matching(report, side, keys, renames, bound, splits=(), banks=None):
     """The index's subjects matched across the revisions, scored by the keys' items (see the module's note):
     {"matching": {"groups", "right", "wrong", "unscorable", "items", "matched", "links"}}, or nothing without an
-    index. splits: the keys' (earlier fact ids, later ones), an item become two: a link between them is right."""
+    index. splits: the keys' (earlier fact ids, later ones), an item become two: a link between them is right; banks
+    (proposals): units of one service, any of one side's with any of the other's right (_read)."""
     from semantic_pdf_diff import indexes
     subjects = (report.get("index") or {}).get("subjects")
     if not subjects:
@@ -230,11 +248,7 @@ def _matching(report, side, keys, renames, bound, splits=()):
         top = max(found.values(), default=0)
         return {i for i, n in found.items() if n == top} if top else set()
 
-    related = {(item(a), item(b)) for old, new in splits for a in old for b in new if a in facts[0] and b in facts[1]}
-
-    def read(x, y):
-        return ("unscorable" if not x or not y else "right" if x & y or any((i, j) in related for i in x for j in y)
-                else "wrong")
+    read, bank = _read(facts, item, splits, banks)
     by_name = {(next(iter(s["claims"])), s["name"]): s for s in subjects if len(s["claims"]) == 1}
     for s in subjects:
         for link in s.get("links", []):
@@ -250,6 +264,8 @@ def _matching(report, side, keys, renames, bound, splits=()):
         counts[read(*sides)] += 1
         if sides[0] & sides[1]:
             matched |= sides[0] & sides[1]
+        elif read(*sides) == "right":  # units of one bank: each side's matched
+            matched |= {i for i in sides[0] | sides[1] if bank.get(i)}
     both = {i for i in items[0] if items[0][i] >= indexes.OTHER_CLAIMS and items[1][i] >= indexes.OTHER_CLAIMS}
     return {"matching": {**{k: counts[k] for k in ("groups", "right", "wrong", "unscorable")}, "items": len(both),
                          "matched": len(both & matched),
