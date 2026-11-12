@@ -264,6 +264,12 @@ class Batches(unittest.TestCase):
         self.assertTrue(all('probability' not in prompt for prompt, _ in panel.prompts))
         scores = review.link_scores(folder)
         self.assertEqual((list(scores), scores['SECRET-RESPONDER']['items']), (['SECRET-RESPONDER'], len(links)))
+        held = Path(self.dir.name) / 'links-held'
+        with contextlib.redirect_stdout(io.StringIO()):
+            cli.main(['review', 'sample', str(held), '--store', f'SECRET-RESPONDER={self.store}', '--claims', '0',
+                      '--abouts', '0', '--pairs', '0', '--links', '4', '--exclude', str(folder)])
+        again = {i['id'] for i in json.loads((held / 'batch.json').read_text())['items']}
+        self.assertFalse(again & {i['id'] for i in links})  # a held-out sample: none of the first's
 
 if __name__ == '__main__':
     unittest.main()

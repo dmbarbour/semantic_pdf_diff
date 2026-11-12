@@ -75,6 +75,8 @@ def review_command(argv):
     sample.add_argument('--links', type=int, default=0,
                         help="Links per store: two subjects of its comparison's two sources (round-robin over the "
                              "combiner's probability bands; the store's report.json)")
+    sample.add_argument('--exclude', type=Path, action='append', default=[], metavar='BATCH',
+                        help="Leave out another batch's items (a held-out sample); repeatable")
     sample.add_argument('--seed', type=int, default=1)
     add = sub.add_parser('import', help="Check a reviewer's labels file and add it to the batch")
     add.add_argument('batch', type=Path)
@@ -108,7 +110,10 @@ def review_command(argv):
             if not path:
                 raise ValueError(f'--store {spec!r}: use LABEL=DIR')
             stores.append((label, Path(path)))
-        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed, args.links)
+        exclude = {i['id'] for b in args.exclude
+                   for i in json.loads((b / 'batch.json').read_text(encoding='utf-8'))['items']}
+        batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed, args.links,
+                              exclude)
         asked = sum(1 for i in batch['items'] if i.get('request'))
         print(f"{len(batch['items'])} items: first judge the questions blind ({asked} recorded) in "
               f"{args.batch / 'questions.html'}, then the answers in {args.batch / 'review.html'}")

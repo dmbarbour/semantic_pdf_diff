@@ -121,11 +121,12 @@ class Source:
 def _headings(source, content):
     return {s.id: " > ".join(s.heading_path) for s in source.store.sections(content)}
 
-def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0):
+def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclude=()):
     """Write a batch: a stratified random sample of claims (round-robin over claim kinds),
     about statements, claim pairs and links (two subjects of two sources, round-robin over
     the combiner's probability bands) from each store. Each item shows the exact request
-    (instructions and input) that produced it, from the store's query log."""
+    (instructions and input) that produced it, from the store's query log. exclude: item ids
+    left out (another batch's links: a held-out sample)."""
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
@@ -136,7 +137,7 @@ def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0):
             found = _sample_claims(source, folder, rng, claims)
             found += _sample_abouts(source, folder, rng, abouts)
             found += _sample_pairs(source, folder, rng, pairs)
-            found += _sample_links(source, folder, rng, links)
+            found += _sample_links(source, folder, rng, links, set(exclude))
             requests = Requests(source.store)
             for item in found:
                 item["request"] = requests.describe(item, source, folder)
@@ -383,7 +384,7 @@ def _link_pairs(data):
             for s in subjects if len(s["claims"]) == 2]
     return out
 
-def _sample_links(source, folder, rng, n):
+def _sample_links(source, folder, rng, n, exclude=frozenset()):
     """Up to n links of the store's comparison (its report.json's index), round-robin over LINK_BANDS: each side's
     names, claims and sections, and its first claim's views; blind to the probability and how it was reached."""
     report = source.folder / "report.json"
@@ -393,11 +394,12 @@ def _sample_links(source, folder, rng, n):
     evidence = {e["id"]: e for e in source.claims()}
     groups = {}
     for p, how, sides in _link_pairs(data):
-        band = "joined by name" if p is None else [name for low, name in LINK_BANDS if p >= low][-1]
-        groups.setdefault(band, []).append((p, how, sides))
-    items = []
-    for p, how, sides in _stratified(rng, groups, n):
         iid = item_id("link", source.label, *(f"{src}:{','.join(ids)}" for src, ids in sides))
+        if iid not in exclude:
+            band = "joined by name" if p is None else [name for low, name in LINK_BANDS if p >= low][-1]
+            groups.setdefault(band, []).append((p, how, sides, iid))
+    items = []
+    for p, how, sides, iid in _stratified(rng, groups, n):
         images, texts, context, shown = [], [], {}, {}
         for side, (src, ids) in zip("AB", sides):
             claims = [evidence[c] for c in ids if c in evidence]
