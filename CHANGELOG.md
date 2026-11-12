@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.63.1 (2026-11-12)
+
+- **A bank's units no longer paired by their numbering between proposals:** names tagged as units of a series in their document (P-101A to C, IP-1 to 3) aren't joined by the model's other names, which paired them by order (P-101A with IP-1, as one item at 0.82); the model's match, the judge's pairings and the tags' spelling weigh nothing between them. Such banks show unmatched until they can be linked as sets. The owner: "If it's just three fungible pumps coordinating in a shared role, then how would it make sense to match them one to one?"
+- The lab scores any of one design's raw water pumps matched to any of the other's as right (comparable).
+
 ## 0.63.0 (2026-11-11)
 
 - **`link_levels: combined` on by default** (the owner: "D1. Yes, turn it on by default."): a link's standing is a probability from its evidence (names, the model's readings, properties, values, the judge, a key), shown with each family's part; plausible and possible are cuts on it (0.6, 0.35); proposals' firm groups join at 0.70, never certain; linked values, link gaps and topics take a link by its probability. `link_levels: rubric` keeps the old levels; round 0's settings pin it. The controlled corpus and the slices fixture re-recorded ($0.003): firm groups 2,445 right and 1 wrong to 2,466 and 4 (the three new ones Harrow Creek's UV option joined to a chlorine contact basin), mean average precision 0.991 to 0.994.
