@@ -15459,6 +15459,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 20,
@@ -15538,6 +15542,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 22,
      "matches": 22,
@@ -15614,6 +15622,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 22,
      "matches": 22,
@@ -15689,6 +15701,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 23,
@@ -15772,6 +15788,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -15853,6 +15873,10 @@
       "wrong": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 23,
      "matches": 20,
@@ -15932,6 +15956,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 21,
@@ -16014,6 +16042,10 @@
       "wrong": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 25,
      "matches": 19,
@@ -16086,6 +16118,10 @@
     "unscorable": 0,
     "items": 9,
     "matched": 6,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -16159,6 +16195,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -16650,6 +16690,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -16733,6 +16777,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 30,
@@ -16822,6 +16870,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 33,
      "matches": 23,
@@ -16899,6 +16951,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -16970,6 +17026,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -17046,6 +17106,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -17125,6 +17189,10 @@
       "links": 3,
       "right": 3
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 23,
@@ -17208,6 +17276,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 23,
      "matches": 22,
@@ -17290,6 +17362,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 23,
      "matches": 20,
@@ -17371,6 +17447,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -33217,6 +33297,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 20,
@@ -33296,6 +33380,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 22,
      "matches": 22,
@@ -33372,6 +33460,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 22,
      "matches": 22,
@@ -33447,6 +33539,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 23,
@@ -33530,6 +33626,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -33611,6 +33711,10 @@
       "wrong": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 23,
      "matches": 20,
@@ -33690,6 +33794,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 21,
@@ -33772,6 +33880,10 @@
       "wrong": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 25,
      "matches": 19,
@@ -33844,6 +33956,10 @@
     "unscorable": 0,
     "items": 9,
     "matched": 6,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -33917,6 +34033,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -34408,6 +34528,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -34491,6 +34615,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 30,
@@ -34580,6 +34708,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 33,
      "matches": 23,
@@ -34657,6 +34789,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -34728,6 +34864,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -34804,6 +34944,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -34883,6 +35027,10 @@
       "links": 3,
       "right": 3
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 23,
@@ -34966,6 +35114,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 23,
      "matches": 22,
@@ -35048,6 +35200,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 23,
      "matches": 20,
@@ -35129,6 +35285,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -48071,6 +48231,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -48150,6 +48314,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 22,
      "matches": 22,
@@ -48225,6 +48393,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -48303,6 +48475,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -48379,6 +48555,10 @@
       "links": 2,
       "right": 2
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 22,
@@ -48460,6 +48640,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 21,
      "matches": 19,
@@ -48540,6 +48724,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 21,
      "matches": 19,
@@ -48615,6 +48803,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 21,
@@ -49033,6 +49225,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -49119,6 +49315,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 33,
      "matches": 23,
@@ -49197,6 +49397,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -49268,6 +49472,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -49344,6 +49552,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -49423,6 +49635,10 @@
       "links": 3,
       "right": 3
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 23,
@@ -49506,6 +49722,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -49582,6 +49802,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -62474,6 +62698,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -62553,6 +62781,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 22,
      "matches": 22,
@@ -62628,6 +62860,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -62706,6 +62942,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -62782,6 +63022,10 @@
       "links": 2,
       "right": 2
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 22,
@@ -62863,6 +63107,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 21,
      "matches": 19,
@@ -62943,6 +63191,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 21,
      "matches": 19,
@@ -63018,6 +63270,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 21,
@@ -63436,6 +63692,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -63522,6 +63782,10 @@
       "right": 3
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 33,
      "matches": 23,
@@ -63600,6 +63864,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -63671,6 +63939,10 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 30,
      "matches": 21,
@@ -63747,6 +64019,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,
@@ -63826,6 +64102,10 @@
       "links": 3,
       "right": 3
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 23,
@@ -63909,6 +64189,10 @@
       "right": 1
      }
     },
+    "sets": {
+     "links": 1,
+     "right": 1
+    },
     "ranking": {
      "pairs": 20,
      "matches": 19,
@@ -63985,6 +64269,10 @@
       "links": 1,
       "right": 1
      }
+    },
+    "sets": {
+     "links": 1,
+     "right": 1
     },
     "ranking": {
      "pairs": 20,

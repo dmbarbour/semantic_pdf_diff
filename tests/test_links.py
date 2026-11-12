@@ -548,6 +548,36 @@ class Series(unittest.TestCase):
                          [("the model's match (corresponding), units of two series", 0.0)])
         self.assertLess(links.combined(picked, "proposals")[0], links.SHOWN["possible"])
 
+    def test_two_banks_are_linked_as_sets(self):
+        from semantic_pdf_diff import indexfiles
+        from semantic_pdf_diff.report import subjects_html
+        tags = (("P-101A", "P-101B", "P-101C"), ("IP-1", "IP-2", "IP-3"))
+        data = self.built(tags)
+        found = data["index"]["sets"]
+        self.assertEqual([sorted(x["sources"][s]["members"] for s in x["sources"]) for x in found],
+                         [[["Intake pump IP-1", "Intake pump IP-2", "Intake pump IP-3"],
+                           ["Raw water pump P-101A", "Raw water pump P-101B", "Raw water pump P-101C"]]])
+        self.assertGreaterEqual(found[0]["probability"], links.SHOWN["possible"])
+        self.assertEqual([(p["name"], p["a"], p["b"]) for p in found[0]["properties"]],
+                         [("capacity", "5000 to 5200 gpm", "5000 to 5200 gpm"),
+                          ("total dynamic head", "96 ft", "96 ft")])
+        md = indexfiles.markdown(data["index"])
+        self.assertIn("## Sets", md)
+        self.assertIn("One of a bank, possibly the counterpart as a set of Intake pump IP-1, Intake pump IP-2, "
+                      "Intake pump IP-3 (b; ", md)
+        self.assertIn("one of a bank, possibly the counterpart as a set of",
+                      subjects_html(data["index"]["subjects"], ["a", "b"]))
+
+    def test_a_numbering_scheme_of_other_roles_is_no_bank(self):
+        claims = [claim(f"a-{n}", "ca", f"{role} pump P-101{x}", "capacity", f"{3000 + n}", "gpm")
+                  for n, (role, x) in enumerate((("Backwash", "A"), ("Sludge", "B"), ("Washwater recycle", "C")))]
+        claims += [claim(f"b-{n}", "cb", f"Raw water pump P-201{x}", "capacity", f"{5000 + n}", "gpm")
+                   for n, x in enumerate("ABC")]
+        data = report(claims, [], ("a", "b"), mode="proposals", settings={"link_levels": "combined"})
+        index = indexes.built(data)
+        self.assertEqual([(src, len(members)) for src, members in links.banks(index)], [("b", 3)])
+        self.assertNotIn("sets", index)
+
     def test_one_unit_each_still_joined_by_the_models_groups(self):
         data = self.built((("P-101",), ("IP-1",)))
         self.assertEqual([(s["name"], s["matched_by"]) for s in data["index"]["subjects"] if len(s["claims"]) == 2],

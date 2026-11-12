@@ -797,7 +797,90 @@ SIGNALS = {"name": "names", "keyed": "a tag, name or other name both give",
            "judged": "claims the judge paired", "grouped": "grouped by alignment", "model": "the model's match"}
 
 FAMILIES = {"key": "a key both give", "names": "names", "model": "the model's readings", "properties": "properties",
-            "values": "values", "judge": "the judge", "alignment": "alignment"}  # a combined link's families, as said
+            "values": "values", "judge": "the judge", "alignment": "alignment",
+            FUNCTION: "function"}  # a combined link's families, as said
+
+def banks(index):
+    """Each source's banks: [(source, [subject indices])], the subjects alone in a source that are units of one series
+    (align.series: P-101A to C) and named alike but for their tags ("Raw water pump P-201A"; a member named by its tag
+    alone fits any), two or more. A series whose members are named otherwise (Birch Hollow's backwash, sludge and
+    washwater recycle pumps P-101A to C) is no bank: a numbering scheme, not one service."""
+    alone = _alone(index)
+    tagged = series({(source, n) for source, xs in alone.items() for _, s in xs for n in s["names"]})
+    out = []
+    for source, xs in sorted(alone.items()):
+        by_stem = defaultdict(list)
+        for i, s in xs:
+            tags = sorted({tag for (src, n), tag in tagged.items() if src == source and n in s["names"]})
+            if tags:
+                named = frozenset(w for n in s["names"] for w in words(n) if w not in identifiers(words(n)))
+                by_stem[tags[0][:-1]].append((i, named))
+        for members in by_stem.values():
+            kinds = {named for _, named in members if named}
+            if len(members) >= 2 and len(kinds) <= 1:
+                out.append((source, sorted(i for i, _ in members)))
+    return out
+
+def _range(values):
+    """A property's values on one side, as said: "5,088 to 8,542 gpm", or its distinct values listed."""
+    numbers, units = [], {v.get("unit", "") for v in values}
+    for v in values:
+        try:
+            numbers.append((float(str(v["value"]).replace(",", "")), v["value"]))
+        except ValueError:
+            return ", ".join(dict.fromkeys(f"{v['value']} {v.get('unit', '')}".strip() for v in values))
+    if not numbers:
+        return ""
+    low, high = min(numbers)[1], max(numbers)[1]
+    unit_said = f" {units.pop()}" if len(units) == 1 and "" not in units else ""
+    return (low if low == high else f"{low} to {high}") + unit_said
+
+def sets(data, index):
+    """Between proposals, two sources' banks (banks) linked as sets, not unit to unit (evidence combined numerically,
+    milestone 10, step 5; the owner, 2026-11-12: "If it's just three fungible pumps coordinating in a shared role,
+    then how would it make sense to match them one to one?"): each bank weighed as one subject of its members'
+    claims (candidates, combined; their tags' numbering weighs nothing: series), linked where its probability
+    reaches SHOWN's possible. [{"sources": {source: {"members": [names], "subjects": [indices]}}, "probability",
+    "contributions", "properties": [{"name", source: its range}]}], the likeliest first."""
+    sources = index.get("sources", [])
+    if data.get("mode") != "proposals" or len(sources) != 2:
+        return []
+    found = banks(index)
+    if not any(source == sources[0] for source, _ in found) or not any(source == sources[1] for source, _ in found):
+        return []
+    subjects = index["subjects"]
+    pseudo = [{"name": " ".join(subjects[i]["name"] for i in members[:1]) + f" ({len(members)})",
+               "names": sorted({n for i in members for n in subjects[i]["names"]}),
+               "claims": {source: [c for i in members for c in subjects[i]["claims"][source]]},
+               "properties": [p for i in members for p in subjects[i]["properties"]]}
+              for source, members in found]
+    out = []
+    for c in candidates(data, {"sources": sources, "subjects": pseudo}):
+        c["features"]["several"] = 0  # a bank is several units by design
+        p, families = combined(c, "proposals")
+        if p < SHOWN["possible"]:
+            continue
+        pair = [found[c["i"]], found[c["j"]]]
+        common = _properties(pseudo[c["i"]]) & _properties(pseudo[c["j"]])
+        shown = {" ".join(sorted(words(q["name"]))): q["name"] for x in (pseudo[c["j"]], pseudo[c["i"]])
+                 for q in x["properties"]}  # a key's name as printed
+        ranges = []
+        for key in sorted(common, key=lambda k: shown.get(k, k).casefold()):
+            row = {"name": shown.get(key, key)}
+            for source, members in pair:
+                row[source] = _range([v for i in members for q in subjects[i]["properties"]
+                                      if " ".join(sorted(words(q["name"]))) == key for v in q["values"]])
+            ranges.append(row)
+        out.append({"sources": {source: {"members": [subjects[i]["name"] for i in members], "subjects": members}
+                                for source, members in pair},
+                    "probability": p, "contributions": {f: v for f, v in families.items() if v}, "properties": ranges})
+    return sorted(out, key=lambda x: -x["probability"])
+
+def set_said(found):
+    """A bank's unit's set link, as the index and the page say it (sets): "one of a bank, possibly the counterpart as
+    a set of IP-1, IP-2, IP-3 (b.pdf; 0.67)"."""
+    return (f"one of a bank, possibly the counterpart as a set of {', '.join(found['others'])} "
+            f"({found['source']}; {found['probability']:.2f})")
 
 def link_said(link):
     """A link as the index and the page say it: "possibly the counterpart of Alum (a.pdf; plausible: properties in

@@ -35,6 +35,9 @@ def title(index):
 
 # --- index.md ------------------------------------------------------------------------------------------------------
 
+SETS_NOTE = ("Units of one bank in each source (tagged as one series, named alike), linked as sets: told apart by "
+             "their numbering alone, they aren't paired one to one; their values compared as ranges.")
+
 def markdown(index):
     """index.md's text."""
     sources, many = index["sources"], len(index["sources"]) > 1
@@ -59,6 +62,9 @@ def markdown(index):
                 lines.append(link_said(x)[0].upper() + link_said(x)[1:]
                              + (", its values (not merged):" if x.get("values") else ""))
                 lines += [f"  - {v['property']}: {v['said']} ({v['where']})" for v in x.get("values", [])]
+            if s.get("set"):
+                from .links import set_said
+                lines.append(set_said(s["set"])[0].upper() + set_said(s["set"])[1:])
         lines.append("")
         for p in s["properties"]:
             also = [n for n in p.get("names", []) if n.casefold() != p["name"].casefold()]
@@ -71,6 +77,19 @@ def markdown(index):
             else:
                 lines.append(f"- {named}: " + "; ".join(f"{said(v)} ({v['where']})" for v in p["values"]))
         lines.append("")
+    if index.get("sets"):
+        lines += ["## Sets", "", SETS_NOTE, ""]
+        for x in index["sets"]:
+            from .links import FAMILIES
+            parts = [f"{FAMILIES.get(f, f)} {'+' if v > 0 else '−'}{abs(v):g}"
+                     for f, v in sorted(x["contributions"].items(), key=lambda y: -abs(y[1]))]
+            lines += ["### " + " ~ ".join(f"{', '.join(x['sources'][src]['members'])} ({src})"
+                                          for src in sources if src in x["sources"]),
+                      f"Possibly counterparts as sets ({x['probability']:.2f}"
+                      + (": " + ", ".join(parts) if parts else "") + ")", ""]
+            lines += [f"- **{p['name']}**: " + "; ".join(f"{src}: {p.get(src) or '—'}" for src in sources)
+                      for p in x["properties"]]
+            lines.append("")
     lines += ["## Properties", ""]
     for p in properties(index):
         lines.append(f"- **{p['name']}**: " + "; ".join(

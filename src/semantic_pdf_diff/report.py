@@ -822,6 +822,10 @@ def link_said(link):
     from .links import link_said as said
     return said(link)
 
+def set_said(found):
+    from .links import set_said as said
+    return said(found)
+
 def subjects_html(subjects, sources, gaps=()):
     """The Subjects view (indexes.py): each subject, its other names and its properties, each value linked to its
     claim's card; in a comparison a column a source, "—" where one gives nothing (weak: not saying isn't absence),
@@ -846,7 +850,8 @@ def subjects_html(subjects, sources, gaps=()):
             [SEVERAL.format(', '.join(s['several']))] if s.get('several') else []) + (
             ['claims: ' + ', '.join(f"{src} {len(s['claims'].get(src, []))}" for src in sources)
              + (f" (matched by {s['matched_by']})" if s['matched_by'] else '')] if many else []) + [
-            link_said(x) for x in s.get('links', [])]  # possibly one, kept apart (links.py)
+            link_said(x) for x in s.get('links', [])] + (  # possibly one, kept apart (links.py)
+            [set_said(s['set'])] if s.get('set') else [])  # a bank's unit, its bank linked as a set
         heads = ''.join(f'<th>{esc(src)}</th>' for src in sources) if many else '<th>Values</th>'
         rows = ''.join(
             f"<tr><td>{esc(p['name'])}"

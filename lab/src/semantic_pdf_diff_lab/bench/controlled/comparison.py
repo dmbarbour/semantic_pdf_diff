@@ -267,10 +267,17 @@ def _matching(report, side, keys, renames, bound, splits=(), banks=None):
         elif read(*sides) == "right":  # units of one bank: each side's matched
             matched |= {i for i in sides[0] | sides[1] if bank.get(i)}
     both = {i for i in items[0] if items[0][i] >= indexes.OTHER_CLAIMS and items[1][i] >= indexes.OTHER_CLAIMS}
+    banks = Counter()  # banks linked as sets (links.sets): each side's members' items
+    for x in (report.get("index") or {}).get("sets", []):
+        sides_ = [set().union(*(most(subjects[i]["claims"].get(name, [])) for i in x["sources"][name]["subjects"]))
+                  if name in x["sources"] else set() for name in names]
+        banks["links"] += 1
+        banks[read(*sides_)] += 1
     return {"matching": {**{k: counts[k] for k in ("groups", "right", "wrong", "unscorable")}, "items": len(both),
                          "matched": len(both & matched),
                          **({"links": {level: dict(sorted(c.items())) for level, c in sorted(linked.items())}}
                             if linked else {}),
+                         **({"sets": dict(sorted(banks.items()))} if banks else {}),
                          **_ranking(report, subjects, names, most, read)}}
 
 LEVEL_SCORE = {"firm": 3, "plausible": 2, "possible": 1}  # the null arm: today's levels as a score

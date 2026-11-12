@@ -515,7 +515,16 @@ def built(data):
     if data.get("kind_check"):  # the model's names and moves (the confirm_kinds lever, kindcheck.py)
         regroup = lambda groups: regrouped(groups, subjects, data["kind_check"])  # noqa: E731
     found_kinds = kinds(subjects, sheet_shapes(data), regroup)
+    from .links import sets  # banks linked as sets between proposals (evidence combined numerically, milestone 10)
+    banked = sets(data, {"sources": sources, "subjects": subjects})
+    for x in banked:  # each unit says its bank's set link
+        for src, side in x["sources"].items():
+            other = next(o for o in x["sources"] if o != src)
+            for i in side["subjects"]:
+                subjects[i].setdefault("set", {"source": other, "others": x["sources"][other]["members"],
+                                               "probability": x["probability"]})
     return {"sources": sources, "subjects": subjects, "figures": figures(data, where), "glossary": terms(data),
+            **({"sets": banked} if banked else {}),
             "kinds": found_kinds, "gaps": gaps(data, subjects, found_kinds, where),
             "inconsistencies": inconsistencies(data, where),
             **({"keyed": sorted([i, j] for i, j in keyed)} if keyed else {})}  # kept apart, keyed alike: for links
