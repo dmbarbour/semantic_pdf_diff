@@ -1,6 +1,6 @@
 # System use: what makes two designs' components the same or comparable
 
-- **Status:** Reviewed (2026-11-12); for the owner, ahead of rewriting milestone 10 of [evidence combined numerically](../plans/evidence-combination-2026-11-11.md).
+- **Status:** Reviewed (2026-11-12); answered the same day (below): two families; siblings paired one to one only where meaningfully differentiated, Claude's proposal for judging it below, for the owner; then milestone 10 of [evidence combined numerically](../plans/evidence-combination-2026-11-11.md) is rewritten from this review.
 - **Asked for:** the owner, 2026-11-12, answering [the place review](place-review-2026-11-11.md)'s questions:
   - Q2: "I don't know which relations best show two design's components are the same. Certainly, serving the same role or duty would be a big part. Having similar inputs and outputs. Similar roles for the upstream and downstream components. Develop a list of suspects that an engineer, mechanic, or architect might examine. Ask Fable for recommendations, too."
   - Q3: "Existing claims first, and carefully determine where we should be asking readers for more role and context info. Ask Fable to review and make suggestions, too."
@@ -116,6 +116,34 @@ The owner's three, marked; the rest Claude's and Fable's, merged. "For" and "aga
 2. **Q5, revisited:** the suspects split two ways: what a component does and handles (duty, medium, kind) and where it sits (part of, serves, fed by, feeds). One family ("use", say), or two ("duty" and "setting", say)? Names aren't settled by this; the split is the question.
 
 The order of the steps is Claude's; the second pass's request starts on contested subjects unless the owner prefers every subject.
+
+## The owner's answers (2026-11-12)
+
+- **1:** "IIUC, whether we can compare them one vs. one depends on if they are meaningfully differentiated. If it's just three fungible pumps coordinating in a shared role, then how would it make sense to match them one to one? But how should we approach making this judgement in our analysis? I don't know."
+- **2:** "Two families seems wiser given there's a clear split." Their names: open (Claude's suggestion below).
+
+## Siblings: when to pair one to one (Claude's proposal, for the owner)
+
+**Today both the product and the lab pair siblings by their numbering's order:**
+
+- **The product:** between Harrow Creek and Pine Ridge, the model's name groups (`synonyms`) pair P-101A with IP-1, B with 2, C with 3, and the index joins them on those groups ("other names", 0.821 each). Between Harrow Creek and Birch Hollow, P-101B joins P-201B and C joins C by evidence (0.723), their spelling alike.
+- **The lab:** the templates rename "Raw water pump P-101A" to "Intake pump IP-1" and to "P-201A" by order (`proposals.py`), so the scorer counts P-101A ~ IP-2 wrong though it is as valid.
+- **The template's parallel pumps aren't parallel:** each of the three raw water pumps gets its own random capacity, head and motor (`corpus.py`). In a real bank they are usually alike, so here every set would look differentiated by size: an artefact, and nothing to tune a size rule on.
+
+**The proposal** (proposals only; within revisions a tag names one thing over time):
+
+- **Sibling sets** within one source: today's kinds (`indexes.kinds`: tag stems, numbered names), narrowed by the use family's slots (the same kind, duty and medium). Birch Hollow's P-101A to C (backwash, sludge, washwater recycle) are a numbering scheme, not siblings.
+- **Differentiated or fungible, categorical first:** members differ meaningfully where their setting differs (what each serves, feeds or is part of: the north intake and the south; train A's filters and train B's) or their duty differs. A tag suffix never differentiates. Size only by class (a small jockey pump among mains), never by spread within a class.
+- **One to one needs correspondence:** both sets differentiated and their differentiators corresponding (the north intake's pump with the north intake's; the small one with the small one). Otherwise a set-to-set link at the set's probability, its members listed, the set's properties compared: count, each unit's range, total and firm capacity (one out of service), arrangement.
+- **Numerically:** within a fungible set a member's evidence against the other set's members is symmetric, so its margin over its own siblings is near zero. That margin, measured, is the sign of fungibility, and what should stop a member pair forming at 0.821.
+- **The lab:** keys naming sibling sets, and a scorer rule counting a match within corresponding sets as right ("comparable"), committed before fresh seeds as a held-out rule is; two knobs: a bank of identical parallel pumps, and a differentiated bank (a jockey pump; north and south intakes). The base template's pumps made alike re-records the revisions pairs.
+- **The families' names** (Claude's suggestion): "use" for what a component does and handles (duty, medium, kind); "setting" for where it sits (part of, serves, fed by, feeds).
+
+**For the owner:**
+
+1. **Duty and standby:** "P-101A and B duty, C standby" against "IP-1 and 2 duty, IP-3 standby". The standbys paired (C with 3), or the sets paired with "two duty, one standby" as their arrangement (pumps usually rotate duty)?
+2. **Size classes:** 4,000, 4,000 and 2,000 gpm against 5,000, 5,000 and 1,500 gpm. The small ones paired and the large ones a set, or all three a set with the pattern compared?
+3. **The names:** "use" and "setting", or others?
 
 ## Checked by Claude
 
