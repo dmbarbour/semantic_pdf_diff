@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.66.0 (2026-11-12)
+
+- **Banks of units linked as sets between proposals:** units of one tag series named alike but for their tags (raw water pumps P-101A to C; intake pumps IP-1 to 3) are linked to the other design's bank as a set, never unit to unit, with each property's range side by side (index.md's "Sets"; each unit's card says its set). A numbering scheme of other roles (a backwash, a sludge and a recycle pump tagged P-101A to C) is no bank.
+
 ## 0.65.1 (2026-11-12)
 
 - **A subject that is several things within one document is split:** a subject whose claims give two tags or more, each on a page of its own, becomes one subject a tag (a drawing set's "sheet" becomes "sheet S-522", "sheet S-601"); and other names don't join a document's subjects into one that gives a property in two media (a building's air filters and a plant's granular filtration stay two).
