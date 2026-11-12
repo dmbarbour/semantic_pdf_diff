@@ -1,2 +1,2 @@
 """Bounded-context, evidence-first PDF comparison."""
-__version__ = "0.64.2"
+__version__ = "0.65.0"

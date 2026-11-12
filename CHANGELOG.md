@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.65.0 (2026-11-12)
+
+- **The medium a subject handles as evidence between proposals** (the function family's first points; evidence combined numerically, milestone 10): units say liquid, air or light (gpm, MGD, mg/L; cfm, scfm; nm); two subjects handling different media are unlikely one, and a subject giving one property in two media (air's cfm/ft² and water's gpm/ft²) is likely two things. A building's air filters no longer join a treatment plant's filtration.
+- The lab's review samples can leave out another batch's items (`review sample --exclude`), for held-out panels; the first two panels' fixes held out (average precision of "the same" 0.41 to 0.59 on 72 fresh links).
+
 ## 0.64.2 (2026-11-12)
 
 - **A subject naming several tagged items counts against a match between proposals:** where one document's subject gives two or more tags in one property (a "sheet" with sheet numbers S-522, S-601 and S-701), it's several things, and the evidence it shares with the other design's weighs less (two houses' drawings no longer join their "sheet" subjects).
