@@ -154,11 +154,12 @@ TAXONOMY = {
     # real pairs); "comparable" the owner's: "whether two things are the same or at least comparable" (2026-11-12)
     "link": {"verdicts": [
         {"name": "same", "label": "The same",
-         "help": "One thing as each document describes it; in two designs, the counterpart playing the same part in "
-                 "each"},
+         "help": "Counterparts: one thing as each document describes it. Between two designs nothing is literally one "
+                 "object: each design's rotor, its tower, its bank of raw water pumps are counterparts, the same"},
         {"name": "comparable", "label": "Comparable",
-         "help": "Not one thing, but worth comparing: units of one bank, alternatives for one purpose, a part and its "
-                 "whole"},
+         "help": "Not counterparts, but worth comparing: one unit of a bank against a unit of the other's, "
+                 "alternatives for one purpose (UV reactors against a chlorine contact basin), a part against its "
+                 "whole, a property named as a thing against its thing (tower mass against the tower)"},
         {"name": "different", "label": "Different", "help": "Different things, not worth comparing"}],
         "flags": LINK_FLAGS},
 }

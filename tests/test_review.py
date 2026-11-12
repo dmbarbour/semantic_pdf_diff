@@ -256,7 +256,7 @@ class Batches(unittest.TestCase):
         batch = json.loads((folder / 'batch.json').read_text())
         links = [i for i in batch['items'] if i['type'] == 'link']
         self.assertTrue(links)
-        self.assertTrue(all(set(i['shown']) == {'A', 'B'} and 'probability' in i['hidden'] for i in links))
+        self.assertTrue(all(set(i['shown']) == {'A', 'B', 'relation'} and 'probability' in i['hidden'] for i in links))
         self.assertTrue(all('hidden' not in i and 'store' not in i for i in review.public_items(batch)))
         self.assertNotIn('"hidden"', (folder / 'review.html').read_text())
         panel = FakePanel()

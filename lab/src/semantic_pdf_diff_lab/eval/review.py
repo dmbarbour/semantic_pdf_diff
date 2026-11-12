@@ -414,6 +414,8 @@ def _sample_links(source, folder, rng, n):
                            "more_claims": max(0, len(claims) - LINK_CLAIMS),
                            "sections": sorted({headings.get(e.get("section", ""), "") for e in claims} - {""})}
         else:
+            shown["relation"] = ("two revisions of one document" if data.get("mode") == "revisions"
+                                 else "two competing designs (proposals)")
             band = "joined by name" if p is None else [name for low, name in LINK_BANDS if p >= low][-1]
             items.append({"id": iid, "type": "link", "store": source.label,
                           "target": {side: {"source": src, "claims": ids} for side, (src, ids) in zip("AB", sides)},
@@ -676,10 +678,11 @@ QUESTIONS = {
     "pair": "An automated retrieval step paired these two claims and a model judged their relation. A and B come from "
             "different sources: competing proposals (different designs) or revisions of one document. Is the pairing "
             "sensible, and is the judged relation right by the definitions given with the verdicts?",
-    "link": "A and B are two subjects, each as one source describes it (its names, claims and sections): two "
-            "competing designs, or two revisions of one document. Are they the same thing, comparable, or different, "
-            "by the definitions given with the verdicts? In fields, answer ok where A and B agree, wrong where they "
-            "differ, unsure where the item doesn't say.",
+    "link": "A and B are two subjects, each as one source describes it (its names, claims and sections); the "
+            "item's relation says whether the sources are two competing designs or two revisions of one document. "
+            "Are A and B the same thing (counterparts), comparable, or different, by the definitions given with the "
+            "verdicts? In fields, answer ok where A and B agree, wrong where they differ, unsure where the item "
+            "doesn't say.",
 }
 
 JUDGE = """You are one reviewer on a panel checking an automated system that reads engineering documents.
