@@ -165,7 +165,7 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
   - **Drawings:** average precision 0.39; above 0.8, 2 of 8 the same. The panel's "different" are right on reading: generic names joined as keys or near them: "sheet" ~ "sheet" (0.96, two sheets), "detail" ~ "detail" (0.80), "component" ~ "component H" (a deck detail against a grid bubble), "A1" ~ "Bedroom Section (A1)".
   - **Calibration on real pairs:** overconfident above 0.6 (development's corpus has few generic names).
   - **Its 72 links are development data now** (re-scored offline after each change, no requests); a held-out check takes a fresh sample without them.
-  - **Fixed 2026-11-12: a document's parts' names** ("sheet", "detail", "grid line") no key between proposals, nor names' evidence: "the same" ranked 0.46 to 0.63.
+  - **Fixed 2026-11-12: a document's parts' names** ("sheet", "detail", "grid line") no key between proposals, nor names' evidence: "the same" ranked 0.46 to 0.63; and **a side naming several tagged items** (each house's "sheet" three sheets' numbers) against a pair (−1.5): 0.66, log loss 0.39 (0.58 at first).
 
 ### 9. Weights fitted
 

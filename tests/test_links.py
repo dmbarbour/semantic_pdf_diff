@@ -583,6 +583,20 @@ class Generic(unittest.TestCase):
         self.assertNotIn("names", links.contributions(pair, "proposals"))
         self.assertEqual(sorted(s["name"] for s in subjects), ["Grid Line 4", "Grid line"])
 
+class Several(unittest.TestCase):
+    def test_a_side_naming_several_tagged_items_counts_against_a_pair(self):
+        # two houses' drawings: each "sheets" subject holding several sheets' numbers (the first link panel, 2026-11-12)
+        claims = [claim("A-1", "ca", "drawing sheets", "sheet number", "S-522", ""),
+                  claim("A-2", "ca", "drawing sheets", "sheet number", "S-601", ""),
+                  claim("A-3", "ca", "drawing sheets", "drawn by", "TEAM A", ""),
+                  claim("B-1", "cb", "drawing sheets", "sheet number", "A-301", ""),
+                  claim("B-2", "cb", "drawing sheets", "drawn by", "TEAM B", "")]
+        data = report(claims, [], ("a", "b"), mode="proposals", settings={"link_levels": "combined"})
+        data["index"] = indexes.built(data)
+        pair = links.candidates(data, data["index"])
+        self.assertEqual([c["features"]["several"] for c in pair], [2])
+        self.assertIn(("a side names several items", -1.5), links.contributions(pair[0], "proposals")["names"])
+
 class Kinds(unittest.TestCase):
     """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The
     gotchas review: "150 psi and 1,034 kPa never meet"."""

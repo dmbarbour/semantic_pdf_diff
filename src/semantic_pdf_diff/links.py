@@ -66,7 +66,7 @@ import math
 import re
 from collections import Counter, defaultdict
 
-from .align import DOCUMENT_PARTS, GENERIC, STOP, identifiers, series, unit, value_key, words
+from .align import DOCUMENT_PARTS, GENERIC, STOP, TAG, identifiers, series, unit, value_key, words
 from .schema import Evidence
 
 RUBRIC = "rubric/1"
@@ -75,8 +75,9 @@ RUBRIC = "rubric/1"
 # evidence was also kept as numbers (features; evidence combined numerically, milestone 1, 2026-11-11); candidates/4
 # since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10); candidates/5
 # since units of two series (align.series) were marked; candidates/6 since a document's parts' words ("sheet",
-# "detail") left proposals' names' words and spelling (2026-11-12)
-CANDIDATES = "candidates/6"
+# "detail") left proposals' names' words and spelling; candidates/7 since several tagged items one side's claims give
+# were counted (2026-11-12)
+CANDIDATES = "candidates/7"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -431,6 +432,9 @@ def contributions(c, mode):
         out["judge"].append((f"the judge paired {len(strong)}", 0.8 if len(strong) > 1 else 0.6))  # 0.94, ditto
     if f["grouped"]:
         out["alignment"].append(("grouped by alignment", 1.0))
+    if mode == "proposals" and f.get("several", 0) >= 2:  # a subject of several things (two houses' drawings: each
+        # "sheet" holding three sheets' numbers and titles, joined at 0.82; the first link panel, 2026-11-12)
+        out["names"].append(("a side names several items", -1.5))
     # Evidence that follows from other evidence counts less (correlated, not independent): siblings' values and the
     # judge's pairings follow from what siblings share (0.31 right, chance, against 0.95 apart: a little still orders
     # siblings among themselves); a key both give put the two before the judge and the read, which count nothing (0.10
@@ -621,6 +625,15 @@ def candidates(data, index):
     near, counterpart = _places(subjects, evidence, sources, keyed)
     # units of a series in their source (a bank's pumps), by their tags: two of two series are told apart by numbering
     tagged = series({(source, n) for source, alone_in in alone.items() for _, x in alone_in for n in x["names"]})
+
+    def several(x):  # the most tagged items one attribute of a subject's claims gives ("sheet number": S-522, S-601)
+        found = defaultdict(set)
+        for ids in x["claims"].values():
+            for c in ids:
+                e = evidence.get(c)
+                if e and TAG.fullmatch(str(e["value"]).strip()):
+                    found[e["attribute"].casefold()].add(e["value"].strip())
+        return max(map(len, found.values()), default=0)
     unit_of = {i: {tag for (source, n), tag in tagged.items() if n in x["names"]}
                for alone_in in alone.values() for i, x in alone_in}
     out = []
@@ -672,7 +685,8 @@ def candidates(data, index):
             "own": [len(_properties(s)), len(_properties(t))],
             "place": _place(i, j, sources, near, counterpart),
             "series": bool(mode == "proposals" and unit_of.get(i) and unit_of.get(j)
-                           and not unit_of[i] & unit_of[j])}
+                           and not unit_of[i] & unit_of[j]),
+            "several": max(several(s), several(t))}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
                     "keyed": (i, j) in keyed, "features": features})
