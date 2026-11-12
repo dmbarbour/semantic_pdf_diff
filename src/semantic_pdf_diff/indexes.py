@@ -97,6 +97,51 @@ def subjects_of(claims):
     side = Side([Evidence.model_validate(c) for c in claims])
     return [(key, side.display(key), [claims[i] for i in idx]) for key, idx in side.items.items()]
 
+def split_items(subjects):
+    """One source's subjects, a subject whose claims give two tags or more, one a page, split into one a tag (a drawing
+    set's "sheet" giving S-522, S-601 and S-701 on three pages: "sheet S-522" and so on; the first link panel on real
+    pairs, 2026-11-12, found two houses' "sheet" joined). Claims on a page giving none stay with the subject; a page
+    giving two tags leaves it whole."""
+    from .align import TAG
+    out = []
+    for key, name, cs in subjects:
+        on = defaultdict(set)  # a page: the tags its claims give
+        for c in cs:
+            value = str(c.get("value") or "").strip()
+            if TAG.fullmatch(value):
+                on[(c.get("locator") or {}).get("page")].add(value)
+        if len(set().union(*on.values()) if on else ()) < 2 or any(len(tags) > 1 for tags in on.values()):
+            out.append((key, name, cs))
+            continue
+        tag_of = {page: next(iter(tags)) for page, tags in on.items()}
+        by_tag, rest = defaultdict(list), []
+        for c in cs:
+            tag = tag_of.get((c.get("locator") or {}).get("page"))
+            (by_tag[tag] if tag else rest).append(c)
+        for tag in sorted(by_tag, key=natural):
+            out.append((f"{key} {fold(tag)}", name if tag in name else f"{name} {tag}", by_tag[tag]))
+        if rest:
+            out.append((key, name, rest))
+    return out
+
+def _media(claims):
+    """A subject's media by property ({property's words: media}; values.medium)."""
+    from .align import words
+    from .values import medium
+    by = defaultdict(set)
+    for c in claims:
+        found = medium(c.get("unit"))
+        if found:
+            by[" ".join(sorted(words(c["attribute"])))].add(found)
+    return by
+
+def mixes(a, b):
+    """Whether two subjects' claims together give a property in two media that neither gives alone: two things
+    (Spruce Lake's air filters' 486 cfm/ft² and its granular filtration's 2.8 gpm/ft², one subject by the model's
+    other names; milestone 10, the function family)."""
+    x, y = _media(a), _media(b)
+    return any(len(x[p] | y[p]) > 1 and len(x[p]) == len(y[p]) == 1 for p in set(x) & set(y))
+
 def alias_key(name):
     return fold(name).rstrip(".")
 
@@ -177,16 +222,17 @@ def kin(a, b):
 
 def renamed(subjects, alias):
     """One source's subjects, those named as other names of one thing joined (the first's key and name, their claims
-    together)."""
-    out, at = [], {}
+    together), but where together they'd give a property in two media (mixes)."""
+    out, at = [], defaultdict(list)  # an other name's subjects: more than one where they'd mix media
     for key, name, cs in subjects:
         a = alias(name) or next((alias(c["entity"]) for c in cs if alias(c["entity"])), None)
-        if a is not None and a in at:
-            k, n, prior = out[at[a]]
-            out[at[a]] = (k, n, prior + cs)
+        into = next((k for k in at.get(a, ()) if not mixes(out[k][2], cs)), None) if a is not None else None
+        if into is not None:
+            k, n, prior = out[into]
+            out[into] = (k, n, prior + cs)
             continue
         if a is not None:
-            at[a] = len(out)
+            at[a].append(len(out))
         out.append((key, name, cs))
     return out
 
@@ -382,7 +428,7 @@ def built(data):
     for e in data.get("evidence", []):
         claims[where.source.get(e["content"], "")].append(e)
     alias = aliases(data)
-    found = {source: renamed(subjects_of(claims[source]), alias) for source in sources}
+    found = {source: renamed(split_items(subjects_of(claims[source])), alias) for source in sources}
     paired = [(f["a"], f["b"]) for f in data.get("findings", []) if f.get("relation") in PAIRING]
     matches = [((c["source"], c["subject"]), (c["other_source"], c["other"]), c["relation"])
                for c in (data.get("commentary") or {}).get("entries", [])

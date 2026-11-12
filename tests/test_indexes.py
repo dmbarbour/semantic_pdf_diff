@@ -31,6 +31,29 @@ ONE = [claim("A-1", "ca", "P-101 feed pump", "rated power", "10", "kW"),
        claim("A-3", "ca", "P-102 pump", "rated power", "12", "kW"),
        claim("A-4", "ca", "P-102 pump", "Rated  power", "12.5", "kW", page=9)]
 
+class SplitWithinSource(unittest.TestCase):
+    """A subject that is several things within one source, split (evidence combined numerically, milestone 10, step
+    2; the first link panel on real pairs, 2026-11-12)."""
+    def test_a_subject_giving_a_tag_a_page_is_one_subject_a_tag(self):
+        sheets = [claim("A-1", "ca", "sheet", "sheet number", "S-522", "", page=1),
+                  claim("A-2", "ca", "sheet", "title", "DECK FOOTING DETAILS", "", page=1),
+                  claim("A-3", "ca", "sheet", "sheet number", "S-601", "", page=2),
+                  claim("A-4", "ca", "sheet", "drawn by", "TEAM A", "", page=5)]
+        index = indexes.built(report(sheets))
+        self.assertEqual([(s["name"], len(s["claims"]["a"])) for s in index["subjects"]],
+                         [("sheet", 1), ("sheet S-522", 2), ("sheet S-601", 1)])  # page 5 gives none: stays
+        two = sheets + [claim("A-5", "ca", "sheet", "reference", "A-301", "", page=2)]  # page 2 gives two: whole
+        self.assertEqual([s["name"] for s in indexes.built(report(two))["subjects"]], ["sheet"])
+
+    def test_other_names_dont_join_a_property_in_two_media(self):
+        filters = [claim("A-1", "ca", "Filters", "filtration rate", "486", "cfm/ft²"),
+                   claim("A-2", "ca", "granular filtration", "filtration rate", "2.8", "gpm/ft²"),
+                   claim("A-3", "ca", "granular media beds", "filtration rate", "3.1", "gpm/ft²")]
+        groups = {"items": [["Filters", "granular filtration", "granular media beds"]]}
+        index = indexes.built(report(filters, synonyms=groups))
+        self.assertEqual(sorted(s["names"] for s in index["subjects"]),
+                         [["Filters"], ["granular filtration", "granular media beds"]])
+
 class Reproducible(unittest.TestCase):
     def test_names_alike_but_for_case_ordered_the_same_whatever_the_hash_seed(self):
         # a recorded report's index differed between processes: "Height" and "height" tie on natural's case folding
