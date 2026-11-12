@@ -1,6 +1,6 @@
 # Place: where a component is used in a system, not where a document discusses it
 
-- **Status:** Reviewed (2026-11-11); for the owner, ahead of milestone 10's redesign.
+- **Status:** Reviewed (2026-11-11); answered 2026-11-12 (below), questions 2 to 4 continued in [the system use review](system-use-review-2026-11-12.md).
 - **Asked for:** the owner, 2026-11-11, on Claude's report of milestone 10: "Since you're mentioning matched sections, it seems you and I had a very different understanding for what 'place' meant when we were talking about it. I was thinking more about where a component is used in a system. Not where the section discussing a component appears in a document discussing the component, which seems much less meaningful as evidence. Review this misunderstanding and its outcomes with Fable."
 - **Done by:** Claude's account first, then Fable (claude-fable-5-1), read-only, checking it against the code, the record and recorded reports; Fable's claims checked by Claude (below).
 - **Concerns:** [evidence combined numerically](../plans/evidence-combination-2026-11-11.md) (milestone 10), [tentative matches](../plans/tentative-matches-2026-11-07.md) (milestones 10 and 12), [the same-thing review](same-thing-review-2026-11-09.md), [the gotchas review](gotchas-review-2026-11-09.md), [the evidence combination review](evidence-combination-review-2026-11-11.md).
@@ -86,6 +86,15 @@ The same shape as the levels review, two days apart: the owner's domain word →
 3. **Relations from existing claims first** (no requests: Backwash pump P-101A's scope "to the filters" becomes an edge to the filters), **or the reader asked now** (`role` and `context` defined; every recording re-made)?
 4. **The second pass in comparisons,** a request a subject, so each subject gets a system line (Spruce Lake's building filters: "part of the administration building's air handling; serves the offices")?
 5. **The family's name:** "system" or "use", with today's neighbours feature renamed "adjacency" so "place" isn't a mechanism's name?
+
+## The owner's answers (2026-11-12)
+
+- **1:** "We can keep matching sections as a weak signal, especially when the sections are naming components or subsystems."
+- **2:** "I don't know which relations best show two design's components are the same. Certainly, serving the same role or duty would be a big part. Having similar inputs and outputs. Similar roles for the upstream and downstream components. Develop a list of suspects that an engineer, mechanic, or architect might examine. Ask Fable for recommendations, too."
+- **3:** "Existing claims first, and carefully determine where we should be asking readers for more role and context info. Ask Fable to review and make suggestions, too."
+- **4:** "I'm not sure of your intention here. Is this one request per component as part of the second pass, after gathering enough information to present it? Or something else? It seems to me that understanding components requires understanding what they're part of, and so does identifying whether two things are the same or at least comparable. This entangles things in some awkward ways, and I'm also struggling to understand the best approaches. Perhaps review our options, ask Fable for a backup review."
+- **5:** "Seems viable, but this is trying to fit some connotations. Perhaps revisit after expanding on Q2?" (open)
+- Questions 2 to 4 are taken up in [the system use review](system-use-review-2026-11-12.md).
 
 ## Checked by Claude
 
