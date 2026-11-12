@@ -23,7 +23,7 @@ numeric match (Bayesian, BM25, etc.)").
 import math
 from collections import Counter, defaultdict
 
-from .measures import calibration  # noqa: F401 (linkfit.calibration, as before)
+from semantic_pdf_diff_lab.eval.ranking import calibration  # noqa: F401 (linkfit.calibration, as before)
 
 SMOOTH = 0.5  # added to each band's count
 FEATURES = ("alike", "meaning", "properties", "distinct", "fits", "judged", "model")

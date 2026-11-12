@@ -1,6 +1,7 @@
 """Measures of a ranking of pairs, each labelled a match or not (evidence combined numerically, milestone 2): its
-average precision, its probabilities' log loss and calibration. Shared by the scorer (comparison) and the fitting
-(linkfit), neither importing the other."""
+average precision, its probabilities' log loss and calibration. Shared by the controlled corpus's scorer
+(comparison), the fitting (linkfit) and the review panel's links (review.link_scores); in evaluation, which the
+benches may use and which reaches into none of them."""
 import math
 from collections import defaultdict
 

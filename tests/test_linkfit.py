@@ -1,11 +1,12 @@
-"""The lab's measures of a ranking of pairs (measures.average_precision, log_loss; comparison._ranking): evidence
+"""The lab's measures of a ranking of pairs (ranking.average_precision, log_loss; comparison._ranking): evidence
 combined numerically, milestone 2. A combiner is judged by how it ranks and how well its probabilities are
 calibrated, not by counts moved across a level."""
 import stubs  # noqa: F401 (a clean environment)
 import unittest
 
 from semantic_pdf_diff import indexes
-from semantic_pdf_diff_lab.bench.controlled import comparison, measures
+from semantic_pdf_diff_lab.bench.controlled import comparison
+from semantic_pdf_diff_lab.eval import ranking as measures
 from test_indexes import report
 from test_links import A, B
 

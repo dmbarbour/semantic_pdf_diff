@@ -282,7 +282,7 @@ def _ranking(report, subjects, names, most, read):
     nothing without a scorable pair."""
     from semantic_pdf_diff import links
 
-    from . import measures
+    from semantic_pdf_diff_lab.eval import ranking as measures
     scored, probable = [], []
     for s in subjects:
         if len(s["claims"]) == 2:
