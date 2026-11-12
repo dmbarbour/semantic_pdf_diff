@@ -597,6 +597,32 @@ class Several(unittest.TestCase):
         self.assertEqual([c["features"]["several"] for c in pair], [2])
         self.assertIn(("a side names several items", -1.5), links.contributions(pair[0], "proposals")["names"])
 
+class Media(unittest.TestCase):
+    """Milestone 10's function family: the medium a subject handles, from its units (values.MEDIA). Spruce Lake's
+    administration building filters pass air (cfm/ft²), the plant's filters water (gpm/ft²): one kind of unit, flow
+    per area, two media."""
+    def candidate(self, a_claims, b_claims):
+        data = report(a_claims + b_claims, [], ("a", "b"), mode="proposals", settings={"link_levels": "combined"})
+        data["index"] = indexes.built(data)
+        return next(c for c in links.candidates(data, data["index"]))
+
+    def test_media_differing_count_against_a_pair(self):
+        from semantic_pdf_diff.values import medium
+        self.assertEqual([medium(u) for u in ("gpm/ft²", "CFM", "MGD", "psi", "")],
+                         ["liquid", "air", "liquid", None, None])
+        c = self.candidate([claim("A-1", "ca", "filters", "filtration rate", "346", "cfm/ft²")],
+                           [claim("B-1", "cb", "filters", "filtration rate", "4.2", "gpm/ft²")])
+        self.assertEqual((c["features"]["media"], c["features"]["mixed"]), ([["air"], ["liquid"]], False))
+        self.assertIn(("handles another medium", -2.0), links.contributions(c, "proposals")[links.FUNCTION])
+
+    def test_a_property_given_in_two_media_is_two_things(self):
+        c = self.candidate([claim("A-1", "ca", "Filters", "filtration rate", "486", "cfm/ft²"),
+                            claim("A-2", "ca", "Filters", "filtration rate", "2.8", "gpm/ft²")],
+                           [claim("B-1", "cb", "filtration", "filtration rate", "4.2", "gpm/ft²")])
+        self.assertTrue(c["features"]["mixed"])
+        self.assertEqual(links.contributions(c, "proposals")[links.FUNCTION],
+                         [("a side gives a property in two media", -2.0)])  # the media share water: no other point
+
 class Kinds(unittest.TestCase):
     """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The
     gotchas review: "150 psi and 1,034 kPa never meet"."""

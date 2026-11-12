@@ -68,6 +68,7 @@ from collections import Counter, defaultdict
 
 from .align import DOCUMENT_PARTS, GENERIC, STOP, TAG, identifiers, series, unit, value_key, words
 from .schema import Evidence
+from .values import medium
 
 RUBRIC = "rubric/1"
 # What candidates() makes, versioned: a weight table fitted on another version is stale (weights). candidates/1 until
@@ -76,8 +77,11 @@ RUBRIC = "rubric/1"
 # since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10); candidates/5
 # since units of two series (align.series) were marked; candidates/6 since a document's parts' words ("sheet",
 # "detail") left proposals' names' words and spelling; candidates/7 since several tagged items one side's claims give
-# were counted (2026-11-12)
-CANDIDATES = "candidates/7"
+# were counted; candidates/8 since each side's media (2026-11-12)
+CANDIDATES = "candidates/8"
+# Evidence families named by the owner (2026-11-12: "Perhaps "function" and "integration"", in code as constants): what
+# a subject does and handles; where it sits in its system (milestone 10)
+FUNCTION, INTEGRATION = "function", "integration"
 LINKS = 3  # a subject's links, at most: the most evidenced first
 RARE = 4  # subjects whose names hold a word, at most, for a name word in common to count
 NAME_SHARE = 0.5  # or the share of two names' words in common, at least
@@ -432,6 +436,11 @@ def contributions(c, mode):
         out["judge"].append((f"the judge paired {len(strong)}", 0.8 if len(strong) > 1 else 0.6))  # 0.94, ditto
     if f["grouped"]:
         out["alignment"].append(("grouped by alignment", 1.0))
+    media = f.get("media") or [[], []]
+    if mode == "proposals" and media[0] and media[1] and not set(media[0]) & set(media[1]):
+        out[FUNCTION].append(("handles another medium", -2.0))  # 0 right of 24 on development (seeds 1 to 17)
+    if mode == "proposals" and f.get("mixed"):  # a side gives one property in two media: two things (0 right of 4;
+        out[FUNCTION].append(("a side gives a property in two media", -2.0))  # Spruce Lake's "Filters", air and water
     if mode == "proposals" and f.get("several", 0) >= 2:  # a subject of several things (two houses' drawings: each
         # "sheet" holding three sheets' numbers and titles, joined at 0.82; the first link panel, 2026-11-12)
         out["names"].append(("a side names several items", -1.5))
@@ -626,6 +635,21 @@ def candidates(data, index):
     # units of a series in their source (a bank's pumps), by their tags: two of two series are told apart by numbering
     tagged = series({(source, n) for source, alone_in in alone.items() for _, x in alone_in for n in x["names"]})
 
+    known = {}
+
+    def media(x):  # (the media its claims' units are of, whether one of its properties is given in two)
+        if id(x) in known:
+            return known[id(x)]
+        by = defaultdict(set)
+        for ids in x["claims"].values():
+            for c in ids:
+                e = evidence.get(c)
+                found = e and medium(e.get("unit"))
+                if found:
+                    by[" ".join(sorted(words(e["attribute"])))].add(found)
+        known[id(x)] = set().union(*by.values()) if by else set(), any(len(m) > 1 for m in by.values())
+        return known[id(x)]
+
     def several(x):  # the most tagged items one attribute of a subject's claims gives ("sheet number": S-522, S-601)
         found = defaultdict(set)
         for ids in x["claims"].values():
@@ -686,7 +710,10 @@ def candidates(data, index):
             "place": _place(i, j, sources, near, counterpart),
             "series": bool(mode == "proposals" and unit_of.get(i) and unit_of.get(j)
                            and not unit_of[i] & unit_of[j]),
-            "several": max(several(s), several(t))}
+            "several": max(several(s), several(t)),
+            # the function family's medium (milestone 10), weighing nothing till measured: each side's media, and
+            # whether a side gives one property in two (Spruce Lake's "Filters": air's 486 cfm/ft², water's 2.8 gpm/ft²)
+            "media": [sorted(m) for m, _ in (media(s), media(t))], "mixed": media(s)[1] or media(t)[1]}
         out.append({"i": i, "j": j, "evidence": ev, "alike": alike,
                     "distinct": len(ev["properties"]) >= 2 and distinct(i, j), "fits": fits, "read": reads.get((i, j)),
                     "keyed": (i, j) in keyed, "features": features})

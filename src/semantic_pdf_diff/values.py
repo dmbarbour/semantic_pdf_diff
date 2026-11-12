@@ -225,6 +225,21 @@ def spelled(text):
     text = re.sub(r"(?<=[A-Za-zµμ])-(?=[A-Za-z])", ".", re.sub("[·•⋅*×]", ".", text)).replace("^", "")
     return " ".join(text.split()).rstrip(".")
 
+# What a unit's quantity is of: the medium a subject handles, as evidence two designs' subjects do one job (evidence
+# combined numerically, milestone 10: the function family). Apart from the kinds: cfm/ft² and gpm/ft² are both flow per
+# area, but Spruce Lake's administration building filters pass air and the plant's filtration water (the system use
+# review, 2026-11-12). Units read as search_unit spells them, lowercased; one meaning each, the ambiguous left out
+# (psi, ft/s: water or air).
+MEDIA = {"liquid": ("gpm", "gpm/ft²", "gpm/ft2", "mgd", "l/s", "l/min", "m³/h", "m3/h", "m³/d", "m3/d", "ml/d", "gal",
+                    "gpd", "gal/min", "gal/day", "mg/l", "ntu"),
+         "air": ("cfm", "cfm/ft²", "cfm/ft2", "scfm", "acfm", "fpm", "in. w.g.", "in w.g.", "in. wc", "in wc"),
+         "light": ("nm", "lux", "lx", "lm")}
+_MEDIUM = {u: medium for medium, units in MEDIA.items() for u in units}
+
+def medium(text):
+    """The medium a unit's quantity is of ("liquid", "air", "light"), or None."""
+    return _MEDIUM.get(spelled(str(text or "")).lower()) if text else None
+
 def search_unit(text):
     """(kind, size in its base) of a unit as a search reads it, or None: as spelled, else lowercased where that's
     unambiguous."""
