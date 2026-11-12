@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.64.1 (2026-11-12)
+
+- **Names of a document's parts no longer join two designs' subjects:** a subject named only by words such as "sheet", "detail", "grid line" or "component" isn't matched by that name between proposals, and those words don't count as names alike ("Grid Line 4" spells only "4"). Found by the first link panel: two houses' drawings joined "sheet" with "sheet" (two different sheets) and "detail" with "detail".
+
 ## 0.64.0 (2026-11-12)
 
 - **Links in the lab's review batches,** for a model panel on real pairs (evidence combined numerically, milestone 8): `review sample --links N` takes two subjects of a comparison's two sources across the combiner's probability range, shown blind with their names, claims, sections and crops; a panel grades them the same, comparable or different, with kind, function and integration; `review links` scores the panel's consensus against the probabilities.
