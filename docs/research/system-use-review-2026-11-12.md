@@ -145,6 +145,51 @@ The order of the steps is Claude's; the second pass's request starts on conteste
 2. **Size classes:** 4,000, 4,000 and 2,000 gpm against 5,000, 5,000 and 1,500 gpm. The small ones paired and the large ones a set, or all three a set with the pattern compared?
 3. **The names:** "use" and "setting", or others?
 
+## The owner's answers on siblings (2026-11-12)
+
+- **1:** "Ideally, we'd match with domain knowledge of the subject. I, personally, don't have domain knowledge of pump duty cycles and rotation."
+- **2:** "It seems reasonable to pair large to large and small to small, especially if there's a good reason to have them organized that way (and reasonable to assume there is). But perhaps we should be looking for that reason as a distinguishing role? That would give us the stronger foundation to distinguish them."
+- **3:** "The word "use" is easy to confuse with a verb, so perhaps "usage" or "role" or something? Ask a thesaurus."
+- "Please have Fable review things too."
+
+## Fable's review of the sibling proposal (2026-11-12, read-only, offline)
+
+**The 0.821 is one thing, the model's name groups:** `synonyms.PROMPT`'s groups pair P-101A with IP-1 by order, `indexes.aliases` makes the group a key, the index joins on it ("other names") and the combiner counts a key both give (+2.6). Without those groups the nine pump pairs sit at 0.25 to 0.29, flat (Fable; Claude checked that no pump group forms). So the margin Claude proposed to measure is already near zero in the evidence; the key bypasses it. The prompt already refuses "items numbered apart (web 1 and web 2)". A second site: apart, the pumps are asked of `match_subjects`, and its match of two numbered tags of different schemes weighs +2.0 (about 0.75) unless demoted the same way.
+
+**Domain knowledge** (common practice; Fable's confidence in brackets, no standard cited):
+
+- **A bank sharing one tag number with suffix letters (P-101A to C) is one service** (high); a unit of another size or role gets another number (P-102) or a note.
+- **Identical units are the default in a bank** (high): firm capacity is rated with the largest unit out of service, so any unit must be able to be the one out.
+- **Duty, standby, lead and lag rotate** (high): the controls alternate the lead by run-hours or each start. "Standby" is the set's arrangement ("two duty, one standby"), not a member's identity: don't pair C with 3. A standby is differentiated where its driver differs (an engine-driven standby, a variable-speed drive on the lead only) or its size.
+- **A jockey or pony pump** (high): a small unit keeping pressure or carrying minimum flows ("low-flow", "minimum flow", "turndown", "night"); never interchangeable with the mains.
+- **Trains** (high): Train A mirrors Train B; pair train to train where both designs have trains, else sets.
+- **HVAC:** N+1 chillers often identical (medium); air handlers differ by area served (high: "AHU-3 serves Hall C"), never fungible.
+- **Assemblies:** a turbine's three blades are a balanced set (high): report the count and one blade's properties.
+- **Architecture:** typical rooms and floors are sets (high); numbered rooms differ by location and adjacency, and across designs the number means nothing.
+- **What documents say:** one row "3 @ 4,000 gpm" against separate rows; "TYP.", "identical", "each", "N+1", "duty/standby", "lead/lag", "alternate", "jockey", "pony", "low-flow", "VFD", "future"; a Service column ("raw water", "backwash"); "area served"; different tag numbers; a different driver.
+
+**The owner's Q2, a size's reason:** stated reasons (jockey, low-flow, a separate tag number or Service row, "P-102 carries night flows") weigh as duty; the model's guess from knowledge ("probably a low-flow unit") is logged as an inference without a quote and weighs less; with no reason, a size class is a weak "comparable", never a one-to-one join, compared by ratios within the set (5,000 and 1,500 against 4,000 and 2,000 both "two large, one small"), a class of two or more or a stated reason. The template's three random draws always make a class: nothing to tune on.
+
+**Domain knowledge in the analysis:**
+
+- **The kind dossier** (`dossiers.KIND_PROMPT`, one request a kind a source, already mentions "identical, duty and standby"): a key for whether the items are interchangeable, as the source says it, each answer quoting the passages (checked as adds are). In comparisons a request a kind a source (the second pass doesn't run there). Tested with knobs: an identical bank; a differentiated one (a jockey; north and south intakes); a stated "two duty, one standby"; and a **trap**: today's random-valued bank, where the right answer is "not stated". A null arm without the key.
+- **A table of document patterns** (one tag number with suffix letters; the words above; a Service column): no requests; Birch Hollow's P-101A to C (three duties) must not be a set.
+- **The second pass's line a subject** can't see the set; the reader's words last.
+
+**Claude's proposal, corrected:**
+
+- **A fix first:** between proposals, a name group of two numbered tags of different schemes (P-101A, IP-1) is not a key, nor is the model's match of them; then the set-to-set link is the shape of what remains.
+- **`indexes.kinds` isn't sibling sets:** it groups both sources' subjects by tag letters (Harrow Creek against Birch Hollow: one "pump (P)" kind of nine, four duties). Sets need a partition a source and the names' head words (backwash, sludge, recycle), available now.
+- **A margin near zero means undifferentiated by the evidence weighed,** not fungible: duty words weigh nothing yet, so a jockey among mains shows none either.
+- **A set's probability** through the same `candidates` and `combined` path, as a subject of the set's members (count, each property's range, total and firm capacity, arrangement words), so the report's "why" keeps one shape.
+- **The scorer:** `comparison._matching`'s read already takes related pairs from splits; a `sets` argument with the cross-pairs of corresponding sets is the "comparable" rule, committed before fresh seeds.
+- **The base template's pumps stay distinct:** the revisions knobs need distinct values (`revisions.renamed_later`, `split_later`); the identical bank is a proposals knob.
+- **A set-to-set link shows:** both sets' members and counts, each property's range a side, total and firm capacity, the arrangement words quoted, and why no pairs: undifferentiated in either source; differentiated, but not correspondingly; differentiated one side only. Gaps stay a member's.
+
+**The families' names** (ranked): **duty** and **placement** (nouns; the owner's own "duty"; few collisions in the code; slots within duty: kind, medium, service, arrangement; within placement: part of, serves, fed by, feeds, location; "duty" also names the duty/standby arrangement, hence that slot's name); **service** and **connections** (the schedules' and P&IDs' words; 32 collisions; connections misses part of); **function** and **position** (plain; code's words). Rejected: role, usage, setting, situation, context, topology, siting.
+
+**Likely mistakes next:** building fungibility before removing the ordinal key; `indexes.kinds` as sibling sets; a margin near zero read as fungible; a size rule tuned on random draws; standbys paired; the base template's pumps made identical; asking the model "interchangeable?" without quotes and without the trap knob; the scorer's one-to-one ids taken as truth before the set rule.
+
 ## Checked by Claude
 
 - `values.search_unit("cfm/ft²")` is None; cfm and gpm are both "flow". True.
