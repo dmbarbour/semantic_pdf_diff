@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.64.2 (2026-11-12)
+
+- **A subject naming several tagged items counts against a match between proposals:** where one document's subject gives two or more tags in one property (a "sheet" with sheet numbers S-522, S-601 and S-701), it's several things, and the evidence it shares with the other design's weighs less (two houses' drawings no longer join their "sheet" subjects).
+
 ## 0.64.1 (2026-11-12)
 
 - **Names of a document's parts no longer join two designs' subjects:** a subject named only by words such as "sheet", "detail", "grid line" or "component" isn't matched by that name between proposals, and those words don't count as names alike ("Grid Line 4" spells only "4"). Found by the first link panel: two houses' drawings joined "sheet" with "sheet" (two different sheets) and "detail" with "detail".
