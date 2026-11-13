@@ -51,7 +51,7 @@ import os
 import re
 from collections import Counter, defaultdict
 
-from .align import Side, generic, shape
+from .align import Side, generic, placeholder, shape
 from .glossary import natural
 from .terms import fold
 from .schema import Evidence
@@ -194,7 +194,8 @@ def aliases(data):
             join(alias_key(t["term"]), alias_key(t["meaning"]))
     def may(x, y):  # two items' names joined by the model's groups
         return (apart is None or apart(x, y)) and not (numbered.get(x) and numbered.get(y)
-                                                       and not numbered[x] & numbered[y])
+                                                       and not numbered[x] & numbered[y]) and not (
+            data.get("mode") == "proposals" and placeholder(x) and placeholder(y))  # "revision 1", "revision 1 of B"
     for kind in ("items", "properties"):
         for group in (data.get("synonyms") or {}).get(kind, []):
             for name in group[1:]:
@@ -418,6 +419,11 @@ def listed(subjects, by_tag, said):
                         other["properties"].sort(key=lambda q: natural(q["name"]))
                     into["values"].append(dict(v))
 
+def no_key(name):
+    """Between proposals, a name that is no key: a document's part (align.generic: "sheet"), or one numbered
+    (align.placeholder: "component 6", "revision 2")."""
+    return generic(name) or placeholder(name)
+
 def built(data):
     """The report's index: {"sources", "subjects", "figures"} (as report.json keeps it under "index"). Each subject:
     its name, its names as printed, how it was matched across sources, its claims by source, and its properties,
@@ -444,7 +450,7 @@ def built(data):
         subjects, by_tag, origins = [], {}, {}
         halves = {}  # (source, key): (its subject, the other half's (source, key)): kept apart, keyed alike (firm)
         for group in matched(found, data.get("findings", []), sources, alias, data.get("mode") != "proposals",
-                             matches, firm, rank, joins, generic if data.get("mode") == "proposals" else None):
+                             matches, firm, rank, joins, no_key if data.get("mode") == "proposals" else None):
             subject = make(group, by_tag, len(subjects))
             subjects.append(subject)
             origins[id(subject)] = [(source, group[source][0]) for source in sources if source in group]

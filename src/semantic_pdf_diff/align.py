@@ -120,6 +120,19 @@ def generic(name):
     w = words(name)
     return bool(w) and w <= GENERIC | DOCUMENT_PARTS
 
+# Words a reader puts on a thing it can't name, besides a document's parts ("unspecified component 6")
+PLACEHOLDING = {"unspecified", "unnamed", "unknown", "unlabeled", "unlabelled", "misc", "miscellaneous", "other"}
+
+def placeholder(name):
+    """Whether a name is a document's part numbered: its words but its identifiers all generic, a document's parts or
+    a placeholder's (PLACEHOLDING), and an identifier ("component 6", "revision 2", "Sheet M-101", "dimension line 2";
+    not "M-101" alone, a tag, nor "Circuit 2"). Between two designs its number is a place in each document's
+    numbering, not the thing's (the link panel on mechanical drawings, 2026-11-13: a grid bubble "component 6" and a
+    schedule's row "unspecified component 6" joined at 0.82)."""
+    w = words(name)
+    ids = identifiers(w)
+    return bool(ids) and bool(w - ids) and w - ids <= GENERIC | DOCUMENT_PARTS | PLACEHOLDING
+
 def attribute(claim):
     """An attribute's words without its identifiers or generic words: "dimension 1" and "dimension 2" are positions
     a reader gave, which shift between revisions, so the values decide between them. Empty: unnamed."""

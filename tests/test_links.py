@@ -623,6 +623,24 @@ class Generic(unittest.TestCase):
         self.assertEqual(joined(self.built("detail", "detail")), [])
         self.assertEqual(joined(self.built("project", "project")), ["name"])
 
+    def test_a_document_part_numbered_is_a_placeholder(self):
+        # the link panel on mechanical drawings (2026-11-13): a grid bubble "component 6" and a schedule's row
+        # "unspecified component 6" joined at 0.82 by their number; revisions of two houses' drawings by theirs
+        from semantic_pdf_diff.align import placeholder
+        names = ("component 6", "unspecified component 6", "revision 2", "Sheet M-101", "M-101", "HEAT PUMP HP-1",
+                 "Room 104")
+        self.assertEqual([placeholder(n) for n in names],
+                         [True, True, True, True, False, False, False])
+        joined = lambda data: [s["matched_by"] for s in data["index"]["subjects"] if len(s["claims"]) == 2]  # noqa
+        self.assertNotIn("name", joined(self.built("revision 1", "revision 1")))  # no key; their evidence may join
+        first, merges = [], links.merges  # the first pass's candidates, as the merge weighs them
+        with mock.patch.object(links, "merges", lambda d, i: first.append(links.candidates(d, i)) or merges(d, i)):
+            self.built("component 6", "unspecified component 6")
+        pair = first[0][0]
+        self.assertTrue(pair["features"]["placeholders"])
+        said = links.contributions(pair, "proposals")["names"]
+        self.assertFalse([w for name, w in said if name.startswith("spelled alike") and w > 0])  # the number's
+
     def test_a_document_parts_words_spell_nothing(self):
         data = self.built("Grid line", "Grid Line 4")
         subjects = data["index"]["subjects"]

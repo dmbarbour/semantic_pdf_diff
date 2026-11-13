@@ -66,7 +66,7 @@ import math
 import re
 from collections import Counter, defaultdict
 
-from .align import DOCUMENT_PARTS, GENERIC, STOP, TAG, identifiers, series, unit, value_key, words
+from .align import DOCUMENT_PARTS, GENERIC, STOP, TAG, generic, identifiers, placeholder, series, unit, value_key, words
 from .schema import Evidence
 from .values import medium
 
@@ -77,8 +77,9 @@ RUBRIC = "rubric/1"
 # since identifiers differing, each side's property count and place joined them (milestones 4, 6 and 10); candidates/5
 # since units of two series (align.series) were marked; candidates/6 since a document's parts' words ("sheet",
 # "detail") left proposals' names' words and spelling; candidates/7 since several tagged items one side's claims give
-# were counted; candidates/8 since each side's media (2026-11-12)
-CANDIDATES = "candidates/8"
+# were counted; candidates/8 since each side's media (2026-11-12); candidates/9 since documents' numbered parts
+# (align.placeholder, 2026-11-13)
+CANDIDATES = "candidates/9"
 # Evidence families named by the owner (2026-11-12: "Perhaps "function" and "integration"", in code as constants): what
 # a subject does and handles; where it sits in its system (milestone 10)
 FUNCTION, INTEGRATION = "function", "integration"
@@ -450,12 +451,14 @@ def contributions(c, mode):
     # right: milestone 14, the read picking the tag it was shown)
     siblings = n and rival >= n
     for family, points in out.items():
-        if f.get("series") and family in ("model", "judge", "names"):  # two series' units: the model's match, the
-            # judge's pairings and the tags' spelling follow their numbering, which tells nothing of a bank's units
-            # (Harrow Creek's P-101A and Pine Ridge's IP-1, paired by order: the owner, 2026-11-12, align.series);
-            # their kind's words still count
-            out[family] = [(name + ", units of two series", 0.0) if w > 0 and (family != "names" or name ==
-                           "spelled alike") else (name, w) for name, w in points]
+        if (f.get("series") or f.get("placeholders")) and family in ("model", "judge", "names"):  # two series' units
+            # or two documents' numbered parts: the model's match, the judge's pairings and the names' spelling follow
+            # their numbering, which tells nothing of a bank's units (Harrow Creek's P-101A and Pine Ridge's IP-1,
+            # paired by order: the owner, 2026-11-12, align.series) nor of "component 6" in two drawings
+            # (align.placeholder); their kind's words still count
+            said = ", units of two series" if f.get("series") else ", documents' numbered parts"
+            out[family] = [(name + said, 0.0) if w > 0 and (family != "names" or name == "spelled alike")
+                           else (name, w) for name, w in points]
         elif f["keyed"] and family in ("judge", "model", "names"):
             out[family] = [(name + ", shown by the key", 0.0) if w > 0 and name != "a key both give" else (name, w)
                            for name, w in points]
@@ -711,6 +714,7 @@ def candidates(data, index):
             "series": bool(mode == "proposals" and unit_of.get(i) and unit_of.get(j)
                            and not unit_of[i] & unit_of[j]),
             "several": max(several(s), several(t)),
+            "placeholders": bool(bare and all(generic(n) or placeholder(n) for x in (s, t) for n in x["names"])),
             # the function family's medium (milestone 10), weighing nothing till measured: each side's media, and
             # whether a side gives one property in two (Spruce Lake's "Filters": air's 486 cfm/ft², water's 2.8 gpm/ft²)
             "media": [sorted(m) for m, _ in (media(s), media(t))], "mixed": media(s)[1] or media(t)[1]}
