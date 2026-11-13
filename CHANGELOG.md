@@ -2,6 +2,11 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.67.1 (2026-11-13)
+
+- **A document's numbered parts no longer join two designs by their number:** a subject named only by a document's parts and an identifier ("component 6", "revision 2", "Sheet M-101") isn't matched by name between proposals, and its number counts for nothing (a grid bubble "component 6" and a schedule's row "unspecified component 6" no longer join).
+- The lab's samples gain four more Solar Decathlon 2013 teams' drawings (`solar-decathlon-2013-more`, optional), and the slices eight mechanical sheets' sets, paired for development and held out.
+
 ## 0.67.0 (2026-11-13)
 
 - **`read_context`** (off): a link's read by the model shown each subject's table captions ("Raw water pumps") and the lead-ins introducing them. Measured on development's proposals pairs, it did no better than showing a field carrying nothing new, both a little worse than without: it stays off.
