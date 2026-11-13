@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.67.3 (2026-11-13)
+
+- **Category nouns don't join two designs' subjects:** a subject named only by a category noun and disciplines ("equipment", "MECHANICAL EQUIPMENT", "HVAC equipment") isn't matched by that name between proposals, and the noun counts for nothing as names alike ("HVAC system" and "equipment shelf" still name things).
+
 ## 0.67.2 (2026-11-13)
 
 - **Two designs' revision marks, sheet and detail numbers don't make their subjects counterparts:** between proposals, the number two documents' numbered parts share ("revision 3", "component 6") counts for nothing (the owner: "Revision numbers are relevant for situating two versions of the same thing"). The lab's link panel is told the same.
