@@ -310,6 +310,76 @@
       "public": true,
       "family": "drawings",
       "sha256": "5a7656f117c628832ffb78892ddedf81eae5d1431e5cd5c9cfa1695277bf3bc6"
+    },
+    {
+      "name": "iea-15mw-p35-39",
+      "source": "wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf",
+      "source_sha256": "93762e252922b1e75df59a453d2c08ef3f556367adf57229bc1800a4b1b11dbd",
+      "pages": [
+        35,
+        39
+      ],
+      "use": "Nacelle, drivetrain and hub: hub, main shaft, bearings, bedplate, yaw system, direct-drive generator.",
+      "set": "dev",
+      "public": true,
+      "family": "reports",
+      "sha256": "5eb1c96dca193700dbadffbb1e9d05fb60111964cd12d67d4d193f5408b828fb"
+    },
+    {
+      "name": "iea-22mw-p28-37",
+      "source": "wind-reference-turbines/iea-22mw/IEA-22MW-reference-turbine.pdf",
+      "source_sha256": "92d95f3ed67c04a5e5dc21d21b0fc9a90391b9bbafdc26a6907284abb5ec7b8f",
+      "pages": [
+        28,
+        37
+      ],
+      "use": "Hub, drivetrain and nacelle: hub system, generator, main shaft, bearings, turret, bedplate, yaw system.",
+      "set": "dev",
+      "public": true,
+      "family": "reports",
+      "sha256": "89deb3cbac67fe5397e4dc5dacbd6f3db62e5f7bbd08242863b63ffd6beeb763"
+    },
+    {
+      "name": "iea-15mw-p31-34",
+      "source": "wind-reference-turbines/iea-15mw/IEA-15MW-reference-turbine.pdf",
+      "source_sha256": "93762e252922b1e75df59a453d2c08ef3f556367adf57229bc1800a4b1b11dbd",
+      "pages": [
+        31,
+        34
+      ],
+      "use": "Tower and monopile properties.",
+      "set": "dev",
+      "public": true,
+      "family": "reports",
+      "sha256": "6626fdcfd2ca21d8b3192e0f9a557d0b05f5e46b6f15da86feaea1f381fc5650"
+    },
+    {
+      "name": "iea-22mw-p38-40",
+      "source": "wind-reference-turbines/iea-22mw/IEA-22MW-reference-turbine.pdf",
+      "source_sha256": "92d95f3ed67c04a5e5dc21d21b0fc9a90391b9bbafdc26a6907284abb5ec7b8f",
+      "pages": [
+        38,
+        40
+      ],
+      "use": "Tower and monopile: design process, structural design, damping.",
+      "set": "dev",
+      "public": true,
+      "family": "reports",
+      "sha256": "52fce93a0add651479eea1ef7ef7b4ff8f77099993a6957da0651cfb115f279f"
+    },
+    {
+      "name": "nrel-5mw-p16-22",
+      "source": "wind-reference-turbines/nrel-5mw/NREL-5MW-reference-turbine.pdf",
+      "source_sha256": "b4ce1e088368857cb75460af0729411cc64c8a68efe0df4fb0c1324e96a21ff2",
+      "pages": [
+        16,
+        22
+      ],
+      "use": "Blade structural and aerodynamic properties.",
+      "set": "heldout",
+      "public": true,
+      "family": "reports",
+      "sha256": "25e098593344c11ac5c821b1799d2900ad63621e5cdb4791859855bde0314db6"
     }
   ],
   "runs": [
@@ -438,6 +508,30 @@
       "slices": [
         "unlv-cd-p86-88",
         "ken-cd-p100-101"
+      ],
+      "set": "heldout"
+    },
+    {
+      "name": "turbines-nacelles",
+      "slices": [
+        "iea-15mw-p35-39",
+        "iea-22mw-p28-37"
+      ],
+      "set": "dev"
+    },
+    {
+      "name": "turbines-towers",
+      "slices": [
+        "iea-15mw-p31-34",
+        "iea-22mw-p38-40"
+      ],
+      "set": "dev"
+    },
+    {
+      "name": "turbines-blades",
+      "slices": [
+        "nrel-5mw-p16-22",
+        "iea-22mw-p12-21"
       ],
       "set": "heldout"
     }
