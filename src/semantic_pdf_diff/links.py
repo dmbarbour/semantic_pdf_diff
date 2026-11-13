@@ -457,8 +457,10 @@ def contributions(c, mode):
             # paired by order: the owner, 2026-11-12, align.series) nor of "component 6" in two drawings
             # (align.placeholder); their kind's words still count
             said = ", units of two series" if f.get("series") else ", documents' numbered parts"
-            out[family] = [(name + said, 0.0) if w > 0 and (family != "names" or name == "spelled alike")
-                           else (name, w) for name, w in points]
+            out[family] = [(name + said, 0.0) if w > 0 and (family != "names" or name == "spelled alike"
+                                                            or f.get("placeholders"))  # their words in common: numbers
+                           else (name, w) for name, w in points]  # (the owner, 2026-11-13: "Revision numbers are
+            # relevant for situating two versions of the same thing")
         elif f["keyed"] and family in ("judge", "model", "names"):
             out[family] = [(name + ", shown by the key", 0.0) if w > 0 and name != "a key both give" else (name, w)
                            for name, w in points]

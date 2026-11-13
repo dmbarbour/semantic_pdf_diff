@@ -632,7 +632,7 @@ class Generic(unittest.TestCase):
         self.assertEqual([placeholder(n) for n in names],
                          [True, True, True, True, False, False, False])
         joined = lambda data: [s["matched_by"] for s in data["index"]["subjects"] if len(s["claims"]) == 2]  # noqa
-        self.assertNotIn("name", joined(self.built("revision 1", "revision 1")))  # no key; their evidence may join
+        self.assertEqual(joined(self.built("revision 1", "revision 1")), [])  # nor their number in common
         first, merges = [], links.merges  # the first pass's candidates, as the merge weighs them
         with mock.patch.object(links, "merges", lambda d, i: first.append(links.candidates(d, i)) or merges(d, i)):
             self.built("component 6", "unspecified component 6")

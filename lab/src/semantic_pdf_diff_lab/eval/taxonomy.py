@@ -155,7 +155,9 @@ TAXONOMY = {
     "link": {"verdicts": [
         {"name": "same", "label": "The same",
          "help": "Counterparts: one thing as each document describes it. Between two designs nothing is literally one "
-                 "object: each design's rotor, its tower, its bank of raw water pumps are counterparts, the same"},
+                 "object: each design's rotor, its tower, its bank of raw water pumps are counterparts, the same. A "
+                 "document's numbering (revision marks, sheet, detail and grid numbers) makes nothing counterparts "
+                 "between two designs: each design numbers its own"},
         {"name": "comparable", "label": "Comparable",
          "help": "Not counterparts, but worth comparing: one unit of a bank against a unit of the other's, "
                  "alternatives for one purpose (UV reactors against a chlorine contact basin), a part against its "
