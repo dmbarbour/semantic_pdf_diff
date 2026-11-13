@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.67.2 (2026-11-13)
+
+- **Two designs' revision marks, sheet and detail numbers don't make their subjects counterparts:** between proposals, the number two documents' numbered parts share ("revision 3", "component 6") counts for nothing (the owner: "Revision numbers are relevant for situating two versions of the same thing"). The lab's link panel is told the same.
+
 ## 0.67.1 (2026-11-13)
 
 - **A document's numbered parts no longer join two designs by their number:** a subject named only by a document's parts and an identifier ("component 6", "revision 2", "Sheet M-101") isn't matched by name between proposals, and its number counts for nothing (a grid bubble "component 6" and a schedule's row "unspecified component 6" no longer join).
