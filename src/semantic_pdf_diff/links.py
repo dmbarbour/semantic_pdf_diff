@@ -66,7 +66,8 @@ import math
 import re
 from collections import Counter, defaultdict
 
-from .align import DOCUMENT_PARTS, GENERIC, STOP, TAG, generic, identifiers, placeholder, series, unit, value_key, words
+from .align import (CATEGORY_NOUNS, DOCUMENT_PARTS, GENERIC, STOP, TAG, generic, identifiers, placeholder, series, unit,
+                    value_key, words)
 from .schema import Evidence
 from .values import medium
 
@@ -78,8 +79,8 @@ RUBRIC = "rubric/1"
 # since units of two series (align.series) were marked; candidates/6 since a document's parts' words ("sheet",
 # "detail") left proposals' names' words and spelling; candidates/7 since several tagged items one side's claims give
 # were counted; candidates/8 since each side's media (2026-11-12); candidates/9 since documents' numbered parts
-# (align.placeholder, 2026-11-13)
-CANDIDATES = "candidates/9"
+# (align.placeholder, 2026-11-13); candidates/10 since category nouns ("equipment") left them too
+CANDIDATES = "candidates/10"
 # Evidence families named by the owner (2026-11-12: "Perhaps "function" and "integration"", in code as constants): what
 # a subject does and handles; where it sits in its system (milestone 10)
 FUNCTION, INTEGRATION = "function", "integration"
@@ -200,7 +201,8 @@ def _trigrams(name):
 def _bare(name):
     """A name without its generic words or a document's parts' ("Grid Line 4": "4"; "Bedroom Section (A1)": "Bedroom
     A1"): between proposals, what spells a thing of its own (align.DOCUMENT_PARTS)."""
-    kept = re.sub(r"[A-Za-z0-9]+", lambda w: "" if words(w[0]) <= GENERIC | DOCUMENT_PARTS else w[0], name)
+    kept = re.sub(r"[A-Za-z0-9]+", lambda w: "" if words(w[0]) <= GENERIC | DOCUMENT_PARTS | CATEGORY_NOUNS else w[0],
+                  name)
     return " ".join(kept.split())  # the rest as written
 
 def _spelling(a, b, bare=False):
@@ -594,7 +596,7 @@ def candidates(data, index):
     # a name's words: between proposals not a document's parts' ("sheet", "detail": align.DOCUMENT_PARTS), which two
     # designs' documents share by habit (the first link panel on real pairs, 2026-11-12)
     bare = mode == "proposals"
-    name_words = (lambda s: _name_words(s) - DOCUMENT_PARTS) if bare else _name_words  # noqa: E731
+    name_words = (lambda s: _name_words(s) - DOCUMENT_PARTS - CATEGORY_NOUNS) if bare else _name_words  # noqa: E731
     # candidates sharing a name word or a property's name, besides those named
     by = defaultdict(set)
     for j, t in alone.get(sources[1], []):

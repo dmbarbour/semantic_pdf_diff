@@ -114,11 +114,19 @@ GENERIC = {"dimension", "size", "measurement", "data", "figure", "amount", "para
 DOCUMENT_PARTS = {"sheet", "detail", "drawing", "document", "section", "view", "page", "note", "component", "element",
                   "grid", "callout", "label", "reference", "symbol", "revision", "title", "legend"}
 
+# Category nouns, and the disciplines that qualify them: "equipment", "HVAC equipment" name a class of things, not one
+# (the held-out link panel on mechanical drawings, 2026-11-13: "equipment" ~ "EQUIPMENT SHELF" at 0.86, "MECHANICAL
+# EQUIPMENT" ~ "HVAC equipment" at 0.84, different things); "HVAC" alone, or "HVAC system", may be a design's own
+CATEGORY_NOUNS = {"equipment", "appliance", "fixture", "device", "material"}
+DISCIPLINES = {"mechanical", "electrical", "plumbing", "hvac", "structural", "architectural", "civil"}
+
 def generic(name):
     """Whether a name names no thing of its own: its words all generic or a document's parts (DOCUMENT_PARTS), with no
-    identifier ("sheet", "Grid line"; not "component F", "Section A", "project")."""
+    identifier ("sheet", "Grid line"; not "component F", "Section A", "project"); or a category noun, with
+    disciplines at most ("equipment", "HVAC equipment"; not "HVAC system", "equipment shelf")."""
     w = words(name)
-    return bool(w) and w <= GENERIC | DOCUMENT_PARTS
+    return bool(w) and (w <= GENERIC | DOCUMENT_PARTS
+                        or bool(w & CATEGORY_NOUNS) and w <= GENERIC | DOCUMENT_PARTS | CATEGORY_NOUNS | DISCIPLINES)
 
 # Words a reader puts on a thing it can't name, besides a document's parts ("unspecified component 6")
 PLACEHOLDING = {"unspecified", "unnamed", "unknown", "unlabeled", "unlabelled", "misc", "miscellaneous", "other"}
@@ -131,7 +139,7 @@ def placeholder(name):
     schedule's row "unspecified component 6" joined at 0.82)."""
     w = words(name)
     ids = identifiers(w)
-    return bool(ids) and bool(w - ids) and w - ids <= GENERIC | DOCUMENT_PARTS | PLACEHOLDING
+    return bool(ids) and bool(w - ids) and w - ids <= GENERIC | DOCUMENT_PARTS | PLACEHOLDING | CATEGORY_NOUNS
 
 def attribute(claim):
     """An attribute's words without its identifiers or generic words: "dimension 1" and "dimension 2" are positions

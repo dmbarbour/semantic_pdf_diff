@@ -621,6 +621,10 @@ class Generic(unittest.TestCase):
                                                "project")], [True, True, True, False, False, False])
         joined = lambda data: [s["matched_by"] for s in data["index"]["subjects"] if len(s["claims"]) == 2]  # noqa
         self.assertEqual(joined(self.built("detail", "detail")), [])
+        # a category noun, with disciplines at most (the held-out panel on mechanical drawings, 2026-11-13)
+        self.assertEqual([generic(n) for n in ("MECHANICAL EQUIPMENT", "HVAC equipment", "EQUIPMENT SHELF", "HVAC",
+                                               "HVAC system")], [True, True, False, False, False])
+        self.assertEqual(joined(self.built("HVAC equipment", "HVAC equipment")), [])
         self.assertEqual(joined(self.built("project", "project")), ["name"])
 
     def test_a_document_part_numbered_is_a_placeholder(self):
