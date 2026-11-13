@@ -198,6 +198,118 @@
       "sha256": "e0051becfd8968d3511251477c93dce5ac9799468f91ae8c25bd24ef00558c1e",
       "public": true,
       "family": "drawings"
+    },
+    {
+      "name": "dc-cd-p130-134",
+      "source": "solar-decathlon-2013/teams/dc/dc_cd.pdf",
+      "source_sha256": "996c2df2e2363c7e99be5685ff6eb7c53c3b12a33f68616b96478aacf266f44d",
+      "pages": [
+        130,
+        134
+      ],
+      "use": "Mechanical sheets M-001 to M-501: equipment schedule, plans, details (air handler, heat pump, exhaust fan).",
+      "set": "dev",
+      "public": true,
+      "family": "drawings",
+      "sha256": "b4bc204176c3188bbdb82a5694b22db8f1cd56774c2395bd6c219cb065bcad21"
+    },
+    {
+      "name": "calg-cd-p73-75",
+      "source": "solar-decathlon-2013/teams/calg/calg_cd.pdf",
+      "source_sha256": "747ca1bcb8dc7eaeb52c126228ddb88b2e79968807f290203b902801cdd0df86",
+      "pages": [
+        73,
+        75
+      ],
+      "use": "Mechanical sheets M-601, M-602, M-901: equipment schedule, system schematic, isometric.",
+      "set": "dev",
+      "public": true,
+      "family": "drawings",
+      "sha256": "b940e09e8c6d11da71b2831c32cae8857991ac63ca95087d60091361c845949c"
+    },
+    {
+      "name": "nu-cd-p79-82",
+      "source": "solar-decathlon-2013-more/teams/nu/nu_cd.pdf",
+      "source_sha256": "3b20c2d95d8c68593eb99c048b2825442c2791497f88d8e02967e4c54f28e088",
+      "pages": [
+        79,
+        82
+      ],
+      "use": "Mechanical sheets M-001 to M-103: schedules, plans (split heat pump, HRV).",
+      "set": "dev",
+      "public": true,
+      "family": "drawings",
+      "sha256": "97ae4c5ef63eaea13d089d5c2fdb4bcf921cc749cb1e493e276049e6d882c79d"
+    },
+    {
+      "name": "uncc-cd-p76-80",
+      "source": "solar-decathlon-2013-more/teams/uncc/uncc_cd.pdf",
+      "source_sha256": "58b35cd3ce4a713f35cf5b39cc999700430d74b7b43b9dc4335342bbe24e2173",
+      "pages": [
+        76,
+        80
+      ],
+      "use": "Mechanical sheets M-101 to M-601: plans, details, controls, equipment schedule (AHUs, ERV, dehumidifier).",
+      "set": "dev",
+      "public": true,
+      "family": "drawings",
+      "sha256": "5970a83132bf87e96b995242742b73fd1df1c48df011dafa91376b942838bfb8"
+    },
+    {
+      "name": "scical-cd-p47-49",
+      "source": "solar-decathlon-2013/teams/scical/scical_cd.pdf",
+      "source_sha256": "0ee73ff5d68fe33cf5960b68b20862a01ed39b128529b2a0684bf73667f33d94",
+      "pages": [
+        47,
+        49
+      ],
+      "use": "Mechanical sheets M-301, M-601, M-901: HVAC elevations, schedules and schematic, isometric.",
+      "set": "heldout",
+      "public": true,
+      "family": "drawings",
+      "sha256": "d4a053ab1f03fa0e62bbbf7d20fa65533dc75cb6f9c31e34fcc17cc1618ba526"
+    },
+    {
+      "name": "su-cd-p104-106",
+      "source": "solar-decathlon-2013-more/teams/su/su_cd.pdf",
+      "source_sha256": "c42162ac50a0865dfad0634c83c1168103670826e5af2879eb58c0d3c808850b",
+      "pages": [
+        104,
+        106
+      ],
+      "use": "Mechanical sheets M-201, M-601, M-901: sections, equipment schedule, isometric.",
+      "set": "heldout",
+      "public": true,
+      "family": "drawings",
+      "sha256": "14d70d106adfd8d3f14c68d465dd720b5068e5bf547b3889b47db76c710553f4"
+    },
+    {
+      "name": "unlv-cd-p86-88",
+      "source": "solar-decathlon-2013-more/teams/unlv/unlv_cd.pdf",
+      "source_sha256": "181b442e6ffce7460349e09ee2c005fb553a1e401bb139fb71c76b44d8ddebce",
+      "pages": [
+        86,
+        88
+      ],
+      "use": "Mechanical sheets M-201, M-102: HVAC plan (fan coils, ERV), radiant piping.",
+      "set": "heldout",
+      "public": true,
+      "family": "drawings",
+      "sha256": "bbbaf867c4cf0d9f75d4ab23a754e42ed1db3efe20a103645da196ea48a4d833"
+    },
+    {
+      "name": "ken-cd-p100-101",
+      "source": "solar-decathlon-2013/teams/ken/ken_cd.pdf",
+      "source_sha256": "8f091a997b469588a5de671c56d63723f0456ccc91f44785571cea8ff41c0118",
+      "pages": [
+        100,
+        101
+      ],
+      "use": "Equipment and appliance schedules E-609, E-610.",
+      "set": "heldout",
+      "public": true,
+      "family": "drawings",
+      "sha256": "5a7656f117c628832ffb78892ddedf81eae5d1431e5cd5c9cfa1695277bf3bc6"
     }
   ],
   "runs": [
@@ -296,6 +408,38 @@
         "calg-cd-p62-66"
       ],
       "set": "dev"
+    },
+    {
+      "name": "mech-dc-calg",
+      "slices": [
+        "dc-cd-p130-134",
+        "calg-cd-p73-75"
+      ],
+      "set": "dev"
+    },
+    {
+      "name": "mech-nu-uncc",
+      "slices": [
+        "nu-cd-p79-82",
+        "uncc-cd-p76-80"
+      ],
+      "set": "dev"
+    },
+    {
+      "name": "mech-scical-su",
+      "slices": [
+        "scical-cd-p47-49",
+        "su-cd-p104-106"
+      ],
+      "set": "heldout"
+    },
+    {
+      "name": "mech-unlv-ken",
+      "slices": [
+        "unlv-cd-p86-88",
+        "ken-cd-p100-101"
+      ],
+      "set": "heldout"
     }
   ]
 }

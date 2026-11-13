@@ -853,6 +853,49 @@
           "bytes": 4956979
         }
       ]
+    },
+    "solar-decathlon-2013-more": {
+      "default": false,
+      "use": "Four more U.S. DOE Solar Decathlon 2013 teams' construction drawings, competing proposals to the same rules as solar-decathlon-2013's: nu = Norwich University, uncc = UNC Charlotte (development), unlv = UNLV, su = Stanford (held out). Their mechanical, plumbing and electrical sheets pair with each other's and the four teams' for the link panel (evidence combined numerically, milestone 8; the owner, 2026-11-13: \"Feel free to bring in a few more sets for training, and search for a few more holdouts as needed.\").",
+      "terms": "U.S. Department of Energy public website content. Fetched from the Internet Archive first because solardecathlon.gov currently fails TLS certificate verification; the original URL is kept as a fallback. Hashes make either source safe.",
+      "files": [
+        {
+          "path": "teams/nu/nu_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207223604id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/nu_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/nu_cd.pdf"
+          ],
+          "sha256": "3b20c2d95d8c68593eb99c048b2825442c2791497f88d8e02967e4c54f28e088",
+          "bytes": 13915909
+        },
+        {
+          "path": "teams/uncc/uncc_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241025034128id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/uncc_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/uncc_cd.pdf"
+          ],
+          "sha256": "58b35cd3ce4a713f35cf5b39cc999700430d74b7b43b9dc4335342bbe24e2173",
+          "bytes": 20983159
+        },
+        {
+          "path": "teams/unlv/unlv_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207081834id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/unlv_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/unlv_cd.pdf"
+          ],
+          "sha256": "181b442e6ffce7460349e09ee2c005fb553a1e401bb139fb71c76b44d8ddebce",
+          "bytes": 13348252
+        },
+        {
+          "path": "teams/su/su_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241207223606id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/su_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/su_cd.pdf"
+          ],
+          "sha256": "c42162ac50a0865dfad0634c83c1168103670826e5af2879eb58c0d3c808850b",
+          "bytes": 15434960
+        }
+      ]
     }
   }
 }
