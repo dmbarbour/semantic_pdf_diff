@@ -309,6 +309,24 @@ class Tested(unittest.TestCase):
             with_read = report(self.PUMPS, judged, ("a", "b"), mode="proposals", commentary={"entries": entries})
             self.assertEqual(links_of(with_read)["P-101", "LL-1"][0], level)
 
+    def test_a_read_shown_its_subjects_captions(self):
+        # milestone 10, step 6 (read_context): a table's caption and the lead-in introducing it, from its claims'
+        # records ("Raw water pumps"; the administration building's air handling units' lead-in)
+        from semantic_pdf_diff import crossmatch
+        from semantic_pdf_diff.records import caption
+        table = {"kind": "table", "items": ["Tag", "Capacity (gpm)"],
+                 "text": "Above the table: ...The plant's pumps are listed as follows. Table 1. Raw water pumps Tag "
+                         "Capacity (gpm) P-101 1,300"}
+        self.assertEqual(caption(table), ("Raw water pumps", "The plant's pumps are listed as follows."))
+        self.assertEqual(caption({**table, "text": "Table 2. Options Tag"})[1], "")  # nothing introduces it
+        judged = [{"a": "A-10", "b": "B-10", "relation": "different"}]
+        pumps = [dict(c, records=["table:p1:0"]) if c["content"] == "ca" else c for c in self.PUMPS]
+        records = [{"content": "ca", "id": "table:p1:0", **table}]
+        for on in (False, True):
+            data = report(pumps, judged, ("a", "b"), mode="proposals", records=records, settings={"read_context": on})
+            text = crossmatch.links_asked(data, indexes.built(data))[0][-1]
+            self.assertEqual('"described as": [\n   "Raw water pumps"' in text, on)
+
 class Weighed(unittest.TestCase):
     """Milestone 6: a link's level from its features' weights (link_levels: weights; proposals only), the table taken
     as fitted on today's candidates (link_weights.json's own, weights/1, is stale: test_a_stale_table)."""

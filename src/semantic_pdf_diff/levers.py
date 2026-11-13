@@ -1526,6 +1526,14 @@ class LinkRead(Lever):
     def reads_links(self, mode):
         return self.link_read and mode == "proposals"
 
+class ReadContext(Lever):
+    lever_name, stage, off = "read_context", "comparison", {"read_context": False}
+    # comparisons: the read of a link (link_read) shown each subject's context: the captions of the tables its claims
+    # are read from ("described as": "Raw water pumps") and the lead-ins introducing them (crossmatch.contexts;
+    # evidence combined numerically, milestone 10, step 6: where a component is used, without an embedding model:
+    # the owner, 2026-11-13, "I'd prefer not to depend on any embedding model in particular"). Off till measured
+    read_context: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class LinkMeaning(Lever):
     lever_name, stage, off = "link_meaning", "comparison", {"link_meaning": False}
     # comparisons: each subject's names embedded (embed.names, with embed_model), two names alike in meaning a
@@ -1653,7 +1661,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks,
-                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead,
+                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead, ReadContext,
                  LinkMeaning,
                  LinkRerank,
                  LookGaps,

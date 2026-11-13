@@ -214,6 +214,28 @@ def changed_records(earlier, later, left, right):
                         "later": {"content": cb, "id": b.id, "text": b.text, "items": b.items}, "claims": claims})
     return out
 
+CAPTION = re.compile(r"\bTable\s+\d+[.:]\s+")
+INTRODUCES = re.compile(r"(?:as follows|below)\s*[.:]?$|:$")
+
+def caption(record):
+    """(a table record's caption, the lead-in introducing it) as its text gives them: its last "Table N." up to its
+    headers ("Raw water pumps"), and the sentence before it where that introduces the table ("The administration
+    building's air handling units are served as follows."); "" for either it doesn't give. record: a ContextRecord or
+    a report's dict of one."""
+    get = record.get if isinstance(record, dict) else lambda k, default=None: getattr(record, k, default)
+    text, items = get("text", "") or "", get("items", []) or []
+    found = list(CAPTION.finditer(text))
+    if get("kind", "") != "table" or not found:
+        return "", ""
+    rest = text[found[-1].end():]
+    cuts = [rest.find(f" {i}") for i in items if isinstance(i, str) and i and rest.find(f" {i}") >= 0]
+    cuts += [rest.find(" Within:")] if " Within:" in rest else []
+    said = rest[:min(cuts) if cuts else len(rest)].strip(" .:")
+    before = " ".join(text[:found[-1].start()].replace(CONTEXT_NOTE, "").split())
+    before = re.sub(r"^(?:Above the table:)?[\s.…]*", "", before)  # the window's opening
+    lead = re.split(r"(?<=[.!?:])\s+", before)[-1] if before else ""
+    return said[:120], lead[:200] if INTRODUCES.search(lead) else ""
+
 def context_shown(evidence, records):
     """The context a claim's records give it, as the judge is shown it (the judge_context lever): {"context": [one
     line per record: its kind, its label and its text, a table's headers too]}, each record's parents before it, each

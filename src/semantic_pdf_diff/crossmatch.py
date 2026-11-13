@@ -174,6 +174,7 @@ def links_asked(data, index):
     by = {(s_, x["name"]): x for x in index.get("subjects", []) if len(x["claims"]) == 1
           for s_ in x["claims"]}
     out = []
+    context = contexts(data) if (data.get("settings") or {}).get("read_context") else None
     for s in index.get("subjects", []):
         if list(s["claims"]) != [sources[0]]:
             continue
@@ -188,8 +189,9 @@ def links_asked(data, index):
             first = hashlib.sha256(f"{s['name']}|{other['name']}".encode()).digest()[0] % 2 == 0
             shown_values = mode == "revisions"  # proposals' values differ by design: names and properties only
             pair = (other, decoy) if first else (decoy, other)
-            shown = {"item": _shown(s, sources[0], shown_values),
-                     "candidates": {f"B{n}": _shown(x, link["source"], shown_values) for n, x in enumerate(pair, 1)}}
+            shown = {"item": _shown(s, sources[0], shown_values, context),
+                     "candidates": {f"B{n}": _shown(x, link["source"], shown_values, context)
+                                    for n, x in enumerate(pair, 1)}}
             what = "two revisions of one document" if mode == "revisions" else "two proposals or designs"
             values = " and its values" if shown_values else " (values left out: designs differ in them)"
             text = READ.format(what=what, values=values) + json.dumps(shown, ensure_ascii=False, indent=1) + "\n"
@@ -198,13 +200,38 @@ def links_asked(data, index):
                 return out
     return out
 
-def _shown(subject, source, values):
-    if values:
-        return described(subject, source)
-    also = [n for n in subject["names"] if fold(n) != fold(subject["name"])][:4]
-    return {"name": subject["name"], **({"also": also} if also else {}),
-            "properties": sorted({p["name"] for p in subject["properties"]
-                                  if any(v["source"] == source for v in p["values"])})[:PROPERTIES]}
+def _shown(subject, source, values, context=None):
+    shown = described(subject, source) if values else {
+        "name": subject["name"],
+        **({"also": also} if (also := [n for n in subject["names"] if fold(n) != fold(subject["name"])][:4]) else {}),
+        "properties": sorted({p["name"] for p in subject["properties"]
+                              if any(v["source"] == source for v in p["values"])})[:PROPERTIES]}
+    return {**shown, **(context(subject) if context else {})}
+
+CONTEXTS = 3  # a subject's captions and lead-ins shown, at most, each
+
+def contexts(data):
+    """A subject's context as the read is shown it (the read_context lever; evidence combined numerically, milestone
+    10, step 6): the captions of the tables its claims are read from ("described as": "Raw water pumps") and the
+    lead-ins introducing them ("introduced by"), from its claims' records (records.caption), CONTEXTS each at most."""
+    from .records import caption
+    said = {(r["content"], r["id"]): caption(r) for r in data.get("records", [])}
+    evidence = {e["id"]: e for e in data.get("evidence", [])}
+
+    def of(subject):
+        captions, leads = {}, {}
+        for ids in subject["claims"].values():
+            for c in ids:
+                e = evidence.get(c) or {}
+                for rid in e.get("records", []):
+                    cap, lead = said.get((e["content"], rid), ("", ""))
+                    if cap:
+                        captions[cap] = None
+                    if lead:
+                        leads[lead] = None
+        return {**({"described as": list(captions)[:CONTEXTS]} if captions else {}),
+                **({"introduced by": list(leads)[:CONTEXTS]} if leads else {})}
+    return of
 
 def read_links(data, index, client, mode, label, progress=None):
     """Each link read against its decoy (links_asked): {"entries": [the log's "link_read" entries: relation picked,

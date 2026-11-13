@@ -232,7 +232,7 @@ class Binding(unittest.TestCase):
                                                         "match_subjects", "link_tests", "link_levels", "link_index",
                                                         "property_links", "keyed_links", "other_names_fit",
                                                         "unit_kinds",
-                                                        "link_read",
+                                                        "link_read", "read_context",
                                                         "link_meaning",
                                                         "link_rerank", "look_gaps",
                                                         "judge_glossary", "topic_names",

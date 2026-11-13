@@ -284,6 +284,8 @@ HELP = {
                            "weighed by kind and size in links' fit test and property_links' values"),
     "link_read": Help(_L, "proposals: each link read by the model against a decoy, the other source's next "
                           "likeliest; the decoy or neither picked leaves it possible"),
+    "read_context": Help(_L, "proposals: a link's read shown each subject's table captions and the lead-ins "
+                             "introducing them (where it's used)"),
     "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "
                              "alike in meaning a link's evidence and its candidates"),
     "link_rerank": Help(_L, "comparisons, with a reranker (rerank_model): each subject ranked against the other "
