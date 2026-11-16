@@ -15447,16 +15447,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 7,
+    "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -15468,39 +15468,39 @@
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.694,
+     "log_loss": 0.6428,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.784
+       0.843
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -15538,8 +15538,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -15559,31 +15563,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7581,
+     "log_loss": 0.7624,
      "calibration": [
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -15618,8 +15628,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -15639,31 +15653,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7508,
+     "log_loss": 0.7555,
      "calibration": [
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.795
+       1,
+       1,
+       0.841
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.955
+       0.963
       ]
      ]
     }
@@ -15690,16 +15710,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 6,
+    "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -15711,45 +15731,45 @@
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 13,
-      "matches": 10,
+      "pairs": 14,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.5994,
+     "log_loss": 0.5709,
      "calibration": [
       [
        "0.0-0.1",
        3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.827
+       2,
+       2,
+       0.822
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.955
+       0.963
       ]
      ]
     }
@@ -15776,16 +15796,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -15794,50 +15814,50 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7515,
+     "log_loss": 0.6549,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.812
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 1,
@@ -15857,19 +15877,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
-    "right": 8,
+    "groups": 7,
+    "right": 7,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 6,
+    "matched": 5,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
-     },
-     "possible": {
-      "links": 1,
+      "links": 4,
+      "right": 3,
       "wrong": 1
      }
     },
@@ -15878,55 +15895,61 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 23,
+     "pairs": 24,
      "matches": 20,
-     "average_precision": 0.9744,
+     "average_precision": 0.9656,
      "candidates": {
-      "pairs": 15,
-      "matches": 12,
-      "average_precision": 0.9215
+      "pairs": 17,
+      "matches": 13,
+      "average_precision": 0.8964
      },
      "precision": {
-      "plausible": 1.0,
+      "plausible": 0.9091,
       "possible": 0.9091
      },
-     "log_loss": 0.7017,
+     "log_loss": 0.6709,
      "calibration": [
       [
        "0.0-0.1",
-       2,
+       3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        10,
        10,
-       0.257
+       0.281
       ],
       [
        "0.5-0.7",
+       3,
        2,
-       1,
-       0.611
+       0.678
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.784
+       4,
+       4,
+       0.778
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.944
+       4,
+       4,
+       0.961
       ]
      ]
     }
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 2,
+    "unbound": 1,
+    "found_beside": 0
+   },
    "findings": {
     "complementary": 5,
     "different": 37,
@@ -15945,16 +15968,17 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 9,
-    "right": 8,
-    "wrong": 1,
+    "groups": 7,
+    "right": 7,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     },
     "sets": {
@@ -15962,55 +15986,59 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 21,
-     "matches": 19,
-     "average_precision": 0.9385,
+     "pairs": 24,
+     "matches": 20,
+     "average_precision": 0.9538,
      "candidates": {
-      "pairs": 12,
-      "matches": 11,
-      "average_precision": 1.0
+      "pairs": 17,
+      "matches": 13,
+      "average_precision": 0.8579
      },
      "precision": {
-      "plausible": 0.9,
-      "possible": 0.9
+      "plausible": 0.9091,
+      "possible": 0.9091
      },
-     "log_loss": 0.8291,
+     "log_loss": 0.7089,
      "calibration": [
       [
        "0.0-0.1",
-       1,
+       3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        10,
        10,
-       0.259
+       0.273
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.784
+       6,
+       5,
+       0.798
       ],
       [
        "0.9-1.0",
-       6,
-       5,
-       0.93
+       3,
+       3,
+       0.972
       ]
      ]
     }
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "unbound": 1,
+    "found_beside": 0
+   },
    "findings": {
     "complementary": 3,
     "different": 18,
@@ -16059,31 +16087,37 @@
       "plausible": 0.9,
       "possible": 0.9
      },
-     "log_loss": 0.6553,
+     "log_loss": 0.6367,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        13,
        10,
-       0.251
+       0.27
       ],
       [
        "0.5-0.7",
        2,
        1,
-       0.622
+       0.691
+      ],
+      [
+       "0.7-0.9",
+       2,
+       2,
+       0.778
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.938
+       6,
+       6,
+       0.958
       ]
      ]
     }
@@ -16135,31 +16169,31 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6599,
+     "log_loss": 0.6246,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.811
+       3,
+       3,
+       0.785
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.949
+       7,
+       7,
+       0.961
       ]
      ]
     }
@@ -16184,16 +16218,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 9,
-    "right": 9,
+    "groups": 8,
+    "right": 8,
     "wrong": 0,
     "unscorable": 0,
     "items": 8,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -16201,43 +16235,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
+     "pairs": 21,
      "matches": 19,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 11,
-      "matches": 10,
+      "pairs": 13,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6711,
+     "log_loss": 0.6256,
      "calibration": [
       [
        "0.0-0.1",
-       1,
+       2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
+      ],
+      [
+       "0.5-0.7",
+       1,
+       1,
+       0.652
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.756
+       3,
+       3,
+       0.742
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.94
+       6,
+       6,
+       0.961
       ]
      ]
     }
@@ -16273,49 +16313,53 @@
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 4,
-      "right": 3,
+      "links": 3,
+      "right": 2,
       "wrong": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
      "pairs": 15,
      "matches": 12,
-     "average_precision": 0.9296,
+     "average_precision": 0.9714,
      "candidates": {
       "pairs": 6,
       "matches": 3,
-      "average_precision": 0.6667
+      "average_precision": 0.6944
      },
      "precision": {
-      "plausible": 0.9231,
+      "plausible": 0.9167,
       "possible": 0.9231
      },
-     "log_loss": 0.3121,
+     "log_loss": 0.2802,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.632
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.823
+       5,
+       4,
+       0.827
       ],
       [
        "0.9-1.0",
        5,
-       4,
-       0.94
+       5,
+       0.955
       ]
      ]
     }
@@ -16347,57 +16391,56 @@
     "unchanged": 2
    },
    "matching": {
-    "groups": 8,
-    "right": 8,
+    "groups": 7,
+    "right": 7,
     "wrong": 0,
     "unscorable": 0,
     "items": 7,
-    "matched": 7,
+    "matched": 6,
     "links": {
      "plausible": {
       "links": 2,
-      "right": 1,
-      "wrong": 1
+      "right": 2
      }
     },
     "ranking": {
-     "pairs": 11,
+     "pairs": 13,
      "matches": 9,
-     "average_precision": 0.9349,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 3,
-      "matches": 1,
-      "average_precision": 0.5
+      "pairs": 6,
+      "matches": 2,
+      "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9,
-      "possible": 0.9
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.3745,
+     "log_loss": 0.1815,
      "calibration": [
       [
        "0.1-0.3",
-       1,
+       4,
        0,
-       0.231
+       0.221
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.69
       ],
       [
        "0.7-0.9",
-       4,
-       4,
-       0.793
+       3,
+       3,
+       0.841
       ],
       [
        "0.9-1.0",
-       5,
        4,
-       0.951
+       4,
+       0.978
       ]
      ]
     }
@@ -16436,6 +16479,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "right": 2
      }
     },
     "ranking": {
@@ -16451,43 +16498,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3175,
+     "log_loss": 0.2947,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.034
+       0.084
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
-       2,
-       2,
-       0.327
+       1,
+       1,
+       0.453
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.628
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.814
+       0.807
       ],
       [
        "0.9-1.0",
        4,
        4,
-       0.957
+       0.974
       ]
      ]
     }
@@ -16514,56 +16561,56 @@
     "unchanged": 2
    },
    "matching": {
-    "groups": 9,
-    "right": 9,
+    "groups": 8,
+    "right": 8,
     "wrong": 0,
     "unscorable": 0,
     "items": 7,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "ranking": {
-     "pairs": 19,
+     "pairs": 25,
      "matches": 12,
-     "average_precision": 0.9693,
+     "average_precision": 0.9567,
      "candidates": {
-      "pairs": 10,
-      "matches": 3,
-      "average_precision": 0.7667
+      "pairs": 17,
+      "matches": 4,
+      "average_precision": 0.8088
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3256,
+     "log_loss": 0.2773,
      "calibration": [
       [
        "0.1-0.3",
-       9,
+       15,
        2,
-       0.163
+       0.146
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.69
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.783
+       2,
+       2,
+       0.809
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.943
+       0.957
       ]
      ]
     }
@@ -16600,6 +16647,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
@@ -16615,43 +16666,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.2669,
+     "log_loss": 0.2621,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.034
+       0.084
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
        1,
        1,
-       0.337
+       0.453
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        2,
        2,
-       0.81
+       0.79
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.951
+       0.969
       ]
      ]
     }
@@ -16678,16 +16729,17 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 11,
-    "right": 11,
+    "groups": 12,
+    "right": 12,
     "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 7,
+    "matched": 8,
     "links": {
-     "plausible": {
-      "links": 1,
-      "right": 1
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -16697,47 +16749,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
-      "pairs": 19,
-      "matches": 10,
-      "average_precision": 1.0
+      "pairs": 18,
+      "matches": 9,
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4082,
+     "log_loss": 0.5249,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.308
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.821
+       3,
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
-       10,
-       10,
-       0.946
+       9,
+       9,
+       0.952
       ]
      ]
     }
@@ -16776,6 +16828,11 @@
      "plausible": {
       "links": 1,
       "right": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -16785,53 +16842,53 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 19,
       "matches": 10,
-      "average_precision": 1.0
+      "average_precision": 0.8151
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4377,
+     "log_loss": 0.5416,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        5,
        5,
-       0.817
+       0.833
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.948
+       0.951
       ]
      ]
     }
@@ -16868,6 +16925,11 @@
      "plausible": {
       "links": 3,
       "right": 3
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -16877,53 +16939,53 @@
     "ranking": {
      "pairs": 33,
      "matches": 23,
-     "average_precision": 1.0,
+     "average_precision": 0.9376,
      "candidates": {
       "pairs": 24,
       "matches": 14,
-      "average_precision": 1.0
+      "average_precision": 0.839
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4844,
+     "log_loss": 0.6029,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.033
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
-       7,
-       3,
-       0.214
+       13,
+       6,
+       0.17
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.309
+       7,
+       4,
+       0.404
       ],
       [
        "0.5-0.7",
        3,
        3,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        1,
        1,
-       0.821
+       0.841
       ],
       [
        "0.9-1.0",
        8,
        8,
-       0.952
+       0.958
       ]
      ]
     }
@@ -16951,6 +17013,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -16958,47 +17027,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -17026,6 +17095,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -17033,47 +17109,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -17095,16 +17171,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -17116,39 +17192,39 @@
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6913,
+     "log_loss": 0.6424,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.674
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.797
+       0.843
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -17186,8 +17262,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -17207,37 +17287,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7263,
+     "log_loss": 0.733,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -17272,8 +17358,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -17293,37 +17383,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7193,
+     "log_loss": 0.7264,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.795
+       1,
+       1,
+       0.841
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.955
+       0.963
       ]
      ]
     }
@@ -17350,16 +17446,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 7,
+    "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -17367,49 +17463,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 23,
+     "pairs": 24,
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 13,
-      "matches": 10,
+      "pairs": 15,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.5972,
+     "log_loss": 0.5479,
      "calibration": [
       [
        "0.0-0.1",
-       3,
+       4,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.833
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -17436,14 +17532,18 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 6,
+    "matched": 7,
     "links": {
      "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
       "links": 1,
       "right": 1
      }
@@ -17453,51 +17553,51 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9663,
+     "pairs": 22,
+     "matches": 22,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 13,
+      "matches": 13,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7571,
+     "log_loss": 0.7111,
      "calibration": [
       [
        "0.1-0.3",
-       9,
-       9,
-       0.254
+       11,
+       11,
+       0.284
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.62
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.785
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.957
+       0.97
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 3,
@@ -17542,25 +17642,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1301,
+     "log_loss": 0.1178,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.83
+       7,
+       7,
+       0.841
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.956
+       7,
+       7,
+       0.974
       ]
      ]
     }
@@ -17583,38 +17683,62 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 15,
-    "right": 15,
+    "groups": 14,
+    "right": 14,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    },
     "ranking": {
-     "pairs": 15,
+     "pairs": 17,
      "matches": 15,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 0,
-      "matches": 0,
-      "average_precision": null
+      "pairs": 3,
+      "matches": 1,
+      "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1487,
+     "log_loss": 0.1596,
      "calibration": [
       [
+       "0.0-0.1",
+       1,
+       0,
+       0.022
+      ],
+      [
+       "0.1-0.3",
+       1,
+       0,
+       0.231
+      ],
+      [
+       "0.5-0.7",
+       1,
+       1,
+       0.628
+      ],
+      [
        "0.7-0.9",
-       11,
-       11,
-       0.831
+       10,
+       10,
+       0.837
       ],
       [
        "0.9-1.0",
        4,
        4,
-       0.955
+       0.956
       ]
      ]
     }
@@ -17641,56 +17765,72 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 13,
-    "right": 13,
+    "groups": 12,
+    "right": 12,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 10,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 3,
+      "right": 3
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
-     "pairs": 17,
+     "pairs": 18,
      "matches": 17,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 4,
-      "matches": 4,
+      "pairs": 6,
+      "matches": 5,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.2859,
+     "log_loss": 0.2735,
      "calibration": [
       [
+       "0.0-0.1",
+       1,
+       0,
+       0.022
+      ],
+      [
        "0.1-0.3",
-       2,
-       2,
-       0.288
+       1,
+       1,
+       0.187
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.424
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.67
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.829
+       5,
+       5,
+       0.833
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -17738,25 +17878,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1476,
+     "log_loss": 0.13,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       7,
-       7,
-       0.818
+       8,
+       8,
+       0.837
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -17804,25 +17944,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1466,
+     "log_loss": 0.1283,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        7,
        7,
-       0.816
+       0.83
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -33285,16 +33425,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 7,
+    "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -33306,39 +33446,39 @@
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.694,
+     "log_loss": 0.6428,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.784
+       0.843
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -33376,8 +33516,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -33397,31 +33541,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7581,
+     "log_loss": 0.7624,
      "calibration": [
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -33456,8 +33606,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -33477,31 +33631,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7508,
+     "log_loss": 0.7555,
      "calibration": [
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.795
+       1,
+       1,
+       0.841
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.955
+       0.963
       ]
      ]
     }
@@ -33528,16 +33688,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 6,
+    "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -33549,45 +33709,45 @@
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 13,
-      "matches": 10,
+      "pairs": 14,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.5994,
+     "log_loss": 0.5709,
      "calibration": [
       [
        "0.0-0.1",
        3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.827
+       2,
+       2,
+       0.822
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.955
+       0.963
       ]
      ]
     }
@@ -33614,16 +33774,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -33632,50 +33792,50 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7515,
+     "log_loss": 0.6549,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.812
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 1,
@@ -33695,19 +33855,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
-    "right": 8,
+    "groups": 7,
+    "right": 7,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 6,
+    "matched": 5,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
-     },
-     "possible": {
-      "links": 1,
+      "links": 4,
+      "right": 3,
       "wrong": 1
      }
     },
@@ -33716,55 +33873,61 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 23,
+     "pairs": 24,
      "matches": 20,
-     "average_precision": 0.9744,
+     "average_precision": 0.9656,
      "candidates": {
-      "pairs": 15,
-      "matches": 12,
-      "average_precision": 0.9215
+      "pairs": 17,
+      "matches": 13,
+      "average_precision": 0.8964
      },
      "precision": {
-      "plausible": 1.0,
+      "plausible": 0.9091,
       "possible": 0.9091
      },
-     "log_loss": 0.7017,
+     "log_loss": 0.6709,
      "calibration": [
       [
        "0.0-0.1",
-       2,
+       3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        10,
        10,
-       0.257
+       0.281
       ],
       [
        "0.5-0.7",
+       3,
        2,
-       1,
-       0.611
+       0.678
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.784
+       4,
+       4,
+       0.778
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.944
+       4,
+       4,
+       0.961
       ]
      ]
     }
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "another fact": 2,
+    "both give it": 2,
+    "unbound": 1,
+    "found_beside": 0
+   },
    "findings": {
     "complementary": 5,
     "different": 37,
@@ -33783,16 +33946,17 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 9,
-    "right": 8,
-    "wrong": 1,
+    "groups": 7,
+    "right": 7,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 4,
+      "right": 3,
+      "wrong": 1
      }
     },
     "sets": {
@@ -33800,55 +33964,59 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 21,
-     "matches": 19,
-     "average_precision": 0.9385,
+     "pairs": 24,
+     "matches": 20,
+     "average_precision": 0.9538,
      "candidates": {
-      "pairs": 12,
-      "matches": 11,
-      "average_precision": 1.0
+      "pairs": 17,
+      "matches": 13,
+      "average_precision": 0.8579
      },
      "precision": {
-      "plausible": 0.9,
-      "possible": 0.9
+      "plausible": 0.9091,
+      "possible": 0.9091
      },
-     "log_loss": 0.8291,
+     "log_loss": 0.7089,
      "calibration": [
       [
        "0.0-0.1",
-       1,
+       3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        10,
        10,
-       0.259
+       0.273
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.784
+       6,
+       5,
+       0.798
       ],
       [
        "0.9-1.0",
-       6,
-       5,
-       0.93
+       3,
+       3,
+       0.972
       ]
      ]
     }
    },
    "gaps_found": "0/2",
    "gaps": {},
+   "if_one_item": {
+    "unbound": 1,
+    "found_beside": 0
+   },
    "findings": {
     "complementary": 3,
     "different": 18,
@@ -33897,31 +34065,37 @@
       "plausible": 0.9,
       "possible": 0.9
      },
-     "log_loss": 0.6553,
+     "log_loss": 0.6367,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        13,
        10,
-       0.251
+       0.27
       ],
       [
        "0.5-0.7",
        2,
        1,
-       0.622
+       0.691
+      ],
+      [
+       "0.7-0.9",
+       2,
+       2,
+       0.778
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.938
+       6,
+       6,
+       0.958
       ]
      ]
     }
@@ -33973,31 +34147,31 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6599,
+     "log_loss": 0.6246,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.811
+       3,
+       3,
+       0.785
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.949
+       7,
+       7,
+       0.961
       ]
      ]
     }
@@ -34022,16 +34196,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 9,
-    "right": 9,
+    "groups": 8,
+    "right": 8,
     "wrong": 0,
     "unscorable": 0,
     "items": 8,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -34039,43 +34213,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
+     "pairs": 21,
      "matches": 19,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 11,
-      "matches": 10,
+      "pairs": 13,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6711,
+     "log_loss": 0.6256,
      "calibration": [
       [
        "0.0-0.1",
-       1,
+       2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
+      ],
+      [
+       "0.5-0.7",
+       1,
+       1,
+       0.652
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.756
+       3,
+       3,
+       0.742
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.94
+       6,
+       6,
+       0.961
       ]
      ]
     }
@@ -34111,49 +34291,53 @@
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 4,
-      "right": 3,
+      "links": 3,
+      "right": 2,
       "wrong": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
      "pairs": 15,
      "matches": 12,
-     "average_precision": 0.9296,
+     "average_precision": 0.9714,
      "candidates": {
       "pairs": 6,
       "matches": 3,
-      "average_precision": 0.6667
+      "average_precision": 0.6944
      },
      "precision": {
-      "plausible": 0.9231,
+      "plausible": 0.9167,
       "possible": 0.9231
      },
-     "log_loss": 0.3121,
+     "log_loss": 0.2802,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.632
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.823
+       5,
+       4,
+       0.827
       ],
       [
        "0.9-1.0",
        5,
-       4,
-       0.94
+       5,
+       0.955
       ]
      ]
     }
@@ -34185,57 +34369,56 @@
     "unchanged": 2
    },
    "matching": {
-    "groups": 8,
-    "right": 8,
+    "groups": 7,
+    "right": 7,
     "wrong": 0,
     "unscorable": 0,
     "items": 7,
-    "matched": 7,
+    "matched": 6,
     "links": {
      "plausible": {
       "links": 2,
-      "right": 1,
-      "wrong": 1
+      "right": 2
      }
     },
     "ranking": {
-     "pairs": 11,
+     "pairs": 13,
      "matches": 9,
-     "average_precision": 0.9349,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 3,
-      "matches": 1,
-      "average_precision": 0.5
+      "pairs": 6,
+      "matches": 2,
+      "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9,
-      "possible": 0.9
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.3745,
+     "log_loss": 0.1815,
      "calibration": [
       [
        "0.1-0.3",
-       1,
+       4,
        0,
-       0.231
+       0.221
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.69
       ],
       [
        "0.7-0.9",
-       4,
-       4,
-       0.793
+       3,
+       3,
+       0.841
       ],
       [
        "0.9-1.0",
-       5,
        4,
-       0.951
+       4,
+       0.978
       ]
      ]
     }
@@ -34274,6 +34457,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "right": 2
      }
     },
     "ranking": {
@@ -34289,43 +34476,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3175,
+     "log_loss": 0.2947,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.034
+       0.084
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
-       2,
-       2,
-       0.327
+       1,
+       1,
+       0.453
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.628
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.814
+       0.807
       ],
       [
        "0.9-1.0",
        4,
        4,
-       0.957
+       0.974
       ]
      ]
     }
@@ -34352,56 +34539,56 @@
     "unchanged": 2
    },
    "matching": {
-    "groups": 9,
-    "right": 9,
+    "groups": 8,
+    "right": 8,
     "wrong": 0,
     "unscorable": 0,
     "items": 7,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "ranking": {
-     "pairs": 19,
+     "pairs": 25,
      "matches": 12,
-     "average_precision": 0.9693,
+     "average_precision": 0.9567,
      "candidates": {
-      "pairs": 10,
-      "matches": 3,
-      "average_precision": 0.7667
+      "pairs": 17,
+      "matches": 4,
+      "average_precision": 0.8088
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3256,
+     "log_loss": 0.2773,
      "calibration": [
       [
        "0.1-0.3",
-       9,
+       15,
        2,
-       0.163
+       0.146
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.69
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.783
+       2,
+       2,
+       0.809
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.943
+       0.957
       ]
      ]
     }
@@ -34438,6 +34625,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
@@ -34453,43 +34644,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.2669,
+     "log_loss": 0.2621,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.034
+       0.084
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
        1,
        1,
-       0.337
+       0.453
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        2,
        2,
-       0.81
+       0.79
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.951
+       0.969
       ]
      ]
     }
@@ -34516,16 +34707,17 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 11,
-    "right": 11,
+    "groups": 12,
+    "right": 12,
     "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 7,
+    "matched": 8,
     "links": {
-     "plausible": {
-      "links": 1,
-      "right": 1
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -34535,47 +34727,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
-      "pairs": 19,
-      "matches": 10,
-      "average_precision": 1.0
+      "pairs": 18,
+      "matches": 9,
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4082,
+     "log_loss": 0.5249,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.308
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.821
+       3,
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
-       10,
-       10,
-       0.946
+       9,
+       9,
+       0.952
       ]
      ]
     }
@@ -34614,6 +34806,11 @@
      "plausible": {
       "links": 1,
       "right": 1
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -34623,53 +34820,53 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 19,
       "matches": 10,
-      "average_precision": 1.0
+      "average_precision": 0.8151
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4377,
+     "log_loss": 0.5416,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        5,
        5,
-       0.817
+       0.833
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.948
+       0.951
       ]
      ]
     }
@@ -34706,6 +34903,11 @@
      "plausible": {
       "links": 3,
       "right": 3
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -34715,53 +34917,53 @@
     "ranking": {
      "pairs": 33,
      "matches": 23,
-     "average_precision": 1.0,
+     "average_precision": 0.9376,
      "candidates": {
       "pairs": 24,
       "matches": 14,
-      "average_precision": 1.0
+      "average_precision": 0.839
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4844,
+     "log_loss": 0.6029,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.033
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
-       7,
-       3,
-       0.214
+       13,
+       6,
+       0.17
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.309
+       7,
+       4,
+       0.404
       ],
       [
        "0.5-0.7",
        3,
        3,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        1,
        1,
-       0.821
+       0.841
       ],
       [
        "0.9-1.0",
        8,
        8,
-       0.952
+       0.958
       ]
      ]
     }
@@ -34789,6 +34991,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -34796,47 +35005,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -34864,6 +35073,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -34871,47 +35087,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -34933,16 +35149,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 8,
+    "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -34954,39 +35170,39 @@
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6913,
+     "log_loss": 0.6424,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.674
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.797
+       0.843
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -35024,8 +35240,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -35045,37 +35265,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7263,
+     "log_loss": 0.733,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -35110,8 +35336,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -35131,37 +35361,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7193,
+     "log_loss": 0.7264,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.795
+       1,
+       1,
+       0.841
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.955
+       0.963
       ]
      ]
     }
@@ -35188,16 +35424,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
-    "right": 10,
+    "groups": 9,
+    "right": 9,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 7,
+    "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -35205,49 +35441,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 23,
+     "pairs": 24,
      "matches": 20,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 13,
-      "matches": 10,
+      "pairs": 15,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.5972,
+     "log_loss": 0.5479,
      "calibration": [
       [
        "0.0-0.1",
-       3,
+       4,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.833
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -35274,14 +35510,18 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 6,
+    "matched": 7,
     "links": {
      "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
       "links": 1,
       "right": 1
      }
@@ -35291,51 +35531,51 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9663,
+     "pairs": 22,
+     "matches": 22,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 13,
+      "matches": 13,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7571,
+     "log_loss": 0.7111,
      "calibration": [
       [
        "0.1-0.3",
-       9,
-       9,
-       0.254
+       11,
+       11,
+       0.284
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.62
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.785
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.957
+       0.97
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 3,
@@ -35380,25 +35620,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1301,
+     "log_loss": 0.1178,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.83
+       7,
+       7,
+       0.841
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.956
+       7,
+       7,
+       0.974
       ]
      ]
     }
@@ -35421,38 +35661,62 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 15,
-    "right": 15,
+    "groups": 14,
+    "right": 14,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 10,
+    "links": {
+     "plausible": {
+      "links": 1,
+      "right": 1
+     }
+    },
     "ranking": {
-     "pairs": 15,
+     "pairs": 17,
      "matches": 15,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 0,
-      "matches": 0,
-      "average_precision": null
+      "pairs": 3,
+      "matches": 1,
+      "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1487,
+     "log_loss": 0.1596,
      "calibration": [
       [
+       "0.0-0.1",
+       1,
+       0,
+       0.022
+      ],
+      [
+       "0.1-0.3",
+       1,
+       0,
+       0.231
+      ],
+      [
+       "0.5-0.7",
+       1,
+       1,
+       0.628
+      ],
+      [
        "0.7-0.9",
-       11,
-       11,
-       0.831
+       10,
+       10,
+       0.837
       ],
       [
        "0.9-1.0",
        4,
        4,
-       0.955
+       0.956
       ]
      ]
     }
@@ -35479,56 +35743,72 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 13,
-    "right": 13,
+    "groups": 12,
+    "right": 12,
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 10,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 3,
+      "right": 3
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
-     "pairs": 17,
+     "pairs": 18,
      "matches": 17,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 4,
-      "matches": 4,
+      "pairs": 6,
+      "matches": 5,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.2859,
+     "log_loss": 0.2735,
      "calibration": [
       [
+       "0.0-0.1",
+       1,
+       0,
+       0.022
+      ],
+      [
        "0.1-0.3",
-       2,
-       2,
-       0.288
+       1,
+       1,
+       0.187
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.424
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.67
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.829
+       5,
+       5,
+       0.833
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -35576,25 +35856,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1476,
+     "log_loss": 0.13,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       7,
-       7,
-       0.818
+       8,
+       8,
+       0.837
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -35642,25 +35922,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1466,
+     "log_loss": 0.1283,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        7,
        7,
-       0.816
+       0.83
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -48219,16 +48499,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -48237,42 +48517,42 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9663,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7614,
+     "log_loss": 0.6565,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
        4,
-       3,
-       0.776
+       4,
+       0.818
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.952
+       5,
+       5,
+       0.974
       ]
      ]
     }
@@ -48310,8 +48590,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -48331,31 +48615,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7581,
+     "log_loss": 0.7624,
      "calibration": [
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -48382,16 +48672,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -48400,50 +48690,50 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7455,
+     "log_loss": 0.6572,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.798
+       3,
+       0.795
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 1,
@@ -48463,16 +48753,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -48481,50 +48771,50 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7443,
+     "log_loss": 0.6549,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.803
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 1,
@@ -48544,16 +48834,17 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
-    "right": 7,
-    "wrong": 1,
+    "groups": 6,
+    "right": 6,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 5,
+      "right": 4,
+      "wrong": 1
      }
     },
     "sets": {
@@ -48561,49 +48852,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 22,
-     "matches": 19,
-     "average_precision": 0.9385,
+     "pairs": 27,
+     "matches": 20,
+     "average_precision": 0.9466,
      "candidates": {
-      "pairs": 14,
-      "matches": 12,
-      "average_precision": 1.0
+      "pairs": 21,
+      "matches": 14,
+      "average_precision": 0.8577
      },
      "precision": {
-      "plausible": 0.9,
-      "possible": 0.9
+      "plausible": 0.9091,
+      "possible": 0.9091
      },
-     "log_loss": 0.7951,
+     "log_loss": 0.6327,
      "calibration": [
       [
        "0.0-0.1",
-       2,
+       6,
        0,
-       0.027
+       0.078
       ],
       [
        "0.1-0.3",
        10,
        10,
-       0.257
+       0.281
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.784
+       6,
+       5,
+       0.777
       ],
       [
        "0.9-1.0",
-       6,
-       5,
-       0.933
+       3,
+       3,
+       0.955
       ]
      ]
     }
@@ -48657,37 +48948,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6653,
+     "log_loss": 0.6286,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        10,
        9,
-       0.252
+       0.277
       ],
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.821
+       4,
+       4,
+       0.81
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.934
+       5,
+       5,
+       0.955
       ]
      ]
     }
@@ -48741,31 +49032,31 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.633,
+     "log_loss": 0.6141,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.811
+       4,
+       4,
+       0.767
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.941
+       6,
+       6,
+       0.958
       ]
      ]
     }
@@ -48792,16 +49083,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 9,
-    "right": 9,
+    "groups": 8,
+    "right": 8,
     "wrong": 0,
     "unscorable": 0,
     "items": 8,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -48809,43 +49100,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 21,
+     "pairs": 22,
      "matches": 19,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 12,
-      "matches": 10,
+      "pairs": 14,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6404,
+     "log_loss": 0.6011,
      "calibration": [
       [
        "0.0-0.1",
-       2,
+       3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
+      ],
+      [
+       "0.5-0.7",
+       1,
+       1,
+       0.652
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.756
+       3,
+       3,
+       0.742
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.94
+       6,
+       6,
+       0.961
       ]
      ]
     }
@@ -48881,49 +49178,53 @@
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 4,
-      "right": 3,
+      "links": 3,
+      "right": 2,
       "wrong": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
      "pairs": 15,
      "matches": 12,
-     "average_precision": 0.9296,
+     "average_precision": 0.9714,
      "candidates": {
       "pairs": 6,
       "matches": 3,
-      "average_precision": 0.6667
+      "average_precision": 0.6944
      },
      "precision": {
-      "plausible": 0.9231,
+      "plausible": 0.9167,
       "possible": 0.9231
      },
-     "log_loss": 0.3121,
+     "log_loss": 0.2802,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.632
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.823
+       5,
+       4,
+       0.827
       ],
       [
        "0.9-1.0",
        5,
-       4,
-       0.94
+       5,
+       0.955
       ]
      ]
     }
@@ -48965,6 +49266,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "right": 2
      }
     },
     "ranking": {
@@ -48980,43 +49285,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3167,
+     "log_loss": 0.2945,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.03
+       0.083
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
-       2,
-       2,
-       0.327
+       1,
+       1,
+       0.453
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.628
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.814
+       0.807
       ],
       [
        "0.9-1.0",
        4,
        4,
-       0.957
+       0.974
       ]
      ]
     }
@@ -49053,6 +49358,10 @@
      "plausible": {
       "links": 1,
       "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
@@ -49068,37 +49377,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3138,
+     "log_loss": 0.2939,
      "calibration": [
       [
        "0.1-0.3",
        8,
        1,
-       0.258
+       0.282
       ],
       [
        "0.3-0.5",
        1,
        1,
-       0.335
+       0.453
       ],
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.814
+       0.807
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.951
+       0.969
       ]
      ]
     }
@@ -49135,6 +49444,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
@@ -49150,43 +49463,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.266,
+     "log_loss": 0.2619,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.03
+       0.083
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
        1,
        1,
-       0.337
+       0.453
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        2,
        2,
-       0.81
+       0.79
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.951
+       0.969
       ]
      ]
     }
@@ -49213,16 +49526,17 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 11,
-    "right": 11,
+    "groups": 12,
+    "right": 12,
     "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 7,
+    "matched": 8,
     "links": {
-     "plausible": {
-      "links": 1,
-      "right": 1
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -49232,47 +49546,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
-      "pairs": 19,
-      "matches": 10,
-      "average_precision": 1.0
+      "pairs": 18,
+      "matches": 9,
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4082,
+     "log_loss": 0.5249,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.308
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.821
+       3,
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
-       10,
-       10,
-       0.946
+       9,
+       9,
+       0.952
       ]
      ]
     }
@@ -49313,6 +49627,11 @@
      "plausible": {
       "links": 3,
       "right": 3
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -49322,53 +49641,53 @@
     "ranking": {
      "pairs": 33,
      "matches": 23,
-     "average_precision": 1.0,
+     "average_precision": 0.9376,
      "candidates": {
       "pairs": 24,
       "matches": 14,
-      "average_precision": 1.0
+      "average_precision": 0.839
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4941,
+     "log_loss": 0.6121,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.033
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
-       7,
-       3,
-       0.214
+       13,
+       6,
+       0.17
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.309
+       7,
+       4,
+       0.404
       ],
       [
        "0.5-0.7",
        3,
        3,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.821
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.948
+       0.951
       ]
      ]
     }
@@ -49397,6 +49716,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -49404,47 +49730,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -49472,6 +49798,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -49479,47 +49812,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -49541,16 +49874,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 11,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -49559,42 +49892,42 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9663,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7588,
+     "log_loss": 0.6561,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.674
       ],
       [
        "0.7-0.9",
        4,
-       3,
-       0.785
+       4,
+       0.818
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.952
+       5,
+       5,
+       0.974
       ]
      ]
     }
@@ -49632,8 +49965,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -49653,37 +49990,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7263,
+     "log_loss": 0.733,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -49710,16 +50053,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -49727,51 +50070,57 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "pairs": 21,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 12,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7429,
+     "log_loss": 0.6269,
      "calibration": [
+      [
+       "0.0-0.1",
+       1,
+       0,
+       0.083
+      ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.803
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.958
+       0.963
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 3,
@@ -49791,14 +50140,18 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 6,
+    "matched": 7,
     "links": {
      "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
       "links": 1,
       "right": 1
      }
@@ -49808,51 +50161,51 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "pairs": 22,
+     "matches": 22,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 13,
+      "matches": 13,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7499,
+     "log_loss": 0.7111,
      "calibration": [
       [
        "0.1-0.3",
-       9,
-       9,
-       0.254
+       11,
+       11,
+       0.284
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.62
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.776
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.957
+       0.97
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 3,
@@ -49897,25 +50250,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1301,
+     "log_loss": 0.1178,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.83
+       7,
+       7,
+       0.841
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.956
+       7,
+       7,
+       0.974
       ]
      ]
     }
@@ -49943,19 +50296,23 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9,
+    "matched": 10,
     "links": {
      "plausible": {
       "links": 3,
       "right": 3
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
-     "pairs": 17,
+     "pairs": 18,
      "matches": 17,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 5,
+      "pairs": 6,
       "matches": 5,
       "average_precision": 1.0
      },
@@ -49963,42 +50320,50 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.2966,
+     "log_loss": 0.2971,
      "calibration": [
       [
+       "0.0-0.1",
+       1,
+       0,
+       0.022
+      ],
+      [
        "0.1-0.3",
-       2,
-       2,
-       0.289
+       1,
+       1,
+       0.187
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.424
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.67
       ],
       [
        "0.7-0.9",
        7,
        7,
-       0.828
+       0.821
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.953
+       5,
+       5,
+       0.961
       ]
      ]
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "unbound": 1
-   },
-   "if_one_item": {
-    "unbound": 1,
-    "found_beside": 0
+    "unbound": 2
    },
    "findings": {
     "complementary": 23,
@@ -50043,25 +50408,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1476,
+     "log_loss": 0.13,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       7,
-       7,
-       0.818
+       8,
+       8,
+       0.837
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -50109,25 +50474,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1466,
+     "log_loss": 0.1283,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        7,
        7,
-       0.816
+       0.83
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }
@@ -62686,16 +63051,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -62704,42 +63069,42 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9663,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7614,
+     "log_loss": 0.6565,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
        4,
-       3,
-       0.776
+       4,
+       0.818
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.952
+       5,
+       5,
+       0.974
       ]
      ]
     }
@@ -62777,8 +63142,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -62798,31 +63167,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7581,
+     "log_loss": 0.7624,
      "calibration": [
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -62849,16 +63224,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -62867,50 +63242,50 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7455,
+     "log_loss": 0.6572,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.798
+       3,
+       0.795
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 1,
@@ -62930,16 +63305,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 9,
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -62948,50 +63323,50 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7443,
+     "log_loss": 0.6549,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.803
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 1,
@@ -63011,16 +63386,17 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 8,
-    "right": 7,
-    "wrong": 1,
+    "groups": 6,
+    "right": 6,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 2,
-      "right": 2
+      "links": 5,
+      "right": 4,
+      "wrong": 1
      }
     },
     "sets": {
@@ -63028,49 +63404,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 22,
-     "matches": 19,
-     "average_precision": 0.9385,
+     "pairs": 27,
+     "matches": 20,
+     "average_precision": 0.9466,
      "candidates": {
-      "pairs": 14,
-      "matches": 12,
-      "average_precision": 1.0
+      "pairs": 21,
+      "matches": 14,
+      "average_precision": 0.8577
      },
      "precision": {
-      "plausible": 0.9,
-      "possible": 0.9
+      "plausible": 0.9091,
+      "possible": 0.9091
      },
-     "log_loss": 0.7951,
+     "log_loss": 0.6327,
      "calibration": [
       [
        "0.0-0.1",
-       2,
+       6,
        0,
-       0.027
+       0.078
       ],
       [
        "0.1-0.3",
        10,
        10,
-       0.257
+       0.281
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.671
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.784
+       6,
+       5,
+       0.777
       ],
       [
        "0.9-1.0",
-       6,
-       5,
-       0.933
+       3,
+       3,
+       0.955
       ]
      ]
     }
@@ -63124,37 +63500,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6653,
+     "log_loss": 0.6286,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        10,
        9,
-       0.252
+       0.277
       ],
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.821
+       4,
+       4,
+       0.81
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.934
+       5,
+       5,
+       0.955
       ]
      ]
     }
@@ -63208,31 +63584,31 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.633,
+     "log_loss": 0.6141,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.811
+       4,
+       4,
+       0.767
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.941
+       6,
+       6,
+       0.958
       ]
      ]
     }
@@ -63259,16 +63635,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 9,
-    "right": 9,
+    "groups": 8,
+    "right": 8,
     "wrong": 0,
     "unscorable": 0,
     "items": 8,
-    "matched": 5,
+    "matched": 4,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -63276,43 +63652,49 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 21,
+     "pairs": 22,
      "matches": 19,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 12,
-      "matches": 10,
+      "pairs": 14,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.6404,
+     "log_loss": 0.6011,
      "calibration": [
       [
        "0.0-0.1",
-       2,
+       3,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
+      ],
+      [
+       "0.5-0.7",
+       1,
+       1,
+       0.652
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.756
+       3,
+       3,
+       0.742
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.94
+       6,
+       6,
+       0.961
       ]
      ]
     }
@@ -63348,49 +63730,53 @@
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 4,
-      "right": 3,
+      "links": 3,
+      "right": 2,
       "wrong": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
      "pairs": 15,
      "matches": 12,
-     "average_precision": 0.9296,
+     "average_precision": 0.9714,
      "candidates": {
       "pairs": 6,
       "matches": 3,
-      "average_precision": 0.6667
+      "average_precision": 0.6944
      },
      "precision": {
-      "plausible": 0.9231,
+      "plausible": 0.9167,
       "possible": 0.9231
      },
-     "log_loss": 0.3121,
+     "log_loss": 0.2802,
      "calibration": [
       [
        "0.0-0.1",
        2,
        0,
-       0.027
+       0.083
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.632
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.823
+       5,
+       4,
+       0.827
       ],
       [
        "0.9-1.0",
        5,
-       4,
-       0.94
+       5,
+       0.955
       ]
      ]
     }
@@ -63432,6 +63818,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 2,
+      "right": 2
      }
     },
     "ranking": {
@@ -63447,43 +63837,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3167,
+     "log_loss": 0.2945,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.03
+       0.083
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
-       2,
-       2,
-       0.327
+       1,
+       1,
+       0.453
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.628
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.814
+       0.807
       ],
       [
        "0.9-1.0",
        4,
        4,
-       0.957
+       0.974
       ]
      ]
     }
@@ -63520,6 +63910,10 @@
      "plausible": {
       "links": 1,
       "right": 1
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
@@ -63535,37 +63929,37 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.3138,
+     "log_loss": 0.2939,
      "calibration": [
       [
        "0.1-0.3",
        8,
        1,
-       0.258
+       0.282
       ],
       [
        "0.3-0.5",
        1,
        1,
-       0.335
+       0.453
       ],
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.814
+       0.807
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.951
+       0.969
       ]
      ]
     }
@@ -63602,6 +63996,10 @@
      "plausible": {
       "links": 2,
       "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
@@ -63617,43 +64015,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.266,
+     "log_loss": 0.2619,
      "calibration": [
       [
        "0.0-0.1",
-       5,
+       4,
        0,
-       0.03
+       0.083
       ],
       [
        "0.1-0.3",
-       8,
+       9,
        1,
-       0.258
+       0.267
       ],
       [
        "0.3-0.5",
        1,
        1,
-       0.337
+       0.453
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        2,
        2,
-       0.81
+       0.79
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.951
+       0.969
       ]
      ]
     }
@@ -63680,16 +64078,17 @@
     "unchanged": 0
    },
    "matching": {
-    "groups": 11,
-    "right": 11,
+    "groups": 12,
+    "right": 12,
     "wrong": 0,
     "unscorable": 0,
     "items": 11,
-    "matched": 7,
+    "matched": 8,
     "links": {
-     "plausible": {
-      "links": 1,
-      "right": 1
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -63699,47 +64098,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
-      "pairs": 19,
-      "matches": 10,
-      "average_precision": 1.0
+      "pairs": 18,
+      "matches": 9,
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4082,
+     "log_loss": 0.5249,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.308
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
-       2,
-       2,
-       0.821
+       3,
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
-       10,
-       10,
-       0.946
+       9,
+       9,
+       0.952
       ]
      ]
     }
@@ -63780,6 +64179,11 @@
      "plausible": {
       "links": 3,
       "right": 3
+     },
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
      }
     },
     "sets": {
@@ -63789,53 +64193,53 @@
     "ranking": {
      "pairs": 33,
      "matches": 23,
-     "average_precision": 1.0,
+     "average_precision": 0.9376,
      "candidates": {
       "pairs": 24,
       "matches": 14,
-      "average_precision": 1.0
+      "average_precision": 0.839
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4941,
+     "log_loss": 0.6121,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.033
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
-       7,
-       3,
-       0.214
+       13,
+       6,
+       0.17
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.309
+       7,
+       4,
+       0.404
       ],
       [
        "0.5-0.7",
        3,
        3,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.821
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.948
+       0.951
       ]
      ]
     }
@@ -63864,6 +64268,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -63871,47 +64282,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -63939,6 +64350,13 @@
     "unscorable": 0,
     "items": 10,
     "matched": 7,
+    "links": {
+     "possible": {
+      "links": 7,
+      "right": 4,
+      "wrong": 3
+     }
+    },
     "sets": {
      "links": 1,
      "right": 1
@@ -63946,47 +64364,47 @@
     "ranking": {
      "pairs": 30,
      "matches": 21,
-     "average_precision": 1.0,
+     "average_precision": 0.9534,
      "candidates": {
       "pairs": 18,
       "matches": 9,
-      "average_precision": 1.0
+      "average_precision": 0.7756
      },
      "precision": {
       "plausible": 1.0,
-      "possible": 1.0
+      "possible": 0.8421
      },
-     "log_loss": 0.4124,
+     "log_loss": 0.5199,
      "calibration": [
       [
        "0.0-0.1",
-       6,
-       0,
-       0.032
+       1,
+       1,
+       0.056
       ],
       [
        "0.1-0.3",
+       10,
        4,
-       1,
-       0.168
+       0.161
       ],
       [
        "0.3-0.5",
-       8,
-       8,
-       0.307
+       7,
+       4,
+       0.404
       ],
       [
        "0.7-0.9",
        3,
        3,
-       0.815
+       0.828
       ],
       [
        "0.9-1.0",
        9,
        9,
-       0.953
+       0.96
       ]
      ]
     }
@@ -64008,16 +64426,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 11,
     "matched": 7,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -64026,42 +64444,42 @@
     },
     "ranking": {
      "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9663,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 11,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7588,
+     "log_loss": 0.6561,
      "calibration": [
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.674
       ],
       [
        "0.7-0.9",
        4,
-       3,
-       0.785
+       4,
+       0.818
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.952
+       5,
+       5,
+       0.974
       ]
      ]
     }
@@ -64099,8 +64517,12 @@
     "matched": 5,
     "links": {
      "plausible": {
-      "links": 3,
-      "right": 3
+      "links": 2,
+      "right": 2
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "sets": {
@@ -64120,37 +64542,43 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.7263,
+     "log_loss": 0.733,
      "calibration": [
       [
        "0.0-0.1",
        1,
        0,
-       0.027
+       0.083
       ],
       [
        "0.1-0.3",
        11,
        11,
-       0.261
+       0.265
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.493
       ],
       [
        "0.5-0.7",
        2,
        2,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       3,
-       3,
-       0.804
+       2,
+       2,
+       0.841
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.953
+       0.96
       ]
      ]
     }
@@ -64177,16 +64605,16 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
     "matched": 6,
     "links": {
      "plausible": {
-      "links": 1,
-      "right": 1
+      "links": 2,
+      "right": 2
      }
     },
     "sets": {
@@ -64194,51 +64622,57 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "pairs": 21,
+     "matches": 20,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 12,
+      "matches": 11,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7429,
+     "log_loss": 0.6269,
      "calibration": [
+      [
+       "0.0-0.1",
+       1,
+       0,
+       0.083
+      ],
       [
        "0.1-0.3",
        9,
        9,
-       0.254
+       0.282
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.665
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.803
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.958
+       0.963
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 3,
@@ -64258,14 +64692,18 @@
     "unchanged": 1
    },
    "matching": {
-    "groups": 10,
+    "groups": 9,
     "right": 9,
-    "wrong": 1,
+    "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 6,
+    "matched": 7,
     "links": {
      "plausible": {
+      "links": 1,
+      "right": 1
+     },
+     "possible": {
       "links": 1,
       "right": 1
      }
@@ -64275,51 +64713,51 @@
      "right": 1
     },
     "ranking": {
-     "pairs": 20,
-     "matches": 19,
-     "average_precision": 0.9715,
+     "pairs": 22,
+     "matches": 22,
+     "average_precision": 1.0,
      "candidates": {
-      "pairs": 10,
-      "matches": 10,
+      "pairs": 13,
+      "matches": 13,
       "average_precision": 1.0
      },
      "precision": {
-      "plausible": 0.9091,
-      "possible": 0.9091
+      "plausible": 1.0,
+      "possible": 1.0
      },
-     "log_loss": 0.7499,
+     "log_loss": 0.7111,
      "calibration": [
       [
        "0.1-0.3",
-       9,
-       9,
-       0.254
+       11,
+       11,
+       0.284
       ],
       [
        "0.5-0.7",
-       1,
-       1,
-       0.622
+       2,
+       2,
+       0.62
       ],
       [
        "0.7-0.9",
-       4,
        3,
-       0.776
+       3,
+       0.808
       ],
       [
        "0.9-1.0",
        6,
        6,
-       0.957
+       0.97
       ]
      ]
     }
    },
    "gaps_found": "2/2",
    "gaps": {
-    "both give it": 1,
-    "right": 2
+    "right": 2,
+    "unbound": 1
    },
    "findings": {
     "complementary": 3,
@@ -64364,25 +64802,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1301,
+     "log_loss": 0.1178,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       6,
-       6,
-       0.83
+       7,
+       7,
+       0.841
       ],
       [
        "0.9-1.0",
-       8,
-       8,
-       0.956
+       7,
+       7,
+       0.974
       ]
      ]
     }
@@ -64410,19 +64848,23 @@
     "wrong": 0,
     "unscorable": 0,
     "items": 10,
-    "matched": 9,
+    "matched": 10,
     "links": {
      "plausible": {
       "links": 3,
       "right": 3
+     },
+     "possible": {
+      "links": 1,
+      "right": 1
      }
     },
     "ranking": {
-     "pairs": 17,
+     "pairs": 18,
      "matches": 17,
      "average_precision": 1.0,
      "candidates": {
-      "pairs": 5,
+      "pairs": 6,
       "matches": 5,
       "average_precision": 1.0
      },
@@ -64430,42 +64872,50 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.2966,
+     "log_loss": 0.2971,
      "calibration": [
       [
+       "0.0-0.1",
+       1,
+       0,
+       0.022
+      ],
+      [
        "0.1-0.3",
-       2,
-       2,
-       0.289
+       1,
+       1,
+       0.187
+      ],
+      [
+       "0.3-0.5",
+       1,
+       1,
+       0.424
       ],
       [
        "0.5-0.7",
-       2,
-       2,
-       0.622
+       3,
+       3,
+       0.67
       ],
       [
        "0.7-0.9",
        7,
        7,
-       0.828
+       0.821
       ],
       [
        "0.9-1.0",
-       6,
-       6,
-       0.953
+       5,
+       5,
+       0.961
       ]
      ]
     }
    },
    "gaps_found": "0/0",
    "gaps": {
-    "unbound": 1
-   },
-   "if_one_item": {
-    "unbound": 1,
-    "found_beside": 0
+    "unbound": 2
    },
    "findings": {
     "complementary": 23,
@@ -64510,25 +64960,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1476,
+     "log_loss": 0.13,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
-       7,
-       7,
-       0.818
+       8,
+       8,
+       0.837
       ],
       [
        "0.9-1.0",
-       7,
-       7,
-       0.953
+       6,
+       6,
+       0.975
       ]
      ]
     }
@@ -64576,25 +65026,25 @@
       "plausible": 1.0,
       "possible": 1.0
      },
-     "log_loss": 0.1466,
+     "log_loss": 0.1283,
      "calibration": [
       [
        "0.5-0.7",
        1,
        1,
-       0.622
+       0.691
       ],
       [
        "0.7-0.9",
        7,
        7,
-       0.816
+       0.83
       ],
       [
        "0.9-1.0",
        7,
        7,
-       0.959
+       0.966
       ]
      ]
     }

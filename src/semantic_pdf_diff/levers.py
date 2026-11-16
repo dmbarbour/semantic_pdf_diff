@@ -1530,8 +1530,9 @@ class LinkFit(Lever):
     lever_name, stage, off = "link_fit", "comparison", {"link_fit": False}
     # proposals: each point of a link's evidence weighed by its fitted multiplier (links.FITTED; evidence combined
     # numerically, milestone 9): fitted on development's real links judged by the model panel and its controlled
-    # pairs, shrunk toward the hand-set weights. Off till its held-out rule is met
-    link_fit: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # pairs, shrunk toward the hand-set weights. The default since 2026-11-16, after passing its held-out rule (the
+    # owner: "We'll turn it on by default.")
+    link_fit: Annotated[bool, _selecting(roles=COMPARE)] = True
 
 class ReadContext(Lever):
     lever_name, stage, off = "read_context", "comparison", {"read_context": False}
