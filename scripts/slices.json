@@ -380,6 +380,34 @@
       "public": true,
       "family": "reports",
       "sha256": "25e098593344c11ac5c821b1799d2900ad63621e5cdb4791859855bde0314db6"
+    },
+    {
+      "name": "scu-cd-p79-84",
+      "source": "solar-decathlon-2013-more/teams/scu/scu_cd.pdf",
+      "source_sha256": "f8fd6509e9fb3623a7649bc7f93f5ee6f4afd9121bfb6f799e10307a90dfb80c",
+      "pages": [
+        79,
+        84
+      ],
+      "use": "Mechanical sheets M-101 to M-401: plans, radiant system, air-to-water heat pump, domestic hot water.",
+      "set": "heldout",
+      "public": true,
+      "family": "drawings",
+      "sha256": "46e5328ecbad7ecfc3cdb3942943b06bc8ace4b7cfa88722aa1a8299445000ad"
+    },
+    {
+      "name": "usc-cd-p93-96",
+      "source": "solar-decathlon-2013-more/teams/usc/usc_cd.pdf",
+      "source_sha256": "79059178c618d90c47c51e5f76c27064dfa669ac048f68a1f9a245bf546e0649",
+      "pages": [
+        93,
+        96
+      ],
+      "use": "Mechanical sheets M-101, M-102, M-601, M-602: plans, schedules.",
+      "set": "heldout",
+      "public": true,
+      "family": "drawings",
+      "sha256": "d5a5ed05d949f594e45d74d39aa21bf1115e045dcefc9593214ea1eb20df4d25"
     }
   ],
   "runs": [
@@ -532,6 +560,14 @@
       "slices": [
         "nrel-5mw-p16-22",
         "iea-22mw-p12-21"
+      ],
+      "set": "heldout"
+    },
+    {
+      "name": "mech-scu-usc",
+      "slices": [
+        "scu-cd-p79-84",
+        "usc-cd-p93-96"
       ],
       "set": "heldout"
     }

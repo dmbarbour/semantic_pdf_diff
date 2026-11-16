@@ -856,7 +856,7 @@
     },
     "solar-decathlon-2013-more": {
       "default": false,
-      "use": "Four more U.S. DOE Solar Decathlon 2013 teams' construction drawings, competing proposals to the same rules as solar-decathlon-2013's: nu = Norwich University, uncc = UNC Charlotte (development), unlv = UNLV, su = Stanford (held out). Their mechanical, plumbing and electrical sheets pair with each other's and the four teams' for the link panel (evidence combined numerically, milestone 8; the owner, 2026-11-13: \"Feel free to bring in a few more sets for training, and search for a few more holdouts as needed.\").",
+      "use": "Four more U.S. DOE Solar Decathlon 2013 teams' construction drawings, competing proposals to the same rules as solar-decathlon-2013's: nu = Norwich University, uncc = UNC Charlotte (development), unlv = UNLV, su = Stanford, scu = Santa Clara, usc = Southern California (held out). Their mechanical, plumbing and electrical sheets pair with each other's and the four teams' for the link panel (evidence combined numerically, milestone 8; the owner, 2026-11-13: \"Feel free to bring in a few more sets for training, and search for a few more holdouts as needed.\").",
       "terms": "U.S. Department of Energy public website content. Fetched from the Internet Archive first because solardecathlon.gov currently fails TLS certificate verification; the original URL is kept as a fallback. Hashes make either source safe.",
       "files": [
         {
@@ -894,6 +894,24 @@
           ],
           "sha256": "c42162ac50a0865dfad0634c83c1168103670826e5af2879eb58c0d3c808850b",
           "bytes": 15434960
+        },
+        {
+          "path": "teams/scu/scu_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241208173726id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/scu_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/scu_cd.pdf"
+          ],
+          "sha256": "f8fd6509e9fb3623a7649bc7f93f5ee6f4afd9121bfb6f799e10307a90dfb80c",
+          "bytes": 22328020
+        },
+        {
+          "path": "teams/usc/usc_cd.pdf",
+          "urls": [
+            "https://web.archive.org/web/20241214211806id_/https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/usc_cd.pdf",
+            "https://www.solardecathlon.gov/sites/default/files/past/2013/pdfs/usc_cd.pdf"
+          ],
+          "sha256": "79059178c618d90c47c51e5f76c27064dfa669ac048f68a1f9a245bf546e0649",
+          "bytes": 11398060
         }
       ]
     }

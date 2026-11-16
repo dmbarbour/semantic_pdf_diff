@@ -185,6 +185,8 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 
 ### 9. Weights fitted
 
+- **Held-out rule for the fit and for 0.67.3** (written 2026-11-16, before its pairs are recorded or the fit is run): two pairs held out, neither recorded: NREL 5 MW's blades against IEA 22 MW's rotor (`turbines-blades`) and two fresh Solar Decathlon 2013 teams' mechanical sheets, Santa Clara against Southern California (`mech-scu-usc`); recorded with the code to be checked; 36 links a pair (seed 7); the same three models with today's definitions; labels by the consensus, two designs' numbered parts never the same (the owner's ruling). **The fit** (weights fitted on the real links of development's panel batches, shrunk toward the hand-set ones, the controlled corpus a guard): against the hand-set weights on the same reports, **targets:** average precision of "the same" not lower and log loss not higher, both pairs together; **guards:** the controlled corpus's firm groups wrong not up by more than 2 and its all-pairs average precision not down by more than 0.005 (development, offline); no link at 0.8 or above under the fit that the consensus calls different and the hand-set weights didn't also put there. **0.67.3** (category nouns) against 0.67.2 on the drawings pair: average precision not lower, log loss not higher. Reported by pair too.
+
 - Where the training sets allow: non-match rates from real pairs (the drawings pair showed synthetic ones mislead), match rates from the keys, shrunk toward the hand-set weights (53 matches are too few alone). Held out by template.
 
 ### 10. Function and integration, as weighted evidence (tentative matches' milestone 10, redefined 2026-11-12)
