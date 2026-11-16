@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.69.0 (2026-11-16)
+
+- **`link_fit` on by default** (the owner: "We'll turn it on by default."): each piece of a link's evidence between proposals weighed as fitted on real document pairs a model panel judged, kept near the hand-set weights; on held-out pairs it ranked true counterparts better (average precision 0.44 to 0.68). `link_fit: false` keeps the hand-set weights; round 0's settings pin them. The controlled corpus and the slices fixture re-recorded.
+
 ## 0.68.0 (2026-11-16)
 
 - **`link_fit`** (off): each piece of a link's evidence between proposals weighed by a fitted multiplier on its hand-set weight, fitted on real document pairs a model panel judged (turbine reports, Solar Decathlon drawings) and the controlled corpus, kept near the hand-set weights. On held-out pairs it ranked true counterparts better (average precision 0.44 to 0.68) and stated its probabilities better (log loss 0.52 to 0.40). The default is the owner's call.
