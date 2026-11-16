@@ -693,6 +693,25 @@ class Media(unittest.TestCase):
         self.assertEqual(links.contributions(c, "proposals")[links.FUNCTION],
                          [("a side gives a property in two media", -2.0)])  # the media share water: no other point
 
+class Fitted(unittest.TestCase):
+    """Milestone 9: each point weighed by its fitted multiplier (links.FITTED; the link_fit lever's, proposals)."""
+    def test_the_fitted_multipliers_weigh_proposals_links_only_where_set(self):
+        claims = [claim("A-1", "ca", "main shaft", "length", "10", "m"),
+                  claim("A-2", "ca", "main shaft", "mass", "50", "t"),
+                  claim("B-1", "cb", "low-speed shaft", "length", "12", "m"),
+                  claim("B-2", "cb", "low-speed shaft", "mass", "60", "t")]
+        found = {}
+        for fit in (False, True):  # the rubric: no joins by evidence, the pair a candidate
+            data = report(claims, [], ("a", "b"), mode="proposals", settings={"link_fit": fit, "link_levels": "rubric"})
+            pair, = links.candidates(data, indexes.built(data))
+            found[fit] = links.contributions(pair, "proposals")
+            self.assertEqual(links.contributions(pair, "revisions"),
+                             links.contributions({**pair, "features": {**pair["features"], "fit": False}}, "revisions"))
+        self.assertEqual(links.point("3 in common, no rival as many"), "N in common")
+        self.assertEqual(links.point("the judge paired 2, as siblings"), "the judge paired N")
+        self.assertEqual(found[True], links.fitted(found[False]))
+        self.assertNotEqual(found[True], found[False])
+
 class Kinds(unittest.TestCase):
     """Milestone 15: values in units the product's table doesn't know weighed by kind and size (unit_kinds; off). The
     gotchas review: "150 psi and 1,034 kPa never meet"."""

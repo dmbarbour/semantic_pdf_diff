@@ -468,7 +468,30 @@ def contributions(c, mode):
                            for name, w in points]
         elif siblings and family in ("judge", "values"):
             out[family] = [(name + ", as siblings", round(w * 0.3, 3)) if w > 0 else (name, w) for name, w in points]
-    return dict(out)
+    out = dict(out)
+    return fitted(out) if mode == "proposals" and f.get("fit") else out
+
+# Each point's weight fitted (evidence combined numerically, milestone 9; the link_fit lever's, proposals): a multiplier
+# on its hand-set weight, fitted 2026-11-16 on development's real links judged by the model panel (354, 52 the same:
+# the turbines', the drawings', the mechanical sheets') and its controlled pairs' first pass (12,163, each 0.03),
+# shrunk toward the hand-set weights; out of the batch fitted on, the real links' "the same" ranked 0.556 to 0.702 and
+# their log loss 0.432 to 0.387. Points not named keep their weight. Fitted on candidates/10's points
+FITTED = {("judge", "the judge paired N"): 0.1, ("key", "a key"): 0.66, ("model", "neither picked"): 8.9,
+          ("model", "picked over a decoy"): 0.18, ("names", "a rare word in common"): 0.11,
+          ("names", "spelled alike"): 0.35, ("names", "words in common"): 3.06,
+          ("properties", "a rival shares more"): 0.5, ("values", "magnitudes close"): 2.19,
+          ("values", "magnitudes far apart"): 0.41, ("values", "values of other kinds of unit"): 1.21}
+
+def point(label):
+    """A point's label as FITTED names it: without what's said after a comma or a bracket, its counts as N ("3 in
+    common, no rival as many": "N in common"; "the judge paired 2": "the judge paired N")."""
+    label = re.split(r",| \(", label)[0]
+    return re.sub(r"^\d+ in common", "N in common", re.sub(r"paired \d+", "paired N", label))
+
+def fitted(out):
+    """A pair's points (contributions) with FITTED's multipliers."""
+    return {family: [(label, round(w * FITTED.get((family, point(label)), 1.0), 3)) for label, w in points]
+            for family, points in out.items()}
 
 def combined(c, mode):
     """(a candidate pair's probability of being one, {family: its log-odds}): each family's points for decaying
@@ -718,6 +741,7 @@ def candidates(data, index):
             "series": bool(mode == "proposals" and unit_of.get(i) and unit_of.get(j)
                            and not unit_of[i] & unit_of[j]),
             "several": max(several(s), several(t)),
+            "fit": bool((data.get("settings") or {}).get("link_fit")),  # the fitted weights (milestone 9)
             "placeholders": bool(bare and all(generic(n) or placeholder(n) for x in (s, t) for n in x["names"])),
             # the function family's medium (milestone 10), weighing nothing till measured: each side's media, and
             # whether a side gives one property in two (Spruce Lake's "Filters": air's 486 cfm/ft², water's 2.8 gpm/ft²)

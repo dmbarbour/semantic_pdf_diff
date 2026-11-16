@@ -1526,6 +1526,13 @@ class LinkRead(Lever):
     def reads_links(self, mode):
         return self.link_read and mode == "proposals"
 
+class LinkFit(Lever):
+    lever_name, stage, off = "link_fit", "comparison", {"link_fit": False}
+    # proposals: each point of a link's evidence weighed by its fitted multiplier (links.FITTED; evidence combined
+    # numerically, milestone 9): fitted on development's real links judged by the model panel and its controlled
+    # pairs, shrunk toward the hand-set weights. Off till its held-out rule is met
+    link_fit: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class ReadContext(Lever):
     lever_name, stage, off = "read_context", "comparison", {"read_context": False}
     # comparisons: the read of a link (link_read) shown each subject's context: the captions of the tables its claims
@@ -1661,7 +1668,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks,
-                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead, ReadContext,
+                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead, ReadContext, LinkFit,
                  LinkMeaning,
                  LinkRerank,
                  LookGaps,

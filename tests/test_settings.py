@@ -114,6 +114,7 @@ NOT_EXERCISED = {
     'link_read': "needs links between subjects alone in each document; run with the model's reads in "
                  "tests/test_links.py",
     'read_context': "needs links whose subjects' claims are read from captioned tables; run in tests/test_links.py",
+    'link_fit': "needs candidate pairs between proposals; run in tests/test_links.py",
     'link_rerank': "needs a reranker (rerank_model) and subjects alone in each document; run with ranks in "
                    "tests/test_links.py",
     'look_gaps': "needs subjects matched across the documents, each with two claims or more; run with the model's "
