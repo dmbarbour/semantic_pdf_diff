@@ -586,6 +586,32 @@ class Series(unittest.TestCase):
         self.assertIn("one of a bank, possibly the counterpart as a set of",
                       subjects_html(data["index"]["subjects"], ["a", "b"]))
 
+    def test_a_unit_of_its_own_stands_apart_from_its_bank(self):
+        # a jockey pump among raw water pumps (named its own way), and one only its claims mark (DIFFERENTIATES)
+        claims = [claim(f"a-{n}", "ca", f"Raw water pump P-101{x}", "capacity", f"{5000 + n}", "gpm")
+                  for n, x in enumerate("ABC")]
+        claims += [claim("a-9", "ca", "Jockey pump P-101D", "capacity", "300", "gpm")]
+        claims += [claim(f"b-{n}", "cb", f"Intake pump IP-{n + 1}", "capacity", f"{5100 + n}", "gpm") for n in range(3)]
+        claims += [claim("b-8", "cb", "Intake pump IP-4", "capacity", "250", "gpm"),
+                   claim("b-9", "cb", "Intake pump IP-4", "service", "pressure maintenance at low flows", "")]
+        data = report(claims, [], ("a", "b"), mode="proposals",
+                      commentary={"entries": [{"kind": "match", "source": "a", "subject": "Jockey pump P-101D",
+                                               "other_source": "b", "other": "Intake pump IP-4",
+                                               "relation": "corresponding", "taken": True}]},
+                      settings={"link_levels": "rubric"})
+        index = indexes.built(data)
+        evidence = {e["id"]: e for e in data["evidence"]}
+        named = lambda members: sorted(index["subjects"][i]["name"] for i in members)  # noqa: E731
+        self.assertEqual([(src, named(m)) for src, m in links.banks(index, evidence)],
+                         [("a", ["Raw water pump P-101A", "Raw water pump P-101B", "Raw water pump P-101C"]),
+                          ("b", ["Intake pump IP-1", "Intake pump IP-2", "Intake pump IP-3"])])
+        subjects = index["subjects"]
+        pair = {"Jockey pump P-101D", "Intake pump IP-4"}
+        jockeys = next(c for c in links.candidates(data, index)
+                       if {subjects[c["i"]]["name"], subjects[c["j"]]["name"]} == pair)
+        self.assertTrue(jockeys["features"]["series"] and jockeys["features"]["differentiated"])
+        self.assertIn(("the model's match (corresponding)", 2.0), links.contributions(jockeys, "proposals")["model"])
+
     def test_a_numbering_scheme_of_other_roles_is_no_bank(self):
         claims = [claim(f"a-{n}", "ca", f"{role} pump P-101{x}", "capacity", f"{3000 + n}", "gpm")
                   for n, (role, x) in enumerate((("Backwash", "A"), ("Sludge", "B"), ("Washwater recycle", "C")))]

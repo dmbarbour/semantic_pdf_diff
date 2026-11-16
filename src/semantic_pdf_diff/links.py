@@ -79,8 +79,9 @@ RUBRIC = "rubric/1"
 # since units of two series (align.series) were marked; candidates/6 since a document's parts' words ("sheet",
 # "detail") left proposals' names' words and spelling; candidates/7 since several tagged items one side's claims give
 # were counted; candidates/8 since each side's media (2026-11-12); candidates/9 since documents' numbered parts
-# (align.placeholder, 2026-11-13); candidates/10 since category nouns ("equipment") left them too
-CANDIDATES = "candidates/10"
+# (align.placeholder, 2026-11-13); candidates/10 since category nouns ("equipment") left them too; candidates/11 since a
+# series' unit standing apart from its bank was marked (2026-11-16)
+CANDIDATES = "candidates/11"
 # Evidence families named by the owner (2026-11-12: "Perhaps "function" and "integration"", in code as constants): what
 # a subject does and handles; where it sits in its system (milestone 10)
 FUNCTION, INTEGRATION = "function", "integration"
@@ -453,7 +454,8 @@ def contributions(c, mode):
     # right: milestone 14, the read picking the tag it was shown)
     siblings = n and rival >= n
     for family, points in out.items():
-        if (f.get("series") or f.get("placeholders")) and family in ("model", "judge", "names"):  # two series' units
+        if (f.get("series") and not f.get("differentiated") or f.get("placeholders")) and family in (
+                "model", "judge", "names"):  # two banks' units
             # or two documents' numbered parts: the model's match, the judge's pairings and the names' spelling follow
             # their numbering, which tells nothing of a bank's units (Harrow Creek's P-101A and Pine Ridge's IP-1,
             # paired by order: the owner, 2026-11-12, align.series) nor of "component 6" in two drawings
@@ -664,6 +666,7 @@ def candidates(data, index):
     near, counterpart = _places(subjects, evidence, sources, keyed)
     # units of a series in their source (a bank's pumps), by their tags: two of two series are told apart by numbering
     tagged = series({(source, n) for source, alone_in in alone.items() for _, x in alone_in for n in x["names"]})
+    banked = {i for _, members in banks(index, evidence) for i in members}  # a series' unit outside its bank: its own
 
     known = {}
 
@@ -740,6 +743,8 @@ def candidates(data, index):
             "place": _place(i, j, sources, near, counterpart),
             "series": bool(mode == "proposals" and unit_of.get(i) and unit_of.get(j)
                            and not unit_of[i] & unit_of[j]),
+            # a series' unit standing apart from its bank (a jockey pump): told apart by more than its numbering
+            "differentiated": bool(unit_of.get(i) and i not in banked or unit_of.get(j) and j not in banked),
             "several": max(several(s), several(t)),
             "fit": bool((data.get("settings") or {}).get("link_fit")),  # the fitted weights (milestone 9)
             "placeholders": bool(bare and all(generic(n) or placeholder(n) for x in (s, t) for n in x["names"])),
@@ -832,25 +837,40 @@ FAMILIES = {"key": "a key both give", "names": "names", "model": "the model's re
             "values": "values", "judge": "the judge", "alignment": "alignment",
             FUNCTION: "function"}  # a combined link's families, as said
 
-def banks(index):
+# Words marking a bank's unit as one of its own (Fable's domain notes, the system use review, 2026-11-12): a jockey or
+# pony pump, a unit for low or minimum flows, for a season or the night. Duty, standby, lead and lag aren't among
+# them: a bank's units take turns at those (the set's arrangement, not a unit's identity)
+DIFFERENTIATES = re.compile(r"\b(?:jockey|pony|low[- ]flows?|minimum flows?|pressure maintenance|night|winter|"
+                            r"summer)\b", re.I)
+
+def banks(index, evidence=None):
     """Each source's banks: [(source, [subject indices])], the subjects alone in a source that are units of one series
     (align.series: P-101A to C) and named alike but for their tags ("Raw water pump P-201A"; a member named by its tag
-    alone fits any), two or more. A series whose members are named otherwise (Birch Hollow's backwash, sludge and
-    washwater recycle pumps P-101A to C) is no bank: a numbering scheme, not one service."""
+    alone takes the most named), two or more. Units named otherwise stand apart from the bank (a "Jockey pump P-101D"
+    among raw water pumps), and so do units whose claims mark them (DIFFERENTIATES, with evidence: {claim id:
+    claim}); a series of units each named its own way (Birch Hollow's backwash, sludge and washwater recycle pumps
+    P-101A to C) is no bank: a numbering scheme, not one service."""
     alone = _alone(index)
     tagged = series({(source, n) for source, xs in alone.items() for _, s in xs for n in s["names"]})
+
+    def marked(s):
+        return any(DIFFERENTIATES.search(" ".join(str(e.get(k) or "") for k in ("entity", "attribute", "value",
+                                                                                 "conditions")))
+                   for ids in s["claims"].values() for e in (evidence.get(c) for c in ids) if e) if evidence else False
     out = []
     for source, xs in sorted(alone.items()):
         by_stem = defaultdict(list)
         for i, s in xs:
             tags = sorted({tag for (src, n), tag in tagged.items() if src == source and n in s["names"]})
-            if tags:
+            if tags and not marked(s):
                 named = frozenset(w for n in s["names"] for w in words(n) if w not in identifiers(words(n)))
                 by_stem[tags[0][:-1]].append((i, named))
         for members in by_stem.values():
-            kinds = {named for _, named in members if named}
-            if len(members) >= 2 and len(kinds) <= 1:
-                out.append((source, sorted(i for i, _ in members)))
+            kinds = Counter(named for _, named in members if named)
+            most = min(kinds, key=lambda k: (-kinds[k], sorted(k))) if kinds else frozenset()
+            bank = sorted(i for i, named in members if named in (most, frozenset()))
+            if len(bank) >= 2:
+                out.append((source, bank))
     return out
 
 def _range(values):
@@ -877,7 +897,7 @@ def sets(data, index):
     sources = index.get("sources", [])
     if data.get("mode") != "proposals" or len(sources) != 2:
         return []
-    found = banks(index)
+    found = banks(index, {e["id"]: e for e in data.get("evidence", [])})
     if not any(source == sources[0] for source, _ in found) or not any(source == sources[1] for source, _ in found):
         return []
     subjects = index["subjects"]
@@ -889,6 +909,7 @@ def sets(data, index):
     out = []
     for c in candidates(data, {"sources": sources, "subjects": pseudo}):
         c["features"]["several"] = 0  # a bank is several units by design
+        c["features"]["differentiated"] = False  # nor does it stand apart from itself
         p, families = combined(c, "proposals")
         if p < SHOWN["possible"]:
             continue
