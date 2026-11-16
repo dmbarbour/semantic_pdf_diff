@@ -288,6 +288,26 @@ python scripts/paired.py read/lone --base read/base --target "claims right" --al
 - **The verdict** (`bench/paired.judge`): better when the target improves on the base and on every null arm at p < 0.1 and no guard is worse; worse when the target or a guard is worse on the base and on every null; otherwise no different.
 - **What it can't see:** a change confined to one or two documents never reaches p < 0.1 (two documents can't go below 0.5), so a lever reaching few documents is judged by inspecting them.
 
+## Judging matching on real pairs
+
+The controlled corpus scores matching exactly but only on its templates; real pairs are judged by a model panel ([decision 0043](decisions/0043-matching-measured-on-real-pairs-by-a-model-panel.md)). The pairs are public slices paired as runs in `scripts/slices.json` (reference turbines' reports, Solar Decathlon drawings; `set` dev or heldout).
+
+```bash
+python scripts/record_runs.py --fixture tests/fixtures/slices.sqlite --set dev --run turbines-nacelles \
+    --out benchmarks/runs/panel-pairs                        # a pair's comparison (held-out runs: --set heldout)
+semantic-pdf-diff review sample BATCH --store NAME=benchmarks/runs/panel-pairs/turbines-nacelles \
+    --claims 0 --abouts 0 --pairs 0 --links 36 --seed 6      # links across the probability bands, blind
+semantic-pdf-diff review judge BATCH --model google/gemini-3.1-pro --model Qwen/Qwen3.5-397B-A17B \
+    --model XiaomiMiMo/MiMo-V2.6-Pro --max-cost 2.5          # the panel (about $2 for 72 links)
+semantic-pdf-diff review links BATCH                         # the consensus against the probabilities
+```
+
+- **What a link shows:** each side's names, up to six claims, sections and its first claim's crop and page, and whether the sources are two designs or two revisions; never the probability nor how it was reached.
+- **Verdicts:** the same (counterparts), comparable (units of one bank, alternatives, a part and its whole), different; fields for kind, function and integration. A document's numbering makes nothing counterparts between designs ([decision 0042](decisions/0042-counterparts-only-where-differentiated.md)).
+- **Measured offline:** a change's probabilities for each sampled link computed on the same recorded reports with the old code and the new (a git worktree on the import path), against the consensus: average precision of "the same" and log loss, by pair and together.
+- **Held out:** the rule committed before the pairs are recorded; a fresh sample leaving out earlier batches' links (`review sample --exclude BATCH`) or fresh pairs; once used, a batch is development's.
+- **Agreement:** the panel agrees less on drawings (α 0.43 to 0.67) than on reports (0.56 to 0.66); the owner's rulings correct its labels where it errs on a principle.
+
 ## Synthetic samples
 
 Deliberately messy synthetic spreadsheets (several tables on one sheet, multi-row headers, value/uncertainty pairs, a formula without a cached value, a hidden superseded sheet, a long list that must not be sampled), each with an answer key describing its true layout:
