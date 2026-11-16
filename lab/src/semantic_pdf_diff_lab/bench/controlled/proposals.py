@@ -1,4 +1,4 @@
-"""Proposal pairs (docs/plans/tentative-matches-2026-11-07.md, milestone 5): a corpus document and another design of
+"""Proposal pairs (tentative matches, a retired plan, milestone 5): a corpus document and another design of
 the same kind of thing, its items named its own way, so a comparison in proposals mode is scored by what each item
 is, not what it's called.
 

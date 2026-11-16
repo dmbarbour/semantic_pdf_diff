@@ -3,7 +3,7 @@
 - **Status:** Reviewed (2026-11-11); for the owner, ahead of a plan.
 - **Asked for:** the owner, 2026-11-11, on Claude's questions about milestone 10 ("place lowering a link"): "I'd like you to clarify why you'd consider "place lowering a link" to overrule "plausible link is good" as if the latter was a ruling that overrides the general direction of composing evidence? IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point. If this is a misunderstanding or accidental redirection on your part, please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
 - **Done by:** Claude's account first, then Fable (claude-fable-5-1), read-only, checking it against the code and the record; four of Fable's claims checked by Claude (below).
-- **Concerns:** [tentative matches](../plans/tentative-matches-2026-11-07.md) (paused at milestone 10), [the same-thing review](same-thing-review-2026-11-09.md), [the gotchas review](gotchas-review-2026-11-09.md).
+- **Concerns:** tentative matches (a retired plan: [plans index](../plans/README.md#retired)) (paused at milestone 10), [the same-thing review](same-thing-review-2026-11-09.md), [the gotchas review](gotchas-review-2026-11-09.md).
 
 ## The answer to the owner's question
 

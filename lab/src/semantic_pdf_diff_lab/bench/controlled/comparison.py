@@ -38,7 +38,7 @@ report's index (as the run wrote it) is read for its gaps of that kind: right (i
 gap, on the side lacking it), both give it (a fact both revisions give: the reader's miss, or a property named two
 ways), another fact, or unbound; with what each look found, where the look_gaps lever ran.
 
-**Matching** (docs/plans/tentative-matches-2026-11-07.md, milestone 1): the report's index's subjects matched across
+**Matching** (tentative matches, a retired plan, milestone 1): the report's index's subjects matched across
 the revisions (as the run wrote them), each scored by the keys' items its claims are bound to: right where each
 side's most bound item is the same, wrong where it isn't, unscorable where a side's claims are bound to none; and of
 the items both revisions' claims give (OTHER_CLAIMS bound claims or more on each side), how many a right match holds.
@@ -195,7 +195,7 @@ def _items(facts):
                         else named.get(fold(facts[1][fid]["entity"]), fold(facts[1][fid]["entity"])))
 
 def score_proposals(a, b, report):
-    """A proposals comparison scored by role (proposals.py; docs/plans/tentative-matches-2026-11-07.md, milestone 5):
+    """A proposals comparison scored by role (proposals.py; tentative matches, a retired plan, milestone 5):
     the index's matches and the gaps another source fills, a fact's role its id (the two designs' facts of one role
     share it, as a renamed revision's are mapped to the earlier's), the findings' relations counted."""
     side, keys = sides(report), (a, b)

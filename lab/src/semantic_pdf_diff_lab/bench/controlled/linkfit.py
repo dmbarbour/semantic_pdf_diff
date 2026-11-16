@@ -1,4 +1,4 @@
-"""Levels from numbers (docs/plans/tentative-matches-2026-11-07.md, milestone 6; the owner, 2026-11-07: "Perhaps we
+"""Levels from numbers (tentative matches, a retired plan, milestone 6; the owner, 2026-11-07: "Perhaps we
 start with a three-levels rubric then figure out how to analyze or evidence a fuzzy, weighted, or probabilistic
 numeric match (Bayesian, BM25, etc.)").
 

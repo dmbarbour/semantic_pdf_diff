@@ -142,7 +142,7 @@ def read(data, index, client, mode, label, progress=None):
                              relation=answer.relation, why=answer.why.strip(), taken=again))
     return {"entries": entries, **counts}
 
-# A link read by the model against a decoy (the link_read lever; docs/plans/tentative-matches-2026-11-07.md, milestone
+# A link read by the model against a decoy (the link_read lever; tentative matches, a retired plan, milestone
 # 4; Fable's review: "not 'do they match?', which invites relations and leans to confirming, but a question with a
 # wrong answer"): a subject shown its linked subject and a decoy, the next likeliest of the other source, in an order
 # its names decide; the model picks its counterpart, or neither.

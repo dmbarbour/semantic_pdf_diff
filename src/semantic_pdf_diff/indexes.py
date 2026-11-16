@@ -16,7 +16,7 @@ document that would be useful, and it seems deeply related to the problem of com
   matches of what's left. A subject's properties are one where they're named alike or the findings pair their claims
   ("seating capacity" and "rider capacity"). A property one source gives a matched subject and another doesn't is
   left blank there, and is a gap (below). Subjects possibly one, by weaker evidence, are linked and kept apart
-  (links.py: plausible or possible; docs/plans/tentative-matches-2026-11-07.md): never merged, never a gap.
+  (links.py: plausible or possible; tentative matches, a retired plan): never merged, never a gap.
 - **Figures and tables:** situating's figures (PDFs, when it ran: labels, captions, titles, "abouts", the prose
   citing them, the claims inside), and the tables read by rules (their records' titles and columns).
 - **Other names** (milestone 3): the names one thing goes by, as the run found them (a glossary term reaching its
@@ -818,7 +818,7 @@ def given_otherwise(data, subjects, gaps):
 
 def if_one_item(subjects):
     """What a subject's plausible links' other subjects give that it doesn't, were they one item (the link_gaps
-    setting's; docs/plans/tentative-matches-2026-11-07.md, milestone 7: links in the index explored): of a subject
+    setting's; tentative matches, a retired plan, milestone 7: links in the index explored): of a subject
     alone with OTHER_CLAIMS of its own or more, each property its linked subject gives under no name it gives; where
     expected, its first place; why, the link and the other's value; its claims, the other's. The weakest kind, never
     looked for (the owner, 2026-11-07, of plausible matches: "links and topics for now")."""

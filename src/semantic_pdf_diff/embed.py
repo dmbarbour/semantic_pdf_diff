@@ -136,7 +136,7 @@ def embedded(evidence, dispatch, s, label, progress=None):
             "requests": len(batches), "failed": failed, **({"not_sent": len(unsent)} if unsent else {})}
 
 def names(texts, dispatch, s, label, progress=None):
-    """Names embedded, each once, for links by meaning (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone
+    """Names embedded, each once, for links by meaning (links.py; tentative matches, a retired plan, milestone
     3): {"model", "dimensions", "vectors": {name: kept vector}, "requests", "failed"}; a name whose request failed has
     none (the next run asks again)."""
     from .progress import NoProgress

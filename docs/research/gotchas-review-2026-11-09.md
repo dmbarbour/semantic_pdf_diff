@@ -3,7 +3,7 @@
 - **Status:** Reviewed (2026-11-09); for the owner.
 - **Asked for:** the owner, 2026-11-09, after learning that properties were joined across sources only by exact name: "So it seems weighted/fuzzy joining of properties hasn't been done yet, as part of fitting things together. I agree that's a natural part of what we're doing already, to the extent I didn't understand we're treating it separately. We'll also add context of use as something to compare heuristically. Please add a review to find other such elements that might be gotchas for us down the road."
 - **Done by:** Fable (claude-fable-5-1), read-only, three of its claims checked by running the functions locally (no requests); summarized here, its ranking kept.
-- **Builds on:** [the same-thing review](same-thing-review-2026-11-09.md), [tentative matches](../plans/tentative-matches-2026-11-07.md) (milestones 8 to 13).
+- **Builds on:** [the same-thing review](same-thing-review-2026-11-09.md), tentative matches (a retired plan: [plans index](../plans/README.md#retired)) (milestones 8 to 13).
 
 ## The gotchas, ranked
 

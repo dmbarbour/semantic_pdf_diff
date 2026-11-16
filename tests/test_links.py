@@ -1,4 +1,4 @@
-"""Links: subjects of two sources possibly one, kept apart (links.py; docs/plans/tentative-matches-2026-11-07.md,
+"""Links: subjects of two sources possibly one, kept apart (links.py; tentative matches, a retired plan,
 milestone 2). The owner, 2026-11-07: "Three levels is a start"; plausible matches "should feed links and topics for
 now"; revisions' and proposals' evidence weighed apart ("I'll accept these recommendations.")."""
 import stubs  # noqa: F401 (a clean environment)

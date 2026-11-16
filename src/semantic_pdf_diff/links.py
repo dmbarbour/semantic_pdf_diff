@@ -1,4 +1,4 @@
-"""Links: subjects of two sources possibly one, kept apart (docs/plans/tentative-matches-2026-11-07.md, milestone 2;
+"""Links: subjects of two sources possibly one, kept apart (tentative matches, a retired plan, milestone 2;
 the owner, 2026-11-07: "we probably first need a viable model for "possibly relevant or a match, not sure,
 investigate further and see if things fit when tied together" instead of all-or-nothing"; "Three levels is a start";
 plausible matches "should feed links and topics for now").

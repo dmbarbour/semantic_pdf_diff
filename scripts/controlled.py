@@ -292,7 +292,7 @@ def run(replay, responder, max_cost, unaligned, error=None, fixture=None, runs=R
         batch += [(folder / f"{p.earlier}{suffix}", folder / f"{p.later}{suffix}",
                    pair_runs / out.name / f"{p.id}{suffix}", f"pair {p.id}{suffix}", "revisions") for p in listed
                   if (folder / f"{p.earlier}{suffix}").exists() and (folder / f"{p.later}{suffix}").exists()]
-    # each proposal pair in proposals mode (proposals.py; docs/plans/tentative-matches-2026-11-07.md, milestone 5)
+    # each proposal pair in proposals mode (proposals.py; tentative matches, a retired plan, milestone 5)
     from semantic_pdf_diff_lab.bench.controlled import proposals
     batch += [(DOCS / f"{p.earlier}.pdf", DOCS / f"{p.later}.pdf", pair_runs / out.name / p.id, f"pair {p.id}",
                "proposals") for p in proposals.pairs()]

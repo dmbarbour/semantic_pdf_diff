@@ -2,7 +2,7 @@
 
 - **Status:** Reviewed (2026-11-09): Claude's account, corrected where Fable's second opinion found it wrong, then [Fable's second opinion](#fables-second-opinion), for the owner's review.
 - **The owner, 2026-11-09:** "consider how to improve `link_gaps`. We might need a review of our methodology and how we're integrating context (not just properties of a thing, but also of how it's used), with second opinions from Fable. Knowing when two sections or documents are talking about the same thing, with softer confidence levels, is the foundation of most of our analysis and comparisons. We'll start filling tables when we have stronger confidence in our relations."
-- **Builds on:** [tentative matches](../plans/tentative-matches-2026-11-07.md) (links, their levels and measurement), [claim context](../plans/claim-context-2026-10-14.md) (subject, scope, frame, provenance, stance), [single-document analysis](../plans/single-document-analysis-2026-10-28.md) (subjects, dossiers, gaps), [indexes and glossaries](../plans/indexes-and-glossaries-2026-10-29.md) (subjects, kinds, other names), [0038](../decisions/0038-revisions-aligned-then-differences-explained.md) (revisions aligned items-first).
+- **Builds on:** tentative matches (a retired plan: [plans index](../plans/README.md#retired)) (links, their levels and measurement), [claim context](../plans/claim-context-2026-10-14.md) (subject, scope, frame, provenance, stance), [single-document analysis](../plans/single-document-analysis-2026-10-28.md) (subjects, dossiers, gaps), [indexes and glossaries](../plans/indexes-and-glossaries-2026-10-29.md) (subjects, kinds, other names), [0038](../decisions/0038-revisions-aligned-then-differences-explained.md) (revisions aligned items-first).
 
 ## Where "the same thing" is decided today
 
@@ -101,7 +101,7 @@ Fable (claude-fable-5-1), 2026-11-09, read-only, at the owner's request ("with s
 - **B:** "Yes, we need place/use/context relationships that are also 'fitted' based on intelligence and heuristics, generally fuzzy not all or nothing."
 - **C:** "Not sure what this is asking. If it's about test methodology against overfitting, use your best judgement." Claude's judgement: Harbor stays sealed until a candidate beats the rubric on validation; a second sealed template of another genre is made first, so each check has a fresh one.
 - **D:** "Not viable for me to mark things. I'm dealing with projects large enough that investigating each link or verifying a contradiction is an hour of work. But bringing back our panel of judges is something we could try, if we can ensure we provide enough context for their judgements to be meaningful."
-- **Carried on** in [tentative matches](../plans/tentative-matches-2026-11-07.md), milestones 8 to 13, and a review of other such gotchas ([fitting-together gotchas](gotchas-review-2026-11-09.md)).
+- **Carried on** in tentative matches (a retired plan: [plans index](../plans/README.md#retired)), milestones 8 to 13, and a review of other such gotchas ([fitting-together gotchas](gotchas-review-2026-11-09.md)).
 
 ## Questions for the owner (answered above)
 

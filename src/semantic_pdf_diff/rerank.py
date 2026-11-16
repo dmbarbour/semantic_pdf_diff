@@ -36,7 +36,7 @@ INSTRUCTION = ("Given a claim from one engineering design document, retrieve cla
                "same property of the same kind of component, so that their values can be compared")
 VERSION = 1
 log = logging.getLogger("semantic_pdf_diff")
-# What it's told when it ranks subjects for links (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone 3)
+# What it's told when it ranks subjects for links (links.py; tentative matches, a retired plan, milestone 3)
 SUBJECTS = ("Given an item of one engineering design, retrieve the items of another design that are the same item or "
             "play the same part in it, so that their properties can be compared")
 MOST_DOCUMENTS = 60  # subjects a subject is ranked against, at most (A to Z)

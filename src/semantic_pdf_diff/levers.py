@@ -1445,7 +1445,7 @@ class MatchSubjects(Lever):
 
 class LinkTests(Lever):
     lever_name, stage, off = "link_tests", "comparison", {"link_tests": False}
-    # comparisons: a link's evidence tested by code (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone
+    # comparisons: a link's evidence tested by code (links.py; tentative matches, a retired plan, milestone
     # 4; the owner, 2026-11-07: "let's just adapt the normal levers approaches"): properties in common counted only
     # where they set the pair apart from its siblings; between proposals, values of the properties in common that
     # don't fit (another kind of unit, or more than ten times apart) leave a link possible at most. No requests. On by
@@ -1465,7 +1465,7 @@ class LinkLevels(Lever):
 
 class LinkIndex(Lever):
     lever_name, stage, off = "link_index", "comparison", {"link_gaps": False, "linked_values": False}
-    # comparisons: links in the index, explored (docs/plans/tentative-matches-2026-11-07.md, milestone 7; the owner,
+    # comparisons: links in the index, explored (tentative matches, a retired plan, milestone 7; the owner,
     # 2026-11-07: plausible matches "should feed links and topics for now, until we're confident in our tooling and
     # we have a good idea on how to index with weighted relationships. Exploring those options should be a plan
     # step"): link_gaps, what a plausible link's other subject gives that a subject doesn't, as the weakest gaps,
@@ -1552,7 +1552,7 @@ class ReadContext(Lever):
 class LinkMeaning(Lever):
     lever_name, stage, off = "link_meaning", "comparison", {"link_meaning": False}
     # comparisons: each subject's names embedded (embed.names, with embed_model), two names alike in meaning a
-    # link's signal and its candidates (links.py; docs/plans/tentative-matches-2026-11-07.md, milestone 3; the owner,
+    # link's signal and its candidates (links.py; tentative matches, a retired plan, milestone 3; the owner,
     # 2026-11-07: "Match candidates by meaning might help")
     link_meaning: Annotated[bool, _selecting(roles=COMPARE)] = False
 

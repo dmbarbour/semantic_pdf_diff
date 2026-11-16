@@ -6,7 +6,7 @@
 
 ## Context
 
-- [Tentative matches](../plans/tentative-matches-2026-11-07.md) put possible, plausible and firm on the whole pair and combined evidence by rules: families counted (two plausible, one possible), then caps, a floor and splits added lever by lever; firm groups all or nothing. The owner's answers about one point of evidence were wired as outcomes.
+- Tentative matches (a retired plan: [plans index](../plans/README.md#retired)) put possible, plausible and firm on the whole pair and combined evidence by rules: families counted (two plausible, one possible), then caps, a floor and splits added lever by lever; firm groups all or nothing. The owner's answers about one point of evidence were wired as outcomes.
 - The review (Claude, then Fable) traced it to milestone 2's build, which kept "plausible needs two independent signals" and dropped "hand thresholds on hand weights".
 
 ## Decision
