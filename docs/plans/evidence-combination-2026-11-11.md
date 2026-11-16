@@ -149,6 +149,8 @@ The owner's order: bugs, then behaviour-preserving changes, then features.
 
 - `match_subjects` and `link_read` answer with a grade (possible, plausible, firm) besides their pick. Judged against a null arm; the proposals seeds, the corpus and the slices re-recorded (about $0.2 a seed set).
 - **Ideas beside it** (lever index rows): bands other than the three words for models' output (the owner); the owner's wording against overconfidence ("being 100% confident about anything [...] will be dismissed as delusional"), a perhaps; the judge's numeric confidence as a measured feature.
+- **Tried 2026-11-16 for the read, as `read_grades` (off):** the read of a link answers how sure its pick is; three arms on the ten real pairs the panel judged (base, graded, and a null asking for a field of the grade's shape carrying nothing, the length of its why; $0.06), the panel's 432 links as labels. Graded picks: "firm" 28 the same of 45 (62%), "plausible" 5 of 20 (25%); the null's: a long why 32 of 53 (60%), a short one 1 of 9 (11%). The grade splits right picks from wrong no better than a field carrying nothing: what's said is how much the model writes, not a judgement of its own confidence (the owner: "I simply doubt the ability of models to judge or emit a real confidence score"). Average precision 0.753 (base), 0.752 (graded), 0.760 (null): no gain. Kept off; `match_subjects` (off by default) not tried.
+
 
 ### 8. Training sets (the owner: "We clearly need some better training sets for analysis")
 
