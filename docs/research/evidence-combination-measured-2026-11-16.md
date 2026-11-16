@@ -1,33 +1,12 @@
-# Evidence combined numerically: grades per point, a probability per pair
+# Evidence combined numerically: what was built and measured (2026-11-11 to 16)
 
-- **Status:** Completed (closed 2026-11-16; the owner: "Let's close the plan and move open items to proposed levers."). Started 2026-11-11 (the owner: "I've reviewed and don't see anything obviously wrong. Please get started."); milestones 0 to 6 built 2026-11-11, 8 and 9 by 2026-11-16 (the panel on real pairs; the weights fitted and held out, on by default), 7 tried (the read's grade no better than a null), 10 in part (function's medium, splits within a source, banks as sets, units of their own; role phrases by meaning and captions shown to the read tried and kept off).
-- **Where it went:** decisions in [0041](../decisions/0041-evidence-combined-numerically.md) (amended), [0042](../decisions/0042-counterparts-only-where-differentiated.md) (counterparts only where told apart by more than numbering), [0043](../decisions/0043-matching-measured-on-real-pairs-by-a-model-panel.md) (matching measured on real pairs by a model panel) and [0044](../decisions/0044-no-rule-depends-on-one-model.md) (no rule depends on one model); the panel's how-to in [samples and testing](../samples-and-testing.md#judging-matching-on-real-pairs); its open items in the [lever index](../reviews/levers.md#ideas-not-built-yet) (Winkler's EM, revisions' groups on the probability, keys within a source, refits as labels grow, `match_subjects` graded, drawings' furniture not read as subjects, and milestone 10's rows: containers from records, use words, the second pass's system line, the reader's rule, the kind dossier's question, the knobs, role phrases by rank).
-- **The owner, 2026-11-11:** "IIRC, we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric. The way you're describing it here, you missed or lost that point." Then: "please review things with yourself and Fable to see where we've gone off track then we'll prepare a plan to get back on track."
-- **The owner's answers to the review's questions (2026-11-11), in their words:**
-  - **Weights:** "We clearly need some better training sets for analysis. But yes, we can start with hand-set weights adjusted by eye."
-  - **Firm groups on the score:** "Not only is it okay, I'm pretty sure it's necessary. Firm groups aren't like a 100% on a Bayesian that cannot be shifted by evidence. More generally, nothing should ever be pinned at 0% or 100% if we're using Bayesian analysis. Perhaps firm group is only 80% without corroborating evidence."
-  - **Models' grades:** "I think it's fine for models to carry their own possible/plausible/firm grades. TBH, I'd have asked models for numeric confidence scores, but the answer from models seems to be 100% confidence about 90% of the time. Perhaps we should have added "being 100% confident about anything, even whether you have the right numeric bases and interpretation for '2+2=4' without knowing the full context, will be dismissed as delusional" or something. But currently I simply doubt the ability of models to judge or emit a real confidence score. Only techniques such as embeddings or cross-encoders that could touch the probability distributions underneath seem to have decent metrics."
-  - **Display:** "I think it's a good idea to report confidence scores numerically. We could certainly experiment with qualitative bands outside possible/plausible/firm, whether for display or model output."
-  - **Thresholds:** "You'll be the one tuning things based on measurement and initially by analysis."
-- **Takes over** the tentative row *Evidence combined numerically* (2026-11-11), and from tentative matches (a retired plan: [plans index](README.md#retired)) (paused at its milestone 10) its milestones 10 (place and use) and 13 (a panel of judges).
-- **Builds on:** [the evidence combination review](../research/evidence-combination-review-2026-11-11.md) (Claude, then Fable); tentative matches' evidence log (`links.candidates`), banding (`links.bands`) and fitting (lab `linkfit.py`); alignment's weighted score (`align._score`); no rater is ground truth ([0018](../decisions/0018-several-raters-none-ground-truth.md)); levers judged paired and promoted held out ([0037](../decisions/0037-levers-judged-paired-and-promoted-held-out.md)); early development by eye.
+- **What this is:** the measured record of the plan *Evidence combined numerically* (2026-11-11 to 16), kept when the plan was retired (the owner, 2026-11-16: "Please retire the evidence-combination plan the same way."). The plan as it last stood: `git show a8e0d0d:docs/plans/evidence-combination-2026-11-11.md`.
+- **Its decisions:** [0041](../decisions/0041-evidence-combined-numerically.md) (evidence combined numerically, amended), [0042](../decisions/0042-counterparts-only-where-differentiated.md) (counterparts only where told apart by more than numbering), [0043](../decisions/0043-matching-measured-on-real-pairs-by-a-model-panel.md) (matching measured on real pairs by a model panel), [0044](../decisions/0044-no-rule-depends-on-one-model.md) (no rule depends on one model).
+- **Its levers** and their measurements: the [lever index](../reviews/levers.md); its open items there, under *Ideas not built yet*.
+- **Its reviews:** [the evidence combination review](evidence-combination-review-2026-11-11.md), [the place review](place-review-2026-11-11.md), [the system use review](system-use-review-2026-11-12.md).
+- **Summary of results:** combined evidence on by default (0.63.0); the controlled corpus's firm groups 1,842 right and 12 wrong at first, its held-out seeds' average precision 0.954 to 0.973; on real pairs a model panel judged (432 links across six batches), fixes for generic names, numbered parts, category nouns, several things in one subject and media, banks linked as sets; the weights fitted on real links and the controlled corpus and held out (average precision of "the same" 0.44 to 0.68 on fresh pairs), on by default (0.69.0); tried and kept off: place by neighbours, role phrases by meaning, captions shown to the read, the read's grade.
 
-## Why
-
-Tentative matches put possible, plausible and firm on the whole pair and combined evidence by rules: families of evidence counted (two plausible, one possible), then caps (values that don't fit, the model picking a decoy), a floor (a shared tag), splits of firm groups (a rival sharing more properties, no shared property), and consumers gated on "plausible". Firm groups are all or nothing. The review traces how; this plan replaces the rules with a combination.
-
-## Concepts
-
-- **A grade is one point of evidence's** (the owner): possible, plausible or firm, given where a judge or a model reads one thing (the judge's verdict on two claims, the model's match, its read against a decoy). Models' grades are qualitative; a model's numeric self-confidence isn't trusted (the owner: "100% confidence about 90% of the time").
-- **Code's evidence is continuous where it can be:** a shared name word's rarity (its IDF over the subjects' names), names' spelling share, embeddings' cosine and the reranker's score (the owner: these "touch the probability distributions underneath"), properties in common and the margin over the best rival, values' fit (a ratio, unit kinds agreeing), place (later).
-- **A pair's standing is a probability:** each point a signed weight (a log-likelihood ratio), weights of one family (names, the model's readings, properties, values, the judge, place) bounded together so no family decides alone, summed with a prior into log-odds, the probability never 0 or 1 (the owner: "nothing should ever be pinned at 0% or 100%").
-- **Negative evidence is weight, not a cap:** values of other unit kinds, a decoy picked, a rival sharing more properties, places that don't correspond, identifiers that differ (strong between revisions, mild between proposals).
-- **Firm is a threshold, not a certainty:** a group joined where its probability passes the merge threshold, carrying its probability, shifted by later evidence (the owner: "Perhaps firm group is only 80% without corroborating evidence": a shared key alone starts near 0.8).
-- **Hard rules only for scope and cost:** no chaining (A~B and B~C don't make A~C); a source's two subjects aren't linked by this plan; caps on how many links and reads.
-- **Shown as numbers:** a link or group shows its probability and each point's contribution; bands, if any, in other words than the grades (the owner: "experiment with qualitative bands outside possible/plausible/firm").
-- **Thresholds are Claude's** (the owner), set first by analysis of the recorded reports' score distributions, then by measurement.
-
-## Milestones
+## The plan's milestones, as built and measured
 
 The owner's order: bugs, then behaviour-preserving changes, then features.
 
@@ -229,18 +208,3 @@ The owner, 2026-11-11: "I was thinking more about where a component is used in a
     - **Weighed** (+0.8, −0.6, −2.5; or against only) **it moved nothing** on development (firm 1,834 to 1,942 right, 12 to 16 wrong; average precision ±0.001) or on seeds 16 and 17 (spent; the six development pairs: average precision 0.971 → 0.969 with it, 0.971 against only): siblings share neighbours, so "in common" lifts wrong siblings; and where place would help (Spruce Lake's decoy, its own section), too few anchors are near to say.
     - **Next for place (superseded by the place review):** sections from a PDF's headings where it has no outline (by type size and weight: the lever index's row), so place by sections; or use (milestone 10's other half) as the model's context.
 
-## Later
-
-- Revisions' groups on probability (milestone 6's follow-up).
-- Keys within a source (the gotchas review's items 1, 2, 5 and 6): still all or nothing after this.
-
-## Measurement
-
-- **Targets:** average precision and calibration (milestone 2), paired by unit, sign-flip tests as before; level counts guards at most.
-- **Development:** seeds 1 to 15, the turbine pair by eye (never a fit's target), the knobs.
-- **Held out:** by template (Harbor, then milestone 8's), rules written before they're run.
-- **Cost:** milestones 0 to 6 no requests but where a new link set changes the reads; milestone 7 and the panel pennies a pair; estimated first, asked above $5.
-
-## Questions answered
-
-1. **Tentative matches' milestone 11** (link gaps looked for) and 2. **revisions' groups on probability**, asked whether now or later: "We'll wait until after the relevant evidence combo repairs." Milestone 11 after milestone 5; revisions' groups after milestone 6.

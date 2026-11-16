@@ -1,6 +1,6 @@
 # System use: what makes two designs' components the same or comparable
 
-- **Status:** Reviewed (2026-11-12); answered the same day (below): two families; siblings paired one to one only where meaningfully differentiated, Claude's proposal for judging it below, for the owner; then milestone 10 of [evidence combined numerically](../plans/evidence-combination-2026-11-11.md) is rewritten from this review.
+- **Status:** Reviewed (2026-11-12); answered the same day (below): two families; siblings paired one to one only where meaningfully differentiated, Claude's proposal for judging it below, for the owner; then milestone 10 of [evidence combined numerically](evidence-combination-measured-2026-11-16.md) is rewritten from this review.
 - **Asked for:** the owner, 2026-11-12, answering [the place review](place-review-2026-11-11.md)'s questions:
   - Q2: "I don't know which relations best show two design's components are the same. Certainly, serving the same role or duty would be a big part. Having similar inputs and outputs. Similar roles for the upstream and downstream components. Develop a list of suspects that an engineer, mechanic, or architect might examine. Ask Fable for recommendations, too."
   - Q3: "Existing claims first, and carefully determine where we should be asking readers for more role and context info. Ask Fable to review and make suggestions, too."

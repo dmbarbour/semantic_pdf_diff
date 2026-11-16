@@ -1,8 +1,8 @@
 # 0041. Evidence is combined numerically; nothing is pinned
 
-- **Status:** Accepted (2026-11-11; amended 2026-11-16, when [its plan](../plans/evidence-combination-2026-11-11.md) closed)
+- **Status:** Accepted (2026-11-11; amended 2026-11-16, when [its plan](../research/evidence-combination-measured-2026-11-16.md) closed)
 - **Source:** the owner, 2026-11-11: "we discussed the possible/plausible/firm distinction as a qualitative rubric for judges localized to a point of evidence, but how we combine things is more numerical, and combining multiple points of evidence into a holistic metric." And: "nothing should ever be pinned at 0% or 100% if we're using Bayesian analysis. Perhaps firm group is only 80% without corroborating evidence."
-- **Builds on:** [0018](0018-several-raters-none-ground-truth.md) (no rater is ground truth), [0037](0037-levers-judged-paired-and-promoted-held-out.md) (levers judged paired, promoted held out); [the evidence combination review](../research/evidence-combination-review-2026-11-11.md) and [its plan](../plans/evidence-combination-2026-11-11.md)
+- **Builds on:** [0018](0018-several-raters-none-ground-truth.md) (no rater is ground truth), [0037](0037-levers-judged-paired-and-promoted-held-out.md) (levers judged paired, promoted held out); [the evidence combination review](../research/evidence-combination-review-2026-11-11.md) and [its plan](../research/evidence-combination-measured-2026-11-16.md)
 
 ## Context
 

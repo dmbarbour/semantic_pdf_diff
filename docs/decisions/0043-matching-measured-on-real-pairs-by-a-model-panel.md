@@ -2,7 +2,7 @@
 
 - **Status:** Accepted (2026-11-16)
 - **Source:** the owner, 2026-11-09: "Not viable for me to mark things [...] But bringing back our panel of judges is something we could try, if we can ensure we provide enough context for their judgements to be meaningful."; 2026-11-11: "We clearly need some better training sets for analysis"; 2026-11-13: "Feel free to bring in a few more sets for training, and search for a few more holdouts as needed."
-- **Builds on:** [0018](0018-several-raters-none-ground-truth.md) (several raters, none ground truth), [0019](0019-offline-review-pages.md) (review pages), [0037](0037-levers-judged-paired-and-promoted-held-out.md) (held-out promotion); [evidence combined numerically](../plans/evidence-combination-2026-11-11.md), milestones 8 and 9
+- **Builds on:** [0018](0018-several-raters-none-ground-truth.md) (several raters, none ground truth), [0019](0019-offline-review-pages.md) (review pages), [0037](0037-levers-judged-paired-and-promoted-held-out.md) (held-out promotion); [evidence combined numerically](../research/evidence-combination-measured-2026-11-16.md), milestones 8 and 9
 
 ## Context
 

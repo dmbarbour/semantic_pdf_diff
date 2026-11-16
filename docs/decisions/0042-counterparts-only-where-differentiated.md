@@ -2,7 +2,7 @@
 
 - **Status:** Accepted (2026-11-16)
 - **Source:** the owner, 2026-11-12: "whether we can compare them one vs. one depends on if they are meaningfully differentiated. If it's just three fungible pumps coordinating in a shared role, then how would it make sense to match them one to one?"; 2026-11-13: "I don't see how revisions of different things could be considered counterparts in general. Different designs or designers frequently have different numbering schema for revisions. Revision numbers are relevant for situating two versions of the same thing."; and on where a component sits, 2026-11-11: "I was thinking more about where a component is used in a system. Not where the section discussing a component appears in a document discussing the component."
-- **Builds on:** [0041](0041-evidence-combined-numerically.md); [the place review](../research/place-review-2026-11-11.md), [the system use review](../research/system-use-review-2026-11-12.md), [evidence combined numerically](../plans/evidence-combination-2026-11-11.md) (milestone 10)
+- **Builds on:** [0041](0041-evidence-combined-numerically.md); [the place review](../research/place-review-2026-11-11.md), [the system use review](../research/system-use-review-2026-11-12.md), [evidence combined numerically](../research/evidence-combination-measured-2026-11-16.md) (milestone 10)
 
 ## Context
 

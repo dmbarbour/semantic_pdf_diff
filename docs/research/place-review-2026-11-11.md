@@ -3,7 +3,7 @@
 - **Status:** Reviewed (2026-11-11); answered 2026-11-12 (below), questions 2 to 4 continued in [the system use review](system-use-review-2026-11-12.md).
 - **Asked for:** the owner, 2026-11-11, on Claude's report of milestone 10: "Since you're mentioning matched sections, it seems you and I had a very different understanding for what 'place' meant when we were talking about it. I was thinking more about where a component is used in a system. Not where the section discussing a component appears in a document discussing the component, which seems much less meaningful as evidence. Review this misunderstanding and its outcomes with Fable."
 - **Done by:** Claude's account first, then Fable (claude-fable-5-1), read-only, checking it against the code, the record and recorded reports; Fable's claims checked by Claude (below).
-- **Concerns:** [evidence combined numerically](../plans/evidence-combination-2026-11-11.md) (milestone 10), tentative matches (a retired plan: [plans index](../plans/README.md#retired)) (milestones 10 and 12), [the same-thing review](same-thing-review-2026-11-09.md), [the gotchas review](gotchas-review-2026-11-09.md), [the evidence combination review](evidence-combination-review-2026-11-11.md).
+- **Concerns:** [evidence combined numerically](evidence-combination-measured-2026-11-16.md) (milestone 10), tentative matches (a retired plan: [plans index](../plans/README.md#retired)) (milestones 10 and 12), [the same-thing review](same-thing-review-2026-11-09.md), [the gotchas review](gotchas-review-2026-11-09.md), [the evidence combination review](evidence-combination-review-2026-11-11.md).
 
 ## The answer
 
