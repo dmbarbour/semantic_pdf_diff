@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.70.0 (2026-11-16)
+
+- **`read_grades`** (off): a link's read by the model also says how sure its pick is (possible, plausible, firm). Measured on real pairs a model panel judged, the grade split right picks from wrong no better than a field asking how long the model's explanation is: it stays off.
+
 ## 0.69.1 (2026-11-16)
 
 - **A bank's unit of its own:** among units of one tag series, one named otherwise ("Jockey pump P-101D" among raw water pumps) or marked so in its claims (jockey, low or minimum flow, pressure maintenance, a season) no longer stops the others forming a bank, and may be matched one to one with its counterpart; duty, standby, lead and lag don't set a unit apart.
