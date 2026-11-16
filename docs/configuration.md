@@ -214,6 +214,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `unit_kinds` | `true` | selecting | unit_kinds | compare | - |
 | `link_read` | `true` | selecting | link_read | compare | - |
 | `read_context` | `false` | selecting | read_context | compare | - |
+| `read_grades` | `false` | selecting | read_grades | compare | - |
 | `link_fit` | `true` | selecting | link_fit | compare | - |
 | `link_meaning` | `false` | selecting | link_meaning | compare | - |
 | `link_rerank` | `false` | selecting | link_rerank | compare | - |

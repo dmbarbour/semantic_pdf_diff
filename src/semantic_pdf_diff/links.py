@@ -607,6 +607,7 @@ def candidates(data, index):
     # keyed alike, kept apart (indexes.firm_keyed: the keyed_links lever's); pairs, or lists read from a report
     keyed = {tuple(p) for p in index.get("keyed", ()) if all(len(subjects[x]["claims"]) == 1 for x in p)}
     reads = {}  # the model's reads of links against decoys (crossmatch.read_links): {(i, j): relation}
+    graded = {}  # and their grades, where asked (the read_grades lever): {(i, j): possible, plausible or firm}
     # the model's answers (crossmatch.py), taken or not
     named = {(next(iter(s["claims"])), s["name"]): i for i, s in enumerate(subjects) if len(s["claims"]) == 1}
     for c in (data.get("commentary") or {}).get("entries", []):
@@ -618,6 +619,7 @@ def candidates(data, index):
             a, b = named.get((c["source"], c["subject"])), named.get((c.get("other_source"), c.get("other")))
             if a is not None and b is not None:
                 reads[tuple(sorted((a, b)))] = c.get("relation", "")
+                graded[tuple(sorted((a, b)))] = c.get("grade", "")
     # a name's words: between proposals not a document's parts' ("sheet", "detail": align.DOCUMENT_PARTS), which two
     # designs' documents share by habit (the first link panel on real pairs, 2026-11-12)
     bare = mode == "proposals"
@@ -737,6 +739,7 @@ def candidates(data, index):
             "properties": len(ev["properties"]), "rival": max(rival(i, j), rival(j, i)),
             "value_ratio": measure["ratio"], "kinds_differ": measure["differ"], "values": ev["values"],
             "keyed": (i, j) in keyed, "model": [r for r, _ in said["model"]], "read": reads.get((i, j)),
+            "read_grade": graded.get((i, j), ""),  # logged, weighing nothing till measured (milestone 7)
             "verdicts": said.get("verdicts", []), "grouped": sorted(set(said["grouped"])),
             "ids_differ": bool(ids[0] and ids[1] and not ids[0] & ids[1]),
             "own": [len(_properties(s)), len(_properties(t))],

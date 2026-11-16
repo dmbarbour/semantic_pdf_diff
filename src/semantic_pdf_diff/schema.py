@@ -558,8 +558,10 @@ class SubjectMatch(Lenient):
     why: str = Field(default="", max_length=400)
 
 class LinkRead(Lenient):
-    """A link read against a decoy (crossmatch.read_links): the candidate picked (B1, B2) or "", and why."""
+    """A link read against a decoy (crossmatch.read_links): the candidate picked (B1, B2) or "", how sure (its grade,
+    where the read_grades lever asks), and why."""
     pick: str = Field(default="", max_length=20)
+    grade: str = Field(default="", max_length=20)
     why: str = Field(default="", max_length=400)
 
 class SummarySentence(Lenient):

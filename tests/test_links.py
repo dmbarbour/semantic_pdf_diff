@@ -309,6 +309,27 @@ class Tested(unittest.TestCase):
             with_read = report(self.PUMPS, judged, ("a", "b"), mode="proposals", commentary={"entries": entries})
             self.assertEqual(links_of(with_read)["P-101", "LL-1"][0], level)
 
+    def test_a_read_graded_where_asked(self):
+        # milestone 7 (read_grades): the read says how sure its pick is; logged beside it, weighing nothing yet
+        from semantic_pdf_diff import crossmatch
+        judged = [{"a": "A-10", "b": "B-10", "relation": "different"}]
+
+        class Graded:
+            def ask(self, prompt, schema, images=(), key=None):
+                shown = json.loads(prompt[prompt.index('{\n "item"'):])
+                linked = next(k for k, v in shown["candidates"].items() if v["name"] == "LL-1")
+                return schema.model_validate({"pick": linked, "grade": "Firm", "why": "x"})
+        for on in (False, True):
+            data = report(self.PUMPS, judged, ("a", "b"), mode="proposals", settings={"read_grades": on})
+            text = crossmatch.links_asked(data, indexes.built(data))[0][-1]
+            self.assertEqual('"grade": "possible|plausible|firm|"' in text, on)
+            read = crossmatch.read_links(data, indexes.built(data), Graded(), "proposals", "x")
+            entry = next(e for e in read["entries"] if e["other"] == "LL-1")
+            self.assertEqual(entry.get("grade", ""), "firm")  # recorded whatever was asked (the answer gave one)
+            with_read = report(self.PUMPS, judged, ("a", "b"), mode="proposals", commentary={"entries": [entry]})
+            pair = next(c for c in links.candidates(with_read, indexes.built(with_read)) if c["read"])
+            self.assertEqual(pair["features"]["read_grade"], "firm")
+
     def test_a_read_shown_its_subjects_captions(self):
         # milestone 10, step 6 (read_context): a table's caption and the lead-in introducing it, from its claims'
         # records ("Raw water pumps"; the administration building's air handling units' lead-in)

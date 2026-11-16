@@ -1526,6 +1526,13 @@ class LinkRead(Lever):
     def reads_links(self, mode):
         return self.link_read and mode == "proposals"
 
+class ReadGrades(Lever):
+    lever_name, stage, off = "read_grades", "comparison", {"read_grades": False}
+    # proposals: a link's read answers how sure its pick is, possible, plausible or firm (crossmatch.GRADED; evidence
+    # combined numerically, milestone 7; the owner, 2026-11-11: "I think it's fine for models to carry their own
+    # possible/plausible/firm grades"), logged beside the pick and weighing nothing till measured. Off
+    read_grades: Annotated[bool, _selecting(roles=COMPARE)] = False
+
 class LinkFit(Lever):
     lever_name, stage, off = "link_fit", "comparison", {"link_fit": False}
     # proposals: each point of a link's evidence weighed by its fitted multiplier (links.FITTED; evidence combined
@@ -1669,7 +1676,7 @@ LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedE
                  DedupeRepeated,
                  ContinueReading, Align, RetrieveGlossary, VerifyVisuals, ExplainDifferences, Editorial, RecordChanges,
                  JudgeContext, JudgeNotes, MatchSubjects, LinkTests, LinkLevels, LinkIndex, PropertyLinks,
-                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead, ReadContext, LinkFit,
+                 KeyedLinks, OtherNamesFit, UnitKinds, LinkRead, ReadContext, ReadGrades, LinkFit,
                  LinkMeaning,
                  LinkRerank,
                  LookGaps,

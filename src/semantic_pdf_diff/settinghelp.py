@@ -286,6 +286,8 @@ HELP = {
                           "likeliest; the decoy or neither picked leaves it possible"),
     "read_context": Help(_L, "proposals: a link's read shown each subject's table captions and the lead-ins "
                              "introducing them (where it's used)"),
+    "read_grades": Help(_L, "proposals: a link's read answers how sure its pick is (possible, plausible, firm), "
+                            "logged beside it"),
     "link_fit": Help(_L, "proposals: each point of a link's evidence weighed by its fitted multiplier (fitted on real "
                          "links a model panel judged and the controlled corpus, shrunk toward the hand-set weights)"),
     "link_meaning": Help(_L, "comparisons, with an embedding model (embed_model): each subject's names embedded, names "
