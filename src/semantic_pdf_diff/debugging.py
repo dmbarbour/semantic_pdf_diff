@@ -4,8 +4,9 @@ prints error information and error counts. I'm not very able to copy a large scr
 
 Nothing of the documents is printed but what a server's error quotes: the version, the endpoint and the models the last
 comparison used (the store's settings, before one; URLs redacted), the requests the store's runs asked by step
-(answered, failed, never answered: not sent, as after sending stopped), the last comparison's counts, and the errors the
-answers cache recorded, the most frequent first. A failure is recorded once a request has failed its retries; a request
+(answered, failed, never answered: not sent, as after sending stopped), the last comparison's counts and how its
+subjects were matched (counts only: the sources as A and B, no names), and the errors the answers cache recorded, the
+most frequent first. A failure is recorded once a request has failed its retries; a request
 never sent isn't.
 """
 import os
@@ -61,15 +62,57 @@ def steps(roles, outcomes):
             errors[f"{row['step']} ({region})" if role in BY_REGION and region else row["step"], short(error)] += 1
     return sorted(counts.values(), key=lambda r: (-r["asked"], r["step"])), errors
 
+def matching(data):
+    """How a comparison's subjects were matched, in counts (the review of open items, 2026-11-17: what matching did on
+    documents the owner can't share): subjects a source (A, B: the comparison's order) and joined across; links by
+    band (links.SHOWN) and the family each one's evidence weighed most for (links.FAMILIES); sets of interchangeable
+    units; subjects named only as a document's parts (align.generic, align.placeholder: "sheet", "revision 2"), and
+    the links they're in; findings by relation. None without a merged index."""
+    from .align import generic, placeholder
+    from .links import FAMILIES, SHOWN
+    index = data.get("index") or {}
+    sources, subjects = index.get("sources") or [], index.get("subjects") or []
+    if not sources or not subjects:
+        return None
+    letter = {source: chr(ord("A") + n) for n, source in enumerate(sources)}
+    parts = {(next(iter(s["claims"])), s["name"]) for s in subjects
+             if len(s["claims"]) == 1 and (generic(s["name"]) or placeholder(s["name"]))}
+    found = {}
+    for s in subjects:
+        if len(s["claims"]) != 1:
+            continue
+        here = (next(iter(s["claims"])), s["name"])
+        for link in s.get("links", []):
+            found.setdefault(frozenset((here, (link["source"], link["other"]))), link)
+    bands, families = Counter(), Counter()
+    for link in found.values():
+        p = link.get("probability")
+        band = "plausible" if p is not None and p >= SHOWN["plausible"] else link.get("level", "possible")
+        bands[band if band in SHOWN else "possible"] += 1
+        weights = {k: v for k, v in (link.get("contributions") or {}).items() if v > 0}
+        if weights:
+            family = max(weights, key=lambda k: (weights[k], k))
+            families[FAMILIES.get(family, family)] += 1
+    return {"subjects": {letter[x]: sum(1 for s in subjects if x in s["claims"]) for x in sources},
+            "joined": sum(1 for s in subjects if len(s["claims"]) > 1),
+            "links": len(found), "bands": {b: bands[b] for b in SHOWN if bands[b]},
+            "decided_by": dict(families.most_common()),
+            "sets": len(index.get("sets") or []),
+            "document_parts": len(parts),
+            "document_part_links": sum(1 for pair in found if pair & parts),
+            "findings": dict(Counter(f.get("relation", "") for f in data.get("findings") or []).most_common())}
+
 def comparison(data):
-    """The last comparison's counts: {created_at, mode, paused, coverage: {status: n}, reranker, embedding}."""
+    """The last comparison's counts: {created_at, mode, paused, coverage: {status: n}, reranker, embedding,
+    matching}."""
     reranked = (data.get("retrieval") or {}).get("reranked") or None
     vectors = data.get("vectors") or None
     counts = ("model", "requests", "failed", "not_sent")
     return {"created_at": data.get("created_at", ""), "mode": data.get("mode", ""), "paused": data.get("paused") or "",
             "coverage": dict(Counter(r.get("status", "") for r in data.get("coverage") or []).most_common()),
             "reranker": {k: reranked[k] for k in counts if k in reranked} if reranked else None,
-            "embedding": {k: vectors[k] for k in counts if k in vectors} if vectors else None}
+            "embedding": {k: vectors[k] for k in counts if k in vectors} if vectors else None,
+            "matching": matching(data)}
 
 def gather(folder, cache_path, settings, limit=10):
     """What `debug` prints, as data."""
@@ -110,6 +153,24 @@ def _pymupdf():
     except (ImportError, AttributeError):
         return ""
 
+def matched_lines(m, n):
+    """matching's counts as a few lines."""
+    sides = ", ".join(f"{side} {n(count)}" for side, count in m["subjects"].items())
+    out = [f"  subjects: {sides}; joined across the sources {n(m['joined'])}"]
+    if m["links"]:
+        bands = ", ".join(f"{band} {n(count)}" for band, count in m["bands"].items())
+        out.append(f"  links (subjects possibly one, kept apart): {n(m['links'])} ({bands})")
+        if m["decided_by"]:
+            out.append("    weighed most by: " + ", ".join(f"{k} {n(v)}" for k, v in m["decided_by"].items()))
+    if m["sets"]:
+        out.append(f"  sets of interchangeable units linked: {n(m['sets'])}")
+    if m["document_parts"]:
+        out.append(f"  subjects named only as a document's parts (a sheet, \"revision 2\"): {n(m['document_parts'])}"
+                   + (f", in {n(m['document_part_links'])} links" if m["document_part_links"] else ""))
+    if m["findings"]:
+        out.append("  claim pairs judged: " + ", ".join(f"{k or 'unstated'} {n(v)}" for k, v in m["findings"].items()))
+    return out
+
 def lines(found):
     """`debug`'s report, from gather's data."""
     def n(x):
@@ -148,6 +209,9 @@ def lines(found):
                 unsent = last[name].get("not_sent", 0)
                 out.append(f"  {name}: {n(asked)} request{'' if asked == 1 else 's'}, "
                            f"{n(last[name].get('failed', 0))} failed" + (f", {n(unsent)} not sent" if unsent else ""))
+        found_matching = last.get("matching")
+        if found_matching:
+            out += matched_lines(found_matching, n)
     if found["errors"]:
         out.append("errors recorded, the most frequent first (a server's error may quote what was sent):")
         out += [f"  {e['step']:<{wide}}{n(e['count']):>7}  {e['error']}" for e in found["errors"]]

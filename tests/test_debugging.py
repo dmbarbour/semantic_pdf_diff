@@ -146,6 +146,32 @@ class Debug(unittest.TestCase):
                                                 (("rerank", "x" * 297 + "..."), 1)])
         self.assertEqual(len(debugging.short("x" * 400)), debugging.ERROR_CHARACTERS)
 
+    def test_how_subjects_were_matched_in_counts_naming_nothing(self):
+        """The review of open items, 2026-11-17: what matching did, on documents the owner can't share."""
+        a, b = "secret-a.pdf", "secret-b.pdf"
+        subjects = [{"name": "Raw water pump", "claims": {a: ["1"]},
+                     "links": [{"source": b, "other": "Intake pump", "probability": 0.72,
+                                "contributions": {"names": 0.4, "properties": 1.1, "model": -0.2}},
+                               {"source": b, "other": "Sheet M-101", "probability": 0.4,
+                                "contributions": {"names": 0.9}}]},
+                    {"name": "Intake pump", "claims": {b: ["2"]},
+                     "links": [{"source": a, "other": "Raw water pump", "probability": 0.72,
+                                "contributions": {"names": 0.4, "properties": 1.1, "model": -0.2}}]},
+                    {"name": "Sheet M-101", "claims": {b: ["3"]}},
+                    {"name": "Clearwell", "claims": {a: ["4"], b: ["5"]}}]
+        data = {"index": {"sources": [a, b], "subjects": subjects, "sets": [{}]},
+                "findings": [{"relation": "different"}, {"relation": "different"}, {"relation": "equivalent"}]}
+        found = debugging.matching(data)
+        self.assertEqual(found, {"subjects": {"A": 2, "B": 3}, "joined": 1, "links": 2,
+                                 "bands": {"plausible": 1, "possible": 1},
+                                 "decided_by": {"properties": 1, "names": 1}, "sets": 1, "document_parts": 1,
+                                 "document_part_links": 1, "findings": {"different": 2, "equivalent": 1}})
+        shown = "\n".join(debugging.matched_lines(found, str))
+        self.assertIn("links (subjects possibly one, kept apart): 2 (plausible 1, possible 1)", shown)
+        self.assertNotIn("secret", shown)
+        self.assertNotIn("pump", shown)
+        self.assertIsNone(debugging.matching({"index": {}}))
+
     def test_a_long_step_name_keeps_the_columns(self):
         """The owner, 2026-10-29: "table-structure-review [...] (this name is too wide for our columns)"."""
         found = {"version": "0", "python": "3", "pymupdf": "", "store": "s", "cache": "c", "endpoint_of": "e",

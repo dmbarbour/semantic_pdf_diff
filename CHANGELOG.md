@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.71.0 (2026-11-17)
+
+- **`debug` says how the last comparison's subjects were matched,** in counts that name nothing of the documents (the sources as A and B): subjects a source and joined across them; links by band (plausible, possible) and the kind of evidence that weighed most for each; sets of interchangeable units linked; subjects named only as a document's parts ("sheet", "revision 2") and the links they're in; the claim pairs judged, by relation. So what matching did on documents that can't be shared can be read off a screen.
+
 ## 0.70.0 (2026-11-16)
 
 - **`read_grades`** (off): a link's read by the model also says how sure its pick is (possible, plausible, firm). Measured on real pairs a model panel judged, the grade split right picks from wrong no better than a field asking how long the model's explanation is: it stays off.
