@@ -480,7 +480,7 @@ class ReaderGlossary(Lever):
     # the terms a task's words use, as its document's glossary defines them (the glossary lever's, read before the
     # claims; those whose reach covers its page), as a context line: "Defined in this document: SWD = side water
     # depth"; a meaning longer than terms.SHORT left out, and a term its words spell out too (terms.Terms.shown;
-    # docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 5; the owner, 2026-10-30: "let's test glossary to
+    # indexes and glossaries, a retired plan, milestone 5; the owner, 2026-10-30: "let's test glossary to
     # reader")
     reader_glossary: Annotated[bool, _shaping(TEXTUAL | VISUAL)] = False
 
@@ -1184,8 +1184,8 @@ class Align(Lever):
     # firmed up or hedged, reported without a model (docs/plans/claim-context-2026-10-14.md, milestone 5)
     align_hedges: Annotated[bool, _selecting(roles=COMPARE)] = True
     # the revisions' glossaries (the glossary lever's) where names are weighed: a meaning written out folded into its
-    # term, so "side water depth" in one revision is the other's "SWD" (terms.Terms; docs/plans/
-    # indexes-and-glossaries-2026-10-29.md, milestone 5; the owner, 2026-10-30: "Will these subject merges extend to
+    # term, so "side water depth" in one revision is the other's "SWD" (terms.Terms; indexes and
+    # glossaries, a retired plan, milestone 5; the owner, 2026-10-30: "Will these subject merges extend to
     # comparisons and analysis later?"). A default since 2026-10-30 (the owner: "Yes, let's add align_glossary as a
     # default")
     align_glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
@@ -1202,7 +1202,7 @@ class RetrieveGlossary(Lever):
     lever_name, stage, off = "retrieve_glossary", "comparison", {"retrieve_glossary": False}
     # retrieval (proposals; revisions without align) takes a meaning written out as its term, as align_glossary does
     # for alignment, so one team's "air handling unit" meets the other's "AHU" among the candidate pairs
-    # (terms.Terms.abbreviated; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 4; the owner, 2026-10-30:
+    # (terms.Terms.abbreviated; indexes and glossaries, a retired plan, milestone 4; the owner, 2026-10-30:
     # "please use the glossary for candidates when comparing propsals"). A default since 2026-10-30 (the owner: "Yes,
     # turn on the recommended items.")
     retrieve_glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
@@ -1234,7 +1234,7 @@ class ExplainDifferences(Lever):
     explain_context: Annotated[bool, _shaping(roles=COMPARE)] = False
     # each claim's terms shown to the explainer, as its document defines them where it is (terms.Terms.used), as
     # judge_glossary shows the judge, so a value under a term spelled out in one revision and abbreviated in the other
-    # is told "restated" from "changed" (docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 5; the owner,
+    # is told "restated" from "changed" (indexes and glossaries, a retired plan, milestone 5; the owner,
     # 2026-10-30: "experiment with showing terms to the step that explains differences")
     explain_glossary: Annotated[bool, _shaping(roles=COMPARE)] = False
 
@@ -1301,7 +1301,7 @@ class ReadGlossary(Lever):
     lever_name, stage, off = "glossary", "comparison", {"glossary": False}
     # the sources' glossaries read before their claims: their abbreviations, defined terms, symbols and
     # conventions, from the blocks defining them (the model, a request a block's part) and from prose (by pattern),
-    # for the index and the search (glossary.py; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 2; the
+    # for the index and the search (glossary.py; indexes and glossaries, a retired plan, milestone 2; the
     # owner, 2026-10-30: "Please proceed with the glossary."). A default, confirmed 2026-10-31 (the owner: "Confirm
     # glossary on by default.")
     glossary: Annotated[bool, _selecting(roles=COMPARE)] = True
@@ -1420,7 +1420,7 @@ class JudgeNotes(Lever):
     lever_name, stage, off = "judge_notes", "comparison", {"judge_notes": False}
     # comparisons: each source's subjects read together first (the second pass, dossiers.py), and each claim judged
     # shown what it noted of the claim, as a "noted" field: context its passage lacks, its relations to its subject's
-    # other claims, doubts (docs/plans/single-document-analysis-2026-10-28.md, milestone 6; the owner, 2026-10-28:
+    # other claims, doubts (single-document analysis, a retired plan, milestone 6; the owner, 2026-10-28:
     # "A lot of comparisons don't make sense because they're compared without enough context"; 2026-11-07: "Proceed
     # with the recommended path.")
     judge_notes: Annotated[bool, _shaping(roles=COMPARE)] = False
@@ -1436,7 +1436,7 @@ class MatchSubjects(Lever):
     lever_name, stage, off = "match_subjects", "comparison", {"match_subjects": False}
     # proposals: the subjects matching by code (keyed alike, other names) leaves alone in one source each shown with
     # its likeliest counterparts in the other and the model asked which is the same item, the corresponding element
-    # or a state of it, if any (crossmatch.py; docs/plans/single-document-analysis-2026-10-28.md, milestone 7; the
+    # or a state of it, if any (crossmatch.py; single-document analysis, a retired plan, milestone 7; the
     # owner, 2026-11-07: "All four recommendations look good as a start.")
     match_subjects: Annotated[bool, _selecting(roles=COMPARE)] = False
 
@@ -1586,7 +1586,7 @@ class JudgeGlossary(Lever):
     lever_name, stage, off = "judge_glossary", "comparison", {"judge_glossary": False}
     # each claim judged shown the abbreviations and terms its words use, as its document defines them (the glossary
     # lever's, those whose reach covers it: its document's, its sheet's on its page), as a "terms" field; a prompt
-    # whose claims use none is unchanged (terms.Terms; docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 5)
+    # whose claims use none is unchanged (terms.Terms; indexes and glossaries, a retired plan, milestone 5)
     judge_glossary: Annotated[bool, _shaping(roles=COMPARE)] = False
 
     def judged_terms(self, evidence, defined):
@@ -1601,7 +1601,7 @@ class ReadTogether(Lever):
     lever_name, stage, off = "second_pass", "comparison", {"second_pass": False}
     # analyses: each subject's claims read together, a request a subject, what's learnt kept as a log of commentary
     # beside the claims (context added, relations, suspicions, inferences, what's likely missing; dossiers.py;
-    # docs/plans/single-document-analysis-2026-10-28.md, milestone 3; the owner, 2026-10-31: "Agree with all
+    # single-document analysis, a retired plan, milestone 3; the owner, 2026-10-31: "Agree with all
     # second-pass recommendations": a stage, in comparisons once measured). On in analyses since 2026-10-31 (the
     # owner: "Yes, turn `second_pass` on."); comparisons don't run it yet
     second_pass: Annotated[bool, _selecting(roles=COMPARE)] = True
@@ -1613,7 +1613,7 @@ class FindTensions(Lever):
     lever_name, stage, off = "tensions", "comparison", {"tensions": False, "reviewer_concerns": []}
     # analyses: each subject's claims read for those hard to hold together on engineering grounds (a material and a
     # property it doesn't usually have), each with a level of suspicion and what would reconcile it, looked for in
-    # the source by code (tensions.py; docs/plans/single-document-analysis-2026-10-28.md, milestone 4; the owner,
+    # the source by code (tensions.py; single-document analysis, a retired plan, milestone 4; the owner,
     # 2026-11-06: "We'll need to also look for qualitative inconsistencies, with levels of suspicion.");
     # reviewer_concerns: a reviewer's, things to watch for besides what the model knows ("it should work even when not
     # supplied")
@@ -1626,7 +1626,7 @@ class FindTensions(Lever):
 class Summaries(Lever):
     lever_name, stage, off = "summaries", "comparison", {"summaries": []}
     # analyses: the kinds of summary asked, each sentence citing the claims it rests on and checked against them by
-    # code (summaries.py; docs/plans/single-source-outputs-2026-09-23.md, milestone 4; the owner, 2026-11-06: "This
+    # code (summaries.py; single-source outputs, a retired plan, milestone 4; the owner, 2026-11-06: "This
     # seems like a good design for milestone 4."): sections (a drawing set's pages), files (from their sections'),
     # source (from its files'), subjects, topics. Sections, files and the source by default since 2026-11-07 (the
     # owner: "Go ahead and turn on summaries."; subjects' and topics', a request an item or topic, asked for)
@@ -1639,8 +1639,8 @@ class Summaries(Lever):
 class ConfirmKinds(Lever):
     lever_name, stage, off = "confirm_kinds", "comparison", {"confirm_kinds": False}
     # analyses: the kinds the rules found (indexes.kinds) shown to the model, one request a source, which names each
-    # by what its items are and moves the items not of it (kindcheck.py; docs/plans/indexes-and-glossaries-
-    # 2026-10-29.md, design question 7; the owner, 2026-11-01: "But test the model on Q7 and see how it works out.")
+    # by what its items are and moves the items not of it (kindcheck.py; indexes and glossaries, a
+    # retired plan, design question 7; the owner, 2026-11-01: "But test the model on Q7 and see how it works out.")
     confirm_kinds: Annotated[bool, _selecting(roles=COMPARE)] = False
 
     def confirms_kinds(self, mode):

@@ -118,6 +118,8 @@ python scripts/controlled.py generate        # every document and key, byte for 
 python scripts/controlled.py run --replay    # read every document and compare every pair from replay.zip, offline
 python scripts/controlled.py score           # results.json (extraction) and comparisons.json (revision pairs)
 python scripts/controlled.py context         # context.json: claims' context against the keys
+python scripts/controlled.py analyze         # the planted reports and their clean twins analyzed, the second pass on,
+                                             # what's found scored against what's planted (benchmarks/controlled/analysis.json)
 ```
 
 - **Where:** `benchmarks/controlled/docs` (PDFs and their `.key.json`), with the same documents as Markdown (`docs-md`), Word (`docs-docx`), slide decks (`docs-pptx`) and workbooks (`docs-xlsx`). The code is the lab's `bench/controlled/`. Recording and `refresh` are under *Recorded answers*; a lever's arms under *Judging a lever*.

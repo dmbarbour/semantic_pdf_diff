@@ -1,4 +1,4 @@
-"""Planted inconsistencies and gaps (docs/plans/single-document-analysis-2026-10-28.md, milestones 3 to 5): a pump
+"""Planted inconsistencies and gaps (single-document analysis, a retired plan, milestones 3 to 5): a pump
 station's design report written twice from one seed, planted and clean, so the second pass and the gaps found by code
 are scored exactly. The owner, 2026-10-31: "The proposed next steps seem good to me. Please proceed." (the second pass
 scored rather than judged by eye).

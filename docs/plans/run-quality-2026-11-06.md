@@ -4,7 +4,7 @@
 - **The owner, 2026-10-09:** "I'm beginning to believe that having some sort of quality heuristics spot-check for runtime behavior would be useful for both confidence decisions and part of the report."
 - **Chosen 2026-11-02** from the review of open items, where Claude offered it as "How well the run read, shown in the report": the owner, "cited summaries, quality reports, and cut-text work are probably the most valuable to me in the short term"; then, 2026-11-06, "we should finish the quality reports and cut-text work, too."
 - **Takes over** the tentative row *Runtime quality spot checks*, kept whole [below](#moved-in-runtime-quality-spot-checks).
-- **Builds on:** the coverage ledger (every task's status and notes), [text cut by tiles](text-cut-by-tiles-2026-10-28.md)' milestone 1 (each tile's path; the tiles that said their text was cut), the second pass's log of commentary ([single-document analysis](single-document-analysis-2026-10-28.md), milestone 3), the report's views and search ([0033](../decisions/0033-self-contained-reports-and-their-search.md)).
+- **Builds on:** the coverage ledger (every task's status and notes), [text cut by tiles](text-cut-by-tiles-2026-10-28.md)' milestone 1 (each tile's path; the tiles that said their text was cut), the second pass's log of commentary ([single-document analysis](../research/single-document-analysis-measured-2026-11-17.md), milestone 3), the report's views and search ([0033](../decisions/0033-self-contained-reports-and-their-search.md)).
 
 ## Why
 

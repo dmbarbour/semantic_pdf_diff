@@ -1,4 +1,4 @@
-"""A glossary's terms as words (docs/plans/indexes-and-glossaries-2026-10-29.md): text folded as found, a term that
+"""A glossary's terms as words (indexes and glossaries, a retired plan): text folded as found, a term that
 describes a mark drawn, and, for the reader and the comparison (milestone 5), the terms looked up in words (Terms).
 Pure: they import it without the glossary's reading (glossary.py), which reaches the store and the scanner.
 """

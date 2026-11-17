@@ -1,4 +1,4 @@
-"""A report's indexes (docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 1): its subjects, their properties,
+"""A report's indexes (indexes and glossaries, a retired plan, milestone 1): its subjects, their properties,
 and its figures and tables, built from what was read, with no model requests; one source's, or a comparison's merged.
 The owner, 2026-10-29: "building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single
 document that would be useful, and it seems deeply related to the problem of comparing things regardless."
@@ -36,7 +36,7 @@ document that would be useful, and it seems deeply related to the problem of com
   "drawing title"). Where the confirm_kinds lever ran (kindcheck.py), the model's names and moves.
 - **The glossary** (glossary.py, when read): each term once, its meanings with where each is given; in a comparison
   each source's, a term the sources define differently marked.
-- **What it doesn't give** (gaps; docs/plans/single-document-analysis-2026-10-28.md, milestone 5, by code): in a
+- **What it doesn't give** (gaps; single-document analysis, a retired plan, milestone 5, by code): in a
   comparison, a property another source gives a matched subject that a source describing it doesn't (milestone 7;
   the owner's clearest kind: "Project A tells you a bunch about Bob including his favorite food, while Project B
   tells you about Bob but did not mention his favorite food"); a property most of an item's siblings give that it

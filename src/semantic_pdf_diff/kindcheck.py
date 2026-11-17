@@ -1,5 +1,5 @@
 """Kinds confirmed and named by the model (the confirm_kinds lever, off;
-docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 3, design question 7; the owner, 2026-11-01: "Let's try
+indexes and glossaries, a retired plan, milestone 3, design question 7; the owner, 2026-11-01: "Let's try
 your recommendations on the decisions. But test the model on Q7 and see how it works out.").
 
 The rules group a source's items into kinds by their names alone (indexes.kinds: a tag's letters, a sheet number's

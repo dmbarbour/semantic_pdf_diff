@@ -1,16 +1,8 @@
-# Endpoint setup: choosing a model, trying it, and seeing what's remembered
+# Endpoint setup: what was built and measured
 
-- **Status:** Planned (2026-10-28); [milestone 1](#1-the-bug-and-the-first-run-error-bugs-first-0027) done the same day, [2](#2-trying-seeing-and-forgetting-checks) and [3](#3-choosing-a-model) 2026-11-01 (the owner, on the review of open items: "Please go ahead."), [4](#4-guidance-before-each-run-in-place-of-a-guided-setup) and [5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)'s ping and acuity 2026-11-02 (one eye chart tried first and not built; a card a size built: the owner, "Go ahead with the per-size probe cards."). [Design questions](#design-questions) 1 to 3 answered; a controlled page as a probe left.
-- **The owner, 2026-10-28, from trials:** "better configuration setup, support for browsing available models at the endpoint and validating the endpoint, running a few checks if not calibrated. This could be somewhat interactive, or just supported through config ops."
-- **On the key sent to other models' URLs, the same day** (the deferred decision *A key for a model served elsewhere*): "I'll look into the `OPENAI_API_KEY` thing later. For now, it's the same, but we might want to modularize things and simplify user overrides by a user."
-- **The owner, answering design question 1 (2026-10-28):** "Endpoint URL in environment and user settings is sufficient. I'd hate to complicate things too much on the user's end."
-- **Builds on:** [an endpoint checked and calibrated on first use](endpoint-first-use-2026-10-20.md) ([0034](../decisions/0034-endpoint-checked-and-calibrated-on-first-use.md)), settings in layers ([0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md)).
-
-- **The owner, 2026-11-01, on milestones 2 and 3:** "When trying, seeing, and forgetting model checks, how do we distinguish checking a rerank or embedding model? Or can you list mode and other relevant stats (context size, etc.) upon for `config models`?" Both built the same day ([milestone 2](#2-trying-seeing-and-forgetting-checks), [3](#3-choosing-a-model)).
-
-- **The owner, 2026-11-02, answering design questions 2 and 3:**
-  - "Q2. Interactive mode would be more convenient for someone new to the tool, but I'm not sure it's what we need. More important is guidance: always do a quick check on settings before starting, always let users know if they've missed an important one. Perhaps we should distinguish 'no model' from 'unconfigured' for things like embedding and reranking, so users don't default to missing out on a feature they didn't know needed to be configured to use it."
-  - "Q3. Always test a model that hasn't been tested. If there are calibrations, run those up front. Even if the endpoints are tested in cache, do a lightweight ping to ensure the endpoints are up. This tool takes many hours to run, so it's something that is left to run overnight. Better to fail fast up front even if it costs a little. The engineer's time is measured in tens of dollars per hour. The endpoint is tenths of pennies for a liveness check, or perhaps less."
+- **What this is:** the plan *Endpoint setup*, from its first section on, kept as the record of what was designed, built and measured when the plan was retired (the review of open items, 2026-11-17, R8; the owner: "Let's proceed with the recommended order."). Its header (status, the owner's words, what it took over) as it last stood: `git show 54f4f30:docs/plans/endpoint-setup-2026-10-28.md`. Links to plans it names point to them, or to the [plans index](../plans/README.md#retired) where they're retired.
+- **Its decisions:** [0032](../decisions/0032-settings-in-layers-and-one-answers-cache.md) (amended: the endpoint's URL and keys named by variables), [0034](../decisions/0034-endpoint-checked-and-calibrated-on-first-use.md) (amended: models tried, checks seen and forgotten, guidance before each run).
+- **Its open items:** rows in the [lever index](../reviews/levers.md#ideas-not-built-yet) and the [plans index](../plans/README.md#tentative), each naming this plan.
 
 ## What exists (built 2026-10-20)
 
@@ -163,7 +155,7 @@
   - **Two cards at a time since** (2026-11-02, with the low-hanging fruit: the owner, "Let's go with your recommendations on the low-hanging fruit."; `checkup.CARDS_AT_ONCE`), gentler on an endpoint of a few servers. It didn't save Llama-4-Scout: refused every card again, and its JSON check alone too, DeepInfra's model busy whatever is asked. gemma-4 at two at a time: 6.9 px ($0.0014).
   - **Scored a little apart from the lab:** text is folded (dashes, primes, quotes) before NFKC as well as after. NFKC makes a double prime (″) two primes, so the lab's scoring counts an inch mark written so as misread.
   - **Left too:** a controlled document's page read against its key, which needs a pass mark measured across models.
-- **Then:** the vision profile, recommending a model per task ([*Model discovery and per-task selection*](README.md#tentative), [*Vision profiles and adaptive slicing*](README.md#tentative)), and keeping only the models a user's globs allow.
+- **Then:** the vision profile, recommending a model per task ([*Model discovery and per-task selection*](../plans/README.md#tentative), [*Vision profiles and adaptive slicing*](../plans/README.md#tentative)), and keeping only the models a user's globs allow.
 
 ### Later: endpoints as named parts
 
@@ -185,3 +177,4 @@
 3. **The probes' cost and when they run:** only on `config test --probes`, or also on a model's first use?
    - **I'd run them on request only.** The first-use checks stay what they are: cheap, and needed before anything is asked.
    - **Answered 2026-11-02** (quoted at the top): on a model's first use, up front, and a ping each run even where the checks are remembered ([milestone 5](#5-failing-fast-a-ping-each-run-and-probes-on-first-use)).
+

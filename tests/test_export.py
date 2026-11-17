@@ -1,5 +1,5 @@
 """`semantic-pdf-diff export`: a report's claims as Markdown chunks for a RAG system's ingest
-(docs/plans/single-source-outputs-2026-09-23.md, feature 2; the owner, 2026-10-31: "Please proceed in recommended
+(single-source outputs, a retired plan, feature 2; the owner, 2026-10-31: "Please proceed in recommended
 order"; then per topic and per finding: "The proposed next steps seem good to me. Please proceed.")."""
 import stubs  # noqa: F401 (a clean environment)
 import json

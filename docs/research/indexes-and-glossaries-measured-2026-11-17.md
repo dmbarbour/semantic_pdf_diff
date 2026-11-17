@@ -1,31 +1,15 @@
-# Indexes and glossaries: a source's subjects, figures, claims and terms, alone or merged across a comparison
+# Indexes and glossaries: what was built and measured
 
-- **Status:** Active (2026-10-29): milestone 1 built the same day (0.7.0), with [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1 (`analyze`); the glossary (milestone 2), names merged and kinds (milestone 3), and the glossary used by the comparison and given to the reader (milestone 5) built 2026-10-30. [Design questions](#design-questions) 1 to 3 answered 2026-10-29, 4 and 5 on 2026-10-30, 6 and 7 on 2026-11-01 (kinds grouped by what their items are, built the same day, and the model's `confirm_kinds`, off), 8 on 2026-11-02 (a table's lines of two labels joined shown to the structure query, built the same day, `labels_joined`, a default since).
-- **The owner, 2026-10-29:**
-  - "We have a lot of open plans. I'd like to focus on two things that will be immediately useful to me: single document outputs, and building indexes and glossaries, e.g. of claims, diagrams, subjects. Even for a single document that would be useful, and it seems deeply related to the problem of comparing things regardless."
-  - "Well, I say "single document" but I really mean "single source" that might be a folder of docs."
-- **The owner's answers, 2026-10-29** (chosen from options I offered):
-  - **The command:** a new one, `analyze`, for one source; `compare` stays for two or more.
-  - **Files besides report.html:** Markdown, CSV and JSON, and "An excel file is also a good representation for indices. We already output excel workbooks of claims, but not really designed as an indexing model."
-  - **In a comparison:** one merged index, each subject or term listed once, with what each source says side by side.
-- **The owner, 2026-10-30:** "Please proceed with the glossary." And, of design questions 4 and 5, in their words below.
-- **The owner, 2026-10-30,** after names merged the index's subjects: "Will these subject merges extend to comparisons and analysis later? Alright, please proceed."
-- **Earlier, the owner on glossaries (2026-10-15):** "Seems we should consider developing a glossary for abbreviations, framings, etc.. not as a set of claims, but as metadata for reports, comparisons, and comprehending claims in context. This would be another plan of its own, IIUC." The tentative row *Document glossaries* is moved in whole ([the glossary](#the-glossary)).
-- **Takes over:**
-  - [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 2, subjects found mechanically: the subject index, which is [claim context](claim-context-2026-10-14.md)'s per-document entity register
-  - the tentative row *Document glossaries*, and its two lever ideas (the [lever index](../reviews/levers.md): a glossary record; abbreviations as names in alignment)
-- **Builds on:**
-  - alignment's items (`align.Side`: a tag, else the entity's words) and its item correspondence ([0038](../decisions/0038-revisions-aligned-then-differences-explained.md))
-  - situating's figures, the prose citing them and their "abouts" (PDFs; [0039](../decisions/0039-runs-paced-by-throughput-and-situated-after-extraction.md))
-  - context records: tables' titles and headers, sheets' title blocks, notes and legend blocks (`records.py`)
-  - other names (`search_names`), topics and search, the portable report ([0033](../decisions/0033-self-contained-reports-and-their-search.md))
+- **What this is:** the plan *Indexes and glossaries*, from its first section on, kept as the record of what was designed, built and measured when the plan was retired (the review of open items, 2026-11-17, R8; the owner: "Let's proceed with the recommended order."). Its header (status, the owner's words, what it took over) as it last stood: `git show 54f4f30:docs/plans/indexes-and-glossaries-2026-10-29.md`. Links to plans it names point to them, or to the [plans index](../plans/README.md#retired) where they're retired.
+- **Its decisions:** [0046](../decisions/0046-one-source-analyzed-with-indexes-of-what-was-read.md) (the indexes), [0049](../decisions/0049-a-glossary-is-metadata-beside-the-claims.md) (the glossary), [0024](../decisions/0024-pdf-table-structure.md) (amended: rows read as one parted, labels joined).
+- **Its open items:** rows in the [lever index](../reviews/levers.md#ideas-not-built-yet) and the [plans index](../plans/README.md#tentative), each naming this plan.
 
 ## Why
 
 - **A source's claims are only a flat list.** Search, topics and the Claims view reach them, and only in a comparison's report. Nothing gathers what a source says about one thing, lists its figures and tables, or says what its abbreviations mean.
 - **Comparing needs the same gathering.**
   - Two sources' subjects matched, each subject's properties side by side.
-  - A property one source gives for a subject and the other doesn't: [single-document analysis](single-document-analysis-2026-10-28.md)'s clearest gap.
+  - A property one source gives for a subject and the other doesn't: [single-document analysis](single-document-analysis-measured-2026-11-17.md)'s clearest gap.
   - An abbreviation and its expansion taken as one name ("TDH" and "total dynamic head").
 - **A source may be a folder** of documents, as `compare`'s sources are: files, folders and zip archives. Every entry cites its file and where in it.
 - **No workbook is written today.** The nearest is `show evidence_occurrences --format csv`, a flat table of claims.
@@ -94,7 +78,7 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 
 - **report.html:** Subjects, Figures and Glossary views beside Claims, Topics and Search. A subject's entry leads to its claims' cards.
 - **report.json:** an `index` part (subjects, properties, figures, glossary), for tools.
-- **index.md:** the indexes as a readable document, A to Z, each entry with where it's said. Also usable as chunks for an LLM; [single-source outputs](single-source-outputs-2026-09-23.md)' RAG export shares its writing.
+- **index.md:** the indexes as a readable document, A to Z, each entry with where it's said. Also usable as chunks for an LLM; [single-source outputs](single-source-outputs-measured-2026-11-17.md)' RAG export shares its writing.
 - **index/\*.csv:** one file per index.
 - **index.xlsx:** designed as an index (the owner: "not really designed as an indexing model"):
   - a sheet per index, its header frozen and filters on
@@ -124,7 +108,7 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
 - **No new requests:** subjects (mechanical), properties, claims, figures and tables.
 - **Shown** as views in report.html; a comparison's merged.
 - **Written** as report.json's `index`, index.md, the CSV files and index.xlsx.
-- **One source:** in `analyze`'s report, [single-document analysis](single-document-analysis-2026-10-28.md)'s milestone 1, built first.
+- **One source:** in `analyze`'s report, [single-document analysis](single-document-analysis-measured-2026-11-17.md)'s milestone 1, built first.
 - **Built 2026-10-29 (0.7.0):**
   - `indexes.py` and `indexfiles.py`; the page's Subjects and Figures and tables views, each value linked to its claim.
   - A merged subject's properties are one where they're named alike or the findings pair their claims.
@@ -227,7 +211,7 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
      - **Built: where it fits neatly** (pdf/14). Two lines each starting with a tag of their own, of one shape, stay apart (`tables.tagged_apart`), and such a line isn't a structure suspect for want of a rule above it. A line whose first cell, starting with its own tag, spans the columns is parted at the column lines by where its words are (`tables.parted_across`): only where a line beside it holds a tag of that shape alone, no word straddles a line, and the tag alone is left in the first column.
      - **The corpus** (offline, every PDF in samples/ and benchmarks/, 6,028 tables): 3 tables read otherwise, each by eye right: scical's sheet index (in scical_cd.pdf and the 9-sheet subset) and sd15-calpoly's fixture schedule, whose P6, P7 and P8 had been one row. None in the controlled corpus, so nothing recorded moves. Parting cells across columns without the tag condition had changed 69 more (slide headers, "775 775 775" in a load table): too loose.
      - **scical's 9 sheets analysed again** ($0.023, a scratch cache): rows read as one 21 → 0; the sheet index's claims 58 → 85, H-101 and S-001 given their own titles; kinds as before, gaps 48 → 48, contradictions the same 12; suspected misreads 54 → 38 and re-reads finding a claim otherwise 28 → 13, the 15 gone each a merged row the second pass had caught.
-     - **Found on the way, fixed:** the sheets' four title properties, one before, came apart: 20 sheets' index titles, now counted, against their titles as page 1's tiles read them, cut at a tile's edge ("HARDWIRED EQUIPMENT ELECTRICA"). A value cut short in a word, two words or more, is now alike for the join (`indexes._cut`), and the four are one again. The cut itself is the [text cut by tiles](text-cut-by-tiles-2026-10-28.md) plan's.
+     - **Found on the way, fixed:** the sheets' four title properties, one before, came apart: 20 sheets' index titles, now counted, against their titles as page 1's tiles read them, cut at a tile's edge ("HARDWIRED EQUIPMENT ELECTRICA"). A value cut short in a word, two words or more, is now alike for the join (`indexes._cut`), and the four are one again. The cut itself is the [text cut by tiles](../plans/text-cut-by-tiles-2026-10-28.md) plan's.
      - **The model asked where a reading is confusing,** [design question 8](#design-questions): built 2026-11-02, `labels_joined`, a default the same day.
 7. **Kinds by rules alone, or a model as well?** The rules above fix what scical shows. A model asked to confirm and name each source's kinds would catch what rules can't: one request a source, showing its kinds' items and properties, about a cent.
    - **I'd build the rules first and measure them,** and add the model as a lever (off until measured) only if other sets show kinds the rules get wrong.
@@ -255,3 +239,4 @@ The owner, 2026-10-30: "Also think on how much provenance or context should be t
      - **Held-out, by eye:** 120 kept, 196 read otherwise. sd15-calpoly's abbreviation lists, symbol legend and fixture schedule, liftoff's chart labels and the NSREC poster's acronyms all better ("AH ALUM" two rows, "FPGA FRIB" two). sd15-calpoly's title blocks: label pairs left in one row 205 → 146 ("TEAM NAME:" with "ADDRESS:", "DRAWN BY:" with "CHECKED BY:"). The partings read were right, but for a client's lines parted from its web address; of the 26 lines read in parts keeping every one, 8 were wrong (those label pairs, and a date with its sheet's number). And 13 title blocks whose answers passed in base failed twice with the lever, so read as mended: a tagged line the rules didn't name stayed joined, against the example copied apart from the image.
      - **Found on the way, fixed:** a lone value the model gave for a list ("into": "B") failed the whole answer, in every arm (`schema.Lenient`).
    - **A default since 2026-11-02** (the owner, on the report: "Yes, let's turn that on by default."): a store read before reads its tables again on its next run, each unchanged request answered from the cache.
+

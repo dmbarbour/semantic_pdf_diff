@@ -1,4 +1,4 @@
-"""A report's claims as Markdown chunks for a RAG system's ingest (docs/plans/single-source-outputs-2026-09-23.md,
+"""A report's claims as Markdown chunks for a RAG system's ingest (single-source outputs, a retired plan,
 feature 2, milestone 2): `semantic-pdf-diff export`. The target ingest tool keeps little metadata and cuts its text into
 512-token chunks, so each chunk is sized under that and says in its own words where it came from.
 

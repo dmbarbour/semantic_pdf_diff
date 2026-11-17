@@ -1,4 +1,4 @@
-"""A source's glossary (docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 2): its abbreviations, defined
+"""A source's glossary (indexes and glossaries, a retired plan, milestone 2): its abbreviations, defined
 terms, symbols and conventions, each with its meaning and where it's defined. Metadata beside the claims, never
 claims of their own (the owner, 2026-10-15: "a glossary for abbreviations, framings, etc.. not as a set of claims,
 but as metadata for reports, comparisons, and comprehending claims in context"; 2026-10-30: "Please proceed with the

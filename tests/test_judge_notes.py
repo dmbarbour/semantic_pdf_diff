@@ -1,4 +1,4 @@
-"""The second pass in comparisons (the judge_notes lever; docs/plans/single-document-analysis-2026-10-28.md,
+"""The second pass in comparisons (the judge_notes lever; single-document analysis, a retired plan,
 milestone 6): each source's subjects read together before judging, and the judge shown what that noted of each claim.
 The owner, 2026-10-28: "A lot of comparisons don't make sense because they're compared without enough context";
 2026-11-07: "Proceed with the recommended path."."""

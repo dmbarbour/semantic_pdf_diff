@@ -874,7 +874,7 @@ class Replay(unittest.TestCase):
 @slow
 class Planted(unittest.TestCase):
     """The planted reports and their clean twins (consistency.py): the second pass and the gaps found by code scored
-    against what's planted (docs/plans/single-document-analysis-2026-10-28.md, milestones 3 to 5)."""
+    against what's planted (single-document analysis, a retired plan, milestones 3 to 5)."""
     def test_the_twins_differ_only_where_planted_and_place_every_fact(self):
         from semantic_pdf_diff_lab.bench.controlled import consistency
         planted, clean = consistency.station(1, "planted"), consistency.station(1, "clean")

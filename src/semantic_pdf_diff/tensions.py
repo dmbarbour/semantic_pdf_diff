@@ -1,5 +1,5 @@
 """Tensions: a subject's claims hard to hold together on engineering grounds, with a level of suspicion
-(docs/plans/single-document-analysis-2026-10-28.md, milestone 4; the owner, 2026-11-06: "We'll need to also look for
+(single-document analysis, a retired plan, milestone 4; the owner, 2026-11-06: "We'll need to also look for
 qualitative inconsistencies, with levels of suspicion. E.g. claiming low-alloy steel combined with a claim of
 corrosion resistance without a clear mitigating factor. [...] this is where a model with some domain knowledge is
 likely necessary.").

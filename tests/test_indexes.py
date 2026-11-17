@@ -1,4 +1,4 @@
-"""A report's indexes (indexes.py) and their files (indexfiles.py): docs/plans/indexes-and-glossaries-2026-10-29.md,
+"""A report's indexes (indexes.py) and their files (indexfiles.py): indexes and glossaries, a retired plan,
 milestone 1. The owner, 2026-10-29: "building indexes and glossaries, e.g. of claims, diagrams, subjects", and of
 the files: "An excel file is also a good representation for indices.\""""
 import stubs  # noqa: F401 (a clean environment)

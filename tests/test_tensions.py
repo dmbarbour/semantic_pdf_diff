@@ -1,4 +1,4 @@
-"""Tensions (tensions.py; docs/plans/single-document-analysis-2026-10-28.md, milestone 4): a subject's claims hard to
+"""Tensions (tensions.py; single-document analysis, a retired plan, milestone 4): a subject's claims hard to
 hold together on engineering grounds, by level, what would reconcile them looked for in the source by code. The owner,
 2026-11-06: "We'll need to also look for qualitative inconsistencies, with levels of suspicion. E.g. claiming
 low-alloy steel combined with a claim of corrosion resistance without a clear mitigating factor."""

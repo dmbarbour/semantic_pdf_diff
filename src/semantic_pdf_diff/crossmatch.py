@@ -1,5 +1,5 @@
-"""Subjects matched across proposals by the model (the match_subjects lever; docs/plans/single-document-analysis-
-2026-10-28.md, milestone 7; the owner, 2026-11-07, answering its design: "All four recommendations look good as a
+"""Subjects matched across proposals by the model (the match_subjects lever; single-document analysis, a
+retired plan, milestone 7; the owner, 2026-11-07, answering its design: "All four recommendations look good as a
 start."): what matching by code (indexes.matched: keyed alike, other names) leaves alone in each source.
 
 - **Asked:** each subject alone in the source with fewer of them, shown with up to CANDIDATES subjects alone in the

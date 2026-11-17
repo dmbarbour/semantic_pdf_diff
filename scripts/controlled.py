@@ -42,7 +42,7 @@ checkout's.
 `analyze` reads each planted report and its clean twin (docs-analysis; consistency.py) with `analyze`, its second
 pass on and situated (references), recorded or replayed as `run` is (a variant's settings over them with --variant),
 and scores what the second pass and the gaps found by code found against what's planted: analysis.json (the
-standard arm's; docs/plans/single-document-analysis-2026-10-28.md, milestones 3 to 5).
+standard arm's; single-document analysis, a retired plan, milestones 3 to 5).
 
 `heldout` measures a change already chosen on held-out proposals pairs (proposals.py; decision 0037: held-out sets
 scored only when a change is up for promotion): the seeds named, never development's, generated into heldout/

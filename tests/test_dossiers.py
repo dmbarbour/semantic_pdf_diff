@@ -1,4 +1,4 @@
-"""The second pass (dossiers.py; docs/plans/single-document-analysis-2026-10-28.md, milestone 3): each subject's
+"""The second pass (dossiers.py; single-document analysis, a retired plan, milestone 3): each subject's
 claims read together, what's learnt kept as a log beside the claims. The owner, 2026-10-28: "a second pass [...] where
 claims are analyzed in context"; 2026-10-31: "Agree with all second-pass recommendations." (the subject's dossier, a
 stage, text first)."""

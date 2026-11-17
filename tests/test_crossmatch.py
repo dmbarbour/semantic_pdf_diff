@@ -1,5 +1,5 @@
 """Subjects across documents and the gaps another source fills (crossmatch.py, indexes.given_elsewhere, the look_gaps
-lever; docs/plans/single-document-analysis-2026-10-28.md, milestone 7). The owner, 2026-11-07, answering its design:
+lever; single-document analysis, a retired plan, milestone 7). The owner, 2026-11-07, answering its design:
 "All four recommendations look good as a start."."""
 import stubs  # noqa: F401 (a clean environment)
 import io

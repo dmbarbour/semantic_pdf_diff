@@ -1,4 +1,4 @@
-"""Cited summaries (docs/plans/single-source-outputs-2026-09-23.md, milestone 4; the owner, 2026-11-06: "This seems
+"""Cited summaries (single-source outputs, a retired plan, milestone 4; the owner, 2026-11-06: "This seems
 like a good design for milestone 4."): a source's parts summarized from their claims alone, each sentence citing the
 claims it rests on, and checked against them by code.
 

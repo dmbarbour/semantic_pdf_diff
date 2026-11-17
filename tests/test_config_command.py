@@ -189,7 +189,7 @@ class Layers(unittest.TestCase):
         self.assertEqual((plain.mode, plain.report_budget, plain.split), ("proposals", 20_000_000, False))
 
 class EndpointUrl(unittest.TestCase):
-    """The endpoint's URL is the environment's and the user's, never a store's (docs/plans/endpoint-setup-2026-10-28.md,
+    """The endpoint's URL is the environment's and the user's, never a store's (endpoint setup, a retired plan,
     milestone 1; the owner, 2026-10-28: "Endpoint URL in environment and user settings is sufficient. I'd hate to
     complicate things too much on the user's end.")."""
     def setUp(self):

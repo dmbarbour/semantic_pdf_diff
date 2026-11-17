@@ -1,4 +1,4 @@
-"""Cited summaries (summaries.py; docs/plans/single-source-outputs-2026-09-23.md, milestone 4): a source's parts
+"""Cited summaries (summaries.py; single-source outputs, a retired plan, milestone 4): a source's parts
 summarized from their claims alone, each sentence citing the claims it rests on, checked against them by code. The
 owner, 2026-11-06: "This seems like a good design for milestone 4."; "Claims only"; a sentence failing its check kept
 and marked; "Yes, with provenance." (the export)."""

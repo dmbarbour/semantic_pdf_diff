@@ -1,4 +1,4 @@
-"""A report's indexes as files beside it (docs/plans/indexes-and-glossaries-2026-10-29.md; the owner, 2026-10-29,
+"""A report's indexes as files beside it (indexes and glossaries, a retired plan; the owner, 2026-10-29,
 choosing Markdown, CSV and JSON, and "An excel file is also a good representation for indices. We already output
 excel workbooks of claims, but not really designed as an indexing model."):
 

@@ -1,5 +1,5 @@
 """How small a model reads: a card a size, five lines of random codes and numbers at one capitals' height each, read
-back and scored exactly; the acuity check (checkup.py; docs/plans/endpoint-setup-2026-10-28.md, milestone 5; the
+back and scored exactly; the acuity check (checkup.py; endpoint setup, a retired plan, milestone 5; the
 owner, 2026-11-02: "Always test a model that hasn't been tested. If there are calibrations, run those up front.", then,
 on one chart's trial: "Go ahead with the per-size probe cards.").
 

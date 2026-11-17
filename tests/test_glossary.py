@@ -1,4 +1,4 @@
-"""A source's glossary (glossary.py): docs/plans/indexes-and-glossaries-2026-10-29.md, milestone 2. The owner,
+"""A source's glossary (glossary.py): indexes and glossaries, a retired plan, milestone 2. The owner,
 2026-10-15: "a glossary for abbreviations, framings, etc.. not as a set of claims, but as metadata for reports,
 comparisons, and comprehending claims in context"; 2026-10-30: "Please proceed with the glossary.\""""
 import stubs  # noqa: F401 (a clean environment)
