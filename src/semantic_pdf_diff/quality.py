@@ -7,6 +7,7 @@ place to look, not a verdict).
 import re
 
 from .retiling import CUT_NOTE, says_cut
+from .schema import TOO_LONG
 from .tablerules import ALONE
 from .tablestructure import AS_LEFT
 from .tasks import REJECTED, UNQUOTED
@@ -18,6 +19,9 @@ KINDS = (
     ("short", "Cut short", "answers the model said were incomplete (of the page's requests)"),
     ("dropped", "Quotes not found", "claims dropped, their quote not in the text they were read from (of the claims "
                                     "its text gave, kept or dropped)"),
+    ("long", "Too long", "claims dropped as longer than a field allows: a value over 300 characters, a quote over 400 "
+                         "(a requirement's sentence, a rationale)"),
+    ("unsent", "Rows not sent", "table rows too long for one request, never read"),
     ("unverified", "Quotes unverified", "claims kept, their quote not in the page's text layer (a picture's) or in "
                                         "their text (unquoted) (of the page's claims checked)"),
     ("cut", "Text cut", "image tiles whose answer said text was cut at their edges (of the page's images)"),
@@ -33,6 +37,8 @@ NAMES = {key: name for key, name, _ in KINDS}
 OF = {"failed": "requests", "unread": "requests", "short": "requests", "cut": "images", "dropped": "from text",
       "unverified": "checked", "doubted": "claims", "reread": "claims"}
 TABLE_NOTE = re.compile(rf"^(?:{re.escape(AS_LEFT)}|every row {ALONE}|Row .* {ALONE}): ")
+LONG_NOTE = re.compile(rf"^Discarded (\d+) claim\(s\) {re.escape(TOO_LONG)}")
+UNSENT_NOTE = "Table row exceeds text budget"  # tasks.Tasks' oversized note, and extract's
 
 def _row_counts(r):
     """{kind: n} for one coverage row."""
@@ -40,13 +46,19 @@ def _row_counts(r):
     dropped = sum(1 for i in issues if i == REJECTED)
     if dropped:
         out["dropped"] = dropped
+    long_ = sum(int(m.group(1)) for m in map(LONG_NOTE.match, issues) if m)
+    if long_:
+        out["long"] = long_
+    unsent = any(i.startswith(UNSENT_NOTE) for i in issues)
+    if unsent:
+        out["unsent"] = 1
     if r["status"] == "failed":
         out["failed"] = 1
     elif r["status"] == "not_reached":
         out["unread"] = 1
-    elif r["status"] == "partial" and not dropped and not any(i.startswith("Continued: ") or i == UNQUOTED
-                                                              for i in issues):
-        out["short"] = 1  # a row a quote failed made partial is counted as its drops (the two aren't told apart)
+    elif r["status"] == "partial" and not (dropped or long_ or unsent) and not any(
+            i.startswith("Continued: ") or i == UNQUOTED for i in issues):
+        out["short"] = 1  # a row its drops made partial is counted as its drops (the two aren't told apart)
     if says_cut(issues) or any(i.startswith(CUT_NOTE) for i in issues):
         out["cut"] = 1
     tables = sum(1 for i in issues if TABLE_NOTE.match(i))

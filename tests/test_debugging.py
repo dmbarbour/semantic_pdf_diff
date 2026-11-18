@@ -172,6 +172,22 @@ class Debug(unittest.TestCase):
         self.assertNotIn("pump", shown)
         self.assertIsNone(debugging.matching({"index": {}}))
 
+    def test_what_the_reading_lost_in_counts_naming_nothing(self):
+        """Requirements and textual claims, milestone 0: claims too long to keep, rows not sent, and text claims."""
+        data = {"coverage": [{"content": "c", "page": 1, "task": "t1", "status": "partial", "claims": 0,
+                              "issues": ["Discarded 3 claim(s) too long to keep"]},
+                             {"content": "c", "page": 2, "task": "t2", "status": "partial", "claims": 0,
+                              "issues": ["Table row exceeds text budget"]}],
+                "evidence": [{"id": "e1", "content": "c", "locator": {"page": 1}, "value": "SECRET shall hold"},
+                             {"id": "e2", "content": "c", "locator": {"page": 1}, "value": "70"}],
+                "files": [{"source": "s", "path": "a.pdf", "content": "c"}]}
+        found = debugging.reading(data)
+        self.assertEqual((found["claims"], found["text"], found["counts"]), (2, 1, {"long": 3, "unsent": 1}))
+        shown = "\n".join(debugging.read_lines(found, str))
+        self.assertIn("too long 3", shown)
+        self.assertIn("rows not sent 1", shown)
+        self.assertNotIn("SECRET", shown)
+
     def test_a_long_step_name_keeps_the_columns(self):
         """The owner, 2026-10-29: "table-structure-review [...] (this name is too wide for our columns)"."""
         found = {"version": "0", "python": "3", "pymupdf": "", "store": "s", "cache": "c", "endpoint_of": "e",

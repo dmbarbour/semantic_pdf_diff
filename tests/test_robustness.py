@@ -222,7 +222,8 @@ class ValidationTests(unittest.TestCase):
             'not a claim']})
         self.assertEqual(len(result.claims), 2)
         self.assertFalse(result.complete)
-        self.assertIn('Discarded 3 malformed claim(s)', result.issues)
+        self.assertIn('Discarded 2 malformed claim(s)', result.issues)
+        self.assertIn('Discarded 1 claim(s) too long to keep', result.issues)  # the quote of 401 characters
 
     def test_an_answer_without_complete_keeps_its_claims(self):
         # code review 2026-10-08, C12: it was rejected whole, then asked again

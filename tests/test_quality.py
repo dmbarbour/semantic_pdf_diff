@@ -56,6 +56,21 @@ class Counted(unittest.TestCase):
         self.assertEqual(found[(B, 1)]["counts"], {"unread": 1})
         self.assertEqual(quality.said(found[(A, 2)], "tables"), "1")
 
+    def test_claims_too_long_and_rows_not_sent_counted_apart(self):
+        """Requirements and textual claims, milestone 0: what a corpus of statements loses, said without its text."""
+        from semantic_pdf_diff.schema import Extraction
+        good = {"entity": "FOO", "attribute": "rationale", "value": "short", "kind": "table", "quote": "short",
+                "confidence": 0.9}
+        answer = Extraction.model_validate({"complete": True, "claims": [good, {**good, "value": "x" * 301},
+                                                                          {**good, "quote": "y" * 401}]})
+        self.assertEqual(len(answer.claims), 1)
+        self.assertFalse(answer.complete)
+        data = {"coverage": [row(A, 1, "table:p1:t0:r1", "partial", answer.issues),
+                             row(A, 1, "table:p1:t0:r2", "partial", ["Table row exceeds text budget"])],
+                "evidence": [], "files": [{"source": "s", "path": "a.pdf", "content": A}]}
+        counts = quality.pages(data)[0]["counts"]
+        self.assertEqual(counts, {"long": 2, "unsent": 1})  # neither counted cut short as well
+
     def test_the_runs_line_and_the_reports_view(self):
         self.assertEqual(quality.lines(report()), [
             "Read with problems: 5 of 5 pages (failed 1, not read 1, cut short 1, quotes not found 2, quotes "

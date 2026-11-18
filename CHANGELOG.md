@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.73.0 (2026-11-18)
+
+- **What a run's reading lost, counted:** a claim discarded for a field longer than allowed (a value over 300 characters, a quote over 400: a requirement's sentence, a rationale) is said apart from a malformed one, and counted ("Too long"), as are table rows too long to send ("Rows not sent"), in the run's last line, the report's Reading view and `debug`. `debug` also says how many of the last report's claims are text (no digit in their value). Nothing of the documents is printed. The first step of the requirements and textual claims plan: what a corpus of statements loses, sized where it can't be shared.
+
 ## 0.72.0 (2026-11-18)
 
 - **Tensions on by default in analyses** (`tensions`): each subject's claims read for those hard to hold together on engineering grounds, by level, with what would reconcile them looked for in the document, in a Suspects view. Held out on 13 public documents (8 drawing sets, 5 reports), a panel of three models found 45 of 67 tensions worth a reviewer's look (17 design concerns, such as a breaker smaller than its circuit's minimum or mini-splits scheduled in tons their model numbers give in Btu/h; 28 claims read wrongly), against 13 of 67 sets of claims drawn alike. Under half a cent a page. Round 0's settings keep it off.

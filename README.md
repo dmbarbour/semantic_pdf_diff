@@ -4,7 +4,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.72.0** (2026-11-18; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
+**v0.73.0** (2026-11-18; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
 
 - **Sources** as files, folders and zip archives, declared in a persistent, resumable store
 - **Replay fixtures:** recorded model answers, so runs replay offline
@@ -93,7 +93,7 @@ semantic-pdf-diff export --store work --since work/export --json        # only w
 
 A revision is just another source (e.g. `team-a-rev1` vs `team-a-rev2`). Manifests (`source export` / `source import`, or `compare --manifest FILE` for a live link) carry source definitions between stores and users. Files of the types listed under Status are read; others are listed as skipped (`source show` says which, and why).
 
-When requests fail, `semantic-pdf-diff debug --store work` says how often and why, in a few lines to read off a screen: the endpoint and models the last comparison used, the requests the store's runs asked by step (answered, failed, never answered), how the last comparison's subjects were matched (counts of subjects joined, links by band and what weighed most, sets, subjects named only as a document's parts), and the errors recorded, the most frequent first. It asks no model and prints nothing of the documents but what a server's error quotes.
+When requests fail, `semantic-pdf-diff debug --store work` says how often and why, in a few lines to read off a screen: the endpoint and models the last comparison used, the requests the store's runs asked by step (answered, failed, never answered), how the last comparison's subjects were matched (counts of subjects joined, links by band and what weighed most, sets, subjects named only as a document's parts), what the reading lost (claims too long to keep, table rows not sent, quotes not found, ...) and how many claims are text, and the errors recorded, the most frequent first. It asks no model and prints nothing of the documents but what a server's error quotes.
 
 Exit codes: `0` complete (uncertainty may remain); `2` incomplete coverage or processing failures; `3` paused for the budget, or for a rate limit until the time it says: run it again to resume; `1` fatal input or configuration error, a mistyped command or option included; `5` the endpoint failed: a check of `semantic-pdf-diff config test`, or 25 requests in a row (`stop_after_failures`), which pauses the run until it's run again; `130` interrupted by Ctrl+C: run it again to resume.
 

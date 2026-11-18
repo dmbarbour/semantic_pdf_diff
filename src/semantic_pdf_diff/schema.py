@@ -62,6 +62,10 @@ def edges(said):
     found = {EDGE_WORDS.get(w, w) for w in re.findall(r"[a-z]+", words.lower())}
     return [e for e in EDGES if e in found]
 
+# A claim discarded for a field longer than Claim allows (a value over 300 characters, a quote over 400), said apart
+# from one malformed (quality.py counts them: requirements and textual claims, milestone 0)
+TOO_LONG = "too long to keep"
+
 class Extraction(Strict):
     claims: list[Claim] = Field(max_length=MAX_CLAIMS)
     complete: bool
@@ -80,7 +84,7 @@ class Extraction(Strict):
         if not isinstance(data, dict) or not isinstance(data.get("claims"), list):
             return data
         issues = [str(i) for i in data.get("issues") or [] if i is not None]
-        claims, dropped = [], 0
+        claims, dropped, long_ = [], 0, 0
         for raw in data["claims"]:
             if not isinstance(raw, dict):
                 dropped += 1
@@ -96,14 +100,20 @@ class Extraction(Strict):
                 item["stance"] = [x for x in links if isinstance(x, dict) and str(x.get("holder") or "").strip()]
             try:
                 claims.append(Claim.model_validate(item).model_dump())
-            except ValidationError:
-                dropped += 1
+            except ValidationError as e:
+                if all(error["type"] == "string_too_long" for error in e.errors()):
+                    long_ += 1
+                else:
+                    dropped += 1
         complete = data.get("complete")
         if complete is None:  # left out: the claims kept, the answer not complete
             issues.append("The answer didn't say whether it was complete")  # (code review 2026-10-08, C12)
             complete = False
         if dropped:
             issues.append(f"Discarded {dropped} malformed claim(s)")
+            complete = False
+        if long_:
+            issues.append(f"Discarded {long_} claim(s) {TOO_LONG}")
             complete = False
         if len(claims) > MAX_CLAIMS:
             issues.append(f"Kept first {MAX_CLAIMS} of {len(claims)} claims")

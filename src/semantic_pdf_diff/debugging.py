@@ -5,8 +5,9 @@ prints error information and error counts. I'm not very able to copy a large scr
 Nothing of the documents is printed but what a server's error quotes: the version, the endpoint and the models the last
 comparison used (the store's settings, before one; URLs redacted), the requests the store's runs asked by step
 (answered, failed, never answered: not sent, as after sending stopped), the last comparison's counts and how its
-subjects were matched (counts only: the sources as A and B, no names), and the errors the answers cache recorded, the
-most frequent first. A failure is recorded once a request has failed its retries; a request
+subjects were matched (counts only: the sources as A and B, no names), what its reading lost (claims too long to
+keep, rows not sent, quotes not found, ...) and how many claims are text, and the errors the answers cache recorded,
+the most frequent first. A failure is recorded once a request has failed its retries; a request
 never sent isn't.
 """
 import os
@@ -102,6 +103,16 @@ def matching(data):
             "document_part_links": sum(1 for pair in found if pair & parts),
             "findings": dict(Counter(f.get("relation", "") for f in data.get("findings") or []).most_common())}
 
+def reading(data):
+    """What the last report's reading lost or doubted, in counts (quality.py's kinds over its pages), and how many of
+    its claims are text, their value holding no digit (requirements and textual claims, milestone 0: what a corpus of
+    statements loses, said without its text)."""
+    from .quality import pages, totals
+    claims = data.get("evidence") or []
+    counted, troubled = totals(pages(data))
+    return {"claims": len(claims), "text": sum(1 for e in claims if not any(c.isdigit() for c in e.get("value", ""))),
+            "pages_with_problems": troubled, "counts": counted}
+
 def comparison(data):
     """The last comparison's counts: {created_at, mode, paused, coverage: {status: n}, reranker, embedding,
     matching}."""
@@ -112,7 +123,7 @@ def comparison(data):
             "coverage": dict(Counter(r.get("status", "") for r in data.get("coverage") or []).most_common()),
             "reranker": {k: reranked[k] for k in counts if k in reranked} if reranked else None,
             "embedding": {k: vectors[k] for k in counts if k in vectors} if vectors else None,
-            "matching": matching(data)}
+            "matching": matching(data), "reading": reading(data)}
 
 def gather(folder, cache_path, settings, limit=10):
     """What `debug` prints, as data."""
@@ -152,6 +163,15 @@ def _pymupdf():
         return pymupdf.VersionBind
     except (ImportError, AttributeError):
         return ""
+
+def read_lines(r, n):
+    """reading's counts as a few lines."""
+    from .quality import KINDS
+    out = [f"  claims: {n(r['claims'])}, {n(r['text'])} of them text (no digit in their value)"]
+    said = ", ".join(f"{name.lower()} {n(r['counts'][k])}" for k, name, _ in KINDS if r["counts"].get(k))
+    if said:
+        out.append(f"  read with problems on {n(r['pages_with_problems'])} pages: {said}")
+    return out
 
 def matched_lines(m, n):
     """matching's counts as a few lines."""
@@ -209,6 +229,9 @@ def lines(found):
                 unsent = last[name].get("not_sent", 0)
                 out.append(f"  {name}: {n(asked)} request{'' if asked == 1 else 's'}, "
                            f"{n(last[name].get('failed', 0))} failed" + (f", {n(unsent)} not sent" if unsent else ""))
+        read = last.get("reading")
+        if read:
+            out += read_lines(read, n)
         found_matching = last.get("matching")
         if found_matching:
             out += matched_lines(found_matching, n)
