@@ -21,17 +21,17 @@
     "different in changed text": 9,
     "different in unchanged text": 13,
     "equivalent in changed text": 311,
-    "equivalent in unchanged text": 348,
+    "equivalent in unchanged text": 349,
     "settled in changed text": 410,
     "settled in unchanged text": 632,
     "uncertain in changed text": 32,
-    "uncertain in unchanged text": 11,
+    "uncertain in unchanged text": 10,
     "unrelated in changed text": 104,
     "unrelated in unchanged text": 38
    },
    "unmatched": {
     "no_confirmed_counterpart in changed text": 77,
-    "no_confirmed_counterpart in unchanged text": 61,
+    "no_confirmed_counterpart in unchanged text": 59,
     "not_compared in changed text": 417,
     "not_compared in unchanged text": 293,
     "unaligned in changed text": 233,
@@ -45,7 +45,7 @@
     "not_same_item in changed text": 26,
     "not_same_item in unchanged text": 14,
     "restated in changed text": 6,
-    "restated in unchanged text": 4,
+    "restated in unchanged text": 3,
     "split_or_merge in changed text": 3,
     "split_or_merge in unchanged text": 1
    },
@@ -595,21 +595,21 @@
     "different in changed text": 25,
     "different in unchanged text": 17,
     "equivalent in changed text": 83,
-    "equivalent in unchanged text": 441,
+    "equivalent in unchanged text": 442,
     "settled in changed text": 87,
-    "settled in unchanged text": 5851,
-    "uncertain in changed text": 37,
+    "settled in unchanged text": 5853,
+    "uncertain in changed text": 36,
     "uncertain in unchanged text": 28,
-    "unrelated in changed text": 93,
+    "unrelated in changed text": 94,
     "unrelated in unchanged text": 54
    },
    "unmatched": {
     "no_confirmed_counterpart in changed text": 45,
     "no_confirmed_counterpart in unchanged text": 34,
     "not_compared in changed text": 71,
-    "not_compared in unchanged text": 231,
+    "not_compared in unchanged text": 226,
     "unaligned in changed text": 31,
-    "unaligned in unchanged text": 92
+    "unaligned in unchanged text": 90
    },
    "explained": {
     "changed in changed text": 12,
@@ -617,7 +617,7 @@
     "conditions in changed text": 10,
     "conditions in unchanged text": 1,
     "misread in unchanged text": 2,
-    "not_same_item in changed text": 38,
+    "not_same_item in changed text": 37,
     "not_same_item in unchanged text": 35,
     "restated in unchanged text": 3,
     "split_or_merge in changed text": 2,
@@ -626,12 +626,12 @@
    "suspect_differences": 17,
    "numeric_changes": 12,
    "numeric_changes_unseen": 4,
-   "pairs_judged": 870,
-   "settled": 5938,
+   "pairs_judged": 871,
+   "settled": 5940,
    "groupings": {
     "ambiguous": 35,
     "attached": 17,
-    "matched": 1903,
+    "matched": 1905,
     "unaligned": 83
    },
    "examples": {
@@ -1091,8 +1091,8 @@
   },
   "ran1-fl0-fl3": {
    "claims": [
-    994,
-    1188
+    1128,
+    1342
    ],
    "claims_from_pictures": 56,
    "pictures_changed": [
@@ -1105,41 +1105,44 @@
     535
    ],
    "findings": {
+    "complementary in changed text": 1,
     "complementary in unchanged text": 13,
+    "different in changed text": 1,
     "different in unchanged text": 3,
-    "equivalent in changed text": 18,
-    "equivalent in unchanged text": 114,
-    "settled in changed text": 27,
-    "settled in unchanged text": 776,
-    "uncertain in changed text": 5,
-    "uncertain in unchanged text": 11,
+    "equivalent in changed text": 26,
+    "equivalent in unchanged text": 127,
+    "settled in changed text": 25,
+    "settled in unchanged text": 880,
+    "uncertain in changed text": 8,
+    "uncertain in unchanged text": 16,
     "unrelated in changed text": 2,
-    "unrelated in unchanged text": 3
+    "unrelated in unchanged text": 4
    },
    "unmatched": {
-    "no_confirmed_counterpart in changed text": 8,
-    "no_confirmed_counterpart in unchanged text": 12,
-    "not_compared in changed text": 104,
-    "not_compared in unchanged text": 73,
-    "unaligned in changed text": 59,
-    "unaligned in unchanged text": 76
+    "no_confirmed_counterpart in changed text": 11,
+    "no_confirmed_counterpart in unchanged text": 22,
+    "not_compared in changed text": 128,
+    "not_compared in unchanged text": 89,
+    "unaligned in changed text": 58,
+    "unaligned in unchanged text": 77
    },
    "explained": {
+    "changed in changed text": 3,
     "changed in unchanged text": 1,
-    "conditions in unchanged text": 2,
-    "not_same_item in changed text": 4,
-    "not_same_item in unchanged text": 11,
+    "conditions in unchanged text": 6,
+    "not_same_item in changed text": 5,
+    "not_same_item in unchanged text": 12,
     "unclear in changed text": 1
    },
    "suspect_differences": 3,
    "numeric_changes": 7,
    "numeric_changes_unseen": 2,
-   "pairs_judged": 169,
-   "settled": 803,
+   "pairs_judged": 201,
+   "settled": 905,
    "groupings": {
-    "ambiguous": 4,
-    "attached": 19,
-    "matched": 392,
+    "ambiguous": 7,
+    "attached": 27,
+    "matched": 440,
     "unaligned": 89
    },
    "examples": {
@@ -1273,17 +1276,17 @@
     "different in changed text": 9,
     "different in unchanged text": 13,
     "equivalent in changed text": 311,
-    "equivalent in unchanged text": 348,
+    "equivalent in unchanged text": 349,
     "settled in changed text": 410,
     "settled in unchanged text": 632,
     "uncertain in changed text": 32,
-    "uncertain in unchanged text": 11,
+    "uncertain in unchanged text": 10,
     "unrelated in changed text": 104,
     "unrelated in unchanged text": 38
    },
    "unmatched": {
     "no_confirmed_counterpart in changed text": 77,
-    "no_confirmed_counterpart in unchanged text": 61,
+    "no_confirmed_counterpart in unchanged text": 59,
     "not_compared in changed text": 417,
     "not_compared in unchanged text": 293,
     "unaligned in changed text": 233,
@@ -1297,7 +1300,7 @@
     "not_same_item in changed text": 26,
     "not_same_item in unchanged text": 14,
     "restated in changed text": 6,
-    "restated in unchanged text": 4,
+    "restated in unchanged text": 3,
     "split_or_merge in changed text": 3,
     "split_or_merge in unchanged text": 1
    },
@@ -1847,21 +1850,21 @@
     "different in changed text": 25,
     "different in unchanged text": 17,
     "equivalent in changed text": 83,
-    "equivalent in unchanged text": 441,
+    "equivalent in unchanged text": 442,
     "settled in changed text": 87,
-    "settled in unchanged text": 5851,
-    "uncertain in changed text": 37,
+    "settled in unchanged text": 5853,
+    "uncertain in changed text": 36,
     "uncertain in unchanged text": 28,
-    "unrelated in changed text": 93,
+    "unrelated in changed text": 94,
     "unrelated in unchanged text": 54
    },
    "unmatched": {
     "no_confirmed_counterpart in changed text": 45,
     "no_confirmed_counterpart in unchanged text": 34,
     "not_compared in changed text": 71,
-    "not_compared in unchanged text": 231,
+    "not_compared in unchanged text": 226,
     "unaligned in changed text": 31,
-    "unaligned in unchanged text": 92
+    "unaligned in unchanged text": 90
    },
    "explained": {
     "changed in changed text": 12,
@@ -1869,7 +1872,7 @@
     "conditions in changed text": 10,
     "conditions in unchanged text": 1,
     "misread in unchanged text": 2,
-    "not_same_item in changed text": 38,
+    "not_same_item in changed text": 37,
     "not_same_item in unchanged text": 35,
     "restated in unchanged text": 3,
     "split_or_merge in changed text": 2,
@@ -1878,12 +1881,12 @@
    "suspect_differences": 17,
    "numeric_changes": 12,
    "numeric_changes_unseen": 4,
-   "pairs_judged": 870,
-   "settled": 5938,
+   "pairs_judged": 871,
+   "settled": 5940,
    "groupings": {
     "ambiguous": 35,
     "attached": 17,
-    "matched": 1903,
+    "matched": 1905,
     "unaligned": 83
    },
    "examples": {
@@ -2343,8 +2346,8 @@
   },
   "ran1-fl0-fl3": {
    "claims": [
-    994,
-    1188
+    1128,
+    1342
    ],
    "claims_from_pictures": 56,
    "pictures_changed": [
@@ -2357,41 +2360,44 @@
     535
    ],
    "findings": {
+    "complementary in changed text": 1,
     "complementary in unchanged text": 13,
+    "different in changed text": 1,
     "different in unchanged text": 3,
-    "equivalent in changed text": 18,
-    "equivalent in unchanged text": 114,
-    "settled in changed text": 27,
-    "settled in unchanged text": 776,
-    "uncertain in changed text": 5,
-    "uncertain in unchanged text": 11,
+    "equivalent in changed text": 26,
+    "equivalent in unchanged text": 127,
+    "settled in changed text": 25,
+    "settled in unchanged text": 880,
+    "uncertain in changed text": 8,
+    "uncertain in unchanged text": 16,
     "unrelated in changed text": 2,
-    "unrelated in unchanged text": 3
+    "unrelated in unchanged text": 4
    },
    "unmatched": {
-    "no_confirmed_counterpart in changed text": 8,
-    "no_confirmed_counterpart in unchanged text": 12,
-    "not_compared in changed text": 104,
-    "not_compared in unchanged text": 73,
-    "unaligned in changed text": 59,
-    "unaligned in unchanged text": 76
+    "no_confirmed_counterpart in changed text": 11,
+    "no_confirmed_counterpart in unchanged text": 22,
+    "not_compared in changed text": 128,
+    "not_compared in unchanged text": 89,
+    "unaligned in changed text": 58,
+    "unaligned in unchanged text": 77
    },
    "explained": {
+    "changed in changed text": 3,
     "changed in unchanged text": 1,
-    "conditions in unchanged text": 2,
-    "not_same_item in changed text": 4,
-    "not_same_item in unchanged text": 11,
+    "conditions in unchanged text": 6,
+    "not_same_item in changed text": 5,
+    "not_same_item in unchanged text": 12,
     "unclear in changed text": 1
    },
    "suspect_differences": 3,
    "numeric_changes": 7,
    "numeric_changes_unseen": 2,
-   "pairs_judged": 169,
-   "settled": 803,
+   "pairs_judged": 201,
+   "settled": 905,
    "groupings": {
-    "ambiguous": 4,
-    "attached": 19,
-    "matched": 392,
+    "ambiguous": 7,
+    "attached": 27,
+    "matched": 440,
     "unaligned": 89
    },
    "examples": {

@@ -2,6 +2,12 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.73.1 (2026-11-18)
+
+- **Long claims kept:** a claim's value or quote over 300 or 400 characters had been dropped (a requirement's sentence, a rationale); the limits are now generous backstops (2,000 characters, conditions 1,000), and a field longer still is shortened at a word's end, marked, and counted ("Too long"), the claim kept.
+- **Long table rows read in parts:** a row of two cells or one too long for a request (an identifier and a long statement) had been left unread; its longest cell is now split at sentence and word ends, each part sent with the row's other cells and the header. On RAN1's feature-lead summaries (Word tables of companies' proposals), 32 rows that had gone unread gave 289 claims.
+- Every reader's version raised: stores are read again from the answers cache, only the long rows asked.
+
 ## 0.73.0 (2026-11-18)
 
 - **What a run's reading lost, counted:** a claim discarded for a field longer than allowed (a value over 300 characters, a quote over 400: a requirement's sentence, a rationale) is said apart from a malformed one, and counted ("Too long"), as are table rows too long to send ("Rows not sent"), in the run's last line, the report's Reading view and `debug`. `debug` also says how many of the last report's claims are text (no digit in their value). Nothing of the documents is printed. The first step of the requirements and textual claims plan: what a corpus of statements loses, sized where it can't be shared.

@@ -4,7 +4,7 @@
    "claims": 24563,
    "evidence": 14017,
    "frame in conditions": 36,
-   "grounded": 6571,
+   "grounded": 6570,
    "list records": 36,
    "no content words": 4,
    "note records": 11,
@@ -19,7 +19,7 @@
    "table records": 399,
    "unsupported": 39,
    "unsupported (image)": 820,
-   "with conditions": 7536,
+   "with conditions": 7535,
    "with records": 6999
   },
   "placed": {
@@ -116,7 +116,7 @@
     },
     "<=1.0": {
      "readings": 34108,
-     "right": 31244,
+     "right": 31242,
      "share": 0.916
     }
    },
@@ -133,7 +133,7 @@
     },
     "<=1.0": {
      "readings": 22964,
-     "right": 20954,
+     "right": 20952,
      "share": 0.912
     }
    },
@@ -8419,8 +8419,8 @@
   "wtp-s1-cedar.pptx": {
    "inventory": {
     "claims": 31,
-    "grounded": 11,
-    "with conditions": 11,
+    "grounded": 10,
+    "with conditions": 10,
     "positioned": 0,
     "misplaced": {},
     "records": {

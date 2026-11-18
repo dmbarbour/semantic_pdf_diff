@@ -175,7 +175,7 @@ class Debug(unittest.TestCase):
     def test_what_the_reading_lost_in_counts_naming_nothing(self):
         """Requirements and textual claims, milestone 0: claims too long to keep, rows not sent, and text claims."""
         data = {"coverage": [{"content": "c", "page": 1, "task": "t1", "status": "partial", "claims": 0,
-                              "issues": ["Discarded 3 claim(s) too long to keep"]},
+                              "issues": ["Kept 3 claim(s) too long to keep whole, shortened at a word"]},
                              {"content": "c", "page": 2, "task": "t2", "status": "partial", "claims": 0,
                               "issues": ["Table row exceeds text budget"]}],
                 "evidence": [{"id": "e1", "content": "c", "locator": {"page": 1}, "value": "SECRET shall hold"},

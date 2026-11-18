@@ -6895,10 +6895,10 @@
    "recall": 1.0,
    "found_right": 5,
    "missed": [],
-   "claims": 6,
+   "claims": 7,
    "outcomes": {
     "loose": 1,
-    "right": 5
+    "right": 6
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -6924,6 +6924,7 @@
      "right": 5
     },
     "visual": {
+     "loose": 1,
      "right": 5
     }
    },

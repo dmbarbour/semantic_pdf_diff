@@ -220,10 +220,20 @@ class ValidationTests(unittest.TestCase):
             {**GOOD, 'confidence': 5},
             {**GOOD, 'quote': 'x' * 401},
             'not a claim']})
-        self.assertEqual(len(result.claims), 2)
+        self.assertEqual(len(result.claims), 3)  # a quote of 401 characters is kept (requirements and textual claims)
         self.assertFalse(result.complete)
         self.assertIn('Discarded 2 malformed claim(s)', result.issues)
-        self.assertIn('Discarded 1 claim(s) too long to keep', result.issues)  # the quote of 401 characters
+
+    def test_a_claim_too_long_is_kept_cut_at_a_word(self):
+        """Requirements and textual claims, milestone 1: a rationale of many sentences had been dropped."""
+        long_ = ' '.join(['The FOO shall withstand handling temperatures from -40 C to +70 C.'] * 50)
+        result = Extraction.model_validate({'complete': True, 'claims': [{**GOOD, 'value': long_, 'quote': long_}]})
+        claim = result.claims[0]
+        self.assertTrue(claim.value.endswith('…') and len(claim.value) <= 2000)
+        self.assertTrue(long_.startswith(claim.quote) and len(claim.quote) <= 2000)  # a prefix: still found
+        self.assertTrue(claim.quote.endswith('C.') or claim.quote[-1].isalnum())  # cut at a word's end
+        self.assertTrue(result.complete)
+        self.assertIn('Kept 1 claim(s) too long to keep whole, shortened at a word', result.issues)
 
     def test_an_answer_without_complete_keeps_its_claims(self):
         # code review 2026-10-08, C12: it was rejected whole, then asked again
@@ -367,6 +377,22 @@ class ExtractionTests(unittest.TestCase):
             self.assertGreater(len(tables), 1)
             self.assertTrue(all(r['status'] == 'complete' for r in tables))
             self.assertTrue(all(len(source_data(p).encode()) <= 300 for s, p, _ in client.tasks if s == 'table'))
+
+    def test_a_long_row_of_two_cells_is_read_in_parts_with_its_label(self):
+        """Requirements and textual claims, milestone 1: an identifier and a long statement had been left unread."""
+        statement = ' '.join(f'The FOO shall meet condition {i} of the handling envelope.' for i in range(30))
+        rows = [['ID', 'Text'], ['FOO-REQ-112', statement]]
+        with tempfile.TemporaryDirectory() as d, self.fake_tables(rows):
+            client = Recorder(lambda s, p: Extraction(claims=[], complete=True), vision=False, text_bytes=600)
+            _, coverage = extract_pdf(pdf(Path(d)/'t.pdf', lambda p: None), CID, Path(d), client)
+            parts = [r for r in coverage if r['task'].startswith('table')
+                     and r['task'].rsplit(':', 1)[-1].startswith('p')]
+            self.assertGreater(len(parts), 1)
+            self.assertTrue(all(r['status'] == 'complete' and not r['issues'] for r in parts))
+            sent = [source_data(p) for s, p, _ in client.tasks if s == 'table']
+            self.assertTrue(sent and all('FOO-REQ-112' in x for x in sent))  # the label with each part
+            joined = ' '.join(json.loads(x.splitlines()[1].split(': ', 1)[1])[1] for x in sent)
+            self.assertEqual(joined.split(), statement.split())  # every word sent, none twice
 
     def test_visual_duplicates_are_merged_across_refinement(self):
         claim = {**GOOD, 'kind':'diagram'}

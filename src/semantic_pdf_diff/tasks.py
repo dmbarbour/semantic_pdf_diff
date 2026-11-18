@@ -12,7 +12,8 @@ from pathlib import Path
 
 from .failures import CallLimitReached, NotRecorded
 from .pages import union
-from .schema import DerivationStep, Evidence, Extraction, claim_id, coverage_row, merge_occurrences
+from .schema import (WORD_END, DerivationStep, Evidence, Extraction, claim_id, coverage_row, cut_at_word,  # noqa: F401
+                     merge_occurrences)
 from .progress import log
 from .quotes import covered, quoted, snippet
 from .regions import region_of
@@ -121,7 +122,6 @@ def split_utf8(text, limit):
         yield "".join(chunk)
 
 SENTENCE_END = re.compile(r"[.!?;:](?=\s)|\n")  # a sentence's (or a clause's, a line's) end, before the space after it
-WORD_END = re.compile(r"\S(?=\s)")
 
 def split_at_ends(text, limit):
     """split_utf8's chunks, each cut after the last sentence end in its second half, else the last word end there,
@@ -135,13 +135,6 @@ def split_at_ends(text, limit):
         text = text[cut:]
     if text:
         yield text
-
-def cut_at_word(text, limit):
-    """text's first limit characters, ending at a word's end in their second half if there is one."""
-    if len(text) <= limit:
-        return text
-    words = [m.end() for m in WORD_END.finditer(text[:limit + 1]) if m.end() > limit // 2]
-    return text[:words[-1]] if words else text[:limit]
 
 # An incomplete answer's issue saying the claim limit stopped it ("more steps (17-22) than the 20 claim limit
 # allowed"), as a request to continue; not clipping or illegibility, which another request wouldn't mend
@@ -520,9 +513,9 @@ class TaskCore:
         flat = " ".join(str(c) for c in head + cells if c not in (None, ""))
         fits = len(text.encode()) <= s.text_bytes
         splittable = len(columns) > 2
-        if not fits and not splittable:
-            self.record(coverage_row(content=self.content, page=page_no, bbox=list(bbox), task=task, status="partial",
-                                     issues=[self.oversized]))
+        if not fits and not splittable:  # a label and a long text (a requirement's row), or one long cell: read in
+            # parts, the rest of the row with each (requirements and textual claims, milestone 1: it had been unread)
+            self.long_row(page_no, bbox, task, header, row, head, cells, derivation, above)
             return
         if fits:
             def then(status, _):
@@ -539,6 +532,24 @@ class TaskCore:
                               stance=s.table_holder(header, row, above), view=s.table_view(head, cells, context)))
         else:
             self.split_columns(page_no, bbox, task, header, row, columns, depth, derivation, above)
+
+    def long_row(self, page_no, bbox, task, header, row, head, cells, derivation, above=()):
+        """A row too long to send, of two cells or one: its longest cell split at sentence and word ends into parts
+        that fit, each sent with the row's other cells and the header, so a part's claims keep the row's label."""
+        s = self.s
+        longest = max(range(len(cells)), key=lambda n: len(str(cells[n] or "")))
+        rest = [c if n != longest else "" for n, c in enumerate(cells)]
+        budget = max(200, s.text_bytes - len(s.row_text(head, rest).encode()))
+        for i, part in enumerate(split_at_ends(str(cells[longest]), budget)):
+            shown = [part if n == longest else c for n, c in enumerate(cells)]
+            text = s.row_text(head, shown)
+            flat = " ".join(str(c) for c in head + shown if c not in (None, ""))
+            context = self.reader.for_table(page_no, bbox, flat)
+            self.consume(Task(page_no, bbox, f"{task}:p{i}", text, derivation=derivation,
+                              check=lambda q, text=text, flat=flat: (quoted(q, text) or covered(q, flat)
+                                                                     or s.loose_match(q, text)),
+                              context=context, stance=s.table_holder(header, row, above),
+                              view=s.table_view(head, shown, context)))
 
     def split_columns(self, page_no, bbox, task, header, row, columns, depth, derivation, above=()):
         rest = columns[1:]

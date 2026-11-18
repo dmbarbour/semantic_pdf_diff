@@ -19,8 +19,8 @@ KINDS = (
     ("short", "Cut short", "answers the model said were incomplete (of the page's requests)"),
     ("dropped", "Quotes not found", "claims dropped, their quote not in the text they were read from (of the claims "
                                     "its text gave, kept or dropped)"),
-    ("long", "Too long", "claims dropped as longer than a field allows: a value over 300 characters, a quote over 400 "
-                         "(a requirement's sentence, a rationale)"),
+    ("long", "Too long", "claims with a field longer than allowed (a value or a quote over 2,000 characters), kept "
+                         "cut at a word"),
     ("unsent", "Rows not sent", "table rows too long for one request, never read"),
     ("unverified", "Quotes unverified", "claims kept, their quote not in the page's text layer (a picture's) or in "
                                         "their text (unquoted) (of the page's claims checked)"),
@@ -37,7 +37,7 @@ NAMES = {key: name for key, name, _ in KINDS}
 OF = {"failed": "requests", "unread": "requests", "short": "requests", "cut": "images", "dropped": "from text",
       "unverified": "checked", "doubted": "claims", "reread": "claims"}
 TABLE_NOTE = re.compile(rf"^(?:{re.escape(AS_LEFT)}|every row {ALONE}|Row .* {ALONE}): ")
-LONG_NOTE = re.compile(rf"^Discarded (\d+) claim\(s\) {re.escape(TOO_LONG)}")
+LONG_NOTE = re.compile(rf"^Kept (\d+) claim\(s\) {re.escape(TOO_LONG)}")
 UNSENT_NOTE = "Table row exceeds text budget"  # tasks.Tasks' oversized note, and extract's
 
 def _row_counts(r):

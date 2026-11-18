@@ -22,17 +22,32 @@ class Link(Strict):
     attitude: str = Field(default="", max_length=60)   # says, proposes, requires, supports, opposes, ...
     strength: str = Field(default="", max_length=60)
 
+# A claim's fields' longest, backstops (a requirement's sentence, a rationale of a few sentences): a field longer is cut
+# at a word and marked, its claim kept (Extraction.salvage; requirements and textual claims, milestone 1: claims over
+# 300 characters, quotes over 400, had been dropped)
+LONGEST = {"entity": 160, "attribute": 160, "value": 2000, "unit": 40, "conditions": 1000, "frame": 200,
+           "quote": 2000}
+CUT_MARK = "…"
+WORD_END = re.compile(r"\S(?=\s)")
+
+def cut_at_word(text, limit):
+    """text's first limit characters, ending at a word's end in their second half if there is one."""
+    if len(text) <= limit:
+        return text
+    words = [m.end() for m in WORD_END.finditer(text[:limit + 1]) if m.end() > limit // 2]
+    return text[:words[-1]] if words else text[:limit]
+
 class Claim(Strict):
-    entity: str = Field(min_length=1, max_length=160)
-    attribute: str = Field(min_length=1, max_length=160)
-    value: str = Field(min_length=1, max_length=300)
-    unit: str = Field(default="", max_length=40)
-    conditions: str = Field(default="", max_length=300)
+    entity: str = Field(min_length=1, max_length=LONGEST["entity"])
+    attribute: str = Field(min_length=1, max_length=LONGEST["attribute"])
+    value: str = Field(min_length=1, max_length=LONGEST["value"])
+    unit: str = Field(default="", max_length=LONGEST["unit"])
+    conditions: str = Field(default="", max_length=LONGEST["conditions"])
     # how the value is to be read, where the source states it: what a dimension is measured to, a datum, net or gross
     # (the split_conditions lever's; docs/plans/claim-context-2026-10-14.md, milestone 4). Conditions are then scope
-    frame: str = Field(default="", max_length=200)
+    frame: str = Field(default="", max_length=LONGEST["frame"])
     kind: Literal["text", "table", "chart", "diagram"]
-    quote: str = Field(min_length=1, max_length=400)
+    quote: str = Field(min_length=1, max_length=LONGEST["quote"])
     confidence: float = Field(ge=0, le=1)
     approximate: bool = False
     # Claim context (schema v2). Prompts don't ask for these yet, so they default to
@@ -62,9 +77,9 @@ def edges(said):
     found = {EDGE_WORDS.get(w, w) for w in re.findall(r"[a-z]+", words.lower())}
     return [e for e in EDGES if e in found]
 
-# A claim discarded for a field longer than Claim allows (a value over 300 characters, a quote over 400), said apart
-# from one malformed (quality.py counts them: requirements and textual claims, milestone 0)
-TOO_LONG = "too long to keep"
+# A claim with a field longer than LONGEST, kept cut at a word, said apart from one malformed (quality.py counts them:
+# requirements and textual claims, milestones 0 and 1)
+TOO_LONG = "too long to keep whole, shortened at a word"
 
 class Extraction(Strict):
     claims: list[Claim] = Field(max_length=MAX_CLAIMS)
@@ -98,13 +113,15 @@ class Extraction(Strict):
             if "stance" in item:  # links as asked, or none: a malformed stance loses the stance, not the claim
                 links = item["stance"] if isinstance(item["stance"], list) else []
                 item["stance"] = [x for x in links if isinstance(x, dict) and str(x.get("holder") or "").strip()]
+            cut = {k: cut_at_word(item[k], LONGEST[k] - len(CUT_MARK)) + CUT_MARK for k in LONGEST
+                   if isinstance(item.get(k), str) and len(item[k]) > LONGEST[k]}
+            if "quote" in cut:  # a quote cut is a prefix of what it quoted: found as its words are
+                cut["quote"] = cut["quote"][:-len(CUT_MARK)]
             try:
-                claims.append(Claim.model_validate(item).model_dump())
-            except ValidationError as e:
-                if all(error["type"] == "string_too_long" for error in e.errors()):
-                    long_ += 1
-                else:
-                    dropped += 1
+                claims.append(Claim.model_validate({**item, **cut}).model_dump())
+                long_ += bool(cut)
+            except ValidationError:
+                dropped += 1
         complete = data.get("complete")
         if complete is None:  # left out: the claims kept, the answer not complete
             issues.append("The answer didn't say whether it was complete")  # (code review 2026-10-08, C12)
@@ -113,8 +130,7 @@ class Extraction(Strict):
             issues.append(f"Discarded {dropped} malformed claim(s)")
             complete = False
         if long_:
-            issues.append(f"Discarded {long_} claim(s) {TOO_LONG}")
-            complete = False
+            issues.append(f"Kept {long_} claim(s) {TOO_LONG}")
         if len(claims) > MAX_CLAIMS:
             issues.append(f"Kept first {MAX_CLAIMS} of {len(claims)} claims")
             claims, complete = claims[:MAX_CLAIMS], False

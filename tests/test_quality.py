@@ -61,10 +61,9 @@ class Counted(unittest.TestCase):
         from semantic_pdf_diff.schema import Extraction
         good = {"entity": "FOO", "attribute": "rationale", "value": "short", "kind": "table", "quote": "short",
                 "confidence": 0.9}
-        answer = Extraction.model_validate({"complete": True, "claims": [good, {**good, "value": "x" * 301},
-                                                                          {**good, "quote": "y" * 401}]})
-        self.assertEqual(len(answer.claims), 1)
-        self.assertFalse(answer.complete)
+        answer = Extraction.model_validate({"complete": True, "claims": [good, {**good, "value": "word " * 500},
+                                                                          {**good, "quote": "said " * 500}]})
+        self.assertEqual(len(answer.claims), 3)  # kept, cut at a word
         data = {"coverage": [row(A, 1, "table:p1:t0:r1", "partial", answer.issues),
                              row(A, 1, "table:p1:t0:r2", "partial", ["Table row exceeds text budget"])],
                 "evidence": [], "files": [{"source": "s", "path": "a.pdf", "content": A}]}
