@@ -39,7 +39,7 @@ What happens today to a table of statements (read in the code, 2026-11-18):
   - **The statement:** the cells that make the row's sentence, in order ("{Condition}, {Subject} {Verb} {Clause(s)/Content}"; or "{Text}" alone).
   - **The identifier:** the cells that tell the row from the others ("FOOv0.0-001", "FOO-REQ-112"), and a name if one is given.
   - **Qualifiers:** cells that say something more of the statement, each by its own header ("Verification Method: Test, Analysis", "Rationale: ...", "Requirement Status", any miscellaneous column).
-  - **Notes about the statement:** cells discussing the statement rather than the system ("REQUIREMENTS NOTE: discussion of recommended changes"), the document's own commentary.
+  - **Notes about the statement:** cells discussing the statement ("REQUIREMENTS NOTE: discussion of recommended changes"), the document's own commentary; a note may still claim something of the system (a "well, actually"), so a note is read by the model with its statement as context.
   - **References:** cells naming other rows or other things ("Derived From", "Satisfied By"), resolved where the source holds what they name.
   - *Contrast:* a reading says how this table's cells make claims; the rules today say which cell holds which value.
 - **A statement is a claim about the system, with its modality** (the owner: "We're ultimately using requirements to understand what a document is claiming about a system"): shall or must (an obligation), should (a recommendation), may (a permission), will (a claim or an intention), none (a plain description).
@@ -58,6 +58,7 @@ What happens today to a table of statements (read in the code, 2026-11-18):
   - statements in prose ("shall" paragraphs);
   - other tables of statements (a risk register, an interface table);
   - headers differing between two proposals, columns added, dropped and reordered, miscellaneous columns, blank columns and blank statements, notes discussing changes, references between rows.
+  - Notes of two kinds: some only discussing a statement, some claiming something of the system ("the 70 °C limit is unachievable; 60 °C is expected").
   - Knobs across two proposals: a statement reworded; a bound tightened or loosened; a modality changed (shall to should, shall to will); a condition changed; a qualifier differing; a statement split in two; one-sided statements; long statements and notes.
   - The scorer taught to score text: a statement's words whole, its modality, its identifier, a counterpart, a difference's kind.
 - **Public tables of statements** added to the slices: HabEx's science traceability matrices, the 2013 Decathlon rules; others found as they're looked for.
@@ -72,7 +73,8 @@ What happens today to a table of statements (read in the code, 2026-11-18):
 
 - **The table's rules request asked one more thing:** whether its rows are statements, and if so its reading (the statement's cells and their order, the identifier, qualifiers, notes, references), each named by the table's own headers. One request a table, as today; the reading applied by code to every row.
 - **Checked by code:** a row's statement is its cells' words in the reading's order, so it's verbatim by construction; a reading naming a header the table hasn't is refused, and the table read as today.
-- **Each row a subject,** keyed by its identifier within its source (any shape: the reading names it); its statement a claim with its modality, its qualifiers claims of it, by their headers; notes kept as the document's commentary on the statement, not as claims about the system; blank cells give no claim, and a column blank in every row is said once.
+- **Each row a subject,** keyed by its identifier within its source (any shape: the reading names it); its statement a claim with its modality, its qualifiers claims of it, by their headers; blank cells give no claim, and a column blank in every row is said once.
+- **Notes read by the model with their statement as context** (its row's identifier, statement and qualifiers): kept as the document's commentary on the statement, shown beside it; a claim a note makes of the system (a bound it says is wrong, a value it gives instead) kept as the note's, beside the statement's, never in its place ([0047](../decisions/0047-commentary-logged-beside-claims-that-never-change.md); its stance the note's: [claim context](claim-context-2026-10-14.md)). A request a note that says more than a few words; measured on the controlled notes (some only discussing, some claiming) against reading them as plain text.
 - **Numbers in a statement** ("-40 °C to +70 °C") read by code as its bounds, so numeric comparison still applies.
 - **Statements in prose** are the reader's, as today, their modality by code.
 - **Measured** against a null arm of the same request's length and against today's reading, on the controlled shapes; held out before it's a default.
@@ -92,7 +94,7 @@ What happens today to a table of statements (read in the code, 2026-11-18):
 
 - **Statements by code first:** modality, bounds with their units, conditions, and the words differing; a kind given where code can (reworded when only words move; tightened or loosened when a bound or a modality moves one way); the judge asked only what's left, told what code found.
 - **Qualifiers by header likeness, not a fixed list:** columns of the two tables paired by their headers' words and meaning and by the values they hold (two columns both holding "Test", "Analysis"); a pair compared as values (a set of methods, a status); a column with no partner said, not counted as a difference.
-- **Notes** shown beside their statements, not compared.
+- **Notes** shown beside their statements; the claims a note makes of the system compared as the note's (a note in one proposal saying a bound should change is reported as that, not as the statement's).
 
 ### 6. Shown
 
@@ -113,7 +115,6 @@ What happens today to a table of statements (read in the code, 2026-11-18):
 
 Answered 2026-11-18 (quoted at the top), and the plan revised for them: no built-in reading of rows, a model's reading a table instead; "will" a claim or an intention; no table taken as canonical, nor its columns as all there are; Excel pasted from a modelling tool, and tables from elsewhere.
 
-Open:
+- **Notes discussing a statement,** answered 2026-11-18 (the owner: "Although I'd probably read requirements notes as commentary about a document, I wouldn't necessarily reject the possibility that such commentary makes claims about the product (e.g. a "well, actually" in the comment). It's probably something that needs to be read by a model with sufficient context at some point."): commentary on the statement, read by the model with its statement as context, the claims it makes of the system kept as the note's (milestone 2).
 
-1. **Notes discussing a statement** (recommended changes): kept as the document's commentary on its statement and shown beside it, not compared as claims about the system?
-   - I'd say yes: they're about the requirement, not the system; a reader comparing proposals sees them beside the statement.
+None open.
