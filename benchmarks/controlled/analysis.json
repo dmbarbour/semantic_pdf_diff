@@ -77,10 +77,15 @@
    },
    "tensions": {
     "tensions": 6,
-    "standing": 0,
+    "standing": 6,
     "reconciled": 0,
-    "levels": {},
-    "elsewhere": {}
+    "levels": {
+     "conflict": 2,
+     "reason": 4
+    },
+    "elsewhere": {
+     "conflict": 3
+    }
    },
    "log": {
     "subjects": 30,
@@ -148,7 +153,7 @@
    "tensions": {
     "tensions": 6,
     "standing": 0,
-    "reconciled": 0,
+    "reconciled": 4,
     "levels": {},
     "elsewhere": {}
    },
@@ -239,7 +244,7 @@
    "tensions": {
     "tensions": 3,
     "standing": 0,
-    "reconciled": 0,
+    "reconciled": 2,
     "levels": {},
     "elsewhere": {},
     "twin": "clean"
@@ -353,10 +358,15 @@
    },
    "tensions": {
     "tensions": 3,
-    "standing": 0,
+    "standing": 3,
     "reconciled": 0,
-    "levels": {},
-    "elsewhere": {},
+    "levels": {
+     "conflict": 1,
+     "reason": 2
+    },
+    "elsewhere": {
+     "conflict": 1
+    },
     "twin": "planted"
    },
    "claims": {
@@ -453,7 +463,7 @@
    "tensions": {
     "tensions": 3,
     "standing": 0,
-    "reconciled": 0,
+    "reconciled": 2,
     "levels": {},
     "elsewhere": {},
     "twin": "clean"
@@ -582,10 +592,15 @@
    },
    "tensions": {
     "tensions": 3,
-    "standing": 0,
+    "standing": 3,
     "reconciled": 0,
-    "levels": {},
-    "elsewhere": {},
+    "levels": {
+     "conflict": 1,
+     "reason": 2
+    },
+    "elsewhere": {
+     "conflict": 2
+    },
     "twin": "planted"
    },
    "claims": {

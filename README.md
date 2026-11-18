@@ -4,7 +4,7 @@ A Python CLI for evidence-first comparison of competing engineering proposals or
 
 ## Status
 
-**v0.71.0** (2026-11-17; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
+**v0.72.0** (2026-11-18; [changelog](CHANGELOG.md)). Versions are raised at each checkpoint and tagged ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The first tag, v0.2.0, compared two PDFs. Since then the tool has gained:
 
 - **Sources** as files, folders and zip archives, declared in a persistent, resumable store
 - **Replay fixtures:** recorded model answers, so runs replay offline
@@ -50,7 +50,7 @@ Open `result/report.html`: it's one file, which can be moved or sent on its own.
 
 **Summaries, each sentence citing its claims** (`summaries`; in analyses, sections', files' and the source's by default): a section's (a drawing set's sheets, page by page), a file's, a folder's, a subject's or a topic's, written by the model from the claims alone, each sentence citing the claims it rests on and checked against them by code: one stating a number its claims don't give is marked, never corrected. In a Summaries view, each citation a link to its claim, and in `export`, labelled as written by the model.
 
-**Tensions** (`tensions`, off; analyses): a subject's claims hard to hold together on engineering grounds (low-alloy steel said to resist corrosion), at a level of suspicion (can't both hold, needs a reason, worth a look), with what would reconcile them looked for in the document: in a Suspects view, those not reconciled first. `reviewer_concerns` adds a reviewer's own things to watch for.
+**Tensions** (`tensions`, on in analyses since 0.72.0): a subject's claims hard to hold together on engineering grounds (low-alloy steel said to resist corrosion), at a level of suspicion (can't both hold, needs a reason, worth a look), with what would reconcile them looked for in the document: in a Suspects view, those not reconciled first. `reviewer_concerns` adds a reviewer's own things to watch for. Held out on 13 public documents, a model panel found two tensions in three worth a reviewer's look (the reading's errors more often than the design's), against one in five of claims drawn alike.
 
 **One source on its own**, a file or a folder or zip of documents, is read and reported without comparing: `semantic-pdf-diff analyze spec/ --store spec` writes `spec/report.html`, every claim with where it was read, by topic and file, searched as a comparison's report is (its other names and vectors too). It takes `compare`'s options but those of comparing, and the same store, settings and answers cache: a source analyzed and then compared isn't asked of the model twice.
 

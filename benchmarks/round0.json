@@ -119,6 +119,7 @@
   "whole_lines": false,
   "summaries": [],
   "look_gaps": false,
+  "tensions": false,
   "link_tests": false,
   "link_read": false,
   "read_context": false,

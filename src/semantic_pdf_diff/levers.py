@@ -1616,8 +1616,9 @@ class FindTensions(Lever):
     # the source by code (tensions.py; single-document analysis, a retired plan, milestone 4; the owner,
     # 2026-11-06: "We'll need to also look for qualitative inconsistencies, with levels of suspicion.");
     # reviewer_concerns: a reviewer's, things to watch for besides what the model knows ("it should work even when not
-    # supplied")
-    tensions: Annotated[bool, _selecting(roles=COMPARE)] = False
+    # supplied"). On by default since 2026-11-18, after passing its held-out rule (the owner: "Let's turn on tensions
+    # by default.")
+    tensions: Annotated[bool, _selecting(roles=COMPARE)] = True
     reviewer_concerns: Annotated[list[str], _shaping(roles=COMPARE)] = Field(default_factory=list)
 
     def finds_tensions(self, mode):
