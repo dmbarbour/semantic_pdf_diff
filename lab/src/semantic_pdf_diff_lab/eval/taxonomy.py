@@ -127,6 +127,17 @@ LINK_FLAGS = [
     _f("Context", "different_duty", "A different duty or service", "e.g. a backwash pump against a raw water pump"),
 ]
 
+# What a tension is about (tensions.PROMPT's kinds), for a concern
+TENSION_FLAGS = [
+    _f("Concern", "material_service", "A material and a property or service it doesn't usually have",
+       "e.g. low-alloy steel said to resist hydrogen sulfide"),
+    _f("Concern", "rating_location", "A rating and where it's used", "e.g. a NEMA 1 (indoor) enclosure outdoors"),
+    _f("Concern", "class_application", "A class or standard and its application",
+       "e.g. ASTM A307 all-thread rod as an anchor driven into asphalt"),
+    _f("Concern", "capacity_duty", "A capacity and its duty", "e.g. the duty pumps' total short of the peak flow"),
+    _f("Concern", "other_concern", "Another engineering concern", ""),
+]
+
 TAXONOMY = {
     "claim": {"verdicts": [
         {"name": "correct", "label": "Correct",
@@ -164,11 +175,26 @@ TAXONOMY = {
                  "whole, a property named as a thing against its thing (tower mass against the tower)"},
         {"name": "different", "label": "Different", "help": "Different things, not worth comparing"}],
         "flags": LINK_FLAGS},
+    # A subject's claims read together: a tension the tensions lever raised, or a control drawn alike from a subject
+    # that raised none, shown blind to which (the review of open items, 2026-11-17, R5)
+    "tension": {"verdicts": [
+        {"name": "concern", "label": "A concern",
+         "help": "Read together, the claims are hard to hold together on engineering grounds as stated, and nothing "
+                 "shown reconciles them: a reviewer should ask the authors about it"},
+        {"name": "misread", "label": "A misreading",
+         "help": "A concern only because a claim is read wrongly from its source (check it against its images): "
+                 "worth a look for the reading's sake, not the design's"},
+        {"name": "two_items", "label": "Two items",
+         "help": "The claims describe different items sharing a name (a wood beam in one detail, a steel beam in "
+                 "another): nothing to hold together"},
+        {"name": "none", "label": "Nothing to ask",
+         "help": "The claims fit together, or what's shown reconciles them (a coating, a stated condition)"}],
+        "flags": TENSION_FLAGS},
 }
 
 # The coarse question agreement is best measured on: is the result usable?
 USABLE = {"claim": {"correct", "flawed"}, "about": {"good", "acceptable"}, "pair": {"right"},
-          "link": {"same", "comparable"}}
+          "link": {"same", "comparable"}, "tension": {"concern", "misread"}}
 
 # Quick per-field answers shown next to each part of an item: the fastest way to say what's wrong.
 FIELD_ANSWERS = [
@@ -205,10 +231,14 @@ FIELDS = {
     "link": [_field("kind", "The same kind of thing", "pump, filter, room, tower"),
              _field("function", "The same function", "what each does and handles: service, medium, duty"),
              _field("integration", "The same place in its system", "part of, serves, fed by, feeds, location")],
+    "tension": [_field("readings", "Each claim is read right", "against its images"),
+                _field("one_item", "The claims describe one item"),
+                _field("hard", "Hard to hold together on engineering grounds")],
 }
 
 # Suggested verdict from field answers (the reviewer can always choose another).
-CORE_FIELDS = {"claim": {"entity", "attribute", "value"}, "about": {"about"}, "pair": {"relation"}, "link": set()}
+CORE_FIELDS = {"claim": {"entity", "attribute", "value"}, "about": {"about"}, "pair": {"relation"}, "link": set(),
+               "tension": set()}
 
 # --- judging questions (the model's input, before seeing its answer) ---------------------
 
@@ -291,7 +321,7 @@ def suggested_verdict(kind, fields):
         return "wrong" if wrong & CORE_FIELDS["claim"] else "flawed" if wrong else "correct"
     if kind == "about":
         return "wrong" if wrong & CORE_FIELDS["about"] else "acceptable" if wrong else "good"
-    if kind == "link":  # agreeing parts don't decide between the same and comparable
+    if kind in ("link", "tension"):  # their parts don't decide between their verdicts
         return None
     return "wrong" if "relation" in wrong else "right"
 

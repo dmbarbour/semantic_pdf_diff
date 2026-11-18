@@ -271,5 +271,42 @@ class Batches(unittest.TestCase):
         again = {i['id'] for i in json.loads((held / 'batch.json').read_text())['items']}
         self.assertFalse(again & {i['id'] for i in links})  # a held-out sample: none of the first's
 
+    def test_tensions_are_sampled_with_controls_blind_and_scored(self):
+        """The review of open items, 2026-11-17, R5: tensions rated by a panel against controls drawn alike."""
+        import shutil
+        from unittest import mock
+        from semantic_pdf_diff import tensions
+        store = Path(self.dir.name) / 'analysed'
+        shutil.copytree(self.store, store)
+        data = json.loads((store / 'report.json').read_text())
+        claims = data['evidence']
+        self.assertGreaterEqual(len(claims), 4)
+        data['commentary'] = {'entries': [{'kind': 'tension', 'source': 's', 'subject': 'Pump',
+                                           'claims': [claims[0]['id'], claims[1]['id']], 'relation': 'conflict',
+                                           'why': 'SECRET-WHY', 'reconcile': ['SECRET-FIX'], 'id': 'c-1'}]}
+        (store / 'report.json').write_text(json.dumps(data))
+        named = lambda cs: {f'C{n + 1}': c for n, c in enumerate(cs)}  # noqa: E731
+        asked = [('s', 'Pump', named(claims[:2]), {}), ('s', 'Fan', named(claims[2:]), {})]
+        folder = Path(self.dir.name) / 'tensions'
+        with mock.patch.object(tensions, 'asked', return_value=asked), \
+             mock.patch.object(tensions, 'qualitative', return_value=True), contextlib.redirect_stdout(io.StringIO()):
+            cli.main(['review', 'sample', str(folder), '--store', f'SECRET-RESPONDER={store}', '--claims', '0',
+                      '--abouts', '0', '--pairs', '0', '--tensions', '3'])
+        batch = json.loads((folder / 'batch.json').read_text())
+        items = [i for i in batch['items'] if i['type'] == 'tension']
+        self.assertEqual(sorted(i['hidden']['flagged'] for i in items), [False, True])
+        control = next(i for i in items if not i['hidden']['flagged'])
+        self.assertEqual(len(control['target']['claims']), 2)  # as many claims as the tension's
+        self.assertTrue(set(control['target']['claims']) <= {c['id'] for c in claims[2:]})  # a subject raising none
+        public = json.dumps(review.public_items(batch))
+        for secret in ('SECRET-WHY', 'SECRET-FIX', 'conflict', '"flagged"'):
+            self.assertNotIn(secret, public)
+        panel = FakePanel()
+        review.judge(folder, panel, 'panel/model-x')
+        scores = review.tension_scores(folder)['all']
+        self.assertEqual((scores['tensions']['items'], scores['controls']['items']), (1, 1))
+        self.assertEqual(scores['tensions']['worth_a_look'], 1)  # the fake panel's first verdict: a concern
+        self.assertEqual(list(scores['by_level']), ['conflict'])
+
 if __name__ == '__main__':
     unittest.main()

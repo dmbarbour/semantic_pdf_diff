@@ -75,6 +75,9 @@ def review_command(argv):
     sample.add_argument('--links', type=int, default=0,
                         help="Links per store: two subjects of its comparison's two sources (round-robin over the "
                              "combiner's probability bands; the store's report.json)")
+    sample.add_argument('--tensions', type=int, default=0,
+                        help="Tensions per store, each with a control: as many claims of a subject that raised none "
+                             "(its analysis's report.json)")
     sample.add_argument('--exclude', type=Path, action='append', default=[], metavar='BATCH',
                         help="Leave out another batch's items (a held-out sample); repeatable")
     sample.add_argument('--seed', type=int, default=1)
@@ -100,6 +103,7 @@ def review_command(argv):
     for name, help in (('agreement', 'Agreement between reviewers: verdicts, flags, clarity, confidence'),
                        ('scores', 'Verdicts per responder, item type and claim kind, per reviewer'),
                        ('links', "The panel's consensus on links against the combiner's probabilities"),
+                       ('tensions', "The panel's consensus on tensions against their controls"),
                        ('page', 'Rewrite the review page (after a taxonomy change)')):
         sub.add_parser(name, help=help).add_argument('batch', type=Path)
     args = parser.parse_args(argv)
@@ -113,7 +117,7 @@ def review_command(argv):
         exclude = {i['id'] for b in args.exclude
                    for i in json.loads((b / 'batch.json').read_text(encoding='utf-8'))['items']}
         batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed, args.links,
-                              exclude)
+                              exclude, args.tensions)
         asked = sum(1 for i in batch['items'] if i.get('request'))
         print(f"{len(batch['items'])} items: first judge the questions blind ({asked} recorded) in "
               f"{args.batch / 'questions.html'}, then the answers in {args.batch / 'review.html'}")
@@ -152,6 +156,8 @@ def review_command(argv):
         print(json.dumps(review.scores(args.batch), indent=2))
     elif args.command == 'links':
         print(json.dumps(review.link_scores(args.batch), indent=2))
+    elif args.command == 'tensions':
+        print(json.dumps(review.tension_scores(args.batch), indent=2))
     else:
         review.write_page(args.batch, json.loads((args.batch / 'batch.json').read_text(encoding='utf-8')))
         print(f"Rewrote {args.batch / 'questions.html'} and {args.batch / 'review.html'}")

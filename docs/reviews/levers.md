@@ -438,6 +438,19 @@ Built 2026-11-06, both off ([text cut by tiles](../plans/text-cut-by-tiles-2026-
 - **Why image tasks only:** continued, a page's text task read the tables on the page too, copying a header's condition ("rated point") onto every row; the other revision's reading lacked it, so alignment couldn't settle them. Listing the claims without conditions didn't stop it. Text and table tasks keep refinement by splitting their text.
 - **Since** (2026-10-12): a partial tile that was continued at the claim limit is halved, not retiled (*Refinement*, above; [decision 0029](../decisions/0029-tiles-chosen-by-measures.md)).
 
+### Tensions (`tensions`)
+
+- **Mechanism:** a request a subject (with its parts) of two claims or more holding one that isn't a number alone: claims hard to hold together on engineering grounds, each with a level (can't both hold, needs a reason, worth a look), why, and what would reconcile it, looked for by code in the source's claims and records ([single-document analysis](../research/single-document-analysis-measured-2026-11-17.md), milestone 4; [decision 0047](../decisions/0047-commentary-logged-beside-claims-that-never-change.md)). Off; analyses only.
+- **Development:** the planted reports (all 3 planted tensions found and standing in both planted copies, none standing in the clean ones, $0.12); by eye on scical's 9 sheets, IEA 22 MW's pages and a DC drawing set (12 tensions, 2026-11-07).
+- **Rated by a model panel** (the review of open items, R5, 2026-11-17; the owner: "Proceed with R5."): the lab's review batches give each tension a control, as many claims of a subject the lever asked and that raised none, one of them not a number alone; both shown alike, blind to which is which and to the level and why, with the subject's other claims (`review sample --tensions N`, `review tensions`). Verdicts: a concern, a misreading (a concern only because a claim is read wrongly), two items, nothing to ask; worth a look: a concern or a misreading.
+  - **Development's pilot** (the 12 development tensions and 12 controls; gemini-3.1-pro, Qwen3.5-397B-A17B, MiMo-V2.6-Pro; about $0.50; α 0.35): worth a look 9 of 12 against the controls' 2 of 12. Concerns 2 (an ASTM A307 rod driven into asphalt; a 10 ft PV and louvre assembly on drawer slides), misreadings 7 (a post's 3 1/2" read as the footing's width, 16d sinkers read as 6d, a joist's size as the floor sheathing's), nothing to ask 3 (the airfoil's drag coefficient 0 among them, read off a chart's scale). So tensions find readings gone wrong more often than the design's concerns.
+- **Held-out rule** (written 2026-11-18, before any held-out document is analyzed with tensions on):
+  - **Documents** (none used in tuning tensions; their extractions replayed from the slices' archive, anything missing asked): drawings `calg-cd-p62-66`, `nu-cd-p79-82`, `uncc-cd-p76-80`, `su-cd-p104-106`, `unlv-cd-p86-88`, `ken-cd-p95-98`, `scu-cd-p79-84`, `usc-cd-p93-96`; reports `habex-interim-p80-89`, `ken-manual-p70-79`, `nrel-5mw-p25-36`, `iea-15mw-p20-31`, `lcit-report-p12-19`. Each analyzed alone with today's defaults, `tensions` on, `second_pass` and `summaries` off (tensions read neither).
+  - **Rated:** every tension raised, up to 60, each with its control; the same panel; Dawid-Skene consensus.
+  - **Passes** if, with 20 tensions or more rated: at least half are worth a look, and their share is at least twice the controls' and at least 0.25 above it. Fewer than 20: inconclusive, judged by eye.
+  - **Reported besides:** concerns and misreadings apart, by level, standing against reconciled, a document's count, the cost a page.
+  - **Then the owner's call** on a default in analyses.
+
 ## Ideas not built yet
 
 Every lever idea gets a row here when it's raised (the owner, 2026-09-28), so none is forgotten.

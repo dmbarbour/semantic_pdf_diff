@@ -121,12 +121,12 @@ class Source:
 def _headings(source, content):
     return {s.id: " > ".join(s.heading_path) for s in source.store.sections(content)}
 
-def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclude=()):
+def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclude=(), tensions=0):
     """Write a batch: a stratified random sample of claims (round-robin over claim kinds),
-    about statements, claim pairs and links (two subjects of two sources, round-robin over
-    the combiner's probability bands) from each store. Each item shows the exact request
-    (instructions and input) that produced it, from the store's query log. exclude: item ids
-    left out (another batch's links: a held-out sample)."""
+    about statements, claim pairs, links (two subjects of two sources, round-robin over
+    the combiner's probability bands) and tensions (each with a control) from each store.
+    Each item shows the exact request (instructions and input) that produced it, from the
+    store's query log. exclude: item ids left out (another batch's: a held-out sample)."""
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
@@ -138,6 +138,7 @@ def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclud
             found += _sample_abouts(source, folder, rng, abouts)
             found += _sample_pairs(source, folder, rng, pairs)
             found += _sample_links(source, folder, rng, links, set(exclude))
+            found += _sample_tensions(source, folder, rng, tensions, set(exclude))
             requests = Requests(source.store)
             for item in found:
                 item["request"] = requests.describe(item, source, folder)
@@ -179,7 +180,7 @@ class Requests:
         elif item["type"] == "about":
             kind = "figure" if "figure" in item["target"] else "section"
             found = self.index.get(("triage", item["target"]["content"], kind, item["target"][kind]))
-        elif item["type"] == "link":  # code's evidence and several requests', not one request
+        elif item["type"] in ("link", "tension"):  # code's evidence and several requests', not one request
             return None
         else:
             found = self.index.get(("compare", item["target"]["a"], item["target"]["b"]))
@@ -424,6 +425,71 @@ def _sample_links(source, folder, rng, n, exclude=frozenset()):
                           "hidden": {"probability": p, "band": band, "how": how},
                           "images": images, "context": context, "shown": shown, **({"texts": texts} if texts else {})})
     return items
+
+TENSION_CLAIMS = 4   # a tension's claims shown with their views, at most
+TENSION_OTHERS = 10  # a subject's other claims shown, at most
+TENSION_FIELDS = ("entity", "attribute", "value", "unit", "conditions", "quote")
+
+def _sample_tensions(source, folder, rng, n, exclude=frozenset()):
+    """Up to n tensions of the store's analysis (its report.json's commentary: tensions.py), each followed by a
+    control: as many claims of a subject the tensions lever asked and that raised none, one of them not a number
+    alone, as the lever's candidates are (the panel's base rate). Both shown alike, blind to which is which and to
+    the tension's level and why: the subject, its claims with their views, its other claims as the model saw them."""
+    report = source.folder / "report.json"
+    if not n or not report.exists():
+        return []
+    data = json.loads(report.read_text(encoding="utf-8"))
+    entries = [e for e in (data.get("commentary") or {}).get("entries", []) if e["kind"] == "tension"]
+    if not entries:
+        return []
+    from semantic_pdf_diff import indexes, tensions
+    asked = [(src, subject, named) for src, subject, named, _ in tensions.asked(data, indexes.built(data))]
+    by_subject = {(src, subject): named for src, subject, named in asked}
+    raised = {(e["source"], e["subject"]) for e in entries}
+    quiet = [x for x in asked if (x[0], x[1]) not in raised]
+    evidence = {e["id"]: e for e in source.claims()}
+    picked = [e for e in rng.sample(entries, len(entries))
+              if item_id("tension", source.label, *e["claims"]) not in exclude][:n]
+    items = []
+    for e in picked:
+        reconciled = bool(e.get("reconciled") or e.get("reconciled_records"))
+        items.append(_tension_item(source, folder, e["subject"], e["claims"],
+                                   by_subject.get((e["source"], e["subject"]), {}), evidence,
+                                   {"flagged": True, "level": e["relation"],
+                                    "said_level": e.get("said_level", e["relation"]), "reconciled": reconciled,
+                                    "why": e.get("why", "")}))
+        k = len(e["claims"])
+        pool = [x for x in quiet if len(x[2]) >= k and tensions.qualitative(x[2])]
+        if not pool:
+            continue
+        src, subject, named = rng.choice(pool)
+        quiet.remove((src, subject, named))
+        worded = [c for c in named.values() if tensions.qualitative({"c": c})]
+        first = rng.choice(worded)
+        rest = rng.sample([c for c in named.values() if c["id"] != first["id"]], k - 1)
+        ids = [c["id"] for c in rng.sample([first, *rest], k)]
+        if item_id("tension", source.label, *ids) not in exclude:
+            items.append(_tension_item(source, folder, subject, ids, named, evidence, {"flagged": False}))
+    return items
+
+def _tension_item(source, folder, subject, ids, named, evidence, hidden):
+    iid = item_id("tension", source.label, *ids)
+    claims = [evidence[c] for c in ids if c in evidence]
+    images, texts, contexts = [], [], []
+    for n, e in enumerate(claims[:TENSION_CLAIMS]):
+        views, context, lines = _claim_views(source, folder, e, f"{iid}-{n + 1}")
+        images += [dict(i, caption=f"Claim {n + 1}: {i['caption']}") for i in views]
+        texts += [dict(t, caption=f"Claim {n + 1}: {t['caption']}") for t in lines]
+        contexts.append(context)
+    fields = lambda e: {**{k: e[k] for k in TENSION_FIELDS if e.get(k)},  # noqa: E731
+                        "page": (e.get("locator") or {}).get("page")}
+    others = [c for c in named.values() if c["id"] not in ids]
+    shown = {"subject": subject, "claims": [fields(e) for e in claims],
+             "other_claims_of_the_subject": [fields(c) for c in others[:TENSION_OTHERS]],
+             "more_other_claims": max(0, len(others) - TENSION_OTHERS)}
+    return {"id": iid, "type": "tension", "store": source.label, "target": {"subject": subject, "claims": ids},
+            "hidden": hidden, "images": images, "context": contexts[0] if contexts else {}, "shown": shown,
+            **({"texts": texts} if texts else {})}
 
 # --- the review page ---------------------------------------------------------------------
 
@@ -685,6 +751,12 @@ QUESTIONS = {
             "Are A and B the same thing (counterparts), comparable, or different, by the definitions given with the "
             "verdicts? In fields, answer ok where A and B agree, wrong where they differ, unsure where the item "
             "doesn't say.",
+    "tension": "These claims were read from one engineering document, about one subject (with its parts); its other "
+               "claims are shown as context. Read together, do they raise an engineering concern a reviewer should "
+               "ask the authors about (a material and its service, a rating and where it's used, a class or "
+               "standard and its application, a capacity and its duty)? Check each claim against its images: a "
+               "concern that comes only from a claim read wrongly is a misreading. Answer by the definitions given "
+               "with the verdicts.",
 }
 
 JUDGE = """You are one reviewer on a panel checking an automated system that reads engineering documents.
@@ -945,3 +1017,39 @@ def link_scores(folder):
                                "calibration": calibration(same)},
                       "same_or_comparable": {"average_precision": average_precision(worth)}}
     return out
+
+def tension_scores(folder):
+    """The panel's consensus on a batch's tensions and their controls (Dawid-Skene over the four verdicts), per store
+    and in all: how many of each are worth a reviewer's look (a concern or a misreading), the tensions by the level the
+    model gave and by whether code found what reconciles them. A rater of real documents, none of them ground truth
+    (decision 0018)."""
+    batch = json.loads((Path(folder) / "batch.json").read_text(encoding="utf-8"))
+    labels = load_labels(folder)
+    items = [i for i in batch["items"] if i["type"] == "tension"]
+    given = {i["id"]: {r: labels[r][i["id"]]["verdict"] for r in labels
+                       if labels[r].get(i["id"], {}).get("verdict")} for i in items}
+    given = {i: g for i, g in given.items() if g}
+    if not given:
+        return {}
+    classes = [v["name"] for v in TAXONOMY["tension"]["verdicts"]]
+    posteriors, _ = dawid_skene(given, classes)
+    best = {i: max(p, key=p.get) for i, p in posteriors.items()}
+
+    def counted(some):
+        c = Counter(best[i["id"]] for i in some)
+        worth = sum(c[v] for v in USABLE["tension"])
+        return {"items": len(some), "verdicts": {v: c[v] for v in classes if c[v]}, "worth_a_look": worth,
+                "share": _round(worth / len(some)) if some else None}
+
+    def summary(mine):
+        flagged = [i for i in mine if i["hidden"]["flagged"]]
+        return {"tensions": counted(flagged), "controls": counted([i for i in mine if not i["hidden"]["flagged"]]),
+                "by_level": {level: counted([i for i in flagged if i["hidden"]["level"] == level])
+                             for level in sorted({i["hidden"]["level"] for i in flagged})},
+                "standing": counted([i for i in flagged if not i["hidden"]["reconciled"]]),
+                "reconciled": counted([i for i in flagged if i["hidden"]["reconciled"]])}
+    judged = [i for i in items if i["id"] in best]
+    return {"all": summary(judged),
+            "stores": {store: summary([i for i in judged if i["store"] == store])
+                       for store in sorted({i["store"] for i in judged})}}
+

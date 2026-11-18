@@ -308,6 +308,7 @@ semantic-pdf-diff review links BATCH                         # the consensus aga
 - **Verdicts:** the same (counterparts), comparable (units of one bank, alternatives, a part and its whole), different; fields for kind, function and integration. A document's numbering makes nothing counterparts between designs ([decision 0042](decisions/0042-counterparts-only-where-differentiated.md)).
 - **Measured offline:** a change's probabilities for each sampled link computed on the same recorded reports with the old code and the new (a git worktree on the import path), against the consensus: average precision of "the same" and log loss, by pair and together.
 - **Held out:** the rule committed before the pairs are recorded; a fresh sample leaving out earlier batches' links (`review sample --exclude BATCH`) or fresh pairs; once used, a batch is development's.
+- **Tensions rated alike** (`review sample --tensions N`, `review tensions BATCH`): each tension an analysis raised beside a control (as many claims of a subject that raised none), shown blind to which; the panel says a concern, a misreading, two items or nothing to ask (the lever index's *Tensions*).
 - **Agreement:** the panel agrees less on drawings (α 0.43 to 0.67) than on reports (0.56 to 0.66); the owner's rulings correct its labels where it errs on a principle.
 
 ## Synthetic samples
