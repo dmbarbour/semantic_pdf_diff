@@ -6,7 +6,8 @@ import unittest
 
 from semantic_pdf_diff_lab.bench.controlled.representations import key, markdown
 from semantic_pdf_diff_lab.bench.controlled.score import classify_statement, key_facts, score
-from semantic_pdf_diff_lab.bench.controlled.statements import STATEMENT_KNOBS, buoy_requirements, shaped
+from semantic_pdf_diff_lab.bench.controlled.statements import (NOTE_HOLDER, STATEMENT_KNOBS, buoy_requirements,
+                                                                 buoy_risks, shaped)
 
 def project(knob):
     p = buoy_requirements(1)
@@ -38,6 +39,21 @@ class Shapes(unittest.TestCase):
         basis = {f.id: f.basis for f in project("cells").facts if f.attribute == "statement"}
         self.assertEqual((basis["req1.statement"], basis["req4.statement"], basis["req5.statement"],
                           basis["req6.statement"]), ("required", "recommended", "permitted", "intended"))
+
+    def test_notes_claiming_something_are_the_notes_and_the_split_shapes_only(self):
+        """The owner, 2026-11-18: commentary may make claims about the product (a "well, actually")."""
+        held = [f for f in project("split").facts if f.holder == NOTE_HOLDER]
+        self.assertEqual(sorted(f.id for f in held), ["req1.note.alt", "req7.note.alt"])
+        self.assertFalse(any(f.holder == NOTE_HOLDER for f in project("cells").facts))
+        k = key(project("split"), markdown(project("split")))
+        self.assertTrue(all(f["forms"] for f in k["facts"] if f.get("holder") == NOTE_HOLDER))
+
+    def test_a_risk_register_is_another_table_of_statements(self):
+        p = buoy_risks(1)
+        k = key(p, markdown(p))
+        kinds = {f["attribute"] for f in k["facts"] if f.get("drawn") == "statement"}
+        self.assertEqual(kinds, {"risk", "mitigation"})
+        self.assertEqual(k["absent"], [])
 
 class Scored(unittest.TestCase):
     def setUp(self):

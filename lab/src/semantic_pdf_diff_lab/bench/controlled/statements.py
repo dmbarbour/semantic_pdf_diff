@@ -6,7 +6,8 @@ canonical (the owner: "Don't count on that one table example as being canonical.
 - **cells:** a statement in one cell beside an identifier, a name, a rationale, a verification method and a status
   left blank, as a requirements table copied from a modelling tool.
 - **split:** a statement split over condition, subject, verb and content cells, with a note discussing the wording,
-  as a requirements table from elsewhere.
+  as a requirements table from elsewhere; two of its notes claim something of the system (a limit the hull can't
+  meet, another interval wanted), their numbers facts the note holds (NOTE_HOLDER), not the statement.
 - **prose:** numbered paragraphs, each a statement with its rationale and verification after it.
 
 The same facts in every shape: each statement whole and each rationale (text facts, drawn "statement": placed by the
@@ -17,12 +18,14 @@ permitted; will: intended), for later milestones to score.
 from .model import Draw, Fact, Project
 
 STATEMENT_KNOBS = ("cells", "split", "prose")
+NOTE_HOLDER = "the requirements note"  # who holds a note's claim: not the statement's
 
 # a statement's force, as its key says it (the owner, 2026-11-18: "I'd count 'will' as a claim or intention")
 BASIS = {"shall": "required", "should": "recommended", "may": "permitted", "will": "intended"}
 
 # (name, condition, subject, verb, content with {lo} and {hi} numbers, [(number name, attribute, synonyms, unit, low,
-# high, decimals)], rationale, verification method, note discussing the wording)
+# high, decimals)], rationale, verification method, note: discussing the wording, or (claiming something of the system
+# with {alt}, its numbers as the content's))
 REQUIREMENTS = [
     ("Survival Temperature", "", "The buoy hull", "shall",
      "withstand ambient temperatures from {lo} °C to +{hi} °C without damage",
@@ -31,7 +34,8 @@ REQUIREMENTS = [
       ("hi", "maximum survival temperature", ("highest ambient temperature", "survival temperature (maximum)"), "°C",
        45, 60, 0)],
      "The buoy winters in an unheated yard and is deployed through the summer.", "Test",
-     "Align the range with the mooring specification once it is issued."),
+     ("The hull supplier rates the hull to +{alt} °C only; expect the upper limit to be lowered.",
+      [("alt", "maximum survival temperature", ("highest ambient temperature", "hull rating"), "°C", 35, 44, 0)])),
     ("Data Retention", "In the event of a loss of main power", "the data logger", "shall",
      "retain every logged record for at least {lo} hours",
      [("lo", "data retention time", ("record retention on power loss", "retention period"), "h", 48, 96, 0)],
@@ -59,7 +63,8 @@ REQUIREMENTS = [
      "report its position and water temperature at intervals of no more than {lo} minutes",
      [("lo", "maximum reporting interval", ("reporting interval", "transmit interval"), "min", 20, 40, 0)],
      "The harbour office plots positions in near real time.", "Demonstration",
-     "Consider a shorter interval during storms."),
+     ("During storms the harbour office wants reports every {alt} minutes instead.",
+      [("alt", "storm reporting interval", ("reporting interval in storms", "storm interval"), "min", 5, 15, 0)])),
     ("Lamp Visibility", "", "The navigation lamp", "shall",
      "be visible at a range of at least {lo} nautical miles on a clear night",
      [("lo", "minimum lamp range", ("visibility range", "lamp range"), "nmi", 2, 5, 1)],
@@ -96,7 +101,16 @@ def requirements(seed=1):
         facts.append(Fact(f"req{n}.rationale", name, aliases, "rationale", ("justification", "reason"), rationale,
                           drawn="statement", printed_as=(rationale,)))
         rows.append({"ids": ident, "name": name, "condition": condition, "subject": subject, "verb": verb,
-                     "content": said, "rationale": rationale, "method": method, "note": note})
+                     "content": said, "rationale": rationale, "method": method, "note": note, "aliases": aliases})
+    for n, row in enumerate(rows, 1):  # notes claiming something of the system (the owner, 2026-11-18: "a "well,
+        if isinstance(row["note"], tuple):  # actually" in the comment"), drawn after the statements so theirs stay
+            template, claimed = row["note"]
+            alt = {}
+            for key, attribute, synonyms, unit, lo, hi, decimals in claimed:
+                alt[key] = d.number(lo, hi, decimals)
+                facts.append(Fact(f"req{n}.note.{key}", row["name"], row["aliases"], attribute, synonyms, alt[key],
+                                  unit, basis="intended", holder=NOTE_HOLDER))
+            row["note"] = template.format(**alt)
     return facts, rows
 
 def buoy_requirements(seed=1):
@@ -112,10 +126,10 @@ def shaped(project):
     """The project drawn in its knob's shape: its sections, and the facts that shape prints (the split shape prints
     no rationale). The catalog sets the knob after making it, so it shapes the project again (catalog.corpus)."""
     project.sections = sections(project)
-    if project.knob == "split":
+    if project.knob == "split":  # notes, no rationales
         project.facts = [f for f in project.all_facts if f.attribute != "rationale"]
-    else:
-        project.facts = list(project.all_facts)
+    else:  # rationales, no notes
+        project.facts = [f for f in project.all_facts if f.holder != NOTE_HOLDER]
     return project
 
 def sections(project):
@@ -138,4 +152,53 @@ def sections(project):
              r["method"], ""] for r in rows]
     return [("1 Scope", [intro]), ("2 Requirements", [("table", "Table 1. Buoy requirements", header, body)])]
 
+# A risk register: another table of statements, not requirements (Risk ID, Risk, Likelihood, Consequence,
+# Mitigation, Owner): (risk, likelihood, consequence, mitigation with {n}, [its numbers], owner)
+RISKS = [
+    ("If the mooring chain wears through, the buoy may drift into the shipping channel.", "Medium",
+     "A hazard to navigation until the buoy is recovered.",
+     "Replace any chain link worn by more than {n} percent of its diameter.",
+     [("n", "chain wear limit", ("allowed link wear", "wear limit"), "%", 12, 25, 0)], "Operator"),
+    ("If the satellite service is withdrawn, positions stop reaching the harbour office.", "Low",
+     "The buoy's position is unknown between visits.", "Keep a second telemetry provider under contract.", [],
+     "Harbour office"),
+    ("If seabirds foul the solar panel, the battery may not recharge in winter.", "High",
+     "Data gaps through the darkest months.", "Fit bird spikes around the panel frame.", [], "Operator"),
+    ("If the lamp fails at night, the channel is unmarked.", "Low", "Vessels may stray from the channel.",
+     "Broadcast a notice to mariners within {n} hours of a reported failure.",
+     [("n", "notice to mariners time", ("notice deadline", "time to broadcast a notice"), "h", 2, 8, 0)],
+     "Harbour office"),
+]
+
+def buoy_risks(seed=1):
+    """The harbour monitoring buoy's risk register (RISK_KNOBS): each risk and its mitigation text facts, the
+    numbers a mitigation states numeric facts."""
+    d = Draw(seed + 100)
+    d.used.update({"1", "2", *(f"R-{n:02d}" for n in range(1, len(RISKS) + 1))})
+    facts, rows = [], []
+    for n, (risk, likelihood, consequence, mitigation, numbers, owner) in enumerate(RISKS, 1):
+        ident, values = f"R-{n:02d}", {}
+        aliases = (ident, f"risk {n}")
+        for key, attribute, synonyms, unit, lo, hi, decimals in numbers:
+            values[key] = d.number(lo, hi, decimals)
+            facts.append(Fact(f"risk{n}.{key}", f"Risk {ident}", aliases, attribute, synonyms, values[key], unit))
+        said = mitigation.format(**values)
+        facts.append(Fact(f"risk{n}.risk", f"Risk {ident}", aliases, "risk", ("risk statement", "hazard",
+                                                                              "description"),
+                          risk, drawn="statement", printed_as=(risk,)))
+        facts.append(Fact(f"risk{n}.mitigation", f"Risk {ident}", aliases, "mitigation",
+                          ("mitigation measure", "treatment", "control"), said, drawn="statement", printed_as=(said,)))
+        rows.append([ident, risk, likelihood, consequence, said, owner])
+    header = ["Risk ID", "Risk", "Likelihood", "Consequence", "Mitigation", "Owner"]
+    sections = [("1 Purpose", [("p", "This register lists the risks to the harbour monitoring buoy's service and how "
+                                     "each is treated.")]),
+                ("2 Risks", [("table", "Table 1. Risk register", header, rows)])]
+    project = Project(f"hmbr-s{seed}", "Harbour Monitoring Buoy: Risk Register", facts, sections, knob="register",
+                      kinds=RISK_KNOBS)
+    project.statements = rows  # a table of statements: written in every representation (representations.corpus)
+    return project
+
+RISK_KNOBS = ("register",)
+
 STATEMENT_PROJECTS = {"hmb": buoy_requirements}
+RISK_PROJECTS = {"hmbr": buoy_risks}

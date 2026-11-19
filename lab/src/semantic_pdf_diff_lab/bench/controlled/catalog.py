@@ -12,17 +12,18 @@ def corpus(seeds=(1,), knobs=False, revisions=False):
         from .procedures import PROCEDURE_KNOBS, PROCEDURE_PROJECTS
         from .schematics import SCHEMATIC_KNOBS, SCHEMATIC_PROJECTS
         from .sheets import SET_KNOBS, SET_PROJECTS, SHEET_KNOBS, SHEET_PROJECTS
-        from .statements import STATEMENT_KNOBS, STATEMENT_PROJECTS, shaped
+        from .statements import RISK_KNOBS, RISK_PROJECTS, STATEMENT_KNOBS, STATEMENT_PROJECTS, shaped
         for makers, all_knobs in ((TABLE_PROJECTS, TABLE_KNOBS), (PROSE_PROJECTS, PROSE_KNOBS),
                                   (CHART_PROJECTS, CHART_KNOBS), (SCHEMATIC_PROJECTS, SCHEMATIC_KNOBS),
                                   (SHEET_PROJECTS, SHEET_KNOBS), (SET_PROJECTS, SET_KNOBS),
-                                  (PROCEDURE_PROJECTS, PROCEDURE_KNOBS), (STATEMENT_PROJECTS, STATEMENT_KNOBS)):
+                                  (PROCEDURE_PROJECTS, PROCEDURE_KNOBS), (STATEMENT_PROJECTS, STATEMENT_KNOBS),
+                                  (RISK_PROJECTS, RISK_KNOBS)):
             for make in makers.values():
                 for seed in seeds:
                     for knob in all_knobs:
                         p = make(seed)
                         p.id, p.knob = f"{p.id}-{knob}", knob
-                        if getattr(p, "statements", None):  # its shape is its knob's (statements.py)
+                        if getattr(p, "all_facts", None):  # its shape is its knob's (statements.py)
                             shaped(p)
                         out.append(p)
     if revisions:

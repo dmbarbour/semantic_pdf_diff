@@ -2825,10 +2825,10 @@
    }
   },
   "hmb-s1-split": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 8,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -2839,11 +2839,12 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 19,
+   "claims": 23,
    "outcomes": {
     "fragment": 5,
-    "right": 12,
-    "text": 2
+    "loose": 1,
+    "right": 14,
+    "text": 3
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -2851,24 +2852,25 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.4286,
-    "text": 0.3571,
-    "visual": 0.4286
+    "table": 0.5,
+    "text": 0.4375,
+    "visual": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     },
     "text": {
      "fragment": 2,
-     "right": 6,
-     "text": 1
+     "right": 8,
+     "text": 2
     },
     "visual": {
      "fragment": 3,
-     "right": 7,
+     "right": 10,
      "text": 1
     }
    },
@@ -2879,10 +2881,10 @@
    }
   },
   "hmb-s1-split.docx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -2893,22 +2895,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "docx-table": 0.4286
+    "docx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -2918,10 +2922,10 @@
    }
   },
   "hmb-s1-split.md": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -2932,22 +2936,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "md-table": 0.4286
+    "md-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -2957,10 +2963,10 @@
    }
   },
   "hmb-s1-split.pptx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 8,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -2971,23 +2977,23 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
-    "right": 7,
+    "right": 8,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "pptx-table": 0.4286
+    "pptx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
-     "right": 7,
+     "right": 8,
      "text": 1
     }
    },
@@ -2996,10 +3002,10 @@
    }
   },
   "hmb-s1-split.xlsx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -3010,24 +3016,228 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "xlsx-table": 0.4286
+    "xlsx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 16,
+   "outcomes": {
+    "fragment": 2,
+    "right": 8,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "statement": 0.125,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3,
+    "text": 0.2,
+    "visual": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 2,
+     "right": 3,
+     "text": 6
+    },
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 5
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "hmbr-s1-register.docx": {
+   "facts": 10,
+   "found": 2,
+   "recall": 0.2,
+   "found_right": 2,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.mitigation",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 2,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-table": 0.2
+   },
+   "by_reader": {
+    "table": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 2,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.md": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 12,
+   "outcomes": {
+    "fragment": 2,
+    "right": 3,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 2,
+     "right": 3,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.pptx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.xlsx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
     }
    },
    "conditions_by_reader": {
@@ -15470,10 +15680,10 @@
    }
   },
   "hmb-s1-split": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 8,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -15484,11 +15694,12 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 19,
+   "claims": 23,
    "outcomes": {
     "fragment": 5,
-    "right": 12,
-    "text": 2
+    "loose": 1,
+    "right": 14,
+    "text": 3
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -15496,24 +15707,25 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.4286,
-    "text": 0.3571,
-    "visual": 0.4286
+    "table": 0.5,
+    "text": 0.4375,
+    "visual": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     },
     "text": {
      "fragment": 2,
-     "right": 6,
-     "text": 1
+     "right": 8,
+     "text": 2
     },
     "visual": {
      "fragment": 3,
-     "right": 7,
+     "right": 10,
      "text": 1
     }
    },
@@ -15524,10 +15736,10 @@
    }
   },
   "hmb-s1-split.docx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -15538,22 +15750,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "docx-table": 0.4286
+    "docx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -15563,10 +15777,10 @@
    }
   },
   "hmb-s1-split.md": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -15577,22 +15791,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "md-table": 0.4286
+    "md-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -15602,10 +15818,10 @@
    }
   },
   "hmb-s1-split.pptx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -15616,22 +15832,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "pptx-table": 0.4286
+    "pptx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -15641,10 +15859,10 @@
    }
   },
   "hmb-s1-split.xlsx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -15655,24 +15873,228 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "xlsx-table": 0.4286
+    "xlsx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 16,
+   "outcomes": {
+    "fragment": 2,
+    "right": 8,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "statement": 0.125,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3,
+    "text": 0.2,
+    "visual": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 2,
+     "right": 3,
+     "text": 6
+    },
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 5
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "hmbr-s1-register.docx": {
+   "facts": 10,
+   "found": 2,
+   "recall": 0.2,
+   "found_right": 2,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.mitigation",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 2,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-table": 0.2
+   },
+   "by_reader": {
+    "table": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 2,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.md": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 12,
+   "outcomes": {
+    "fragment": 2,
+    "right": 3,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "md-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 2,
+     "right": 3,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.pptx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.xlsx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
     }
    },
    "conditions_by_reader": {
@@ -27691,10 +28113,10 @@
    }
   },
   "hmb-s1-split": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 8,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -27705,11 +28127,12 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 19,
+   "claims": 23,
    "outcomes": {
     "fragment": 5,
-    "right": 12,
-    "text": 2
+    "loose": 1,
+    "right": 14,
+    "text": 3
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -27717,24 +28140,25 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.4286,
-    "text": 0.3571,
-    "visual": 0.4286
+    "table": 0.5,
+    "text": 0.4375,
+    "visual": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     },
     "text": {
      "fragment": 2,
-     "right": 6,
-     "text": 1
+     "right": 8,
+     "text": 2
     },
     "visual": {
      "fragment": 3,
-     "right": 7,
+     "right": 10,
      "text": 1
     }
    },
@@ -27745,10 +28169,10 @@
    }
   },
   "hmb-s1-split.docx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -27759,22 +28183,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "docx-table": 0.4286
+    "docx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -27784,10 +28210,10 @@
    }
   },
   "hmb-s1-split.pptx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -27798,22 +28224,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "pptx-table": 0.4286
+    "pptx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -27823,10 +28251,10 @@
    }
   },
   "hmb-s1-split.xlsx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -27837,24 +28265,190 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "xlsx-table": 0.4286
+    "xlsx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 16,
+   "outcomes": {
+    "fragment": 2,
+    "right": 8,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "statement": 0.125,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3,
+    "text": 0.2,
+    "visual": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 2,
+     "right": 3,
+     "text": 6
+    },
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 5
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "hmbr-s1-register.docx": {
+   "facts": 10,
+   "found": 2,
+   "recall": 0.2,
+   "found_right": 2,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.mitigation",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 2,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-table": 0.2
+   },
+   "by_reader": {
+    "table": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 2,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.pptx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.xlsx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
     }
    },
    "conditions_by_reader": {
@@ -38610,10 +39204,10 @@
    }
   },
   "hmb-s1-split": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 8,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -38624,11 +39218,12 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 19,
+   "claims": 23,
    "outcomes": {
     "fragment": 5,
-    "right": 12,
-    "text": 2
+    "loose": 1,
+    "right": 14,
+    "text": 3
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
@@ -38636,24 +39231,25 @@
     "table": 1.0
    },
    "by_reader": {
-    "table": 0.4286,
-    "text": 0.3571,
-    "visual": 0.4286
+    "table": 0.5,
+    "text": 0.4375,
+    "visual": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     },
     "text": {
      "fragment": 2,
-     "right": 6,
-     "text": 1
+     "right": 8,
+     "text": 2
     },
     "visual": {
      "fragment": 3,
-     "right": 7,
+     "right": 10,
      "text": 1
     }
    },
@@ -38664,10 +39260,10 @@
    }
   },
   "hmb-s1-split.docx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -38678,22 +39274,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "docx-table": 0.4286
+    "docx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -38703,10 +39301,10 @@
    }
   },
   "hmb-s1-split.pptx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -38717,22 +39315,24 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "pptx-table": 0.4286
+    "pptx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
     }
@@ -38742,10 +39342,10 @@
    }
   },
   "hmb-s1-split.xlsx": {
-   "facts": 14,
-   "found": 6,
-   "recall": 0.4286,
-   "found_right": 6,
+   "facts": 16,
+   "found": 8,
+   "recall": 0.5,
+   "found_right": 7,
    "missed": [
     "req1.statement",
     "req2.statement",
@@ -38756,24 +39356,190 @@
     "req7.statement",
     "req8.statement"
    ],
-   "claims": 10,
+   "claims": 11,
    "outcomes": {
     "fragment": 2,
+    "loose": 1,
     "right": 7,
     "text": 1
    },
    "conditions_kept": "0/0",
    "recall_by_form": {
-    "xlsx-table": 0.4286
+    "xlsx-table": 0.5
    },
    "by_reader": {
-    "table": 0.4286
+    "table": 0.5
    },
    "outcomes_by_reader": {
     "table": {
      "fragment": 2,
+     "loose": 1,
      "right": 7,
      "text": 1
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 16,
+   "outcomes": {
+    "fragment": 2,
+    "right": 8,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "statement": 0.125,
+    "table": 1.0
+   },
+   "by_reader": {
+    "table": 0.3,
+    "text": 0.2,
+    "visual": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 2,
+     "right": 3,
+     "text": 6
+    },
+    "text": {
+     "right": 2
+    },
+    "visual": {
+     "right": 5
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0",
+    "text": "0/0",
+    "visual": "0/0"
+   }
+  },
+  "hmbr-s1-register.docx": {
+   "facts": 10,
+   "found": 2,
+   "recall": 0.2,
+   "found_right": 2,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.mitigation",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 2,
+    "text": 7
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "docx-table": 0.2
+   },
+   "by_reader": {
+    "table": 0.2
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 2,
+     "text": 7
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.pptx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "pptx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
+    }
+   },
+   "conditions_by_reader": {
+    "table": "0/0"
+   }
+  },
+  "hmbr-s1-register.xlsx": {
+   "facts": 10,
+   "found": 3,
+   "recall": 0.3,
+   "found_right": 3,
+   "missed": [
+    "risk1.mitigation",
+    "risk1.risk",
+    "risk2.risk",
+    "risk3.mitigation",
+    "risk3.risk",
+    "risk4.mitigation",
+    "risk4.risk"
+   ],
+   "claims": 13,
+   "outcomes": {
+    "fragment": 4,
+    "right": 3,
+    "text": 6
+   },
+   "conditions_kept": "0/0",
+   "recall_by_form": {
+    "xlsx-table": 0.3
+   },
+   "by_reader": {
+    "table": 0.3
+   },
+   "outcomes_by_reader": {
+    "table": {
+     "fragment": 4,
+     "right": 3,
+     "text": 6
     }
    },
    "conditions_by_reader": {

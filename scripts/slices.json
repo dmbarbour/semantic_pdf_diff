@@ -408,6 +408,20 @@
       "public": true,
       "family": "drawings",
       "sha256": "d5a5ed05d949f594e45d74d39aa21bf1115e045dcefc9593214ea1eb20df4d25"
+    },
+    {
+      "name": "habex-final-p132-135",
+      "source": "nasa-flagship-concepts/habex/HabEx-final-report.pdf",
+      "source_sha256": "734ec2aea15b7e12766009a93aac6001d4f7f3e294cb625341cd51e8e56e2e52",
+      "pages": [
+        132,
+        135
+      ],
+      "use": "Science traceability matrix: goals, objectives, measurement and functional requirements as sentences in a wide table (requirements and textual claims)",
+      "set": "dev",
+      "public": true,
+      "family": "reports",
+      "sha256": "42fcfa8eadbee097be46d7c644d12d96f51322b2070ce0a9f77527472f33c595"
     }
   ],
   "runs": [
@@ -570,6 +584,14 @@
         "usc-cd-p93-96"
       ],
       "set": "heldout"
+    },
+    {
+      "name": "habex-stm",
+      "slices": [
+        "habex-final-p132-135",
+        "habex-final-p132-135"
+      ],
+      "set": "dev"
     }
   ]
 }

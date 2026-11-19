@@ -1,25 +1,25 @@
 {
  "totals": {
   "inventory": {
-   "claims": 24760,
-   "evidence": 14161,
+   "claims": 24841,
+   "evidence": 14239,
    "frame in conditions": 36,
-   "grounded": 6674,
+   "grounded": 6711,
    "list records": 36,
    "no content words": 4,
    "note records": 11,
    "numbered in attribute": 164,
    "numbered in conditions": 2,
    "numbered in entity": 408,
-   "partly": 72,
-   "partly (image)": 38,
+   "partly": 83,
+   "partly (image)": 40,
    "positioned": 124,
-   "printed": 9281,
+   "printed": 9342,
    "sheet records": 11,
    "table records": 399,
-   "unsupported": 39,
-   "unsupported (image)": 820,
-   "with conditions": 7647,
+   "unsupported": 44,
+   "unsupported (image)": 821,
+   "with conditions": 7703,
    "with records": 6999
   },
   "placed": {
@@ -35,6 +35,7 @@
     "records": 109
    },
    "holder": {
+    "nowhere": 10,
     "stance": 219
    },
    "provenance": {
@@ -65,6 +66,9 @@
    },
    "frame": {
     "shown, not used": 20
+   },
+   "holder": {
+    "shown, not used": 10
    },
    "provenance": {
     "in conditions": 5,
@@ -115,8 +119,8 @@
      "share": 0.988
     },
     "<=1.0": {
-     "readings": 34358,
-     "right": 31430,
+     "readings": 34414,
+     "right": 31478,
      "share": 0.915
     }
    },
@@ -132,8 +136,8 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 23032,
-     "right": 21000,
+     "readings": 23048,
+     "right": 21016,
      "share": 0.912
     }
    },
@@ -161,9 +165,9 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 11326,
-     "right": 10430,
-     "share": 0.921
+     "readings": 11366,
+     "right": 10462,
+     "share": 0.92
     }
    }
   }
@@ -2464,37 +2468,192 @@
   },
   "hmb-s1-split": {
    "inventory": {
-    "claims": 43,
-    "grounded": 15,
+    "claims": 50,
+    "grounded": 18,
     "partly": 5,
-    "with conditions": 20,
+    "unsupported (image)": 1,
+    "with conditions": 24,
     "positioned": 0,
     "misplaced": {},
-    "printed": 12,
-    "evidence": 15,
-    "context_bytes_per_request": 208,
-    "data_bytes_per_request": 600,
+    "printed": 17,
+    "evidence": 20,
+    "context_bytes_per_request": 202,
+    "data_bytes_per_request": 651,
     "examples": {}
    },
    "keyed": {
-    "placed": {},
-    "audit": {},
+    "placed": {
+     "holder": {
+      "nowhere": 2
+     }
+    },
+    "audit": {
+     "holder": {
+      "shown, not used": 2
+     }
+    },
     "named": {},
-    "examples": {}
+    "examples": {
+     "holder: shown, not used": [
+      "req1.note.alt: wanted 'the requirements note'; read rated temperature limit |  / ambient temperature withstand upper limit | ",
+      "req7.note.alt: wanted 'the requirements note'; read reporting interval (position and water temperature) | During storms / reporting interval | during storms"
+     ]
+    }
    }
   },
   "hmb-s1-split.docx": {
    "inventory": {
-    "claims": 9,
+    "claims": 10,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 10,
+    "context_bytes_per_request": 362,
+    "data_bytes_per_request": 281,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "nowhere": 2
+     }
+    },
+    "audit": {
+     "holder": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "holder: shown, not used": [
+      "req1.note.alt: wanted 'the requirements note'; read ambient temperature withstand upper limit | ",
+      "req7.note.alt: wanted 'the requirements note'; read reporting interval | During storms"
+     ]
+    }
+   }
+  },
+  "hmb-s1-split.md": {
+   "inventory": {
+    "claims": 10,
     "grounded": 5,
     "with conditions": 5,
     "positioned": 0,
     "misplaced": {},
-    "printed": 7,
-    "evidence": 9,
-    "context_bytes_per_request": 362,
-    "data_bytes_per_request": 275,
+    "printed": 8,
+    "evidence": 10,
+    "context_bytes_per_request": 478,
+    "data_bytes_per_request": 282,
     "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "nowhere": 2
+     }
+    },
+    "audit": {
+     "holder": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "holder: shown, not used": [
+      "req1.note.alt: wanted 'the requirements note'; read ambient temperature withstand upper limit | ",
+      "req7.note.alt: wanted 'the requirements note'; read reporting interval | During storms"
+     ]
+    }
+   }
+  },
+  "hmb-s1-split.pptx": {
+   "inventory": {
+    "claims": 10,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 10,
+    "context_bytes_per_request": 254,
+    "data_bytes_per_request": 230,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "nowhere": 2
+     }
+    },
+    "audit": {
+     "holder": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "holder: shown, not used": [
+      "req1.note.alt: wanted 'the requirements note'; read ambient temperature rating | upper limit",
+      "req7.note.alt: wanted 'the requirements note'; read position and water temperature reporting interval | During storms"
+     ]
+    }
+   }
+  },
+  "hmb-s1-split.xlsx": {
+   "inventory": {
+    "claims": 10,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 10,
+    "context_bytes_per_request": 248,
+    "data_bytes_per_request": 230,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {
+     "holder": {
+      "nowhere": 2
+     }
+    },
+    "audit": {
+     "holder": {
+      "shown, not used": 2
+     }
+    },
+    "named": {},
+    "examples": {
+     "holder: shown, not used": [
+      "req1.note.alt: wanted 'the requirements note'; read ambient temperature withstand upper limit | ",
+      "req7.note.alt: wanted 'the requirements note'; read position and water temperature reporting interval | During storms"
+     ]
+    }
+   }
+  },
+  "hmbr-s1-register": {
+   "inventory": {
+    "claims": 19,
+    "grounded": 8,
+    "partly": 4,
+    "partly (image)": 2,
+    "unsupported": 4,
+    "with conditions": 18,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 14,
+    "evidence": 18,
+    "context_bytes_per_request": 114,
+    "data_bytes_per_request": 616,
+    "examples": {
+     "unsupported": [
+      "solar panel | failure mode | winter",
+      "lamp failure | likelihood | at night",
+      "lamp failure | consequence | at night"
+     ]
+    }
    },
    "keyed": {
     "placed": {},
@@ -2503,16 +2662,43 @@
     "examples": {}
    }
   },
-  "hmb-s1-split.md": {
+  "hmbr-s1-register.docx": {
    "inventory": {
-    "claims": 9,
+    "claims": 13,
     "grounded": 5,
-    "with conditions": 5,
+    "partly": 1,
+    "unsupported": 1,
+    "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
     "printed": 7,
-    "evidence": 9,
-    "context_bytes_per_request": 478,
+    "evidence": 13,
+    "context_bytes_per_request": 321,
+    "data_bytes_per_request": 274,
+    "examples": {
+     "unsupported": [
+      "mooring chain link | maximum allowable wear | replacement threshold"
+     ]
+    }
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmbr-s1-register.md": {
+   "inventory": {
+    "claims": 12,
+    "grounded": 9,
+    "partly": 2,
+    "with conditions": 11,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 9,
+    "evidence": 12,
+    "context_bytes_per_request": 430,
     "data_bytes_per_request": 277,
     "examples": {}
    },
@@ -2523,17 +2709,18 @@
     "examples": {}
    }
   },
-  "hmb-s1-split.pptx": {
+  "hmbr-s1-register.pptx": {
    "inventory": {
-    "claims": 9,
-    "grounded": 4,
-    "with conditions": 4,
+    "claims": 13,
+    "grounded": 5,
+    "partly": 2,
+    "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
-    "printed": 7,
-    "evidence": 9,
-    "context_bytes_per_request": 254,
-    "data_bytes_per_request": 225,
+    "printed": 11,
+    "evidence": 13,
+    "context_bytes_per_request": 279,
+    "data_bytes_per_request": 195,
     "examples": {}
    },
    "keyed": {
@@ -2543,17 +2730,18 @@
     "examples": {}
    }
   },
-  "hmb-s1-split.xlsx": {
+  "hmbr-s1-register.xlsx": {
    "inventory": {
-    "claims": 9,
-    "grounded": 4,
-    "with conditions": 4,
+    "claims": 13,
+    "grounded": 5,
+    "partly": 2,
+    "with conditions": 7,
     "positioned": 0,
     "misplaced": {},
-    "printed": 7,
-    "evidence": 9,
-    "context_bytes_per_request": 248,
-    "data_bytes_per_request": 226,
+    "printed": 11,
+    "evidence": 13,
+    "context_bytes_per_request": 272,
+    "data_bytes_per_request": 197,
     "examples": {}
    },
    "keyed": {
