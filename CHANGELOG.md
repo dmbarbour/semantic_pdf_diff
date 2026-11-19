@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.74.0 (2026-11-19)
+
+- **`statement_tables`** (off): a table whose rows are statements (requirements, risks, findings) can be read by a reading the model gives once a table, as the table's own headers say what each column is: the cells making each row's sentence and their order, the identifier and name, qualifiers (a verification method, a rationale, a status), notes discussing the statement, references. Code applies it to every row, word for word: each row's statement a claim, each qualifier, note and reference a claim under its own header, every row still read by itself as before. On the controlled corpus's tables of statements, statements and rationales found went from none to nearly all in PDF, Word, slides and workbooks, with numbers and tables of values unchanged. Not yet held out, so off. Markdown's pipe tables aren't reached (they're read row by row).
+
 ## 0.73.2 (2026-11-19)
 
 - **A table rule's long claim kept, not cut:** claims a table's rules make had their value cut at 300 characters and their quote at 400, mid-word and unmarked (0.73.1 raised the reader's limits but missed this path); they're now kept whole up to the same backstops (2,000 characters), shortened at a word and marked beyond. Every reader's version raised: stores are read again from the answers cache, with no requests.

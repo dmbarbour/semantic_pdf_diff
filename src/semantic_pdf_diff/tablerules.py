@@ -363,6 +363,22 @@ class Transcribed(Lenient):
 
     _texts = field_validator("cells", mode="before")(lambda cls, v: as_text(v))
 
+class Statements(Lenient):
+    """A table of statements' reading (the statement_tables lever; requirements and textual claims, milestone 2; the
+    owner, 2026-11-18: "We'll either need a model's help to understand how to read a row in a given table, or we'll
+    need a generic approach that works across many tables"): its columns by letter, as the table's own headers say
+    what they are; applied to every row by code (statement_claims)."""
+    statement: list[str] = Field(default_factory=list, max_length=20)   # the cells making a row's sentence, in order
+    identifier: list[str] = Field(default_factory=list, max_length=6)   # telling the row from the others
+    name: str = Field(default="", max_length=10)                         # naming it, if a column does
+    qualifiers: list[str] = Field(default_factory=list, max_length=40)  # saying more of the statement
+    notes: list[str] = Field(default_factory=list, max_length=10)       # discussing the statement, not the system
+    references: list[str] = Field(default_factory=list, max_length=10)  # naming other rows or other things
+
+    _texts = field_validator("statement", "identifier", "qualifiers", "notes", "references", mode="before")(
+        lambda cls, v: as_text(v))
+    _name = field_validator("name", mode="before")(lambda cls, v: as_text(v))
+
 class Rules(Lenient):
     """A model's answer to the rules query (RULES)."""
     transcribed: Transcribed | None = None  # with a table's image: one row of values copied from it
@@ -378,6 +394,7 @@ class Rules(Lenient):
     categories: list[str] = Field(default_factory=list, max_length=10)
     points: list[str] = Field(default_factory=list, max_length=20)
     notes: list[str] = Field(default_factory=list, max_length=20)  # rows of POSSIBLE NOTES that are notes
+    statements: Statements | None = None  # a table of statements' reading (the statement_tables lever)
 
     _texts = field_validator("quantities", "categories", "points", "notes", mode="before")(lambda cls, v: as_text(v))
 
@@ -448,6 +465,42 @@ class Misfit(ValueError):
 
 class Broken(ValueError):
     """Rules that can't be applied to any row (an unknown column or placeholder)."""
+
+def statement_problems(reading, g):
+    """What's wrong with a table of statements' reading, mechanically: [] when it can be used."""
+    if reading is None or not reading.statement:
+        return ["reading statements names no statement columns"]
+    try:
+        for letter in [*reading.statement, *reading.identifier, *([reading.name] if reading.name else []),
+                       *reading.qualifiers, *reading.notes, *reading.references]:
+            _index(g, letter)
+    except Broken as error:
+        return [str(error)]
+    return []
+
+def statement_claims(reading, g, i):
+    """Row i of a table of statements read by its reading: [(fields, columns used, what it is)]: its statement, its
+    cells in the reading's order joined as printed; each qualifier, reference and note under its own header; the
+    entity the row's identifier and name. Verbatim: nothing is reworded."""
+    cells = g.rows[i]
+    at = lambda letters: [_index(g, x) for x in letters]  # noqa: E731
+    said = lambda k: " ".join(cells[k].split()) if k < len(cells) else ""  # noqa: E731
+    named = at(reading.identifier) + (at([reading.name]) if reading.name else [])
+    entity = " ".join(said(k) for k in named if said(k)) or g.names[i]
+    out = []
+    statement = [k for k in at(reading.statement) if said(k)]
+    if statement:
+        out.append(({"entity": entity, "attribute": "statement", "value": " ".join(said(k) for k in statement),
+                     "unit": "", "conditions": ""}, statement, "statement"))
+    for role, letters in (("qualifier", reading.qualifiers), ("reference", reading.references),
+                          ("note", reading.notes)):
+        for k in at(letters):
+            value = said(k)
+            if value and value.casefold() not in NOT_APPLICABLE:
+                header = " ".join(g.labels[k].split()) or g.columns[k]
+                out.append(({"entity": entity, "attribute": header, "value": value, "unit": "", "conditions": ""},
+                            [k], role))
+    return out
 
 def _index(g, letter):
     letter = letter.strip().upper()
@@ -563,10 +616,12 @@ def problems(rules, g, cols=None):
     """What's wrong with an answer, mechanically: [] when it can be used. Rules' misfit rows are not problems unless
     more than RETRY_SHARE of the rows."""
     reading = rules.reading.strip().lower()
-    if reading not in ("rules", "rows", "summary"):
+    if reading not in ("rules", "rows", "summary", "statements"):
         return [f"unknown reading {rules.reading!r}: answer rules, rows or summary"]
     if reading == "rows":
         return []
+    if reading == "statements":
+        return statement_problems(rules.statements, g)
     if reading == "summary":
         return summary_problems(rules, g, cols or analyse(g))
     if not rules.claims:
@@ -876,6 +931,19 @@ def read(core, page, g, task, by_itself, source, image=None, mark=None):
         g_, notes = noted(g, answer.notes)  # the notes it names: read by themselves, labelling no rows
         if reading == "rows":
             return record(name, "complete", [everyone(name, f"the model's reading{why}", notes)[:500]])
+        if reading == "statements":  # each row also read by itself: its own claims as today, these besides
+            found = []
+            for i in range(len(g_.rows)):
+                stance = core.s.table_holder(g_.labels, g_.rows[i], g_.rows[:i])
+                for fields, used, role in statement_claims(answer.statements, g_, i):
+                    step = DerivationStep(step="table-statements", detail=f"{role} by the table's reading{why}"[:300])
+                    found.append(_evidence(core, page, row_box(i), name, fields,
+                                           " | ".join(g_.rows[i][k] for k in used), True, [*source_, step],
+                                           records=[table.id] if table else (), stance=stance, mark=mark,
+                                           snippet=row_snippet(g_.labels, g_.rows[i])))
+            told = everyone(name, f"the model's reading as statements{why}", notes)
+            return record(name, "complete", [f"Read as statements: {len(g_.rows)} rows, {len(found)} claims; "
+                                             f"{told}"[:500]], found)
         found, misfits = [], []
         if reading == "summary":
             template = answer.template.strip().lower()

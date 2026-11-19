@@ -349,6 +349,39 @@ class ConditionsByColumn(Lever):
             .replace(TABLE_LAST_EXAMPLE,
                      TABLE_LAST_EXAMPLE + (TABLE_KEYED_EXAMPLE_FRAME if frame else TABLE_KEYED_EXAMPLE))
 
+# The table rules' prompt: a fourth reading, a table of statements, whose columns the model names by what they are and
+# code applies to every row, each row still read by itself (the statement_tables lever; requirements and textual
+# claims, milestone 2)
+TABLE_ROWS_READING = "  several values in one cell, rows unlike each other. Each row is read by itself.\n"
+TABLE_STATEMENTS_READING = (
+    '- "statements": each row states something in sentences (a requirement, a risk, a finding), and its other cells\n'
+    '  identify, qualify or discuss what it states. Name its columns by letter, as its own headers say what they\n'
+    '  are: "statement", the columns whose cells make each row\'s sentence, in their order; "identifier", those\n'
+    '  telling the row from the others; "name", a column naming it, if one does; "qualifiers", those saying more of\n'
+    '  the statement (how it\'s verified, why, its status or priority, a value it gives); "notes", those discussing\n'
+    '  the statement rather than the system; "references", those naming other rows or other things. Leave a column\n'
+    "  out that is none of these. Each row's statement is then its cells joined, word for word, and each row is read\n"
+    "  by itself as well.\n")
+TABLE_READINGS = '"reading":"rules|rows|summary",'
+TABLE_READINGS_STATEMENTS = '"reading":"rules|rows|summary|statements",'
+TABLE_LAST_KEYS = '"categories":["C"], "points":["0"]}'
+TABLE_STATEMENTS_KEYS = ('"categories":["C"], "points":["0"],\n"statements":{"statement":["C","D"], '
+                         '"identifier":["A"], "name":"B", "qualifiers":["E"], "notes":["F"], "references":[]}}')
+
+class StatementTables(Lever):
+    lever_name, stage, off = "statement_tables", "instructions", {"statement_tables": False}
+    # a table whose rows are statements (requirements, risks, findings) read by a reading the model gives once a table,
+    # its statements and qualifiers made by code, word for word, beside each row's own reading (tablerules.Statements;
+    # the owner, 2026-11-18: "we'll certainly need a model to make sense of how to read these tables")
+    statement_tables: Annotated[bool, _shaping(frozenset({"table"}))] = False
+
+    def table_rules_text(self, builtin):
+        text = super().table_rules_text(builtin)
+        if not self.statement_tables:
+            return text
+        return text.replace(TABLE_ROWS_READING, TABLE_ROWS_READING + TABLE_STATEMENTS_READING) \
+            .replace(TABLE_READINGS, TABLE_READINGS_STATEMENTS).replace(TABLE_LAST_KEYS, TABLE_STATEMENTS_KEYS)
+
 class VisualRules(Lever):
     lever_name, stage, off = "visual_rules", "instructions", {"visual_rules": []}
     # appended for image tasks only (tiles, figures, overview)
@@ -1664,7 +1697,8 @@ class DedupeRepeated(Lever):
 # view_rows, align_hedges, hedges_apart, read_holders, hedge_rule, scan_halves, labels_joined and whole_lines
 # (docs/reviews/levers.md); round 0's settings are benchmarks/round0.json.
 LEVER_CLASSES = (ExtractPrompt, SplitConditions, ReadHolders, HedgeRule, WorkedExamples, ColumnConditions,
-                 ConditionsByColumn, ExtractRules, VisualRules, ImagesFirst, CompleteByImage, Neighbours,
+                 ConditionsByColumn, StatementTables, ExtractRules, VisualRules, ImagesFirst, CompleteByImage,
+                 Neighbours,
                  LeaveFurniture, TableContext, StemContext, References, ReaderGlossary, TileLocator, Decoration,
                  Tiling, TileCut,
                  TileChoice, GrowTiles, SheetDetails, SkipEmpty,

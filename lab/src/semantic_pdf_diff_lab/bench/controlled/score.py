@@ -210,12 +210,14 @@ def classify(claim, facts, printed):
 
 STATEMENT_WHOLE = 0.8  # a statement's words a claim must hold to state it
 STATEMENT_PART = 3     # its words a claim's value must hold, at least, to state part of it (a fragment)
+STATEMENT_WITHIN = 0.5  # a claim holding a statement whole: at least this share of its words the statement's (a
+                       # row's statement joined with its consequence states it; a whole table's words don't)
 
 def classify_statement(claim, statements):
     """(outcome, fact id or None) for a claim whose value is text, against the key's statements (statements.py:
     requirements and textual claims, milestone 0). Right: its value holds the statement's words (STATEMENT_WHOLE of
-    them, any order), its value's words mostly the statement's, and its names name the statement (its entity or
-    attribute among the fact's names: a requirement's name, identifiers, subject; "statement", "requirement"...).
+    them, any order), at least STATEMENT_WITHIN of its value's words the statement's, and its names name the statement
+    (its entity or attribute among the fact's names: a requirement's name, identifiers, subject; "statement"...).
     Loose: the same, its names naming no statement, or another's. Fragment: its value is part of one statement's words
     (STATEMENT_PART of them or more, and mostly its): a statement read in pieces. Text: none of them (words the key
     doesn't state: not scored)."""
@@ -224,19 +226,19 @@ def classify_statement(claim, statements):
     if not value:
         return "text", None
     names = tokens(" ".join(str(claim.get(k, "")) for k in ("entity", "attribute")))
-    best = None
+    whole, part = None, None
     for f in statements:
         words = set(said(f.value).split())
         held, within = len(words & value) / len(words), len(words & value) / len(value)
-        if within < STATEMENT_WHOLE or len(words & value) < min(STATEMENT_PART, len(words)):
-            continue
-        if best is None or held > best[0]:
-            best = (held, f)
-    if best is None:
-        return "text", None
-    held, f = best
-    if held < STATEMENT_WHOLE:
-        return "fragment", f.id
+        if held >= STATEMENT_WHOLE and within >= STATEMENT_WITHIN:  # the statement whole, perhaps with more
+            if whole is None or (held, within) > whole[:2]:
+                whole = (held, within, f)
+        elif within >= STATEMENT_WHOLE and len(words & value) >= min(STATEMENT_PART, len(words)):
+            if part is None or held > part[0]:
+                part = (held, f)
+    if whole is None:
+        return ("fragment", part[1].id) if part else ("text", None)
+    f = whole[2]
     named = names & set().union(*(tokens(n) for n in (f.entity, f.attribute) + tuple(f.aliases) + tuple(f.synonyms)))
     return ("right" if named else "loose"), f.id
 

@@ -194,6 +194,9 @@ HELP = {
     "hedge_rule": Help(_L, "the reader is told a hedge on a value is its uncertainty"),
     "worked_examples": Help(_L, "worked examples after the extraction instructions"),
     "column_conditions": Help(_L, "table rules are told a condition some columns have isn't every column's"),
+    "statement_tables": Help(_L, "a table whose rows are statements (requirements, risks) is read by a reading the "
+                                 "model gives once a table: each row's statement and qualifiers kept word for word, "
+                                 "beside its own reading"),
     "conditions_by_column": Help(_L, "table rules' templates give conditions (and frames) column by column"),
     "images_first": Help(_L, "a request's images before its text, as Google's guidance for gemma-4 has them"),
     "complete_by_image": Help(_L, "an image task's completeness is the image's, not its text layer's"),

@@ -188,6 +188,44 @@ class Applying(unittest.TestCase):
             {"value": "TBC"}]}]})
         self.assertEqual(tr.problems(rules, g), [])  # row 9's flow isn't a number: it's read by itself anyway
 
+class Statements(unittest.TestCase):
+    """A table of statements read by the reading a model gives once a table (the statement_tables lever;
+    requirements and textual claims, milestone 2): each row's statement word for word, its qualifiers by their
+    headers."""
+    def split(self):
+        rows = [["FOOv0.1-001", "In the event of power loss", "the logger", "SHALL", "retain its records for 72 hours.",
+                 "Battery or flash: to be confirmed.", "Test"],
+                ["FOOv0.1-002", "", "The hull", "SHALL", "be painted international orange.", "", "n/a"]]
+        return tg.grid(list("ABCDEFG"), ["Temporary UID", "Condition", "Subject", "Verb", "Clause(s)/Content",
+                                         "REQUIREMENTS NOTE", "Method"], rows, [3, 4], [5, 6])
+
+    READING = {"reading": "statements", "statements": {"statement": ["B", "C", "D", "E"], "identifier": ["A"],
+                                                       "qualifiers": ["G"], "notes": ["F"]}}
+
+    def test_a_statement_split_over_cells_is_joined_in_order_and_its_qualifiers_kept_by_header(self):
+        g, rules = self.split(), tr.Rules.model_validate(self.READING)
+        self.assertEqual(tr.problems(rules, g), [])
+        first = {(f["attribute"], f["value"], role) for f, _, role in tr.statement_claims(rules.statements, g, 0)}
+        self.assertEqual(first, {
+            ("statement", "In the event of power loss the logger SHALL retain its records for 72 hours.", "statement"),
+            ("Method", "Test", "qualifier"),
+            ("REQUIREMENTS NOTE", "Battery or flash: to be confirmed.", "note")})
+        entities = {f["entity"] for f, _, _ in tr.statement_claims(rules.statements, g, 0)}
+        self.assertEqual(entities, {"FOOv0.1-001"})  # an identifier of any shape
+        second = [(f["attribute"], f["value"]) for f, _, _ in tr.statement_claims(rules.statements, g, 1)]
+        self.assertEqual(second, [("statement", "The hull SHALL be painted international orange.")])  # n/a and blanks
+
+    def test_a_reading_naming_no_statement_or_a_column_the_table_lacks_is_refused(self):
+        g = self.split()
+        self.assertTrue(tr.problems(tr.Rules.model_validate({"reading": "statements"}), g))
+        bad = {"reading": "statements", "statements": {"statement": ["E"], "qualifiers": ["Z"]}}
+        self.assertTrue(tr.problems(tr.Rules.model_validate(bad), g))
+
+    def test_the_reading_is_offered_only_with_the_lever(self):
+        from semantic_pdf_diff.settings import Settings
+        self.assertNotIn('"statements"', Settings().table_rules_text(tr.RULES))
+        self.assertIn('"statements"', Settings(statement_tables=True).table_rules_text(tr.RULES))
+
 class Summaries(unittest.TestCase):
     def test_a_series_gives_its_range_extremes_and_points(self):
         rules = tr.Rules(reading="summary", template="series", subject="FFA-W3-211", input="A", quantities=["B"],

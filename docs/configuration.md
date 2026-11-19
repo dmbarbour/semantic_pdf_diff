@@ -134,6 +134,7 @@ Generated from the settings' declarations (`levers.settings_table`); `tests/test
 | `worked_examples` | `false` | shaping | worked_examples | extract | all |
 | `column_conditions` | `false` | shaping | column_conditions | extract | table |
 | `conditions_by_column` | `false` | shaping | conditions_by_column | extract | table |
+| `statement_tables` | `false` | shaping | statement_tables | extract | table |
 | `extract_rules` | `[]` | shaping | extract_rules | extract | all |
 | `visual_rules` | `[]` | shaping | visual_rules | extract | figure, overview, tile, vision |
 | `images_first` | `true` | shaping | images_first | extract, triage, compare | figure, overview, tile, vision |

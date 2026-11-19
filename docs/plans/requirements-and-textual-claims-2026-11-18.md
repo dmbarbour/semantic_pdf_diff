@@ -1,6 +1,6 @@
 # Requirements and textual claims: tables of statements read whole, compared across proposals
 
-- **Status:** Active (2026-11-18; the owner: "Proceed."); its design questions answered the same day (below), the plan revised for them. Milestone 0's counts in `debug` built the same day (0.73.0); milestone 1's silent losses fixed (0.73.1).
+- **Status:** Active (2026-11-18; the owner: "Proceed."); its design questions answered the same day (below), the plan revised for them. Milestone 0's counts in `debug` built the same day (0.73.0); milestone 1's silent losses fixed (0.73.1, 0.73.2); milestone 2's reading built, off (0.74.0: `statement_tables`).
 - **The owner, 2026-11-18:** "Do we have anything on the docket useful for comparing requirements and capturing more textual claims? I have a LOT of claims in the form of requirements tables that aren't numerical in nature in my actual corpus, and I feel we've a long way to go to properly extract and compare such claims."
 - **The owner, the same day:** "Please write up the plan." Two sample tables, both to be "compared across proposals, and the columns will certainly NOT match exactly":
   - **One copied from a Cameo model to Excel:** Provider, Requirement table name, ID ("FOO-REQ-112"), Name, Text ("usually one sentence containing 'shall', sometimes blank"), Rationale, Verification Method ("Test, Inspection, Analysis, Demonstration, or a combo"), Requirement Status and Compliance ("all blanks"), Derived From ("a list of other requirement names"), Classified, Refined By, Refines, Owner, Satisfied By, Comment, Stakeholder Requirement, Verification Event.
@@ -89,6 +89,18 @@ What happens today to a table of statements (read in the code, 2026-11-18):
 - **Numbers in a statement** ("-40 °C to +70 °C") read by code as its bounds, so numeric comparison still applies.
 - **Statements in prose** are the reader's, as today, their modality by code.
 - **Measured** against a null arm of the same request's length and against today's reading, on the controlled shapes; held out before it's a default.
+- **Built 2026-11-19** (0.74.0, `statement_tables`, off; `tablerules.Statements`, `statement_claims`): the rules request offers a fourth reading, "statements", the columns named by letter as the table's headers say what they are (statement, identifier, name, qualifiers, notes, references); checked by code (a column the table lacks refuses it); each row's statement its cells joined word for word, each qualifier, reference and note a claim under its own header, the entity the row's identifier and name; every row still read by itself. A table of values isn't offered anything new to do.
+  - **Development** (the controlled corpus's tables of statements, two arms; on $0.19; the scorer's whole statement loosened the same day: a claim holding a statement whole with more beside it, a risk with its consequence, is right):
+
+    | Documents | Statements and rationales or risks found, off → on |
+    |---|---|
+    | Cells shape: PDF, Word, slides, workbook | 0 → 14, 16, 16, 16 of 16 |
+    | Split shape: PDF, Word, slides, workbook | 0 → 8, 7, 8, 8 of 8 |
+    | Risk register: PDF, Word, slides, workbook | 1 → 8, 8, 8, 8 of 8 |
+    | Markdown (every shape), prose (every format) | unchanged |
+
+    Numbers found as before in every document; the equipment schedules' 39 documents (tables of values) unchanged. Missed: a split row whose condition the model named a qualifier (kept as its own claim; the statement without it); a cells table continued over two PDF pages, its second part reading one row of two (the lever index's row on tables continued over pages).
+  - **Not reached:** Markdown's pipe tables are read without a grid, so they're never asked the rules request (`textjob`: rows read by themselves), whatever this lever; and statements in prose are the reader's.
 
 ### 3. Modality and references
 

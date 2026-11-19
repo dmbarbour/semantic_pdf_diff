@@ -39,7 +39,7 @@ TOGGLES = {
     'another_tiling': 'asked',
     'least_half': 0.5, 'skip_sheet_tables': True, 'images_first': False, 'complete_by_image': True,
     'positions': 'conditions', 'records': False, 'editorial': False, 'split_conditions': False,
-    'column_conditions': True, 'conditions_by_column': True, 'sheet_records': False,
+    'column_conditions': True, 'conditions_by_column': True, 'statement_tables': True, 'sheet_records': False,
     'table_holders': False, 'carried_holders': False, 'view_attitudes': False, 'view_rows': False,
     'hedges_apart': False, 'read_holders': False, 'hedge_rule': False,
     'worked_examples': True,
