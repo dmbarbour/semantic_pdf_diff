@@ -936,10 +936,11 @@ def printed_name(g, i, used, value):
 
 def _evidence(core, page, box, task, fields, quote, verified, derivation, approximate=False, records=(), printed="",
               stance=(), mark=None, snippet=""):
-    from .schema import Claim
-    claim = Claim(entity=fields["entity"][:160], attribute=fields["attribute"][:160], value=fields["value"][:300],
-                  unit=fields["unit"][:40], conditions=fields["conditions"][:300], frame=fields.get("frame", "")[:200],
-                  kind="table", quote=quote[:400], confidence=CONFIDENCE, approximate=approximate,
+    from .schema import Claim, kept
+    claim = Claim(entity=kept(fields["entity"], "entity"), attribute=kept(fields["attribute"], "attribute"),
+                  value=kept(fields["value"], "value"), unit=kept(fields["unit"], "unit"),
+                  conditions=kept(fields["conditions"], "conditions"), frame=kept(fields.get("frame", ""), "frame"),
+                  kind="table", quote=kept(quote, "quote"), confidence=CONFIDENCE, approximate=approximate,
                   uncertainty=fields.get("uncertainty", "")[:200], stance=list(stance))
     if claim.stance:
         claim = core.s.held(claim)

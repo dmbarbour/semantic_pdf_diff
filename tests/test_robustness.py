@@ -378,6 +378,15 @@ class ExtractionTests(unittest.TestCase):
             self.assertTrue(all(r['status'] == 'complete' for r in tables))
             self.assertTrue(all(len(source_data(p).encode()) <= 300 for s, p, _ in client.tasks if s == 'table'))
 
+    def test_a_field_too_long_is_kept_shortened_wherever_a_claim_is_made(self):
+        """A rule's claim had been cut at 300 characters (a value) and 400 (a quote), mid-word and unmarked."""
+        from semantic_pdf_diff.schema import kept
+        sentence = 'The FOO shall withstand handling temperatures across its operating range. ' * 10  # 750 characters
+        self.assertEqual(kept(sentence, 'value'), sentence)  # whole: under the backstop
+        long_ = sentence * 4
+        self.assertTrue(kept(long_, 'value').endswith('range.…') and len(kept(long_, 'value')) <= 2000)
+        self.assertTrue(long_.startswith(kept(long_, 'quote')) and kept(long_, 'quote').endswith('range.'))
+
     def test_a_long_row_of_two_cells_is_read_in_parts_with_its_label(self):
         """Requirements and textual claims, milestone 1: an identifier and a long statement had been left unread."""
         statement = ' '.join(f'The FOO shall meet condition {i} of the handling envelope.' for i in range(30))

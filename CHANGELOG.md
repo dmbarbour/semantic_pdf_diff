@@ -2,6 +2,10 @@
 
 Versions are `0.MINOR.PATCH`, raised at each checkpoint that changes the product, and tagged `vX.Y.Z` ([decision 0040](docs/decisions/0040-versions-raised-at-checkpoints.md)). The lab shares the product's version. Each entry says what a user would notice.
 
+## 0.73.2 (2026-11-19)
+
+- **A table rule's long claim kept, not cut:** claims a table's rules make had their value cut at 300 characters and their quote at 400, mid-word and unmarked (0.73.1 raised the reader's limits but missed this path); they're now kept whole up to the same backstops (2,000 characters), shortened at a word and marked beyond. Every reader's version raised: stores are read again from the answers cache, with no requests.
+
 ## 0.73.1 (2026-11-18)
 
 - **Long claims kept:** a claim's value or quote over 300 or 400 characters had been dropped (a requirement's sentence, a rationale); the limits are now generous backstops (2,000 characters, conditions 1,000), and a field longer still is shortened at a word's end, marked, and counted ("Too long"), the claim kept.

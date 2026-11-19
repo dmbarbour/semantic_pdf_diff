@@ -37,6 +37,14 @@ def cut_at_word(text, limit):
     words = [m.end() for m in WORD_END.finditer(text[:limit + 1]) if m.end() > limit // 2]
     return text[:words[-1]] if words else text[:limit]
 
+def kept(text, name):
+    """A claim's field as kept: whole up to LONGEST, else shortened at a word's end and marked (a quote shortened
+    stays a prefix of what it quotes, unmarked, so it's still found)."""
+    limit = LONGEST[name]
+    if len(text) <= limit:
+        return text
+    return cut_at_word(text, limit) if name == "quote" else cut_at_word(text, limit - len(CUT_MARK)) + CUT_MARK
+
 class Claim(Strict):
     entity: str = Field(min_length=1, max_length=LONGEST["entity"])
     attribute: str = Field(min_length=1, max_length=LONGEST["attribute"])
@@ -113,10 +121,7 @@ class Extraction(Strict):
             if "stance" in item:  # links as asked, or none: a malformed stance loses the stance, not the claim
                 links = item["stance"] if isinstance(item["stance"], list) else []
                 item["stance"] = [x for x in links if isinstance(x, dict) and str(x.get("holder") or "").strip()]
-            cut = {k: cut_at_word(item[k], LONGEST[k] - len(CUT_MARK)) + CUT_MARK for k in LONGEST
-                   if isinstance(item.get(k), str) and len(item[k]) > LONGEST[k]}
-            if "quote" in cut:  # a quote cut is a prefix of what it quoted: found as its words are
-                cut["quote"] = cut["quote"][:-len(CUT_MARK)]
+            cut = {k: kept(item[k], k) for k in LONGEST if isinstance(item.get(k), str) and len(item[k]) > LONGEST[k]}
             try:
                 claims.append(Claim.model_validate({**item, **cut}).model_dump())
                 long_ += bool(cut)

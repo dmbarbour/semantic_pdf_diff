@@ -130,7 +130,7 @@ def office_installed(workbook=False):
 
 # Each reader's version: raised whenever what it sends the model changes without a setting or prompt changing (its
 # parsing, its tasks). A store re-reads content its reader has changed since; unchanged queries replay from cache.
-READERS = {".pdf": "pdf/16",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
+READERS = {".pdf": "pdf/17",  # pdf/2: tables asked how they're read; 3: two-line headers merged, stacked tables split;
            # 4: a part the model reads as no table read as a figure; 5: columns joined where words are cut; 6: a
            # structure answer's new tables tagged apart, a structure asked again recorded once (review A2, B7); 7: rows
            # read by themselves as the grid holds them, notes confirmed and read, the structure rules' union said (B2);
@@ -147,18 +147,19 @@ READERS = {".pdf": "pdf/16",  # pdf/2: tables asked how they're read; 3: two-lin
            # (quotes.excerpted; read again from the answers cache, with no requests; every other reader's next
            # version the same); 16: a claim too long kept cut at a word, and a table row too long read in parts
            # (requirements and textual claims, milestone 1; read again from the answers cache, the long rows asked;
-           # every other reader's next version the same)
-           ".txt": "text/6", ".md": "text/5",  # text/2: "A pump ..." isn't a heading (review B4)
-           ".docx": "docx/13",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
+           # every other reader's next version the same); 17: a table rule's claim too long kept shortened at a word,
+           # not cut (read again from the answers cache, with no requests; every other reader's next version the same)
+           ".txt": "text/7", ".md": "text/6",  # text/2: "A pump ..." isn't a heading (review B4)
+           ".docx": "docx/14",  # docx/2: equations, comments; docx/3: tables asked how they're read; 4-5: headers;
            # 6: late table answers on their own page, pictures sharing a line tagged apart (review B1, A1); 7: a
            # table's notes confirmed and read, its rows without rules read from its grid (review B2); 8: as pdf/8; 9: a
            # picture's partial tiles refined as pdf/9
-           ".pptx": "pptx/12",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
+           ".pptx": "pptx/13",  # pptx/2: tables asked how they're read; 3-4: a header's name and group; 5: as docx/6;
            # 6: as docx/7; 7: as docx/9; 8: as docx/8 (a table of two columns asked whether it's a key-value list)
-           ".xlsx": "xlsx/16", ".xlsm": "xlsx/16",  # xlsx/7: vague conditions guarded against; 8-9: header name,
+           ".xlsx": "xlsx/17", ".xlsm": "xlsx/17",  # xlsx/7: vague conditions guarded against; 8-9: header name,
            # group; 10: late table answers on their own sheet (review B1); 11: as docx/7; 12: as docx/8
-           ".csv": "csv/12", ".tsv": "csv/12",  # csv/6: as xlsx/10; csv/7: as xlsx/11; csv/8: as xlsx/12
-           **{extension: "image/6" for extension in IMAGE_EXTENSIONS}}  # image/2: as pdf/11; image/3: as pdf/12
+           ".csv": "csv/13", ".tsv": "csv/13",  # csv/6: as xlsx/10; csv/7: as xlsx/11; csv/8: as xlsx/12
+           **{extension: "image/7" for extension in IMAGE_EXTENSIONS}}  # image/2: as pdf/11; image/3: as pdf/12
 
 def reader_version(extension):
     """The version of what reads content of this extension ("docx/1"); "unsupported" where nothing reads it yet."""
