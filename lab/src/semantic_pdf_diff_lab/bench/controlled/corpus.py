@@ -1539,7 +1539,7 @@ def key(project, log):
     """The answer key: facts with their forms, and the printed numbers with their roles."""
     from .contexts import contexts
     optional = ("tolerance", "relation", "object_aliases", "accepts", "context", "holder", "attitude",
-                "strength")  # when used
+                "strength", "printed_as")  # when used
     found = contexts(project)
     for f in project.facts:
         f.context = found.get(f.id, {})

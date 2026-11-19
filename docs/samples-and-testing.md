@@ -144,6 +144,7 @@ A knob draws a document under one difficulty, with the same facts as its clean d
 | Schematics (`ahu-schematic`, `uv-layout`) | `prose`, `prose-hard` (no figure; plain, or inverse, passive and narrated), `figure-only` (the text cites the figure), `leaders` (names on leader lines), `folded` (the path snaking back), `legend` (link kinds told only by line style) |
 | A floor plan sheet (`lcc-plan`) | `small` (4.5 pt dimension text), `vertical` (depths written sideways), `rotated` (stored turned 90°) |
 | A procedure diagram (`attach`): a message sequence chart | `raster` |
+| A buoy's requirements (`hmb`): statements as sentences, scored by their words (`score.classify_statement`) | `cells` (a statement in one cell beside an ID, a name, a rationale, a verification method), `split` (condition, subject, verb and content cells, and a note), `prose` (numbered paragraphs); none canonical |
 | Word only (`word.py`) | tracked changes, footnotes, numbered lists, merged cells, nested tables, a layout table, text boxes, comments, Word charts |
 | Slide decks (`slides.py`) | speaker notes |
 

@@ -1,25 +1,25 @@
 {
  "totals": {
   "inventory": {
-   "claims": 24563,
-   "evidence": 14017,
+   "claims": 24760,
+   "evidence": 14161,
    "frame in conditions": 36,
-   "grounded": 6570,
+   "grounded": 6674,
    "list records": 36,
    "no content words": 4,
    "note records": 11,
    "numbered in attribute": 164,
    "numbered in conditions": 2,
    "numbered in entity": 408,
-   "partly": 64,
+   "partly": 72,
    "partly (image)": 38,
    "positioned": 124,
-   "printed": 9163,
+   "printed": 9281,
    "sheet records": 11,
    "table records": 399,
    "unsupported": 39,
    "unsupported (image)": 820,
-   "with conditions": 7535,
+   "with conditions": 7647,
    "with records": 6999
   },
   "placed": {
@@ -115,9 +115,9 @@
      "share": 0.988
     },
     "<=1.0": {
-     "readings": 34108,
-     "right": 31242,
-     "share": 0.916
+     "readings": 34358,
+     "right": 31430,
+     "share": 0.915
     }
    },
    "image": {
@@ -132,8 +132,8 @@
      "share": 0.788
     },
     "<=1.0": {
-     "readings": 22964,
-     "right": 20952,
+     "readings": 23032,
+     "right": 21000,
      "share": 0.912
     }
    },
@@ -161,9 +161,9 @@
      "share": 0.158
     },
     "<=1.0": {
-     "readings": 11144,
-     "right": 10290,
-     "share": 0.923
+     "readings": 11326,
+     "right": 10430,
+     "share": 0.921
     }
    }
   }
@@ -2256,6 +2256,310 @@
     "hedges": {
      "uncertainty": 5
     },
+    "examples": {}
+   }
+  },
+  "hmb-s1-cells": {
+   "inventory": {
+    "claims": 39,
+    "grounded": 21,
+    "partly": 1,
+    "with conditions": 22,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 14,
+    "evidence": 18,
+    "context_bytes_per_request": 173,
+    "data_bytes_per_request": 558,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-cells.docx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 6,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 362,
+    "data_bytes_per_request": 287,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-cells.md": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 478,
+    "data_bytes_per_request": 289,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-cells.pptx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "partly": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 254,
+    "data_bytes_per_request": 235,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-cells.xlsx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "partly": 1,
+    "with conditions": 6,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 248,
+    "data_bytes_per_request": 235,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-prose": {
+   "inventory": {
+    "claims": 15,
+    "grounded": 9,
+    "with conditions": 9,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 8,
+    "evidence": 11,
+    "context_bytes_per_request": 279,
+    "data_bytes_per_request": 1148,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-prose.docx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 398,
+    "data_bytes_per_request": 906,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-prose.md": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 542,
+    "data_bytes_per_request": 910,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-prose.pptx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 370,
+    "data_bytes_per_request": 603,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-prose.xlsx": {
+   "inventory": {
+    "claims": 8,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 8,
+    "context_bytes_per_request": 348,
+    "data_bytes_per_request": 606,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-split": {
+   "inventory": {
+    "claims": 43,
+    "grounded": 15,
+    "partly": 5,
+    "with conditions": 20,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 12,
+    "evidence": 15,
+    "context_bytes_per_request": 208,
+    "data_bytes_per_request": 600,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-split.docx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 9,
+    "context_bytes_per_request": 362,
+    "data_bytes_per_request": 275,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-split.md": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 5,
+    "with conditions": 5,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 9,
+    "context_bytes_per_request": 478,
+    "data_bytes_per_request": 277,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-split.pptx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 9,
+    "context_bytes_per_request": 254,
+    "data_bytes_per_request": 225,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
+    "examples": {}
+   }
+  },
+  "hmb-s1-split.xlsx": {
+   "inventory": {
+    "claims": 9,
+    "grounded": 4,
+    "with conditions": 4,
+    "positioned": 0,
+    "misplaced": {},
+    "printed": 7,
+    "evidence": 9,
+    "context_bytes_per_request": 248,
+    "data_bytes_per_request": 226,
+    "examples": {}
+   },
+   "keyed": {
+    "placed": {},
+    "audit": {},
+    "named": {},
     "examples": {}
    }
   },

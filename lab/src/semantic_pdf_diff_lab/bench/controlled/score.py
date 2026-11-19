@@ -208,6 +208,38 @@ def classify(claim, facts, printed):
         return "misread", None
     return "hallucinated", None
 
+STATEMENT_WHOLE = 0.8  # a statement's words a claim must hold to state it
+STATEMENT_PART = 3     # its words a claim's value must hold, at least, to state part of it (a fragment)
+
+def classify_statement(claim, statements):
+    """(outcome, fact id or None) for a claim whose value is text, against the key's statements (statements.py:
+    requirements and textual claims, milestone 0). Right: its value holds the statement's words (STATEMENT_WHOLE of
+    them, any order), its value's words mostly the statement's, and its names name the statement (its entity or
+    attribute among the fact's names: a requirement's name, identifiers, subject; "statement", "requirement"...).
+    Loose: the same, its names naming no statement, or another's. Fragment: its value is part of one statement's words
+    (STATEMENT_PART of them or more, and mostly its): a statement read in pieces. Text: none of them (words the key
+    doesn't state: not scored)."""
+    from .model import said
+    value = set(said(claim.get("value", "")).split())
+    if not value:
+        return "text", None
+    names = tokens(" ".join(str(claim.get(k, "")) for k in ("entity", "attribute")))
+    best = None
+    for f in statements:
+        words = set(said(f.value).split())
+        held, within = len(words & value) / len(words), len(words & value) / len(value)
+        if within < STATEMENT_WHOLE or len(words & value) < min(STATEMENT_PART, len(words)):
+            continue
+        if best is None or held > best[0]:
+            best = (held, f)
+    if best is None:
+        return "text", None
+    held, f = best
+    if held < STATEMENT_WHOLE:
+        return "fragment", f.id
+    named = names & set().union(*(tokens(n) for n in (f.entity, f.attribute) + tuple(f.aliases) + tuple(f.synonyms)))
+    return ("right" if named else "loose"), f.id
+
 def named_within(claim, holder, tied):
     """Whether the claim's entity names the holder by a longer name holding every tied fact's name it says: the
     rivals named only as part of the holder's name ("Packet Number" within "Packet Number Length")."""
@@ -286,7 +318,8 @@ def _scored(key_data, claims):
     """(score's result, how each fact was found)."""
     facts = key_facts(key_data)
     by_id = {f.id: f for f in facts}
-    numeric = [f for f in facts if not f.relation]
+    numeric = [f for f in facts if not f.relation and f.drawn != "statement"]
+    statements = [f for f in facts if f.drawn == "statement"]  # text facts (statements.py), scored by their words
     related = [f for f in key_data["facts"] if f.get("relation")]
     outcomes, found, conditions, relation_outcomes = {}, {}, {}, {}
     if related:  # relations are scored by names (relations.py)
@@ -316,6 +349,10 @@ def _scored(key_data, claims):
         # the same reading twice (overlapping tiles, other readers) counts once, but either may keep its conditions;
         # a value that repeats ("25 MWh" in June and in July) is two readings, told apart by the fact each names
         outcome, fid = classify(c, numeric, key_data["printed"])
+        if statements:  # a statement whole, else a number read right or loose, else a statement's fragment
+            stated = classify_statement(c, statements)
+            if stated[0] in ("right", "loose") or (stated[0] == "fragment" and outcome not in ("right", "loose")):
+                outcome, fid = stated
         reading = (ident, fid or outcome, outcome == "wrong unit", outcome)  # "63.3 mph" and "63.3 m/s": two readings
         if reading not in seen:
             seen.add(reading)

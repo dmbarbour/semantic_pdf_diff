@@ -37,6 +37,7 @@ class Fact:
     holder: str = ""                  # whose view it is, where the document reports one (a company's proposal)
     attitude: str = ""                # the holder's attitude to it: proposes, supports, opposes
     strength: str = ""                # a hedge the document states it with: expected, tentative, working assumption
+    printed_as: tuple = ()            # a text fact's (drawn "statement"): the parts it's printed in, each contiguous
 
     @property
     def number(self):
@@ -107,16 +108,31 @@ class Project:
     def fact(self, fact_id):
         return next(f for f in self.facts if f.id == fact_id)
 
+def said(text):
+    """A text's words, folded, as one string: what a statement's parts are found in (statements.py)."""
+    import unicodedata
+    return " ".join(re.findall(r"\w+", unicodedata.normalize("NFKC", str(text)).casefold()))
+
+def printed_in(fact, text):
+    """Whether a text fact's parts are all printed in a text (a line, a page)."""
+    shown = f" {said(text)} "
+    return all(f" {said(part)} " in shown for part in fact.printed_as if said(part))
+
 def locate(project, doc, placed=None, drawn=None):
     """Find each fact's printed value on its pages (setting fact.forms), and log every number on the pages with
     its role: fact or distractor (by id), or structure (section, table and page numbers, anything else)."""
     by_value = {}
     for f in project.facts:
-        if not f.relation:  # relations are placed by their drawer and their sentences, not found by number
-            by_value.setdefault(printed_value(f.value), []).append(f)
+        if not f.relation and f.drawn != "statement":  # relations are placed by their drawer and their sentences,
+            by_value.setdefault(printed_value(f.value), []).append(f)  # statements by their words, not by number
         f.forms = []
     log = []
     for n, page in enumerate(doc, 1):
+        for f in project.facts:  # a statement: on the page that prints its parts
+            if f.drawn == "statement" and not f.forms and printed_in(f, page.get_text()):
+                hits = page.search_for(" ".join(str(f.printed_as[-1]).split()[:4]))
+                f.forms.append({"form": "statement", "page": n,
+                                **({"box": [round(v, 1) for v in hits[0]]} if hits else {})})
         table_boxes = [t.bbox for t in page.find_tables().tables] + list((placed or {}).get(n, []))
         chart_boxes = []
         for box, bars, numbers, form in (drawn or {}).get(n, []):  # figures: placed and logged as drawn

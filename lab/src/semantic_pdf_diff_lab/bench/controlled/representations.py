@@ -21,6 +21,7 @@ import re
 from semantic_pdf_diff.values import printed_value
 
 from .corpus import key as pdf_key
+from .model import printed_in
 
 def _row(cells):
     return "| " + " | ".join(str(c).replace("|", "\\|") for c in cells) + " |"
@@ -86,6 +87,9 @@ def key(project, lines, tables=None, representation="markdown", pictures=None, c
     prefix = representation if representation in ("docx", "pptx", "xlsx") else "md"
     by_value = {}
     for f in project.facts:
+        if f.drawn == "statement":  # placed by its words below
+            f.forms = []
+            continue
         if not f.relation and (f.drawn not in ("chart", "figure") or (chart_rows and f.drawn == "chart")):
             # a chart's or diagram's facts: absent (though a total may print the same number), unless its data is
             by_value.setdefault(printed_value(f.value), []).append(f)
@@ -98,6 +102,9 @@ def key(project, lines, tables=None, representation="markdown", pictures=None, c
     for n, line in enumerate(lines, 1):
         table = n in tables if tables is not None else line.startswith("|")
         form = f"{prefix}-chart" if n in chart_rows else f"{prefix}-table" if table else f"{prefix}-prose"
+        for f in project.facts:  # a statement: on the line that prints its parts (statements.py)
+            if f.drawn == "statement" and not f.forms and printed_in(f, line):
+                f.forms.append({"form": form, "page": 1, "line": n})
         for text in _numbers(line):
             facts = by_value.get(printed_value(text), []) if re.match(r"[-+±$]?\d", text) else []
             for f in facts:
@@ -120,7 +127,7 @@ def corpus(seeds=(1,)):
     from .catalog import corpus as projects
     out = []
     for project in projects(seeds, knobs=True, revisions=True):
-        lines = markdown(project) if project.knob in MARKDOWN_KNOBS else None
+        lines = markdown(project) if project.knob in MARKDOWN_KNOBS or getattr(project, "statements", None) else None
         if lines is not None:
             out.append((project, lines))
     return out
