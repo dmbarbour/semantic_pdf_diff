@@ -100,6 +100,7 @@ What happens today to a table of statements (read in the code, 2026-11-18):
     | Markdown (every shape), prose (every format) | unchanged |
 
     Numbers found as before in every document; the equipment schedules' 39 documents (tables of values) unchanged. Missed: a split row whose condition the model named a qualifier (kept as its own claim; the statement without it); a cells table continued over two PDF pages, its second part reading one row of two (the lever index's row on tables continued over pages).
+  - **Held out, 2026-11-20** (the lever index's *Tables of statements*): a fresh template, two shapes of its own, 98% and 91% of its statements found with the lever on (5 of 96 off), numbers alike; the real tables weren't reached (LUVOIR's read as values, HabEx's interim matrix stopped by the PDF image check), so the rule's real half is unmet; the owner's own tables the likeliest real test.
   - **Not reached:** Markdown's pipe tables are read without a grid, so they're never asked the rules request (`textjob`: rows read by themselves), whatever this lever; and statements in prose are the reader's.
 
 ### 3. Modality and references
