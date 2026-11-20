@@ -139,6 +139,11 @@ def main(argv=None):
     held.add_argument("--sealed", action="store_true",
                       help="the sealed templates too (proposals.HELDOUT_PAIRS): spent once, on a candidate that beats "
                            "today's default on validation")
+    stated = sub.add_parser("statements-heldout", help="statement_tables' held-out template (statements.py): "
+                                                       "generated, read with a variant's settings, scored by its keys")
+    stated.add_argument("--variant", type=Path, required=True, metavar="FILE", help="as `run --variant` takes")
+    stated.add_argument("--max-cost", type=float, default=0.5)
+    stated.add_argument("--jobs", type=int, default=1)
     sub.add_parser("score", help="score each run against its key, and each pair's comparison (offline)")
     sub.add_parser("context", help="measure the standard runs' claims' context against the keys (offline)")
     args = parser.parse_args(argv)
@@ -163,6 +168,8 @@ def main(argv=None):
         for project in consistency.corpus():  # planted inconsistencies and gaps, and their clean twins
             print(f"{consistency.write(project, DOCS_ANALYSIS)}: {len(project.planted)} planted")
         return 0
+    if args.command == "statements-heldout":
+        return statements_heldout(args.variant, args.max_cost, args.jobs)
     if args.command == "heldout":
         if 1 in args.seed:
             parser.error("seed 1 is development's: held-out seeds are others")
@@ -493,6 +500,68 @@ def heldout(seeds, variant_path, max_cost, jobs=1, sealed=False):
     for arm, levels in scored["totals"].items():
         print(f"{arm:12s} " + "; ".join(f"{level} {c.get('right', 0)} right of {c.get('links', 0)}"
                                          for level, c in sorted(levels.items())))
+    return worst
+
+def statements_heldout(variant_path, max_cost, jobs=1):
+    """The statement_tables lever's held-out template (statements.HELDOUT_STATEMENTS, in each of HELDOUT_KNOBS'
+    shapes, as PDF, Word, slides and a workbook: Markdown's tables aren't asked their reading): generated, each read
+    alone with a variant's settings into its archive, scored by its keys (statements found, numbers found); exit
+    status as run's."""
+    from semantic_pdf_diff import ledger
+    from semantic_pdf_diff.progress import setup_logging
+    from semantic_pdf_diff_lab.bench import controlled
+    from semantic_pdf_diff_lab.bench.controlled import representations, slides, workbooks
+    from semantic_pdf_diff_lab.bench.controlled.statements import HELDOUT_KNOBS, HELDOUT_STATEMENTS, shaped_heldout
+    base = HELDOUT / "statements"
+    folders = {".pdf": base / "docs", ".docx": base / "docs-docx", ".pptx": base / "docs-pptx",
+               ".xlsx": base / "docs-xlsx"}
+    for make in HELDOUT_STATEMENTS.values():
+        for knob in HELDOUT_KNOBS:
+            project = make(1)
+            project.id, project.knob = f"{project.id}-{knob}", knob
+            shaped_heldout(project)
+            controlled.write(project, folders[".pdf"])
+            lines = representations.markdown(project)
+            representations.write_docx(project, lines, folders[".docx"])
+            slides.write(folders[".pptx"], project, slides.deck(project))
+            workbooks.write(folders[".xlsx"], project, workbooks.workbook(project))
+    name, config, _ = variant(variant_path, folder=HELDOUT_RUNS / "statements")
+    runs = HELDOUT_RUNS / "statements" / name
+    alone = [(f, f, runs / f.name, f.name, "proposals") for suffix, folder in folders.items()
+             for f in sorted(folder.glob(f"*{suffix}"))]
+    setup_logging(quiet=True)
+    before = ledger.spent(LEDGER, round="controlled")
+    _BATCH.update(replay=False, responder=None, fixture=base / "fixture.sqlite", export=None, config=config,
+                  overrides={}, max_cost=max_cost, before=before)
+    worst, capped = 0, 0
+    for run_name, code in _each(alone, jobs):
+        if code == CAPPED:
+            capped += 1
+            continue
+        worst = max(worst, code)
+        if code not in (0, 2):
+            print(f"{run_name}: exit {code}", flush=True)
+    print(f"spent ${ledger.spent(LEDGER, round='controlled') - before:.3f}")
+    if capped:
+        print(f"cap of ${max_cost} reached: {capped} runs not started (run again to resume)")
+        return 3
+    from semantic_pdf_diff_lab.bench.controlled.score import score
+    scored = {}
+    for suffix, folder in folders.items():
+        for f in sorted(folder.glob(f"*{suffix}")):
+            key = json.loads((folder / f"{f.stem}.key.json").read_text(encoding="utf-8"))
+            report = runs / f.name / "report.json"
+            if not report.exists():
+                continue
+            result = score(key, json.loads(report.read_text(encoding="utf-8"))["evidence"])
+            text = {x["id"] for x in key["facts"] if x.get("drawn") == "statement"}
+            facts = {x["id"] for x in key["facts"]}
+            found = facts - set(result["missed"])
+            scored[f.name] = {"statements": [len(found & text), len(text)],
+                              "numbers": [len(found - text), len(facts - text)], "outcomes": result["outcomes"]}
+            print(f"{f.name:28s} statements {len(found & text)}/{len(text)}  numbers {len(found - text)}/"
+                  f"{len(facts - text)}", flush=True)
+    (base / f"{name}.json").write_text(json.dumps(scored, indent=1) + "\n", encoding="utf-8")
     return worst
 
 def heldout_scores(pairs, folders, runs):

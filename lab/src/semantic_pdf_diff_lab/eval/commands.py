@@ -78,6 +78,9 @@ def review_command(argv):
     sample.add_argument('--tensions', type=int, default=0,
                         help="Tensions per store, each with a control: as many claims of a subject that raised none "
                              "(its analysis's report.json)")
+    sample.add_argument('--derived', metavar='STEP',
+                        help="claims only those a derivation step of this name made (table-statements: the "
+                             "statement_tables lever's)")
     sample.add_argument('--exclude', type=Path, action='append', default=[], metavar='BATCH',
                         help="Leave out another batch's items (a held-out sample); repeatable")
     sample.add_argument('--seed', type=int, default=1)
@@ -117,7 +120,7 @@ def review_command(argv):
         exclude = {i['id'] for b in args.exclude
                    for i in json.loads((b / 'batch.json').read_text(encoding='utf-8'))['items']}
         batch = review.sample(stores, args.batch, args.claims, args.abouts, args.pairs, args.seed, args.links,
-                              exclude, args.tensions)
+                              exclude, args.tensions, args.derived)
         asked = sum(1 for i in batch['items'] if i.get('request'))
         print(f"{len(batch['items'])} items: first judge the questions blind ({asked} recorded) in "
               f"{args.batch / 'questions.html'}, then the answers in {args.batch / 'review.html'}")

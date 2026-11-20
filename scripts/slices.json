@@ -422,6 +422,34 @@
       "public": true,
       "family": "reports",
       "sha256": "42fcfa8eadbee097be46d7c644d12d96f51322b2070ce0a9f77527472f33c595"
+    },
+    {
+      "name": "habex-interim-p66-68",
+      "source": "nasa-flagship-concepts/habex/HabEx-interim-report.pdf",
+      "source_sha256": "1cb9783c9ad2195b422a2974ad490677108a57d459e2adbe75d2705b81e5a9c7",
+      "pages": [
+        66,
+        68
+      ],
+      "use": "Science traceability matrix, interim layout (statement_tables' held-out rule)",
+      "set": "heldout",
+      "public": true,
+      "family": "reports",
+      "sha256": "b02b20f580c31fc4957b79524afe4d41f667626f1fe828c0ad2fbfc21810776b"
+    },
+    {
+      "name": "luvoir-final-p386",
+      "source": "nasa-flagship-concepts/luvoir/LUVOIR-final-report.pdf",
+      "source_sha256": "c7e072c4a2b896ddaa4ddea2453e7cc3db5f97b3d98478fc88cb1a2c377e0ff6",
+      "pages": [
+        386,
+        386
+      ],
+      "use": "A requirements table: parameter, requirement, goal, reasons (statement_tables' held-out rule)",
+      "set": "heldout",
+      "public": true,
+      "family": "reports",
+      "sha256": "7760d9c22843e2f4c242af6010d5e1387488801a18aee3fd83fd0fc7ed471623"
     }
   ],
   "runs": [

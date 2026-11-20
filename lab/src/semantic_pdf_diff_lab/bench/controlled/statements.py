@@ -202,3 +202,97 @@ RISK_KNOBS = ("register",)
 
 STATEMENT_PROJECTS = {"hmb": buoy_requirements}
 RISK_PROJECTS = {"hmbr": buoy_risks}
+
+# --- held out (statement_tables' held-out rule, docs/reviews/levers.md): never in the development corpus ------------
+# An irrigation controller's requirements, in two shapes of their own, other columns named and ordered otherwise; and a
+# table of values beside them (zone valves), which must read as before. Generated only by `controlled.py
+# statements-heldout`, into benchmarks/controlled/heldout/statements (git-ignored).
+HELDOUT_KNOBS = ("listed", "clauses")
+
+CONTROLLER = [  # (title, trigger, actor, modal, action with {lo}, [its numbers], justification, verification, priority)
+    ("Frost Shutdown", "When the air temperature falls below {lo} °C", "the controller", "shall",
+     "close every zone valve and hold them closed until it rises again",
+     [("lo", "frost shutdown temperature", ("shutdown temperature", "frost threshold"), "°C", 1, 4, 1)],
+     "Water left in the laterals freezes and splits them.", "Test", "Essential"),
+    ("Manual Override", "", "An operator", "shall",
+     "be able to open or close any zone from the cabinet keypad", [],
+     "Crews must water by hand when the schedule is wrong.", "Demonstration", "Essential"),
+    ("Schedule Storage", "", "The controller", "shall",
+     "keep at least {lo} watering programs in non-volatile memory",
+     [("lo", "stored programs", ("program capacity", "number of programs"), "", 12, 24, 0)],
+     "Each season needs its own programs.", "Inspection", "High"),
+    ("Rain Delay", "After rainfall of more than {lo} mm in a day", "the controller", "should",
+     "postpone the next watering by one day",
+     [("lo", "rain delay threshold", ("rainfall threshold", "rain delay rainfall"), "mm", 5, 12, 0)],
+     "Watering after heavy rain wastes water and leaches fertilizer.", "Analysis", "Medium"),
+    ("Remote Reporting", "", "The controller", "may",
+     "send a daily water use summary to the parks office", [],
+     "The office budgets water by park.", "Demonstration", "Low"),
+    ("Cabinet Enclosure", "", "The cabinet", "shall",
+     "be lockable and rated for outdoor installation", [],
+     "Cabinets stand in public parks.", "Inspection", "Essential"),
+    ("Flow Alarm", "If a zone draws more than {lo} percent above its learned flow", "the controller", "shall",
+     "close that zone and raise an alarm",
+     [("lo", "flow alarm margin", ("excess flow alarm", "high flow threshold"), "%", 20, 45, 0)],
+     "A broken head floods the turf and wastes water.", "Test", "High"),
+    ("Valve Replacement", "", "The parks crew", "will",
+     "replace zone valves on failure, keeping two spares per park", [],
+     "Spares avoid a week without water.", "Inspection", "Medium"),
+]
+
+def controller_requirements(seed=1):
+    """The held-out template's requirements and a zone valve schedule; shaped by its knob (HELDOUT_KNOBS)."""
+    d = Draw(seed + 200)
+    count = len(CONTROLLER)
+    d.used.update({"1", "2", *(f"IRC-{n:04d}" for n in range(1, count + 1)), *(f"{n:04d}" for n in range(1, count + 1)),
+                   *(str(n) for n in range(1, count + 1))})
+    facts, rows = [], []
+    for n, (title, trigger, actor, modal, action, numbers, why, method, priority) in enumerate(CONTROLLER, 1):
+        values = {}
+        ident = (f"IRC-{n:04d}", f"REQ {n}")
+        aliases = (*ident, title.lower(), actor.removeprefix("The ").removeprefix("An ").removeprefix("the "))
+        for key, attribute, synonyms, unit, lo, hi, decimals in numbers:
+            values[key] = d.number(lo, hi, decimals)
+            facts.append(Fact(f"irc{n}.{key}", title, aliases, attribute, synonyms, values[key], unit,
+                              basis=BASIS[modal]))
+        when, said = trigger.format(**values), action.format(**values)
+        facts.append(Fact(f"irc{n}.statement", title, aliases, "statement",
+                          ("requirement", "requirement text", "text", "content", "shall statement"),
+                          statement(when, actor, modal, said), basis=BASIS[modal], drawn="statement",
+                          printed_as=tuple(p for p in (when, actor, modal, said) if p)))
+        facts.append(Fact(f"irc{n}.justification", title, aliases, "justification", ("rationale", "reason"), why,
+                          drawn="statement", printed_as=(why,)))
+        rows.append({"ids": ident, "title": title, "when": when, "actor": actor, "modal": modal, "said": said,
+                     "why": why, "method": method, "priority": priority})
+    zones = []
+    for z in range(1, 5):  # a table of values beside the statements: its numbers must read as before
+        flow, pressure = d.number(30, 90), d.number(250, 450)
+        facts.append(Fact(f"zone{z}.flow", f"Zone {z}", (f"zone {z} valve",), "design flow", ("flow",), flow, "L/min"))
+        facts.append(Fact(f"zone{z}.pressure", f"Zone {z}", (f"zone {z} valve",), "operating pressure",
+                          ("pressure",), pressure, "kPa"))
+        zones.append([f"Zone {z}", flow, pressure])
+    project = Project(f"irc-s{seed}", "Park Irrigation Controller: Requirements", facts, [], knob="listed",
+                      kinds=HELDOUT_KNOBS)
+    project.statements, project.all_facts, project.zones = rows, facts, zones
+    return shaped_heldout(project)
+
+def shaped_heldout(project):
+    """The held-out template in its knob's shape (the clauses shape prints no justification)."""
+    rows, zones = project.statements, project.zones
+    valves = ("table", "Table 2. Zone valves", ["Zone", "Design flow (L/min)", "Operating pressure (kPa)"], zones)
+    if project.knob == "clauses":
+        header = ["UID", "Trigger", "Actor", "Modal", "Action", "Phase"]
+        body = [[r["ids"][1], r["when"], r["actor"], r["modal"].upper(), r["said"] + ".", "Construction"] for r in rows]
+        project.facts = [f for f in project.all_facts if f.attribute != "justification"]
+    else:
+        header = ["Req No.", "Priority", "Title", "Requirement", "Verification", "Justification"]
+        body = [[r["ids"][0], r["priority"], r["title"], statement(r["when"], r["actor"], r["modal"], r["said"]),
+                 r["method"], r["why"]] for r in rows]
+        project.facts = list(project.all_facts)
+    project.sections = [("1 Introduction", [("p", "These are the requirements for the park irrigation controller and "
+                                                  "the valves it drives.")]),
+                        ("2 Requirements", [("table", "Table 1. Controller requirements", header, body)]),
+                        ("3 Valves", [valves])]
+    return project
+
+HELDOUT_STATEMENTS = {"irc": controller_requirements}

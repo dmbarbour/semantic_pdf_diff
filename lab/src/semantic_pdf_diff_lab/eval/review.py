@@ -121,12 +121,13 @@ class Source:
 def _headings(source, content):
     return {s.id: " > ".join(s.heading_path) for s in source.store.sections(content)}
 
-def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclude=(), tensions=0):
+def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclude=(), tensions=0, derived=None):
     """Write a batch: a stratified random sample of claims (round-robin over claim kinds),
     about statements, claim pairs, links (two subjects of two sources, round-robin over
     the combiner's probability bands) and tensions (each with a control) from each store.
     Each item shows the exact request (instructions and input) that produced it, from the
-    store's query log. exclude: item ids left out (another batch's: a held-out sample)."""
+    store's query log. exclude: item ids left out (another batch's: a held-out sample). derived: claims only
+    those a derivation step of this name made ("table-statements": the statement_tables lever's)."""
     folder = Path(folder)
     (folder / "images").mkdir(parents=True, exist_ok=True)
     rng = random.Random(seed)
@@ -134,7 +135,7 @@ def sample(stores, folder, claims=12, abouts=4, pairs=4, seed=1, links=0, exclud
     for label, path in stores:
         source = Source(label, path)
         try:
-            found = _sample_claims(source, folder, rng, claims)
+            found = _sample_claims(source, folder, rng, claims, derived)
             found += _sample_abouts(source, folder, rng, abouts)
             found += _sample_pairs(source, folder, rng, pairs)
             found += _sample_links(source, folder, rng, links, set(exclude))
@@ -280,9 +281,11 @@ def _stratified(rng, groups, n):
                 picked.append(pools[key].pop())
     return picked
 
-def _sample_claims(source, folder, rng, n):
+def _sample_claims(source, folder, rng, n, derived=None):
     groups = {}
     for e in source.claims():
+        if derived and not any(step.get("step") == derived for step in e.get("derivation") or []):
+            continue
         groups.setdefault(e["kind"], []).append(e)
     items = []
     for e in _stratified(rng, groups, n):

@@ -55,6 +55,19 @@ class Shapes(unittest.TestCase):
         self.assertEqual(kinds, {"risk", "mitigation"})
         self.assertEqual(k["absent"], [])
 
+    def test_the_held_out_template_places_every_fact_in_both_its_shapes(self):
+        from semantic_pdf_diff_lab.bench.controlled.statements import (HELDOUT_KNOBS, controller_requirements,
+                                                                        shaped_heldout)
+        for knob in HELDOUT_KNOBS:
+            with self.subTest(knob=knob):
+                p = controller_requirements(1)
+                p.knob = knob
+                shaped_heldout(p)
+                k = key(p, markdown(p))
+                self.assertEqual(k["absent"], [])
+                self.assertTrue(any(f.get("drawn") == "statement" for f in k["facts"]))
+                self.assertTrue(any(f["id"].startswith("zone") for f in k["facts"]))  # the table of values
+
 class Scored(unittest.TestCase):
     def setUp(self):
         p = project("cells")

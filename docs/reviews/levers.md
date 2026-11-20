@@ -439,6 +439,17 @@ Built 2026-11-06, both off ([text cut by tiles](../plans/text-cut-by-tiles-2026-
 - **Why image tasks only:** continued, a page's text task read the tables on the page too, copying a header's condition ("rated point") onto every row; the other revision's reading lacked it, so alignment couldn't settle them. Listing the claims without conditions didn't stop it. Text and table tasks keep refinement by splitting their text.
 - **Since** (2026-10-12): a partial tile that was continued at the claim limit is halved, not retiled (*Refinement*, above; [decision 0029](../decisions/0029-tiles-chosen-by-measures.md)).
 
+### Tables of statements (`statement_tables`)
+
+- **Mechanism:** the rules request offers a fourth reading, "statements": the columns by letter as the table's headers say what they are (statement, identifier, name, qualifiers, notes, references), applied by code to every row word for word, each row still read by itself ([requirements and textual claims](../plans/requirements-and-textual-claims-2026-11-18.md), milestone 2). Off.
+- **Development:** the controlled tables of statements (the buoy's requirements in three shapes, its risk register): statements found from none to nearly all in PDF, Word, slides and workbooks; numbers and 39 schedule documents unchanged (the plan's milestone 2).
+- **Held-out rule** (written 2026-11-20, before the held-out template is generated or the held-out tables are read):
+  - **The controlled template** (`statements.HELDOUT_STATEMENTS`: a park irrigation controller's eight requirements, never in the development corpus; two shapes of their own, `listed` (Req No., Priority, Title, Requirement, Verification, Justification) and `clauses` (UID, Trigger, Actor, Modal, Action, Phase); a zone valve schedule beside them, a table of values; PDF, Word, slides and workbooks), read alone in two arms, `statement_tables` off and on, all else the corpus's (`controlled.py statements-heldout`).
+  - **Real tables** (held-out slices, read with the lever on, the second pass, tensions and summaries off): LUVOIR's final report, page 386 (Parameter, Requirement, Goal, Reasons for Requirement/Goal), and HabEx's interim report's science traceability matrix, pages 66 to 68 (a different document and layout from the development slice's matrix, though of the same project).
+  - **Passes** if, on the template, the lever on finds at least 80% of its statements and justifications in each shape (over its four formats), and finds no fewer numbers than off in any document (the valve schedule's among them); and, on the real tables, the model panel (gemini-3.1-pro, Qwen3.5-397B-A17B, MiMo-V2.6-Pro; Dawid-Skene) calls at least 75% of the statements reading's claims usable (correct or flawed), every one rated up to 40, sampled with `review sample --derived table-statements`.
+  - **Reported besides:** which tables the model read as statements, the rows its claims cover, cost.
+  - **Then the owner's call** on a default.
+
 ### Tensions (`tensions`)
 
 - **Mechanism:** a request a subject (with its parts) of two claims or more holding one that isn't a number alone: claims hard to hold together on engineering grounds, each with a level (can't both hold, needs a reason, worth a look), why, and what would reconcile it, looked for by code in the source's claims and records ([single-document analysis](../research/single-document-analysis-measured-2026-11-17.md), milestone 4; [decision 0047](../decisions/0047-commentary-logged-beside-claims-that-never-change.md)). Off; analyses only.
